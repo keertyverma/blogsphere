@@ -11,11 +11,13 @@
   "author": "Keerty Verma",
   "license": "ISC",
   "devDependencies": {
+    "@types/config": "^3.3.4",
     "@types/express": "^4.17.21",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "config": "^3.3.11",
     "dotenv": "^16.4.5",
     "express": "^4.19.2"
   }
