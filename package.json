@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "client": "cd client && npm run dev",
+    "server": "cd server && npm run dev",
+    "start": "concurrently -n 'server,client' -c \"yellow,blue\" \"npm run server\"   \"npm run client\" ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Keerty Verma",
