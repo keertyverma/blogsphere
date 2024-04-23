@@ -33,7 +33,7 @@ const NavBar = () => {
           placeholder="Search"
         />
       </div>
-      <div className="flex items-center gap-1 md:gap-6 ml-auto">
+      <div className="flex items-center gap-1 md:gap-4 ml-auto">
         <Button
           variant="ghost"
           size="sm"
@@ -61,8 +61,19 @@ const NavBar = () => {
           <BsPencilSquare className="text-xl" />
         </Button>
 
-        {/* Sign in button */}
-        {/* Sign  button */}
+        <Button
+          onClick={() => navigate("/login")}
+          variant="outline"
+          className="max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
+        >
+          Log in
+        </Button>
+        <Button
+          onClick={() => navigate("/signup")}
+          className="max-sm:hidden rounded-full"
+        >
+          Sign up
+        </Button>
       </div>
     </nav>
   );
