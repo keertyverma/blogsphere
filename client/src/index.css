@@ -53,9 +53,10 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply m-0 p-0 box-border border-border list-none scroll-smooth;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-screen font-inter;
   }
 }

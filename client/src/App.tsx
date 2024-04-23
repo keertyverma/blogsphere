@@ -1,3 +1,5 @@
+import { logo } from "./assets/images";
+
 const App = () => {
   return (
     <>
@@ -10,6 +12,7 @@ const App = () => {
           Exercitationem quo expedita nostrum doloribus? Doloribus, animi.
         </p>
       </div>
+      <img src={logo} width={100} height={100} alt="logo" />
     </>
   );
 };
