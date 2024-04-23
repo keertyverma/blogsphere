@@ -10,7 +10,7 @@ const NavBar = () => {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="flex items-center md:mr-3">
+      <Link to="/" className="flex items-center md:mr-12">
         <img
           src="assets/images/logo.png"
           alt="logo"
@@ -23,7 +23,7 @@ const NavBar = () => {
         </h1>
       </Link>
       <div
-        className={`absolute md:relative left-0 top-full md:inset-0 w-full md:w-auto mt-0.5 py-4 px-[7vw] md:block md:p-0 md:show ${
+        className={`absolute md:relative left-0 top-full md:inset-0 w-full md:w-auto mt-0.5  py-4 px-[7vw] md:block md:p-0 md:show ${
           toggleSearch ? "show" : "hide"
         }`}
       >
