@@ -29,7 +29,7 @@ const NavBar = () => {
       >
         <BsSearch className="absolute left-[10%] md:left-5 top-1/2 md:pointer-events-none -translate-y-1/2 text-l text-muted-foreground" />
         <Input
-          className="bg-accent pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full"
+          className="bg-accent pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
           placeholder="Search"
         />
       </div>

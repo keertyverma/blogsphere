@@ -70,9 +70,63 @@
   .navbar {
     @apply w-full h-[70px] sticky top-0 z-10 flex items-center px-[5vw] py-4 border-b border-border bg-background;
   }
+
+  /* SHADCN COMPONENTS */
+  .shad-input {
+    @apply h-12 bg-muted border-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
+  }
 }
 
 @layer utilities {
+  /* TYPOGRAPHY */
+  .h1-bold {
+    @apply text-[36px] font-bold leading-[140%] tracking-tighter;
+  }
+
+  .h1-semibold {
+    @apply text-[36px] font-semibold leading-[140%] tracking-tighter;
+  }
+
+  .h2-bold {
+    @apply text-[30px] font-bold leading-[140%] tracking-tighter;
+  }
+
+  .h3-bold {
+    @apply text-[24px] font-bold leading-[140%] tracking-tighter;
+  }
+
+  .base-semibold {
+    @apply text-[16px] font-semibold leading-[140%] tracking-tighter;
+  }
+
+  .base-medium {
+    @apply text-[16px] font-medium leading-[140%];
+  }
+
+  .base-regular {
+    @apply text-[16px] font-normal leading-[140%];
+  }
+
+  .body-bold {
+    @apply text-[18px] font-bold leading-[140%];
+  }
+
+  .body-medium {
+    @apply text-[18px] font-medium leading-[140%];
+  }
+
+  .small-semibold {
+    @apply text-[14px] font-semibold leading-[140%] tracking-tighter;
+  }
+
+  .small-medium {
+    @apply text-[14px] font-medium leading-[140%];
+  }
+
+  .small-regular {
+    @apply text-[14px] font-normal leading-[140%];
+  }
+
   .flex-center {
     @apply flex justify-center items-center;
   }
@@ -87,5 +141,13 @@
 
   .show {
     @apply opacity-100 pointer-events-auto;
+  }
+
+  .h-cover {
+    @apply min-h-[calc(100vh-70px)];
+  }
+
+  .input-icon {
+    @apply absolute top-1/2 -translate-y-1/2 text-muted-foreground;
   }
 }
