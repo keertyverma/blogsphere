@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Layout from "./pages/Layout";
 import SignupForm from "./components/auth/SignupForm";
+import LoginForm from "./components/auth/LoginForm";
 
 const App = () => {
   return (
@@ -9,7 +10,7 @@ const App = () => {
         {/* public routes */}
         <Route path="/" element={<Layout />}>
           <Route path="/signup" element={<SignupForm />} />
-          <Route path="/login" element={<h1>login</h1>} />
+          <Route path="/login" element={<LoginForm />} />
         </Route>
       </Routes>
     </main>
