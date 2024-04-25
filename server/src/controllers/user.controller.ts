@@ -5,6 +5,20 @@ import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import logger from "../utils/logger";
+import { nanoid } from "nanoid";
+
+const generateUsername = async (email: string) => {
+  let username = email.split("@")[0];
+
+  let existingUser = await User.findOne({ "personalInfo.username": username });
+  if (existingUser) {
+    username = username + nanoid().toString().substring(0, 5);
+  }
+
+  console.log("username = ", username);
+
+  return username;
+};
 
 export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);
@@ -28,12 +42,14 @@ export const createUser = async (req: Request, res: Response) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // create user
+  const username = await generateUsername(email);
+
   const user = new User({
     personalInfo: {
       fullname,
       email,
       password: hashedPassword,
-      username: email.split("@")[0],
+      username,
     },
   });
   await user.save();

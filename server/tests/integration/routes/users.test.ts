@@ -114,5 +114,35 @@ describe("/api/v1/users", () => {
       expect(responseData.username).toBe(userData.email.split("@")[0]);
       expect(responseData).not.toHaveProperty("password");
     });
+
+    it("should set dynamic username if username already exists", async () => {
+      // user with username = "test" already exists
+      await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+      });
+
+      const userData = {
+        fullname: "Pluto",
+        password: "Pluto123",
+        email: "test@test2.com",
+      };
+      const res = await request(server)
+        .post(`${endpoint}/register`)
+        .send(userData);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body.status).toBe("success");
+
+      const responseData = res.body.data;
+
+      expect(responseData._id).not.toBeNull;
+      expect(responseData.username).not.toBe(userData.email.split("@")[0]);
+      expect(responseData.username).toMatch(/test/);
+    });
   });
 });
