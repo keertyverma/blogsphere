@@ -19,7 +19,7 @@ export const createUser = async (req: Request, res: Response) => {
 
   const { fullName, email, password } = req.body;
   // check if user exists
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ "personalInfo.email": email });
   if (existingUser) {
     throw new BadRequestError(`User already registered.`);
   }
@@ -36,7 +36,6 @@ export const createUser = async (req: Request, res: Response) => {
       username: email.split("@")[0],
     },
   });
-
   await user.save();
 
   const result: APIResponse = {
@@ -49,6 +48,5 @@ export const createUser = async (req: Request, res: Response) => {
       username: user.personalInfo?.username,
     },
   };
-
   return res.status(result.statusCode).json(result);
 };

@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 
 import userRouter from "./routes/user.route";
 import errorHandler from "./middlewares/error.middleware";
+import routeNotFoundHandler from "./middlewares/route-not-found.middleware";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get(BASE_URL, (req: Request, res: Response) => {
 app.use(`${BASE_URL}/users`, userRouter);
 
 // error handler middleware
+app.use(routeNotFoundHandler);
 app.use(errorHandler);
 
 export default app;
