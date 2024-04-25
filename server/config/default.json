@@ -3,5 +3,6 @@
   "database": {
     "user": "",
     "password": ""
-  }
+  },
+  "secretAccessKey": ""
 }

@@ -8,6 +8,11 @@ import connectDB from "./db";
 
 const PORT = process.env.PORT || 3001;
 
+if (!config.get("secretAccessKey")) {
+  logger.error("FATAL ERROR! SECRET_ACCESS_KEY is not defined");
+  process.exit(1);
+}
+
 // connect to db
 connectDB();
 

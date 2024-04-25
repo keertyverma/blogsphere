@@ -1,5 +1,6 @@
 {
   "database": {
     "name": "blogsphere_test"
-  }
+  },
+  "secretAccessKey": "test-secret-access-key"
 }

@@ -1,5 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 import Joi from "joi";
+import jwt from "jsonwebtoken";
+import config from "config";
 
 interface IUser {
   personalInfo: {
@@ -10,6 +12,10 @@ interface IUser {
     bio?: string;
     profileImage?: string;
   };
+}
+
+interface IUserDocument extends IUser, Document {
+  generateAuthToken(): string;
 }
 
 const userSchema = new Schema(
@@ -58,7 +64,16 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-const User = model("User", userSchema);
+userSchema.methods.generateAuthToken = function (): string {
+  return jwt.sign(
+    {
+      id: this._id,
+    },
+    config.get("secretAccessKey")
+  );
+};
+
+const User = model<IUserDocument>("User", userSchema);
 
 const validateUser = (user: IUser) => {
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;

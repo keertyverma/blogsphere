@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "test": "jest --verbose --coverage",
-    "test:unit": "jest --testPathPattern=tests/unit --verbose",
+    "test:unit": "jest --testPathPattern=tests/unit --verbose --detectOpenHandles",
     "test:integration": "jest --testPathPattern=tests/integration --verbose --detectOpenHandles"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
     "@types/config": "^3.3.4",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/supertest": "^6.0.2",
     "jest-html-reporter": "^3.10.2",
     "supertest": "^7.0.0",
@@ -32,6 +33,7 @@
     "http-status-codes": "^2.3.0",
     "jest": "^29.7.0",
     "joi": "^17.13.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
     "nanoid": "^3.0.0",
     "ts-jest": "^29.1.2",

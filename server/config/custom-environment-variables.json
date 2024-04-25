@@ -2,5 +2,6 @@
   "database": {
     "user": "MONGODB_USER",
     "password": "MONGODB_PASSWORD"
-  }
+  },
+  "secretAccessKey": "SECRET_ACCESS_KEY"
 }

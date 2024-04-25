@@ -53,6 +53,7 @@ export const createUser = async (req: Request, res: Response) => {
     },
   });
   await user.save();
+  const accessToken = user.generateAuthToken();
 
   const result: APIResponse = {
     status: APIStatus.SUCCESS,
@@ -64,5 +65,8 @@ export const createUser = async (req: Request, res: Response) => {
       username: user.personalInfo?.username,
     },
   };
-  return res.status(result.statusCode).json(result);
+  return res
+    .header("x-auth-token", accessToken)
+    .status(result.statusCode)
+    .json(result);
 };
