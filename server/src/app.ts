@@ -2,6 +2,7 @@ import config from "config";
 import express, { Request, Response } from "express";
 
 import userRouter from "./routes/user.route";
+import errorHandler from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -14,5 +15,8 @@ app.get(BASE_URL, (req: Request, res: Response) => {
   res.send("Welcome to BlogSphere API");
 });
 app.use(`${BASE_URL}/users`, userRouter);
+
+// error handler middleware
+app.use(errorHandler);
 
 export default app;
