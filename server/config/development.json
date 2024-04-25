@@ -1,3 +1,6 @@
 {
-  "appName": "blogsphere-dev"
+  "appName": "blogsphere-dev",
+  "database": {
+    "name": "blogsphere_dev"
+  }
 }

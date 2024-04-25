@@ -1,3 +1,7 @@
 {
-  "appName": "blogsphere"
+  "appName": "blogsphere",
+  "database": {
+    "user": "",
+    "password": ""
+  }
 }
