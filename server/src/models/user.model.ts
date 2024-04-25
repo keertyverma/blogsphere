@@ -3,7 +3,7 @@ import Joi from "joi";
 
 interface IUser {
   personalInfo: {
-    fullName: string;
+    fullname: string;
     email: string;
     password: string;
     username?: string;
@@ -15,7 +15,7 @@ interface IUser {
 const userSchema = new Schema(
   {
     personalInfo: {
-      fullName: {
+      fullname: {
         type: String,
         required: true,
         trim: true,
@@ -64,7 +64,7 @@ const validateUser = (user: IUser) => {
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
 
   const schema = Joi.object({
-    fullName: Joi.string().min(2).max(50).required(),
+    fullname: Joi.string().min(2).max(50).required(),
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string()
       .min(5)

@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { User, validateUser } from "../models/user.model";
-import logger from "../utils/logger";
-import BadRequestError from "../utils/errors/bad-request";
-import { APIResponse, APIStatus } from "../types/api-response";
 import { StatusCodes } from "http-status-codes";
+import { User, validateUser } from "../models/user.model";
+import { APIResponse, APIStatus } from "../types/api-response";
+import BadRequestError from "../utils/errors/bad-request";
+import logger from "../utils/logger";
 
 export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);
@@ -17,7 +17,7 @@ export const createUser = async (req: Request, res: Response) => {
     throw new BadRequestError(errorMessage);
   }
 
-  const { fullName, email, password } = req.body;
+  const { fullname, email, password } = req.body;
   // check if user exists
   const existingUser = await User.findOne({ "personalInfo.email": email });
   if (existingUser) {
@@ -30,7 +30,7 @@ export const createUser = async (req: Request, res: Response) => {
   // create user
   const user = new User({
     personalInfo: {
-      fullName,
+      fullname,
       email,
       password: hashedPassword,
       username: email.split("@")[0],
@@ -43,7 +43,7 @@ export const createUser = async (req: Request, res: Response) => {
     statusCode: StatusCodes.CREATED,
     data: {
       _id: user.id,
-      name: user.personalInfo?.fullName,
+      fullname: user.personalInfo?.fullname,
       email: user.personalInfo?.email,
       username: user.personalInfo?.username,
     },
