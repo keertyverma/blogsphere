@@ -2,6 +2,7 @@ import config from "config";
 import express, { Request, Response } from "express";
 
 import userRouter from "./routes/user.route";
+import authRouter from "./routes/auth.route";
 import errorHandler from "./middlewares/error.middleware";
 import routeNotFoundHandler from "./middlewares/route-not-found.middleware";
 
@@ -16,6 +17,7 @@ app.get(BASE_URL, (req: Request, res: Response) => {
   res.send("Welcome to BlogSphere API");
 });
 app.use(`${BASE_URL}/users`, userRouter);
+app.use(`${BASE_URL}/auth`, authRouter);
 
 // error handler middleware
 app.use(routeNotFoundHandler);
