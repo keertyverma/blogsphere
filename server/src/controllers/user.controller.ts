@@ -7,15 +7,13 @@ import BadRequestError from "../utils/errors/bad-request";
 import logger from "../utils/logger";
 import { nanoid } from "nanoid";
 
-const generateUsername = async (email: string) => {
+const generateUsername = async (email: string): Promise<string> => {
   let username = email.split("@")[0];
 
   let existingUser = await User.findOne({ "personalInfo.username": username });
   if (existingUser) {
     username = username + nanoid().toString().substring(0, 5);
   }
-
-  console.log("username = ", username);
 
   return username;
 };

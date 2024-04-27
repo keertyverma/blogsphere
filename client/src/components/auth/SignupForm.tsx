@@ -11,28 +11,43 @@ import {
 } from "../ui/form";
 
 import { Button } from "@/components/ui/button";
+import { IFetchError, IFetchResponse, INewUser } from "@/types";
+import { AxiosError } from "axios";
 import { useState } from "react";
 import { BiUser } from "react-icons/bi";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
-import { Input } from "../ui/input";
+import { useCreateUserAccount } from "../../lib/react-query/queries";
 import AnimationWrapper from "../AnimationWrapper";
+import { Input } from "../ui/input";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
+  const createUserAccount = useCreateUserAccount();
 
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
     defaultValues: {
-      name: "",
+      fullname: "",
       email: "",
       password: "",
     },
   });
 
-  const handleSignup = (user: z.infer<typeof SignupValidation>) => {
-    console.log(user);
+  const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
+    try {
+      const userResponse = await createUserAccount.mutateAsync(user);
+      const authToken = userResponse.headers["x-auth-token"];
+      console.log("authToken = ", authToken);
+    } catch (error) {
+      let errorMessage = "An error occurred. Please try again later.";
+      if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {
+        const errorResponse = error.response?.data as IFetchResponse<INewUser>;
+        errorMessage = (errorResponse.error as IFetchError).details;
+      }
+      console.log("errorMessage = ", errorMessage);
+    }
   };
 
   return (
@@ -51,7 +66,7 @@ const SignupForm = () => {
             </div>
             <FormField
               control={form.control}
-              name="name"
+              name="fullname"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>

@@ -1,5 +1,6 @@
 import config from "config";
 import express, { Request, Response } from "express";
+import cors from "cors";
 
 import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.route";
@@ -9,6 +10,8 @@ import routeNotFoundHandler from "./middlewares/route-not-found.middleware";
 const app = express();
 
 app.use(express.json());
+
+app.use(cors({ exposedHeaders: ["x-auth-token"] }));
 
 // configure app routes
 const BASE_URL = `/${config.get("appName")}/api/v1`;
