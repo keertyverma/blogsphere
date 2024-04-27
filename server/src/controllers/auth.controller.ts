@@ -46,9 +46,18 @@ const authenticateUser = async (req: Request, res: Response) => {
   const result: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: { message: "Logged in successfully", access_token: accessToken },
+    data: {
+      _id: user.id,
+      fullname: user.personalInfo?.fullname,
+      email: user.personalInfo?.email,
+      username: user.personalInfo?.username,
+    },
   };
-  return res.status(result.statusCode).json(result);
+
+  return res
+    .header("x-auth-token", accessToken)
+    .status(result.statusCode)
+    .json(result);
 };
 
 export { authenticateUser };

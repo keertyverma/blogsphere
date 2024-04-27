@@ -103,8 +103,10 @@ describe("/api/v1/auth", () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.body.status).toBe("success");
-      expect(res.body.data.message).toBe("Logged in successfully");
-      expect(res.body.data.access_token).not.toBeNull;
+      expect(res.body.data.email).toBe(userData.email);
+
+      expect(res.headers).toHaveProperty("x-auth-token");
+      expect(res.headers["x-auth-token"]).not.toBe("");
     });
   });
 });
