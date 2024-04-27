@@ -22,6 +22,8 @@ import { useCreateUserAccount } from "../../lib/react-query/queries";
 import AnimationWrapper from "../AnimationWrapper";
 import { Input } from "../ui/input";
 
+import { toast } from "react-toastify";
+
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const createUserAccount = useCreateUserAccount();
@@ -40,13 +42,23 @@ const SignupForm = () => {
       const userResponse = await createUserAccount.mutateAsync(user);
       const authToken = userResponse.headers["x-auth-token"];
       console.log("authToken = ", authToken);
+
+      toast.success("User account is created.", {
+        position: "top-right",
+        autoClose: 3000,
+        className: "mt-20",
+      });
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {
         const errorResponse = error.response?.data as IFetchResponse<INewUser>;
         errorMessage = (errorResponse.error as IFetchError).details;
       }
-      console.log("errorMessage = ", errorMessage);
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        className: "mt-20",
+      });
     }
   };
 
