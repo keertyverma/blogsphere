@@ -17,9 +17,14 @@ import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { Input } from "../ui/input";
 import AnimationWrapper from "../AnimationWrapper";
+import { useLogin } from "@/lib/react-query/queries";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
+import { IFetchError, IFetchResponse, INewUser } from "@/types";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
+  const login = useLogin();
 
   const form = useForm<z.infer<typeof LoginValidation>>({
     resolver: zodResolver(LoginValidation),
@@ -29,8 +34,35 @@ const LoginForm = () => {
     },
   });
 
-  const handleLogin = (user: z.infer<typeof LoginValidation>) => {
+  const handleLogin = async (user: z.infer<typeof LoginValidation>) => {
     console.log(user);
+
+    try {
+      const userResponse = await login.mutateAsync(user);
+      const authToken = userResponse.headers["x-auth-token"];
+      console.log("authToken = ", authToken);
+      console.log("user data = ", userResponse.data.data);
+
+      form.reset();
+      toast.success("Login is successful.", {
+        position: "top-right",
+        autoClose: 3000,
+        className: "mt-20",
+      });
+    } catch (error) {
+      let errorMessage = "An error occurred. Please try again later.";
+      if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {
+        console.log("error = ", error);
+
+        const errorResponse = error.response?.data as IFetchResponse<INewUser>;
+        errorMessage = (errorResponse.error as IFetchError).details;
+      }
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        className: "mt-20",
+      });
+    }
   };
 
   return (
