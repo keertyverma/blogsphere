@@ -21,10 +21,12 @@ import { useLogin } from "@/lib/react-query/queries";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { IFetchError, IFetchResponse, INewUser } from "@/types";
+import { useAuthContext } from "@/context/AuthProvider";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const login = useLogin();
+  const { setUserAndToken } = useAuthContext();
 
   const form = useForm<z.infer<typeof LoginValidation>>({
     resolver: zodResolver(LoginValidation),
@@ -35,13 +37,14 @@ const LoginForm = () => {
   });
 
   const handleLogin = async (user: z.infer<typeof LoginValidation>) => {
-    console.log(user);
-
     try {
       const userResponse = await login.mutateAsync(user);
+      const userData = userResponse.data.data;
       const authToken = userResponse.headers["x-auth-token"];
-      console.log("authToken = ", authToken);
-      console.log("user data = ", userResponse.data.data);
+
+      if (userData && authToken) {
+        setUserAndToken({ ...userData }, authToken);
+      }
 
       form.reset();
       toast.success("Login is successful.", {

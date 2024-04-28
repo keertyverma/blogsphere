@@ -15,3 +15,10 @@ export type IFetchResponse<T = any> = {
   data?: T[] | T;
   error?: IFetchError;
 };
+
+export interface IUser {
+  id: string;
+  email: string;
+  fullname: string;
+  username: string;
+}

@@ -23,10 +23,12 @@ import AnimationWrapper from "../AnimationWrapper";
 import { Input } from "../ui/input";
 
 import { toast } from "react-toastify";
+import { useAuthContext } from "@/context/AuthProvider";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const createUserAccount = useCreateUserAccount();
+  const { setUserAndToken } = useAuthContext();
 
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -40,9 +42,14 @@ const SignupForm = () => {
   const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
     try {
       const userResponse = await createUserAccount.mutateAsync(user);
+      const userData = userResponse.data.data;
       const authToken = userResponse.headers["x-auth-token"];
-      console.log("authToken = ", authToken);
 
+      if (userData && authToken) {
+        setUserAndToken({ ...userData }, authToken);
+      }
+
+      form.reset();
       toast.success("User account is created.", {
         position: "top-right",
         autoClose: 3000,
