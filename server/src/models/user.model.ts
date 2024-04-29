@@ -57,7 +57,7 @@ const userSchema = new Schema(
       },
       profileImage: {
         type: String,
-        default: "",
+        default: () => getRandomProfileImage(),
       },
     },
   },
@@ -94,4 +94,51 @@ const validateUser = (user: IUser) => {
   return schema.validate(user);
 };
 
+const getRandomProfileImage = (): string => {
+  const profileImages: { [key: string]: string[] } = {
+    "adventurer-neutral": [
+      "Gizmo",
+      "Callie",
+      "Garfield",
+      "Simon",
+      "Molly",
+      "Angel",
+      "Sheba",
+      "Sam",
+      "Spooky",
+    ],
+    "lorelei-neutral": [
+      "Rocky",
+      "Oliver",
+      "Sam",
+      "Oscar",
+      "Snuggles",
+      "Patches",
+      "Spooky",
+      "Jasper",
+      "Pepper",
+      "Garfield",
+    ],
+    "notionists-neutral": [
+      "Mittens",
+      "Tinkerbell",
+      "Jack",
+      "Kitty",
+      "Bailey",
+      "Oscar",
+      "Pumpkin",
+      "Felix",
+    ],
+  };
+
+  const collections = Object.keys(profileImages);
+  const randomCollection =
+    collections[Math.floor(Math.random() * collections.length)];
+
+  const imageNames = profileImages[randomCollection];
+  const randomImageName =
+    imageNames[Math.floor(Math.random() * imageNames.length)];
+
+  return `https://api.dicebear.com/8.x/${randomCollection}/svg?seed=${randomImageName}`;
+};
 export { IUser, User, validateUser };

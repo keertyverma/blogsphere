@@ -93,7 +93,9 @@ describe("/api/v1/auth", () => {
           email: "test@test.com",
         });
       expect(registerRes.statusCode).toBe(201);
-      expect(registerRes.body.data._id).not.toBeNull;
+      const { id, fullname, email, username, profileImage } =
+        registerRes.body.data;
+      expect(id).not.toBeNull;
 
       const userData = {
         email: "test@test.com",
@@ -103,7 +105,12 @@ describe("/api/v1/auth", () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.body.status).toBe("success");
-      expect(res.body.data.email).toBe(userData.email);
+
+      const responseData = res.body.data;
+      expect(responseData.fullname).toBe(fullname.toLowerCase());
+      expect(responseData.email).toBe(email);
+      expect(responseData.username).toBe(username);
+      expect(responseData.profileImage).toBe(profileImage);
 
       expect(res.headers).toHaveProperty("x-auth-token");
       expect(res.headers["x-auth-token"]).not.toBe("");

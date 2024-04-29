@@ -57,10 +57,11 @@ export const createUser = async (req: Request, res: Response) => {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
     data: {
-      _id: user.id,
+      id: user.id,
       fullname: user.personalInfo?.fullname,
       email: user.personalInfo?.email,
       username: user.personalInfo?.username,
+      profileImage: user.personalInfo.profileImage,
     },
   };
   return res

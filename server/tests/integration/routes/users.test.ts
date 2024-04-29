@@ -36,9 +36,7 @@ describe("/api/v1/users", () => {
       const res = await request(server)
         .post(`${endpoint}/register`)
         .send(userData);
-
       expect(res.statusCode).toBe(400);
-
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
@@ -48,7 +46,6 @@ describe("/api/v1/users", () => {
 
     it("should return BadRequest-400 if password is invalid", async () => {
       // valid password -> Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter.
-
       const userData = {
         fullname: "Mickey Mouse",
         password: "pluto",
@@ -57,7 +54,6 @@ describe("/api/v1/users", () => {
       const res = await request(server)
         .post(`${endpoint}/register`)
         .send(userData);
-
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
@@ -75,7 +71,6 @@ describe("/api/v1/users", () => {
           email: "test@test.com",
         },
       });
-
       const userData = {
         fullname: "Mickey Mouse",
         password: "Clubhouse12",
@@ -84,7 +79,6 @@ describe("/api/v1/users", () => {
       const res = await request(server)
         .post(`${endpoint}/register`)
         .send(userData);
-
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
@@ -102,17 +96,18 @@ describe("/api/v1/users", () => {
       const res = await request(server)
         .post(`${endpoint}/register`)
         .send(userData);
-
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
       expect(res.header["x-auth-token"]).not.toBeNull();
-
       const responseData = res.body.data;
 
-      expect(responseData._id).not.toBeNull;
-      expect(responseData.fullname).toBe(userData.fullname.toLowerCase());
-      expect(responseData.email).toBe(userData.email);
-      expect(responseData.username).toBe(userData.email.split("@")[0]);
+      const { id, fullname, email, username, profileImage } = responseData;
+
+      expect(id).not.toBeNull;
+      expect(fullname).toBe(userData.fullname.toLowerCase());
+      expect(email).toBe(userData.email);
+      expect(username).toBe(userData.email.split("@")[0]);
+      expect(profileImage).toMatch(/api\.dicebear\.com/);
       expect(responseData).not.toHaveProperty("password");
     });
 
@@ -126,7 +121,6 @@ describe("/api/v1/users", () => {
           username: "test",
         },
       });
-
       const userData = {
         fullname: "Pluto",
         password: "Pluto123",
@@ -135,12 +129,9 @@ describe("/api/v1/users", () => {
       const res = await request(server)
         .post(`${endpoint}/register`)
         .send(userData);
-
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
-
       const responseData = res.body.data;
-
       expect(responseData._id).not.toBeNull;
       expect(responseData.username).not.toBe(userData.email.split("@")[0]);
       expect(responseData.username).toMatch(/test/);

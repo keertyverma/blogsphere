@@ -47,10 +47,11 @@ const authenticateUser = async (req: Request, res: Response) => {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
     data: {
-      _id: user.id,
+      id: user.id,
       fullname: user.personalInfo?.fullname,
       email: user.personalInfo?.email,
       username: user.personalInfo?.username,
+      profileImage: user.personalInfo.profileImage,
     },
   };
 
