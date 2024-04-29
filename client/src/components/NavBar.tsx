@@ -1,12 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuthContext } from "@/context/AuthProvider";
 import { useState } from "react";
-import { BsPencilSquare, BsSearch } from "react-icons/bs";
+import { BsPencilSquare, BsSearch, BsBell } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 
 const NavBar = () => {
   const [toggleSearch, setToggleSearch] = useState(false);
   const navigate = useNavigate();
+  const {
+    isAuthenticated,
+    user: { profileImage },
+  } = useAuthContext();
 
   return (
     <nav className="navbar">
@@ -61,19 +66,47 @@ const NavBar = () => {
           <BsPencilSquare className="text-xl" />
         </Button>
 
-        <Button
-          onClick={() => navigate("/login")}
-          variant="outline"
-          className="max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
-        >
-          Log in
-        </Button>
-        <Button
-          onClick={() => navigate("/signup")}
-          className="max-sm:hidden rounded-full"
-        >
-          Sign up
-        </Button>
+        {isAuthenticated ? (
+          <>
+            <Button
+              onClick={() => navigate("/dashboard/notification")}
+              variant="link"
+              size="icon"
+              className="rounded-full md:bg-accent flex-center"
+            >
+              <BsBell className="text-xl md:text-l text-muted-foreground" />
+            </Button>
+
+            <Button
+              onClick={() => navigate("/")}
+              variant="link"
+              size="icon"
+              className="rounded-full flex-center border-b border-border shadow-md"
+            >
+              <img
+                src={profileImage}
+                alt={"profile image"}
+                className="object-cover w-full h-full rounded-full"
+              />
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              onClick={() => navigate("/login")}
+              variant="outline"
+              className="max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
+            >
+              Log in
+            </Button>
+            <Button
+              onClick={() => navigate("/signup")}
+              className="max-sm:hidden rounded-full"
+            >
+              Sign up
+            </Button>
+          </>
+        )}
       </div>
     </nav>
   );

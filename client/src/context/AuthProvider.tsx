@@ -9,8 +9,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: "",
     username: "",
     fullname: "",
+    profileImage: "",
   });
   const [token, setToken] = useState<string>("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const navigate = useNavigate();
 
   const setUserAndToken = (user: IUser, token: string) => {
@@ -26,13 +29,22 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (loggedInUser) {
       const { user, token } = JSON.parse(loggedInUser);
       setUserAndToken(user, token);
+      setIsAuthenticated(true);
     } else {
       navigate("/login");
     }
   }, []);
 
   return (
-    <authContext.Provider value={{ user, token, setUserAndToken }}>
+    <authContext.Provider
+      value={{
+        user,
+        token,
+        setUserAndToken,
+        isAuthenticated,
+        setIsAuthenticated,
+      }}
+    >
       {children}
     </authContext.Provider>
   );
