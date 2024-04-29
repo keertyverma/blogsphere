@@ -4,14 +4,12 @@ import { useAuthContext } from "@/context/AuthProvider";
 import { useState } from "react";
 import { BsPencilSquare, BsSearch, BsBell } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
+import UserNavigationPanel from "./UserNavigationPanel";
 
 const NavBar = () => {
   const [toggleSearch, setToggleSearch] = useState(false);
   const navigate = useNavigate();
-  const {
-    isAuthenticated,
-    user: { profileImage },
-  } = useAuthContext();
+  const { isAuthenticated } = useAuthContext();
 
   return (
     <nav className="navbar">
@@ -77,18 +75,7 @@ const NavBar = () => {
               <BsBell className="text-xl md:text-l text-muted-foreground" />
             </Button>
 
-            <Button
-              onClick={() => navigate("/")}
-              variant="link"
-              size="icon"
-              className="rounded-full flex-center border-b border-border shadow-md"
-            >
-              <img
-                src={profileImage}
-                alt={"profile image"}
-                className="object-cover w-full h-full rounded-full"
-              />
-            </Button>
+            <UserNavigationPanel />
           </>
         ) : (
           <>

@@ -17,7 +17,7 @@ import { useState } from "react";
 import { BiUser } from "react-icons/bi";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreateUserAccount } from "../../lib/react-query/queries";
 import AnimationWrapper from "../AnimationWrapper";
 import { Input } from "../ui/input";
@@ -28,7 +28,8 @@ import { useAuthContext } from "@/context/AuthProvider";
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const createUserAccount = useCreateUserAccount();
-  const { setUserAndToken } = useAuthContext();
+  const { setUserAndToken, setIsAuthenticated } = useAuthContext();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -47,14 +48,11 @@ const SignupForm = () => {
 
       if (userData && authToken) {
         setUserAndToken({ ...userData }, authToken);
+        setIsAuthenticated(true);
       }
 
       form.reset();
-      toast.success("User account is created.", {
-        position: "top-right",
-        autoClose: 3000,
-        className: "mt-20",
-      });
+      navigate("/");
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {

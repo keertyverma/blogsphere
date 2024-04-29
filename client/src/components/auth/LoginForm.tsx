@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import AnimationWrapper from "../AnimationWrapper";
 import { useLogin } from "@/lib/react-query/queries";
@@ -26,7 +26,8 @@ import { useAuthContext } from "@/context/AuthProvider";
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const login = useLogin();
-  const { setUserAndToken } = useAuthContext();
+  const { setUserAndToken, setIsAuthenticated } = useAuthContext();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof LoginValidation>>({
     resolver: zodResolver(LoginValidation),
@@ -44,14 +45,11 @@ const LoginForm = () => {
 
       if (userData && authToken) {
         setUserAndToken({ ...userData }, authToken);
+        setIsAuthenticated(true);
       }
 
       form.reset();
-      toast.success("Login is successful.", {
-        position: "top-right",
-        autoClose: 3000,
-        className: "mt-20",
-      });
+      navigate("/");
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {
