@@ -4,6 +4,7 @@ import { Error as MongooseError } from "mongoose";
 import errorHandler from "../../../src/middlewares/error.middleware";
 import NotFoundError from "../../../src/utils/errors/not-found";
 import BadRequestError from "../../../src/utils/errors/bad-request";
+import CustomAPIError from "../../../src/utils/errors/custom-api";
 
 describe("Error Handler Middleware Test Suite", () => {
   let req: Request;
@@ -125,6 +126,27 @@ describe("Error Handler Middleware Test Suite", () => {
       },
     };
     const error = new Error("something just not working....");
+
+    errorHandler(error, req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(statusCode);
+    expect(res.send).toHaveBeenCalledWith(expectedResponse);
+  });
+
+  test("should set response status to 403 in case of forbidden request", () => {
+    const statusCode = 403;
+    const errorMessage =
+      "This email address was registered without using Google sign-in. Please use your password to log in and access the account.";
+    const expectedResponse = {
+      status: "error",
+      statusCode: statusCode,
+      error: {
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details: errorMessage,
+      },
+    };
+    const error = new CustomAPIError(errorMessage, statusCode);
 
     errorHandler(error, req, res, next);
 

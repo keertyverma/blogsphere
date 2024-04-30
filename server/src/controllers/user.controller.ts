@@ -5,18 +5,7 @@ import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import logger from "../utils/logger";
-import { nanoid } from "nanoid";
-
-const generateUsername = async (email: string): Promise<string> => {
-  let username = email.split("@")[0];
-
-  let existingUser = await User.findOne({ "personalInfo.username": username });
-  if (existingUser) {
-    username = username + nanoid().toString().substring(0, 5);
-  }
-
-  return username;
-};
+import { generateUsername } from "../utils";
 
 export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);

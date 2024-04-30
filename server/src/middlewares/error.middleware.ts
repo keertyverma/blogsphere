@@ -20,6 +20,10 @@ const errorHandler = (
 
   const errorCodeMessageMap: IErrorCodeMessageMap = {
     400: { code: "BAD_REQUEST", message: "Invalid input data" },
+    403: {
+      code: "FORBIDDEN",
+      message: "You do not have permission to access this resource.",
+    },
     404: {
       code: "RESOURCE_NOT_FOUND",
       message: "The requested resource was not found.",

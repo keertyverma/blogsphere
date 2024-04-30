@@ -4,5 +4,13 @@
     "user": "",
     "password": ""
   },
-  "secretAccessKey": ""
+  "secretAccessKey": "",
+  "firebaseGoogleAuth": {
+    "projectId": "",
+    "privateKeyId": "",
+    "privateKey": "",
+    "clientEmail": "",
+    "clientId": "",
+    "clientX509CertUrl": ""
+  }
 }

@@ -7,11 +7,12 @@ interface IUser {
   personalInfo: {
     fullname: string;
     email: string;
-    password: string;
+    password?: string;
     username?: string;
     bio?: string;
     profileImage?: string;
   };
+  googleAuth: boolean;
 }
 
 interface IUserDocument extends IUser, Document {
@@ -40,7 +41,6 @@ const userSchema = new Schema(
       },
       password: {
         type: String,
-        required: true,
         trim: true,
         minlength: 8,
         maxlength: 1024,
@@ -59,6 +59,10 @@ const userSchema = new Schema(
         type: String,
         default: () => getRandomProfileImage(),
       },
+    },
+    googleAuth: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

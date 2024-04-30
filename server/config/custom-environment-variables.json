@@ -3,5 +3,13 @@
     "user": "MONGODB_USER",
     "password": "MONGODB_PASSWORD"
   },
-  "secretAccessKey": "SECRET_ACCESS_KEY"
+  "secretAccessKey": "SECRET_ACCESS_KEY",
+  "firebaseGoogleAuth": {
+    "projectId": "FIREBASE_PROJECT_ID",
+    "privateKeyId": "FIREBASE_PRIVATE_KEY_ID",
+    "privateKey": "FIREBASE_PRIVATE_KEY",
+    "clientEmail": "FIREBASE_CLIENT_EMAIL",
+    "clientId": "FIREBASE_CLIENT_ID",
+    "clientX509CertUrl": "FIREBASE_CLIENT_X509_CERT_URL"
+  }
 }
