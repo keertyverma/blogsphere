@@ -54,8 +54,6 @@ const LoginForm = () => {
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {
-        console.log("error = ", error);
-
         const errorResponse = error.response?.data as IFetchResponse<INewUser>;
         errorMessage = (errorResponse.error as IFetchError).details;
       }

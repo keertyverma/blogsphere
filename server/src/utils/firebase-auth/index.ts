@@ -24,7 +24,6 @@ const getFirebaseConfig = (): admin.ServiceAccount => {
 
 export const initializeFirebaseAuth = () => {
   const firebaseConfig = getFirebaseConfig();
-  console.log(firebaseConfig);
 
   admin.initializeApp({
     credential: admin.credential.cert(firebaseConfig),
