@@ -17,10 +17,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
   const setUserAndToken = (user: IUser, token: string) => {
-    localStorage.setItem("blogsphere_user", JSON.stringify({ user, token }));
-
     setUser({ ...user });
     setToken(token);
+
+    if (user && token) {
+      localStorage.setItem("blogsphere_user", JSON.stringify({ user, token }));
+    } else {
+      localStorage.removeItem("blogsphere_user");
+    }
   };
 
   useEffect(() => {

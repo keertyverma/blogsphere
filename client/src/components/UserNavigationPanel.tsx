@@ -20,7 +20,6 @@ const UserNavigationPanel = () => {
   } = useAuthContext();
 
   const logoutUser = () => {
-    localStorage.removeItem("blogsphere_user");
     setUserAndToken({} as IUser, "");
     setIsAuthenticated(false);
   };
