@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { getAuth } from "firebase-admin/auth";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 
@@ -9,6 +8,8 @@ import { APIResponse, APIStatus } from "../types/api-response";
 import { generateUsername } from "../utils";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
+import FirebaseAuthError from "../utils/errors/firebase-error";
+import { verifyIdToken } from "../utils/firebase-auth";
 import logger from "../utils/logger";
 
 const validate = (req: { email: string; password: string }) => {
@@ -86,7 +87,7 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
   try {
     // verify access token
     const { accessToken } = req.body;
-    const decodedUser = await getAuth().verifyIdToken(accessToken);
+    const decodedUser = await verifyIdToken(accessToken);
     let { email, name, picture } = decodedUser;
 
     // get high resolution user picture
@@ -95,15 +96,13 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
     // get user by email
     let user = await User.findOne({ "personalInfo.email": email });
     if (user) {
-      console.log("user = ", user);
       if (!user.googleAuth) {
         // do not allow user to continue with google authentication
         throw new CustomAPIError(
-          "This email address was registered without using Google sign-in. Please use your password to log in and access the account.",
+          "This email address was registered without using Google sign-in. Please use your password to log in and access the account",
           StatusCodes.FORBIDDEN
         );
       }
-      //TODO: login
     } else {
       // create user
       const username = await generateUsername(email || "");
@@ -116,7 +115,6 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
         },
         googleAuth: true,
       });
-      console.log("creating new user = ", user);
       await user.save();
     }
 
@@ -138,9 +136,14 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
       .status(result.statusCode)
       .json(result);
   } catch (error) {
-    console.log(error);
-    // handle firebase error and throw Invalid Access Token
-    throw error;
+    const err = error as FirebaseAuthError;
+    if (err.code === "auth/argument-error") {
+      throw new BadRequestError("Invalid Access Token");
+    } else if (err.code === "auth/id-token-expired") {
+      throw new BadRequestError("Access Token has expired");
+    } else {
+      throw error;
+    }
   }
 };
 

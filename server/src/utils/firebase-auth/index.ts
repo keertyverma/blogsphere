@@ -1,5 +1,6 @@
-import admin from "firebase-admin";
 import config from "config";
+import admin from "firebase-admin";
+import { getAuth } from "firebase-admin/auth";
 
 const getFirebaseConfig = (): admin.ServiceAccount => {
   const privateKey: string = config.get(
@@ -25,7 +26,11 @@ const getFirebaseConfig = (): admin.ServiceAccount => {
 export const initializeFirebaseAuth = () => {
   const firebaseConfig = getFirebaseConfig();
 
-  admin.initializeApp({
+  return admin.initializeApp({
     credential: admin.credential.cert(firebaseConfig),
   });
+};
+
+export const verifyIdToken = async (accessToken: string) => {
+  return await getAuth().verifyIdToken(accessToken);
 };

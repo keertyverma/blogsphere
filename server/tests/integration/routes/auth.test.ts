@@ -6,9 +6,30 @@ import http from "http";
 
 import appServer from "../../../src";
 import { User } from "../../../src/models/user.model";
+import * as firebaseAuth from "../../../src/utils/firebase-auth";
+import FirebaseAuthError from "../../../src/utils/errors/firebase-error";
 
 let server: http.Server;
 let endpoint: string = `/${config.get("appName")}/api/v1/auth`;
+
+type DecodedIdToken = {
+  email: string;
+  name: string;
+  picture: string;
+  aud: string;
+  auth_time: number;
+  exp: number;
+  firebase: {
+    identities: {
+      [key: string]: any[];
+    };
+    sign_in_provider: string;
+  };
+  iat: number;
+  iss: string;
+  sub: string;
+  uid: string;
+};
 
 describe("/api/v1/auth", () => {
   afterAll(async () => {
@@ -114,6 +135,159 @@ describe("/api/v1/auth", () => {
 
       expect(res.headers).toHaveProperty("x-auth-token");
       expect(res.headers["x-auth-token"]).not.toBe("");
+    });
+  });
+
+  describe("POST /google-auth", () => {
+    const exec = async (accessToken: string) => {
+      return await request(server).post(`${endpoint}/google-auth`).send({
+        accessToken,
+      });
+    };
+
+    const mockUser = {
+      email: "test@test.com",
+      name: "User-1",
+      picture: "http://example.com/dummy=s96-c",
+    } as DecodedIdToken;
+
+    it("should return BadRequest-400 if access token is not provided", async () => {
+      const userData = {
+        token: "",
+      };
+      const res = await request(server)
+        .post(`${endpoint}/google-auth`)
+        .send(userData);
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"accessToken" is required',
+      });
+    });
+
+    it("should return BadRequest-400 if access token is invalid", async () => {
+      // Mock verifyIdToken function to return rejected promise with error
+      jest
+        .spyOn(firebaseAuth, "verifyIdToken")
+        .mockRejectedValue(
+          new FirebaseAuthError(
+            "Firebase ID token has invalid signature.",
+            "auth/argument-error"
+          )
+        );
+
+      const accessToken = "invalid token";
+      const res = await exec(accessToken);
+
+      expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid Access Token",
+      });
+    });
+
+    it("should return BadRequest-400 if access token is expired", async () => {
+      // Mock verifyIdToken function to return rejected promise with error
+      jest
+        .spyOn(firebaseAuth, "verifyIdToken")
+        .mockRejectedValue(
+          new FirebaseAuthError(
+            "Firebase ID token has expired.",
+            "auth/id-token-expired"
+          )
+        );
+
+      const accessToken = "expired token";
+      const res = await exec(accessToken);
+
+      expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Access Token has expired",
+      });
+    });
+
+    it("should return Forbidden-403 if user is already registered with same email without google sign-in", async () => {
+      // Mock verifyIdToken function to return a mock user object
+      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser);
+
+      // create user with same email
+      await User.create({
+        personalInfo: {
+          fullname: mockUser.name,
+          email: mockUser.email,
+        },
+      });
+
+      const accessToken = "valid token";
+      const res = await exec(accessToken);
+
+      expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details:
+          "This email address was registered without using Google sign-in. Please use your password to log in and access the account",
+      });
+    });
+
+    it("should authenticate user if google auth is set for given user", async () => {
+      // Mock verifyIdToken function to return a mock user object
+      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser);
+
+      // create user with same email and set googleAuth
+      const user = await User.create({
+        personalInfo: {
+          fullname: mockUser.name,
+          email: mockUser.email,
+        },
+        googleAuth: true,
+      });
+
+      const accessToken = "valid token";
+      const res = await exec(accessToken);
+      expect(res.statusCode).toBe(200);
+
+      expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
+
+      // Access token
+      expect(res.header["x-auth-token"]).not.toBeNull();
+
+      // User data in response body
+      const { fullname, email, username } = res.body.data;
+      expect(fullname).toBe(user.personalInfo.fullname);
+      expect(email).toBe(user.personalInfo.email);
+      expect(username).toBe(user.personalInfo.username);
+    });
+
+    it("should create user and authenticate if user does not exists", async () => {
+      // Mock verifyIdToken function to return a mock user object
+      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser);
+
+      const accessToken = "valid token";
+      const res = await exec(accessToken);
+      expect(res.statusCode).toBe(200);
+
+      expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
+
+      // check if user is created in DB and googleAuth is set
+      const user = await User.findOne({ "personalInfo.email": mockUser.email });
+      expect(user?.googleAuth).toBeTruthy();
+
+      // Access token
+      expect(res.header["x-auth-token"]).not.toBeNull();
+
+      // User data in response body
+      const { fullname, email, username } = res.body.data;
+      expect(fullname).toBe(user?.personalInfo.fullname);
+      expect(email).toBe(user?.personalInfo.email);
+      expect(username).toBe(user?.personalInfo.username);
     });
   });
 });
