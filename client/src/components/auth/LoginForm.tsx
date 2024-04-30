@@ -11,7 +11,7 @@ import {
 } from "../ui/form";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { IFetchError, IFetchResponse, INewUser } from "@/types";
 import { useAuthContext } from "@/context/AuthProvider";
+import { googleAuth } from "@/lib/firebase/Firebase";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
@@ -63,6 +64,23 @@ const LoginForm = () => {
         position: "top-right",
         className: "mt-20",
       });
+    }
+  };
+
+  const handleGoogleAuth = async (event: FormEvent) => {
+    event.preventDefault();
+
+    try {
+      const user = await googleAuth();
+      console.log("user = ", user);
+      navigate("/");
+      // TODO: navigate to dashboard
+    } catch (error) {
+      toast.error("Unable to login with Google", {
+        position: "top-right",
+        className: "mt-20",
+      });
+      return console.log("error = ", error);
     }
   };
 
@@ -158,6 +176,7 @@ const LoginForm = () => {
             <Button
               variant="secondary"
               className="h-12 border-b border-slate-500 rounded-full flex-center gap-3 text-sm md:text-base"
+              onClick={handleGoogleAuth}
             >
               <FcGoogle size={20} />
               Continue with Google
