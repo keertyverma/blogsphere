@@ -12,3 +12,9 @@ export const useLogin = () =>
     mutationFn: (user: { email: string; password: string }) =>
       apiClient.post("/auth", user),
   });
+
+export const useLoginWithGoogle = () =>
+  useMutation({
+    mutationFn: (accessToken: string) =>
+      apiClient.post("/auth/google-auth", { accessToken }),
+  });

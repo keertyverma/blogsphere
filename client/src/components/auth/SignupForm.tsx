@@ -18,17 +18,22 @@ import { BiUser } from "react-icons/bi";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-import { useCreateUserAccount } from "../../lib/react-query/queries";
+import {
+  useCreateUserAccount,
+  useLoginWithGoogle,
+} from "../../lib/react-query/queries";
 import AnimationWrapper from "../AnimationWrapper";
 import { Input } from "../ui/input";
 
-import { toast } from "react-toastify";
 import { useAuthContext } from "@/context/AuthProvider";
 import { googleAuth } from "@/lib/firebase/Firebase";
+import { toast } from "react-toastify";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const createUserAccount = useCreateUserAccount();
+  const loginWithGoogle = useLoginWithGoogle();
+
   const { setUserAndToken, setIsAuthenticated } = useAuthContext();
   const navigate = useNavigate();
 
@@ -72,16 +77,53 @@ const SignupForm = () => {
     event.preventDefault();
 
     try {
-      const user = await googleAuth();
-      console.log("user = ", user);
-      navigate("/");
-      // TODO: navigate to dashboard
+      const googleUser = await googleAuth();
+      if (!googleUser) {
+        throw new Error("Invalid Google email/password");
+      }
+
+      const accessToken = await googleUser.getIdToken();
+      const userResponse = await loginWithGoogle.mutateAsync(accessToken);
+      const { data, headers } = userResponse;
+      const { data: userData } = data;
+      const authToken = headers["x-auth-token"];
+
+      if (userData && authToken) {
+        setUserAndToken({ ...userData }, authToken);
+        setIsAuthenticated(true);
+        // TODO: navigate to dashboard
+        navigate("/");
+      }
     } catch (error) {
-      toast.error("Unable to login with Google", {
-        position: "top-right",
-        className: "mt-20",
-      });
-      return console.log("error = ", error);
+      if (error instanceof AxiosError && error.response) {
+        const {
+          response: {
+            status,
+            data: {
+              error: { details },
+            },
+          },
+        } = error;
+
+        let errorMessage = "An error occurred. Please try again later.";
+        if (status === 403) {
+          errorMessage =
+            "Email already registered. Please use email & password to login";
+          navigate("/login");
+          toast.error(errorMessage, {
+            position: "top-right",
+            className: "mt-20",
+          });
+          return;
+        } else if (details?.toLowerCase() === "access token has expired") {
+          errorMessage = "Please re-login with google account";
+        }
+
+        toast.error(errorMessage, {
+          position: "top-right",
+          className: "mt-20",
+        });
+      }
     }
   };
 
