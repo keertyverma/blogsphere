@@ -95,6 +95,7 @@ const SignupForm = () => {
         navigate("/");
       }
     } catch (error) {
+      let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.response) {
         const {
           response: {
@@ -105,7 +106,6 @@ const SignupForm = () => {
           },
         } = error;
 
-        let errorMessage = "An error occurred. Please try again later.";
         if (status === 403) {
           errorMessage =
             "Email already registered. Please use email & password to login";
@@ -118,12 +118,11 @@ const SignupForm = () => {
         } else if (details?.toLowerCase() === "access token has expired") {
           errorMessage = "Please re-login with google account";
         }
-
-        toast.error(errorMessage, {
-          position: "top-right",
-          className: "mt-20",
-        });
       }
+      toast.error(errorMessage, {
+        position: "top-right",
+        className: "mt-20",
+      });
     }
   };
 

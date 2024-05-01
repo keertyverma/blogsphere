@@ -38,6 +38,14 @@ const authenticateUser = async (req: Request, res: Response) => {
     throw new BadRequestError("Invalid email or password");
   }
 
+  // if googleAuth is set then ask user to login with google option
+  if (user.googleAuth) {
+    throw new CustomAPIError(
+      "Account was created using Google. Please log in using Google.",
+      StatusCodes.FORBIDDEN
+    );
+  }
+
   // verify password
   const isValidPassword = await bcrypt.compare(
     password,

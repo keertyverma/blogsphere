@@ -104,6 +104,34 @@ describe("/api/v1/auth", () => {
       });
     });
 
+    it("should return Forbidden-403 if user is registered with google account", async () => {
+      // create user
+      await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@gmail.com",
+          password: "Pluto123",
+        },
+        googleAuth: true,
+      });
+
+      // sending incorrect password
+      const userData = {
+        email: "test@gmail.com",
+        password: "Clubhouse123",
+      };
+      const res = await request(server).post(endpoint).send(userData);
+
+      expect(res.statusCode).toBe(403);
+
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details:
+          "Account was created using Google. Please log in using Google.",
+      });
+    });
+
     it("should authenticate user if request is valid", async () => {
       // call /register route so it can create user and store hash password
       const registerRes = await request(server)
