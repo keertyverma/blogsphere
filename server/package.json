@@ -26,6 +26,7 @@
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/ms": "^0.7.34",
+    "@types/node": "^20.12.8",
     "@types/supertest": "^6.0.2",
     "jest-html-reporter": "^3.10.2",
     "supertest": "^7.0.0",
