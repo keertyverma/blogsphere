@@ -7,6 +7,7 @@
     "node": ">=21.7.0"
   },
   "scripts": {
+    "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
     "test": "jest --verbose --coverage",
     "test:unit": "jest --testPathPattern=tests/unit --verbose --detectOpenHandles",
