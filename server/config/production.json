@@ -1,0 +1,6 @@
+{
+  "appName": "blogsphere",
+  "database": {
+    "name": "blogsphere_prod"
+  }
+}
