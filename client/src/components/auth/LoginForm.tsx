@@ -9,20 +9,20 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
-import { LoaderIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useAuthContext } from "@/context/AuthProvider";
+import { googleAuth } from "@/lib/firebase/Firebase";
+import { useLogin, useLoginWithGoogle } from "@/lib/react-query/queries";
+import { AxiosError } from "axios";
 import { FormEvent, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-import { Input } from "../ui/input";
-import AnimationWrapper from "../AnimationWrapper";
-import { useLogin, useLoginWithGoogle } from "@/lib/react-query/queries";
 import { toast } from "react-toastify";
-import { AxiosError } from "axios";
-import { useAuthContext } from "@/context/AuthProvider";
-import { googleAuth } from "@/lib/firebase/Firebase";
+import AnimationWrapper from "../AnimationWrapper";
+import { Input } from "../ui/input";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
@@ -154,9 +154,7 @@ const LoginForm = () => {
                 Login to your account
               </p>
             </div>
-            {isLoading && (
-              <LoaderIcon className="animate-spin flex-col m-auto" />
-            )}
+            {isLoading && <LoadingSpinner className="flex-col m-auto" />}
             <FormField
               control={form.control}
               name="email"

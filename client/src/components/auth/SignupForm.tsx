@@ -9,7 +9,6 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
-import { LoaderIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { IFetchError, IFetchResponse, INewUser } from "@/types";
@@ -29,6 +28,7 @@ import { Input } from "../ui/input";
 import { useAuthContext } from "@/context/AuthProvider";
 import { googleAuth } from "@/lib/firebase/Firebase";
 import { toast } from "react-toastify";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
@@ -145,9 +145,7 @@ const SignupForm = () => {
                 Create your account
               </p>
             </div>
-            {isLoading && (
-              <LoaderIcon className="animate-spin flex-col m-auto" />
-            )}
+            {isLoading && <LoadingSpinner className="flex-col m-auto" />}
             <FormField
               control={form.control}
               name="fullname"
