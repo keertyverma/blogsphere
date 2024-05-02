@@ -9,6 +9,7 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
+import { LoaderIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { IFetchError, IFetchResponse, INewUser } from "@/types";
@@ -31,8 +32,12 @@ import { toast } from "react-toastify";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
-  const createUserAccount = useCreateUserAccount();
-  const loginWithGoogle = useLoginWithGoogle();
+
+  const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
+    useCreateUserAccount();
+  const { mutateAsync: loginWithGoogle, isPending: isGoogleLoginUser } =
+    useLoginWithGoogle();
+  const isLoading = isCreatingUser || isGoogleLoginUser;
 
   const { setUserAndToken, setIsAuthenticated } = useAuthContext();
   const navigate = useNavigate();
@@ -48,7 +53,7 @@ const SignupForm = () => {
 
   const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
     try {
-      const userResponse = await createUserAccount.mutateAsync(user);
+      const userResponse = await createUserAccount(user);
       const userData = userResponse.data.data;
       const authToken = userResponse.headers["x-auth-token"];
 
@@ -83,7 +88,7 @@ const SignupForm = () => {
       }
 
       const accessToken = await googleUser.getIdToken();
-      const userResponse = await loginWithGoogle.mutateAsync(accessToken);
+      const userResponse = await loginWithGoogle(accessToken);
       const { data, headers } = userResponse;
       const { data: userData } = data;
       const authToken = headers["x-auth-token"];
@@ -140,6 +145,9 @@ const SignupForm = () => {
                 Create your account
               </p>
             </div>
+            {isLoading && (
+              <LoaderIcon className="animate-spin flex-col m-auto" />
+            )}
             <FormField
               control={form.control}
               name="fullname"
@@ -218,6 +226,7 @@ const SignupForm = () => {
             <Button
               type="submit"
               className="h-12 rounded-full mt-2 text-sm md:text-base"
+              disabled={isLoading}
             >
               Sign Up
             </Button>
@@ -239,6 +248,7 @@ const SignupForm = () => {
               variant="secondary"
               className="h-12 border-b border-slate-500 rounded-full flex-center gap-3 text-sm md:text-base"
               onClick={handleGoogleAuth}
+              disabled={isLoading}
             >
               <FcGoogle size={20} />
               Continue with Google

@@ -9,6 +9,7 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
+import { LoaderIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { FormEvent, useState } from "react";
@@ -25,8 +26,11 @@ import { googleAuth } from "@/lib/firebase/Firebase";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
-  const login = useLogin();
-  const loginWithGoogle = useLoginWithGoogle();
+
+  const { mutateAsync: login, isPending: isLoginUser } = useLogin();
+  const { mutateAsync: loginWithGoogle, isPending: isGoogleLoginUser } =
+    useLoginWithGoogle();
+  const isLoading = isLoginUser || isGoogleLoginUser;
 
   const { setUserAndToken, setIsAuthenticated } = useAuthContext();
   const navigate = useNavigate();
@@ -41,7 +45,7 @@ const LoginForm = () => {
 
   const handleLogin = async (user: z.infer<typeof LoginValidation>) => {
     try {
-      const userResponse = await login.mutateAsync(user);
+      const userResponse = await login(user);
       const userData = userResponse.data.data;
       const authToken = userResponse.headers["x-auth-token"];
 
@@ -93,7 +97,7 @@ const LoginForm = () => {
       }
 
       const accessToken = await googleUser.getIdToken();
-      const userResponse = await loginWithGoogle.mutateAsync(accessToken);
+      const userResponse = await loginWithGoogle(accessToken);
       const { data, headers } = userResponse;
       const { data: userData } = data;
       const authToken = headers["x-auth-token"];
@@ -150,7 +154,9 @@ const LoginForm = () => {
                 Login to your account
               </p>
             </div>
-
+            {isLoading && (
+              <LoaderIcon className="animate-spin flex-col m-auto" />
+            )}
             <FormField
               control={form.control}
               name="email"
@@ -208,6 +214,7 @@ const LoginForm = () => {
             <Button
               type="submit"
               className="h-12 rounded-full mt-2 text-sm md:text-base"
+              disabled={isLoading}
             >
               Log in
             </Button>
@@ -229,6 +236,7 @@ const LoginForm = () => {
               variant="secondary"
               className="h-12 border-b border-slate-500 rounded-full flex-center gap-3 text-sm md:text-base"
               onClick={handleGoogleAuth}
+              disabled={isLoading}
             >
               <FcGoogle size={20} />
               Continue with Google

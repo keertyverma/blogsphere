@@ -77,9 +77,8 @@ const UserNavigationPanel = () => {
               </Link>
             </MenubarItem>
             <MenubarSeparator />
-            <MenubarItem className="py-0">
+            <MenubarItem className="py-0" onClick={() => logoutUser()}>
               <Button
-                onClick={() => logoutUser()}
                 variant="secondary"
                 size="sm"
                 className="text-orange-800 p-0 bg-transparent font-medium"
