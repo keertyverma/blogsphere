@@ -12,7 +12,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     profileImage: "",
   });
   const [token, setToken] = useState<string>("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() =>
+    localStorage.getItem("blogsphere_user") ? true : false
+  );
 
   const navigate = useNavigate();
 
@@ -33,7 +35,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (loggedInUser) {
       const { user, token } = JSON.parse(loggedInUser);
       setUserAndToken(user, token);
-      setIsAuthenticated(true);
     } else {
       navigate("/login");
     }

@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/context/AuthProvider";
 import { useState } from "react";
-import { BsPencilSquare, BsSearch, BsBell } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
+import { BsBell, BsPencilSquare, BsSearch } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import Logo from "./Logo";
 import UserNavigationPanel from "./UserNavigationPanel";
 
 const NavBar = () => {
@@ -13,18 +14,7 @@ const NavBar = () => {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="flex items-center md:mr-12">
-        <img
-          src="assets/images/logo.png"
-          alt="logo"
-          width={60}
-          height={60}
-          className="object-contain"
-        />
-        <h1 className="text-xl font-bold text-slate-900 max-sm:hidden">
-          BlogSphere
-        </h1>
-      </Link>
+      <Logo />
       <div
         className={`absolute md:relative left-0 top-full md:inset-0 w-full md:w-auto mt-0.5  py-4 px-[7vw] md:block md:p-0 md:show ${
           toggleSearch ? "show" : "hide"
