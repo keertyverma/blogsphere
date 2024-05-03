@@ -150,4 +150,17 @@
   .input-icon {
     @apply absolute top-1/2 -translate-y-1/2 text-muted-foreground;
   }
+
+  /* File uploader */
+  .file_uploader-img {
+    @apply aspect-video rounded-sm object-cover object-top;
+  }
+
+  .file_uploader-label {
+    @apply text-muted-foreground text-center small-regular w-full p-2 border-t border-t-border;
+  }
+
+  .file_uploader-box {
+    @apply flex-center flex-col gap-2 p-7 h-20 sm:h-40 border-b border-border mt-4;
+  }
 }
