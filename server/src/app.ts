@@ -7,6 +7,7 @@ import compression from "compression";
 
 import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.route";
+import uploadRouter from "./routes/upload.route";
 import errorHandler from "./middlewares/error.middleware";
 import routeNotFoundHandler from "./middlewares/route-not-found.middleware";
 import rateLimiter from "./middlewares/rate-limit-middleware";
@@ -30,6 +31,7 @@ app.get(BASE_URL, (req: Request, res: Response) => {
 });
 app.use(`${BASE_URL}/users`, userRouter);
 app.use(`${BASE_URL}/auth`, authRouter);
+app.use(`${BASE_URL}/upload`, uploadRouter);
 
 // error handler middleware
 app.use(routeNotFoundHandler);
