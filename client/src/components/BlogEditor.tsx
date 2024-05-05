@@ -11,6 +11,7 @@ interface Props {
 
 const BlogEditor = ({ onPublish }: Props) => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
+  const [coverImgURL, setCoverImgURL] = useState("");
 
   return (
     <>
@@ -55,8 +56,20 @@ const BlogEditor = ({ onPublish }: Props) => {
                 <IoClose className="text-base md:text-lg text-secondary-foreground" />
               </Button>
               <hr className="border-border" />
-              <FileUploader />
+              <FileUploader
+                onUpload={(url) => {
+                  setToggleFileUploader(false);
+                  setCoverImgURL(url);
+                }}
+              />
             </div>
+          )}
+          {coverImgURL && (
+            <img
+              src={coverImgURL}
+              alt="cover image"
+              className="file_uploader-img"
+            />
           )}
         </section>
       </AnimationWrapper>

@@ -14,7 +14,7 @@ import rateLimiter from "./middlewares/rate-limit-middleware";
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(cors({ exposedHeaders: ["x-auth-token"] }));
 
 if (process.env.NODE_ENV === "production") {
