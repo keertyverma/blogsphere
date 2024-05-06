@@ -65,7 +65,7 @@ module.exports = {
       },
       fontFamily: {
         inter: ["Inter", "Arial", "Helvetica", "sans-serif"],
-        palanquin: ["Palanquin", "Arial", "Helvetica", "sans-serif"],
+        montserrat: ["Montserrat", "Arial", "Helvetica", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

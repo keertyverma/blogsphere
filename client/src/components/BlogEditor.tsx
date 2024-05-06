@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, KeyboardEvent, ChangeEvent } from "react";
 import AnimationWrapper from "./AnimationWrapper";
 import Logo from "./Logo";
 import { Button } from "./ui/button";
@@ -12,6 +12,17 @@ interface Props {
 const BlogEditor = ({ onPublish }: Props) => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
   const [coverImgURL, setCoverImgURL] = useState("");
+
+  const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.code === "Enter") {
+      e.preventDefault();
+    }
+  };
+
+  const handleTitleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const input = e.target;
+    input.style.height = `${input.scrollHeight}px`;
+  };
 
   return (
     <>
@@ -71,6 +82,12 @@ const BlogEditor = ({ onPublish }: Props) => {
               className="file_uploader-img"
             />
           )}
+          <textarea
+            placeholder="Title ..."
+            className="w-full h-20 h1-semibold mt-10 outline-none resize-none leading-tight"
+            onKeyDown={handleTitleKeyDown}
+            onChange={handleTitleChange}
+          ></textarea>
         </section>
       </AnimationWrapper>
     </>
