@@ -73,7 +73,7 @@ h6.ce-header {
 
 @layer base {
   * {
-    @apply m-0 p-0 box-border border-border list-none scroll-smooth;
+    @apply m-0 p-0 box-border border-border scroll-smooth;
   }
 
   body {

@@ -15,7 +15,10 @@ export const editorJSTools = {
       defaultLevel: 2,
     },
   },
-  list: List,
+  list: {
+    class: List,
+    inlineToolbar: true,
+  },
   image: Image,
   quote: Quote,
   marker: Marker,
