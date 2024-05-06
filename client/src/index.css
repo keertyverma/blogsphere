@@ -153,7 +153,7 @@
 
   /* File uploader */
   .file_uploader-img {
-    @apply aspect-video rounded-sm object-cover object-top;
+    @apply aspect-video rounded-lg object-cover;
   }
 
   .file_uploader-label {

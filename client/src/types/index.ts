@@ -23,3 +23,22 @@ export interface IUser {
   username: string;
   profileImage: string;
 }
+
+export interface IAuthor {
+  personalInfo: {
+    fullname: string;
+    email: string;
+    password?: string;
+    username: string;
+    bio?: string;
+    profileImage: string;
+  };
+}
+
+export interface IBlog {
+  title: string;
+  coverImg: string;
+  description: "";
+  tags: string[];
+  author: IAuthor;
+}

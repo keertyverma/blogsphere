@@ -1,17 +1,19 @@
-import { useState, KeyboardEvent, ChangeEvent } from "react";
+import { useEditorContext } from "@/context/editorContext";
+import { ChangeEvent, KeyboardEvent, useState } from "react";
+import { IoClose, IoImageOutline } from "react-icons/io5";
 import AnimationWrapper from "./AnimationWrapper";
+import FileUploader from "./FileUploader";
 import Logo from "./Logo";
 import { Button } from "./ui/button";
-import FileUploader from "./FileUploader";
-import { IoImageOutline, IoClose } from "react-icons/io5";
 
-interface Props {
-  onPublish: () => void;
-}
-
-const BlogEditor = ({ onPublish }: Props) => {
+const BlogEditor = () => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
-  const [coverImgURL, setCoverImgURL] = useState("");
+  const {
+    setIsPublish,
+    blog,
+    blog: { title, coverImg },
+    setBlog,
+  } = useEditorContext();
 
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.code === "Enter") {
@@ -22,6 +24,7 @@ const BlogEditor = ({ onPublish }: Props) => {
   const handleTitleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const input = e.target;
     input.style.height = `${input.scrollHeight}px`;
+    setBlog({ ...blog, title: input.value });
   };
 
   return (
@@ -29,7 +32,7 @@ const BlogEditor = ({ onPublish }: Props) => {
       <nav className="navbar">
         <Logo />
         <p className="max-md:hidden w-full text-black line-clamp-1 ml-10">
-          New Blog
+          {title?.length ? title : "New Blog"}
         </p>
         <div className="flex gap-2 ml-auto">
           <Button
@@ -39,7 +42,7 @@ const BlogEditor = ({ onPublish }: Props) => {
             save draft
           </Button>
           <Button
-            onClick={() => onPublish()}
+            onClick={() => setIsPublish(true)}
             className="rounded-full capitalize"
           >
             publish
@@ -70,21 +73,21 @@ const BlogEditor = ({ onPublish }: Props) => {
               <FileUploader
                 onUpload={(url) => {
                   setToggleFileUploader(false);
-                  setCoverImgURL(url);
+                  setBlog({ ...blog, coverImg: url });
                 }}
               />
             </div>
           )}
-          {coverImgURL && (
+          {coverImg && (
             <img
-              src={coverImgURL}
+              src={coverImg}
               alt="cover image"
-              className="file_uploader-img"
+              className="file_uploader-img mt-1 md:mt-4"
             />
           )}
           <textarea
             placeholder="Title ..."
-            className="w-full h-20 h1-semibold mt-10 outline-none resize-none leading-tight"
+            className="w-full h-20 h1-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"
             onKeyDown={handleTitleKeyDown}
             onChange={handleTitleChange}
           ></textarea>

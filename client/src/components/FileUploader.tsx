@@ -26,6 +26,7 @@ const FileUploader = ({ onUpload }: Props) => {
       toast.success("Uploaded 👍", {
         position: "top-right",
         className: "mt-20",
+        autoClose: 2000,
       });
     } catch (error) {
       setPreviewURL("");
