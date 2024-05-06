@@ -1,6 +1,8 @@
 import { useEditorContext } from "@/context/editorContext";
-import { ChangeEvent, KeyboardEvent, useState } from "react";
+import EditorJS from "@editorjs/editorjs";
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
+import { editorJSTools } from "../lib/editorjs-tools";
 import AnimationWrapper from "./AnimationWrapper";
 import FileUploader from "./FileUploader";
 import Logo from "./Logo";
@@ -14,6 +16,19 @@ const BlogEditor = () => {
     blog: { title, coverImg },
     setBlog,
   } = useEditorContext();
+
+  const isReady = useRef(false);
+  useEffect(() => {
+    if (!isReady.current) {
+      new EditorJS({
+        holder: "text-editor",
+        data: undefined,
+        tools: editorJSTools,
+        placeholder: "Type '/' for commands.",
+      });
+      isReady.current = true;
+    }
+  }, []);
 
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.code === "Enter") {
@@ -54,7 +69,7 @@ const BlogEditor = () => {
         <section className="mx-auto w-full max-w-[900px] p-4">
           <Button
             variant="ghost"
-            className="capitalize rounded-full flex-center gap-2 text-sm md:text-base text-secondary-foreground"
+            className="capitalize rounded-full flex-center gap-2 text-sm md:text-base text-secondary-foreground px-0"
             onClick={() => setToggleFileUploader((prev) => !prev)}
           >
             <IoImageOutline className="text-xl md:text-2xl text-secondary-foreground" />
@@ -91,6 +106,7 @@ const BlogEditor = () => {
             onKeyDown={handleTitleKeyDown}
             onChange={handleTitleChange}
           ></textarea>
+          <div id="text-editor"></div>
         </section>
       </AnimationWrapper>
     </>
