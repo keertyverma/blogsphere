@@ -1,3 +1,5 @@
+import { OutputData } from "@editorjs/editorjs";
+
 export type INewUser = {
   fullname: string;
   email: string;
@@ -41,4 +43,5 @@ export interface IBlog {
   description: "";
   tags: string[];
   author: IAuthor;
+  content: OutputData;
 }

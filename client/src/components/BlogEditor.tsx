@@ -2,6 +2,7 @@ import { useEditorContext } from "@/context/editorContext";
 import EditorJS from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
+import { toast } from "react-toastify";
 import { editorJSTools } from "../lib/editorjs-tools";
 import AnimationWrapper from "./AnimationWrapper";
 import FileUploader from "./FileUploader";
@@ -15,17 +16,22 @@ const BlogEditor = () => {
     blog,
     blog: { title, coverImg },
     setBlog,
+    textEditor,
+    setTextEditor,
   } = useEditorContext();
 
   const isReady = useRef(false);
   useEffect(() => {
     if (!isReady.current) {
-      new EditorJS({
-        holder: "text-editor",
-        data: undefined,
-        tools: editorJSTools,
-        placeholder: "Type '/' for commands.",
-      });
+      setTextEditor(
+        new EditorJS({
+          holder: "text-editor",
+          data: undefined,
+          tools: editorJSTools,
+          placeholder: "Type '/' for commands.",
+        })
+      );
+
       isReady.current = true;
     }
   }, []);
@@ -42,6 +48,31 @@ const BlogEditor = () => {
     setBlog({ ...blog, title: input.value });
   };
 
+  const handlePublish = async () => {
+    // validate blog editor data
+    if (!title.length) {
+      return toast.error("Add title to publish it");
+    }
+
+    // if (!coverImg.length) {
+    //   return toast.error("Add cover image to publish it");
+    // }
+
+    if (textEditor) {
+      try {
+        const data = await textEditor.save();
+        if (data?.blocks.length) {
+          setBlog({ ...blog, content: data });
+          setIsPublish(true);
+        } else {
+          return toast.error("Add content.Cannot publish an empty blog.");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -56,10 +87,7 @@ const BlogEditor = () => {
           >
             save draft
           </Button>
-          <Button
-            onClick={() => setIsPublish(true)}
-            className="rounded-full capitalize"
-          >
+          <Button onClick={handlePublish} className="rounded-full capitalize">
             publish
           </Button>
         </div>
