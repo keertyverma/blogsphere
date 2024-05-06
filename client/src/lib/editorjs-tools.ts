@@ -7,7 +7,14 @@ import Marker from "@editorjs/marker";
 import Quote from "@editorjs/quote";
 
 export const editorJSTools = {
-  header: Header,
+  header: {
+    class: Header,
+    config: {
+      placeholder: "Type Heading...",
+      levels: [1, 2, 3, 4, 5, 6],
+      defaultLevel: 2,
+    },
+  },
   list: List,
   image: Image,
   quote: Quote,
