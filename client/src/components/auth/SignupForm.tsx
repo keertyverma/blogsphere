@@ -25,7 +25,7 @@ import {
 import AnimationWrapper from "../AnimationWrapper";
 import { Input } from "../ui/input";
 
-import { useAuthContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/authContext";
 import { googleAuth } from "@/lib/firebase/Firebase";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";

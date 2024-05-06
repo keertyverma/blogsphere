@@ -1,6 +1,6 @@
 import BlogEditor from "@/components/BlogEditor";
 import PublishForm from "@/components/PublishForm";
-import { useAuthContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/authContext";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 

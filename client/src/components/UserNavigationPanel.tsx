@@ -1,4 +1,4 @@
-import { useAuthContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/authContext";
 import { IUser } from "@/types";
 import { Link } from "react-router-dom";
 import AnimationWrapper from "./AnimationWrapper";

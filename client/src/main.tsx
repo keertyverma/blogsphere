@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
 import { QueryProvider } from "./lib/react-query/QueryProvider.tsx";
-import AuthProvider from "./context/AuthProvider.tsx";
+import AuthProvider from "./context/authContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

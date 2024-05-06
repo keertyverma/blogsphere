@@ -1,4 +1,4 @@
-import { useAuthContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/authContext";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {

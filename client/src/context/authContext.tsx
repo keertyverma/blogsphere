@@ -1,7 +1,22 @@
-import { ReactNode, useContext, useEffect, useState } from "react";
-import authContext from "./authContext";
 import { IUser } from "@/types";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
+
+type AuthContextType = {
+  user: IUser;
+  token: string;
+  setUserAndToken: (user: IUser, token: string) => void;
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const authContext = createContext<AuthContextType>({} as AuthContextType);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<IUser>({

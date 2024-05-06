@@ -11,7 +11,7 @@ import {
 } from "../ui/form";
 
 import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/authContext";
 import { googleAuth } from "@/lib/firebase/Firebase";
 import { useLogin, useLoginWithGoogle } from "@/lib/react-query/queries";
 import { AxiosError } from "axios";

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuthContext } from "@/context/AuthProvider";
+import { useAuthContext } from "@/context/authContext";
 import { useState } from "react";
 import { BsBell, BsPencilSquare, BsSearch } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
