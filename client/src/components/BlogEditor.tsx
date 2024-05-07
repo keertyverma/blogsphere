@@ -65,7 +65,7 @@ const BlogEditor = () => {
           setBlog({ ...blog, content: data });
           setIsPublish(true);
         } else {
-          return toast.error("Add content.Cannot publish an empty blog.");
+          return toast.error("Can not publish an empty blog. Add content");
         }
       } catch (error) {
         console.log(error);
@@ -128,14 +128,16 @@ const BlogEditor = () => {
               className="cover-img mt-1 md:mt-4"
             />
           )}
-          <textarea
-            defaultValue={title}
-            placeholder="Title ..."
-            className="w-full h-20 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"
-            onKeyDown={handleTitleKeyDown}
-            onChange={handleTitleChange}
-          ></textarea>
-          <div id="text-editor"></div>
+          <div className="px-4">
+            <textarea
+              defaultValue={title}
+              placeholder="Title ..."
+              className="w-full h-20 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"
+              onKeyDown={handleTitleKeyDown}
+              onChange={handleTitleChange}
+            ></textarea>
+            <div id="text-editor"></div>
+          </div>
         </section>
       </AnimationWrapper>
     </>

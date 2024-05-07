@@ -17,3 +17,14 @@ export const LoginValidation = z.object({
     .string()
     .min(8, { message: "Password must be at least 8 characters." }),
 });
+
+export const BlogValidation = z.object({
+  title: z
+    .string()
+    .min(10, { message: "Title must be at least 10 characters." }),
+  description: z
+    .string()
+    .min(20, { message: "Short description must be atleast 20 characters." })
+    .max(200, { message: "Short description must be within 200 characters." }),
+  tag: z.string(),
+});

@@ -40,7 +40,7 @@ export interface IAuthor {
 export interface IBlog {
   title: string;
   coverImg: string;
-  description: "";
+  description: string;
   tags: string[];
   author: IAuthor;
   content: OutputData;

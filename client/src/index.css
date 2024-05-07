@@ -61,7 +61,7 @@
   }
 
   section {
-    @apply py-4 px-[5vw] md:px-[7vw] lg:px-[10vw];
+    @apply py-4 px-[5vw] md:px-[7vw] xl:px-[1vw];
   }
 }
 
@@ -78,6 +78,14 @@
   /* SHADCN COMPONENTS */
   .shad-input {
     @apply h-12 bg-muted border-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
+  }
+
+  .shad-form_message {
+    @apply text-destructive !important;
+  }
+
+  .shad-textarea {
+    @apply h-32 bg-muted rounded-xl border-none focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
   }
 }
 
@@ -161,6 +169,10 @@
 
   .input-icon {
     @apply absolute top-1/2 -translate-y-1/2 text-muted-foreground;
+  }
+
+  .input-box {
+    @apply w-[100%] rounded-md p-2 border border-border focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
   }
 
   .center {
