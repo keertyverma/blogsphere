@@ -4,26 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* EditorJS Headings  */
-h1.ce-header {
-  @apply text-3xl font-bold;
-}
-h2.ce-header {
-  @apply text-2xl font-semibold;
-}
-h3.ce-header {
-  @apply text-xl font-semibold;
-}
-h4.ce-header {
-  @apply text-lg font-semibold;
-}
-h5.ce-header {
-  @apply text-base font-semibold;
-}
-h6.ce-header {
-  @apply text-base font-semibold;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -77,7 +57,11 @@ h6.ce-header {
   }
 
   body {
-    @apply bg-background text-foreground min-h-screen font-inter;
+    @apply min-h-screen font-inter font-normal text-foreground bg-background;
+  }
+
+  section {
+    @apply py-4 px-[5vw] md:px-[7vw] lg:px-[10vw];
   }
 }
 
@@ -100,15 +84,23 @@ h6.ce-header {
 @layer utilities {
   /* TYPOGRAPHY */
   .h1-bold {
-    @apply text-[36px] font-bold leading-[140%] tracking-tighter;
+    @apply text-[30px] md:text-[36px] font-bold leading-[140%] tracking-tighter;
   }
 
   .h1-semibold {
-    @apply text-[30px] md:text-[36px]  font-semibold leading-[140%] tracking-tighter;
+    @apply text-[30px] md:text-[36px] font-semibold leading-[140%] tracking-tighter;
+  }
+
+  .h1-medium {
+    @apply text-[30px] md:text-[36px] font-medium leading-tight tracking-tighter;
   }
 
   .h2-bold {
-    @apply text-[30px] font-bold leading-[140%] tracking-tighter;
+    @apply text-[28px] md:text-[30px] font-bold leading-[140%] tracking-tighter;
+  }
+
+  .h2-semibold {
+    @apply text-[28px] md:text-[30px] font-semibold leading-[140%] tracking-tighter;
   }
 
   .h3-bold {
@@ -171,8 +163,12 @@ h6.ce-header {
     @apply absolute top-1/2 -translate-y-1/2 text-muted-foreground;
   }
 
+  .center {
+    @apply block mx-auto;
+  }
+
   /* File uploader */
-  .file_uploader-img {
+  .cover-img {
     @apply aspect-video rounded-lg object-cover;
   }
 
@@ -183,4 +179,29 @@ h6.ce-header {
   .file_uploader-box {
     @apply flex-center flex-col gap-2 p-7 h-20 sm:h-40 border-b border-border mt-4;
   }
+}
+
+/* EditorJS Styles  */
+h1.ce-header {
+  @apply text-3xl font-bold;
+}
+h2.ce-header {
+  @apply text-2xl font-semibold;
+}
+h3.ce-header {
+  @apply text-xl font-semibold;
+}
+h4.ce-header {
+  @apply text-lg font-semibold;
+}
+h5.ce-header {
+  @apply text-base font-semibold;
+}
+h6.ce-header {
+  @apply text-base font-semibold;
+}
+
+.ce-block__content,
+.ce-toolbar__content {
+  max-width: 900px;
 }

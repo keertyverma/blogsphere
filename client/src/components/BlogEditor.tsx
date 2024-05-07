@@ -14,7 +14,7 @@ const BlogEditor = () => {
   const {
     setIsPublish,
     blog,
-    blog: { title, coverImg },
+    blog: { title, coverImg, content },
     setBlog,
     textEditor,
     setTextEditor,
@@ -26,7 +26,7 @@ const BlogEditor = () => {
       setTextEditor(
         new EditorJS({
           holder: "text-editor",
-          data: undefined,
+          data: content,
           tools: editorJSTools,
           placeholder: "Type '/' for commands.",
         })
@@ -94,7 +94,7 @@ const BlogEditor = () => {
       </nav>
 
       <AnimationWrapper>
-        <section className="mx-auto w-full max-w-[900px] p-4">
+        <section className="mx-auto w-full max-w-[900px]">
           <Button
             variant="ghost"
             className="capitalize rounded-full flex-center gap-2 text-sm md:text-base text-secondary-foreground px-0"
@@ -125,12 +125,13 @@ const BlogEditor = () => {
             <img
               src={coverImg}
               alt="cover image"
-              className="file_uploader-img mt-1 md:mt-4"
+              className="cover-img mt-1 md:mt-4"
             />
           )}
           <textarea
+            defaultValue={title}
             placeholder="Title ..."
-            className="w-full h-20 h1-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"
+            className="w-full h-20 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"
             onKeyDown={handleTitleKeyDown}
             onChange={handleTitleChange}
           ></textarea>

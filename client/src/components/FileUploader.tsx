@@ -79,7 +79,7 @@ const FileUploader = ({ onUpload }: Props) => {
       {previewURL ? (
         <>
           <div className="flex flex-1 justify-center w-full p-1">
-            <img src={previewURL} alt="image" className="file_uploader-img" />
+            <img src={previewURL} alt="cover image" className="cover-img" />
           </div>
           <p className="file_uploader-label">Click photo to replace</p>
         </>
