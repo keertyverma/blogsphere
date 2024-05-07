@@ -94,7 +94,7 @@ const PublishForm = () => {
 
   return (
     <AnimationWrapper>
-      <section className="w-screen min-h-screen grid lg:grid-cols-2 py-16 gap-2 lg:gap-1">
+      <section className="w-screen grid lg:grid-cols-2 py-16 gap-2 lg:gap-1">
         <Button
           variant="ghost"
           className="absolute right-[5vw] top-[1%] md:top-[2%] z-10"
@@ -103,7 +103,7 @@ const PublishForm = () => {
           <IoClose className="text-xl md:text-2xl" />
         </Button>
         {/* preview */}
-        <div className="max-w-[550px] center">
+        <div className="max-w-[550px] md:center">
           <p className="text-md md:text-lg text-muted-foreground mb-1">
             Preview
           </p>
@@ -116,7 +116,7 @@ const PublishForm = () => {
 
           <h1 className="h1-medium mt-2 line-clamp-2">{titleValue}</h1>
 
-          <p className="text-base md:text-lg max-sm:line-clamp-2 leading-7 mt-4">
+          <p className="text-base md:text-lg line-clamp-2 md:line-clamp-4 leading-7 mt-4 overflow-hidden">
             {descriptionValue}
           </p>
         </div>
@@ -124,7 +124,7 @@ const PublishForm = () => {
         {/* publish form */}
         <Form {...form}>
           <form
-            className="p-2 lg:p-6 border-[1px]  border-border rounded-lg lg:shadow-md flex flex-col gap-4 md:gap-3 mt-5 md:max-w-[700px]"
+            className="p-2 lg:p-6 border-[1px] border-border rounded-lg lg:shadow-md flex flex-col gap-4 md:gap-3 max-sm:mt-5 md:max-w-[700px]"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
             <FormField
