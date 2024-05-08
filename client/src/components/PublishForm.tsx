@@ -68,13 +68,13 @@ const PublishForm = () => {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.code === "Enter") {
+    if (e.key === "Enter") {
       e.preventDefault();
     }
   };
 
   const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === "Enter" || e.code === "Comma") {
+    if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
 
       const inputElement = e.target as HTMLInputElement;
