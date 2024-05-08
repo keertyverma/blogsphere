@@ -37,7 +37,7 @@ const BlogEditor = () => {
   }, []);
 
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.code === "Enter") {
+    if (e.key === "Enter") {
       e.preventDefault();
     }
   };

@@ -74,7 +74,17 @@ const PublishForm = () => {
   };
 
   const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
+    // TODO: remove this later,
+    toast.error(`key = ${e.key}, code = ${e.code}, keyCode = ${e.keyCode}`, {
+      autoClose: 12000,
+    });
+
+    if (
+      e.key === "Enter" ||
+      e.key === "," ||
+      e.code === "Comma" ||
+      e.keyCode === 188
+    ) {
       e.preventDefault();
 
       const inputElement = e.target as HTMLInputElement;
@@ -162,7 +172,7 @@ const PublishForm = () => {
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      className="shad-textarea custom-scrollbar md:text-base"
+                      className="shad-textarea custom-scrollbar md:text-base placeholder:text-sm"
                       placeholder="Summarize your blog in a few words"
                       {...field}
                       onChange={(e) => {
@@ -189,14 +199,14 @@ const PublishForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-muted-foreground">
-                    Topics - (Enhances blog searchability and ranking)
+                    Tags - (Enhances blog searchability and ranking)
                   </FormLabel>
                   <FormControl>
                     <div className="relative input-box bg-muted">
                       <Input
                         type="text"
-                        placeholder='Add Tags (separated by comma " , "'
-                        className="mt-1 input-box sticky top-0 left-0 bg-white mb-3 md:text-base"
+                        placeholder="Add Tag and press enter or comma"
+                        className="mt-1 input-box sticky top-0 left-0 bg-white mb-3 md:text-base placeholder:text-sm"
                         {...field}
                         onKeyDown={handleTagKeyDown}
                       />
