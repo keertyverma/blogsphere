@@ -1,7 +1,7 @@
 import { useEditorContext } from "@/context/editorContext";
 import { BlogValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { KeyboardEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
 import { toast } from "react-toastify";
@@ -72,32 +72,58 @@ const PublishForm = () => {
       e.preventDefault();
     }
   };
+  const addTags = (tag: string) => {
+    if (tags.length < TAG_LIMIT) {
+      // add tag
+      if (tag.length && !tags.includes(tag))
+        setBlog({ ...blog, tags: [...tags, tag] });
+    } else {
+      toast.error(`You can add maximum of ${TAG_LIMIT} tags`);
+    }
+  };
 
+  /**
+   * Handle input key down event for adding tags.
+   * Triggers when 'Enter' key is pressed, preventing default behavior.
+   * Adds the trimmed input value as a tag.
+   * Resets the input value after processing.
+   *
+   * @param {KeyboardEvent<HTMLInputElement>} e - The input keyboard event object.
+   */
   const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    // TODO: remove this later,
-    toast.error(`key = ${e.key}, code = ${e.code}, keyCode = ${e.keyCode}`, {
-      autoClose: 12000,
-    });
+    /* This function does not handle the 'comma' key event due to an issue with the Android Google browser. 
+      In this browser, the comma key is not properly identified, and instead, a keycode of 229 is returned for most keys.
+      Known Chromium Bug -> https://issues.chromium.org/issues/41368867
+    */
 
-    if (
-      e.key === "Enter" ||
-      e.key === "," ||
-      e.code === "Comma" ||
-      e.keyCode === 188
-    ) {
+    if (e.key === "Enter") {
       e.preventDefault();
 
       const inputElement = e.target as HTMLInputElement;
       const tag = inputElement.value.trim();
-      if (tags.length < TAG_LIMIT) {
-        // add tag
-        if (tag.length && !tags.includes(tag))
-          setBlog({ ...blog, tags: [...tags, tag] });
-      } else {
-        toast.error(`You can add maximum of ${TAG_LIMIT} tags`);
-      }
+      addTags(tag);
 
       // reset input value
+      form.setValue("tag", "");
+    }
+  };
+
+  /**
+   * Handle input change event for adding tags.
+   * Checks if a 'comma' is present at the end of the input value,
+   * Extracts the value other than the comma, and adds it as a tag.
+   * Resets the input value after processing.
+   *
+   * @param {ChangeEvent<HTMLInputElement>} e - The input change event object.
+   */
+  const handleTagOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const inputElement = e.target as HTMLInputElement;
+    const inputValue = inputElement.value.trim();
+
+    if (inputValue.endsWith(",")) {
+      const tag = inputValue.slice(0, -1).trim();
+      addTags(tag);
+
       form.setValue("tag", "");
     }
   };
@@ -208,6 +234,10 @@ const PublishForm = () => {
                         placeholder="Add Tag and press enter or comma"
                         className="mt-1 input-box sticky top-0 left-0 bg-white mb-3 md:text-base placeholder:text-sm"
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleTagOnChange(e);
+                        }}
                         onKeyDown={handleTagKeyDown}
                       />
                       {tags.map((tag, index) => (
