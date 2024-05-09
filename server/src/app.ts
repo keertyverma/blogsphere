@@ -6,9 +6,7 @@ import helmet from "helmet";
 import compression from "compression";
 
 import { userRouter, authRouter, uploadRouter, blogRouter } from "./routes";
-import errorHandler from "./middlewares/error.middleware";
-import routeNotFoundHandler from "./middlewares/route-not-found.middleware";
-import rateLimiter from "./middlewares/rate-limit-middleware";
+import { errorHandler, routeNotFoundHandler, rateLimiter } from "./middlewares";
 
 const app = express();
 

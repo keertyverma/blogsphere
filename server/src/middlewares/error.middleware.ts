@@ -10,7 +10,7 @@ import {
 import CustomAPIError from "../utils/errors/custom-api";
 import logger from "../utils/logger";
 
-const errorHandler = (
+export const errorHandler = (
   err: MongooseError | CustomAPIError | Error,
   req: Request,
   res: Response,
@@ -71,5 +71,3 @@ const errorHandler = (
 
   res.status(customError.statusCode).send(errorResponse);
 };
-
-export default errorHandler;

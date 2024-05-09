@@ -103,7 +103,7 @@ describe("/api/v1/users", () => {
 
       const { id, fullname, email, username, profileImage } = responseData;
 
-      expect(id).not.toBeNull;
+      expect(id).toBeDefined();
       expect(fullname).toBe(userData.fullname.toLowerCase());
       expect(email).toBe(userData.email);
       expect(username).toBe(userData.email.split("@")[0]);
@@ -126,15 +126,20 @@ describe("/api/v1/users", () => {
         password: "Pluto123",
         email: "test@test2.com",
       };
+
       const res = await request(server)
         .post(`${endpoint}/register`)
         .send(userData);
+
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
-      const responseData = res.body.data;
-      expect(responseData._id).not.toBeNull;
-      expect(responseData.username).not.toBe(userData.email.split("@")[0]);
-      expect(responseData.username).toMatch(/test/);
+      const {
+        data: { id, username },
+      } = res.body;
+
+      expect(id).toBeDefined();
+      expect(username).not.toBe(userData.email.split("@")[0]);
+      expect(username).toMatch(/test/);
     });
   });
 });

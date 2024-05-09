@@ -71,7 +71,7 @@ const userSchema = new Schema(
 userSchema.methods.generateAuthToken = function (): string {
   return jwt.sign(
     {
-      id: this._id,
+      id: this.id,
     },
     config.get("secretAccessKey")
   );

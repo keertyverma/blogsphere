@@ -3,7 +3,7 @@ import ms from "ms";
 
 const MAX_COUNT = 200;
 
-const rateLimiter = rateLimit({
+export const rateLimiter = rateLimit({
   windowMs: ms("1h"),
   max: MAX_COUNT,
   message: `You have exceeded your ${MAX_COUNT} requests per hour limit.`,
@@ -13,5 +13,3 @@ const rateLimiter = rateLimit({
     xForwardedForHeader: false, // Disable validation for X-Forwarded-For header
   },
 });
-
-export default rateLimiter;
