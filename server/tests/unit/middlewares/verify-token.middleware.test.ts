@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import { NextFunction, Request, Response } from "express";
 import { User } from "../../../src/models/user.model";
 import { verifyToken } from "../../../src/middlewares";

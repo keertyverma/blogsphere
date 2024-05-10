@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Error as MongooseError } from "mongoose";
 
-import errorHandler from "../../../src/middlewares/error.middleware";
+import { errorHandler } from "../../../src/middlewares";
 import NotFoundError from "../../../src/utils/errors/not-found";
 import BadRequestError from "../../../src/utils/errors/bad-request";
 import CustomAPIError from "../../../src/utils/errors/custom-api";
