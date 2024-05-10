@@ -54,9 +54,9 @@ const BlogEditor = () => {
       return toast.error("Add title to publish it");
     }
 
-    // if (!coverImg.length) {
-    //   return toast.error("Add cover image to publish it");
-    // }
+    if (!coverImg.length) {
+      return toast.error("Add cover image to publish it");
+    }
 
     if (textEditor) {
       try {

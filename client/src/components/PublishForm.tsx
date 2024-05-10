@@ -1,13 +1,17 @@
+import { useAuthContext } from "@/context/authContext";
 import { useEditorContext } from "@/context/editorContext";
+import { useCreateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "./AnimationWrapper";
 import Tag from "./Tag";
+import LoadingSpinner from "./ui/LoadingSpinner";
 import { Button } from "./ui/button";
 import {
   Form,
@@ -25,13 +29,16 @@ const PublishForm = () => {
   const TAG_LIMIT = 10;
   const DESCRIPTION_CHAR_LIMIT = 200;
   const {
-    blog: { title, coverImg, description, tags },
+    blog: { title, coverImg, description, tags, content },
     blog,
     setIsPublish,
     setBlog,
   } = useEditorContext();
   const [titleValue, setTitleValue] = useState(title);
   const [descriptionValue, setDescriptionValue] = useState(description);
+  const { token } = useAuthContext();
+  const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof BlogValidation>>({
     resolver: zodResolver(BlogValidation),
@@ -43,16 +50,46 @@ const PublishForm = () => {
   });
 
   const handleSubmit = async (value: z.infer<typeof BlogValidation>) => {
-    console.log(value);
-    const { title, description } = value;
+    const { title, description, tag } = value;
 
-    setBlog({ ...blog, title, description });
+    // tags are required
+    if (blog.tags.length === 0 && !tag) {
+      toast.error("Add atleast one tag to publish");
+      return;
+    }
 
-    // call api
-    // handle loading
-    // handle error
+    const updatedBlog = {
+      title,
+      description,
+      tags: blog.tags.length === 0 ? [tag] : blog.tags,
+    };
 
-    // form.reset()
+    setBlog((prevBlog) => ({
+      ...prevBlog,
+      ...updatedBlog,
+    }));
+
+    // publish blog
+    try {
+      await createBlog({
+        blog: {
+          title,
+          description,
+          content: { blocks: content.blocks },
+          coverImgURL: coverImg,
+          tags: updatedBlog.tags,
+          isDraft: false,
+        },
+        token,
+      });
+
+      form.reset();
+      toast.success("Published 🥳");
+      // TODO: navigate to user dashboard
+      navigate("/");
+    } catch (error) {
+      toast.error("An error occurred. Please try again later.");
+    }
   };
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,6 +200,7 @@ const PublishForm = () => {
             className="p-2 lg:p-6 border-[1px] border-border rounded-lg lg:shadow-md flex flex-col gap-4 md:gap-3 max-sm:mt-5 md:max-w-[700px]"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
+            {isPublishing && <LoadingSpinner className="flex-col m-auto" />}
             <FormField
               control={form.control}
               name="title"
@@ -259,8 +297,9 @@ const PublishForm = () => {
               <Button
                 type="submit"
                 className="h-12 px-6 md:px-8 rounded-full text-sm md:text-base"
+                disabled={isPublishing}
               >
-                Publish
+                {isPublishing ? "Publishing" : "Publish"}
               </Button>
             </div>
           </form>
