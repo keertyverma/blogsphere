@@ -6,6 +6,7 @@ import http from "http";
 
 import appServer from "../../../src";
 import { User } from "../../../src/models/user.model";
+import { Blog } from "../../../src/models/blog.model";
 
 let server: http.Server;
 let endpoint: string = `/${config.get("appName")}/api/v1/blogs`;
@@ -23,8 +24,8 @@ describe("/api/v1/blogs", () => {
   afterEach(async () => {
     server.close();
     // db cleanup
-
-    // TODO: delete all blogs
+    await User.deleteMany({});
+    await Blog.deleteMany({});
   });
 
   describe("POST /", () => {
@@ -36,8 +37,9 @@ describe("/api/v1/blogs", () => {
         .send(payload);
     };
 
-    beforeEach(() => {
-      token = `Bearer ${new User().generateAuthToken()}`;
+    beforeEach(async () => {
+      const user = new User();
+      token = `Bearer ${user.generateAuthToken()}`;
     });
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
@@ -89,7 +91,6 @@ describe("/api/v1/blogs", () => {
         description: "short blog description in few words",
         tags: new Array(11).fill("some-tag"),
         content: {
-          time: 1715268053849,
           blocks: [
             {
               id: "O8uS0t2SUk",
@@ -100,7 +101,6 @@ describe("/api/v1/blogs", () => {
               },
             },
           ],
-          version: "2.29.1",
         },
       });
 
@@ -110,6 +110,60 @@ describe("/api/v1/blogs", () => {
         message: "Invalid input data",
         details: '"tags" must contain less than or equal to 10 items',
       });
+    });
+
+    it("should create blog if request is valid", async () => {
+      // create a valid user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+      const totalPosts = user.accountInfo.totalPosts;
+
+      const blog = {
+        title: "How to setup zustand ! with react app @ok ",
+        description: "This is a short tutorial with required steps to setup",
+        coverImgURL: "https://sample.jpg",
+        tags: ["zustand", "reactjs"],
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "this is how it is done",
+                level: 2,
+              },
+            },
+            {
+              id: "s-VOjHF8Kk",
+              type: "list",
+              data: {
+                style: "ordered",
+                items: ["step-1", "step-2", "step-3"],
+              },
+            },
+          ],
+        },
+      };
+
+      const res = await exec(blog);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body.status).toBe("success");
+
+      const { id } = res.body.data;
+      expect(id).toBeDefined();
+
+      // check user total posts and blog
+      const updatedUser = await User.findById(user.id);
+      expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts + 1);
+      expect(updatedUser?.blogs).toHaveLength(1);
     });
   });
 });

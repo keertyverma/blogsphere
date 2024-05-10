@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Types } from "mongoose";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
 import config from "config";
@@ -13,6 +13,13 @@ interface IUser {
     profileImage?: string;
   };
   googleAuth: boolean;
+  accountInfo: {
+    totalPosts: number;
+    totalReads: number;
+  };
+  blogs: string[];
+  joinedAt: Date;
+  updatedAt: Date;
 }
 
 interface IUserDocument extends IUser, Document {
@@ -64,6 +71,22 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    accountInfo: {
+      totalPosts: {
+        type: Number,
+        default: 0,
+      },
+      totalReads: {
+        type: Number,
+        default: 0,
+      },
+    },
+    blogs: [
+      {
+        type: Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
   },
   { timestamps: true }
 );

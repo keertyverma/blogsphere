@@ -16,7 +16,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  logger.debug(err);
+  logger.debug(`${err}`);
 
   const errorCodeMessageMap: IErrorCodeMessageMap = {
     400: { code: "BAD_REQUEST", message: "Invalid input data" },
