@@ -112,7 +112,62 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should create blog if request is valid", async () => {
+    it("should create draft blog if request is valid", async () => {
+      // create a valid user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+      const totalPosts = user.accountInfo.totalPosts;
+
+      const blog = {
+        isDraft: true,
+        title: "How to setup zustand ! with react app @ok ",
+        coverImgURL: "https://sample.jpg",
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "this is how it is done",
+                level: 2,
+              },
+            },
+            {
+              id: "s-VOjHF8Kk",
+              type: "list",
+              data: {
+                style: "ordered",
+                items: ["step-1", "step-2", "step-3"],
+              },
+            },
+          ],
+        },
+      };
+
+      const res = await exec(blog);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body.status).toBe("success");
+
+      const { id } = res.body.data;
+      expect(id).toBeDefined();
+
+      // check user
+      const updatedUser = await User.findById(user.id);
+      // draft blog must be added to blogs
+      expect(updatedUser?.blogs).toHaveLength(1);
+      // total posts should not increase
+      expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts);
+    });
+
+    it("should create publish blog if request is valid", async () => {
       // create a valid user
       const user = await User.create({
         personalInfo: {
@@ -160,10 +215,12 @@ describe("/api/v1/blogs", () => {
       const { id } = res.body.data;
       expect(id).toBeDefined();
 
-      // check user total posts and blog
+      // check user
       const updatedUser = await User.findById(user.id);
-      expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts + 1);
+      // draft blog must be added to blogs
       expect(updatedUser?.blogs).toHaveLength(1);
+      // total posts should not increase
+      expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts + 1);
     });
   });
 });

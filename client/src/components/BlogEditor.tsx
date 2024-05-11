@@ -1,7 +1,10 @@
+import { useAuthContext } from "@/context/authContext";
 import { useEditorContext } from "@/context/editorContext";
+import { useCreateBlog } from "@/lib/react-query/queries";
 import EditorJS from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { editorJSTools } from "../lib/editorjs-tools";
 import AnimationWrapper from "./AnimationWrapper";
@@ -14,11 +17,14 @@ const BlogEditor = () => {
   const {
     setIsPublish,
     blog,
-    blog: { title, coverImg, content },
+    blog: { title, coverImg, content, tags, description },
     setBlog,
     textEditor,
     setTextEditor,
   } = useEditorContext();
+  const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
+  const { token } = useAuthContext();
+  const navigate = useNavigate();
 
   const isReady = useRef(false);
   useEffect(() => {
@@ -73,6 +79,45 @@ const BlogEditor = () => {
     }
   };
 
+  const handleSaveDraft = async () => {
+    if (!title.length) {
+      return toast.error("Add title to save the blog");
+    }
+
+    let content;
+    if (textEditor) {
+      try {
+        const data = await textEditor.save();
+        if (data?.blocks.length) {
+          content = data;
+          setBlog({ ...blog, content: data });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // save blog in draft
+    try {
+      await saveBlog({
+        blog: {
+          title,
+          description,
+          content: { blocks: content?.blocks },
+          coverImgURL: coverImg,
+          tags: tags,
+          isDraft: true,
+        },
+        token,
+      });
+
+      toast.success("Saved 👍");
+      navigate("/");
+    } catch (error) {
+      toast.error("An error occurred. Please try again later.");
+    }
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -84,8 +129,10 @@ const BlogEditor = () => {
           <Button
             variant="secondary"
             className="rounded-full capitalize border-b border-border"
+            onClick={handleSaveDraft}
+            disabled={isSaving}
           >
-            save draft
+            {isSaving ? "saving draft" : "save draft"}
           </Button>
           <Button onClick={handlePublish} className="rounded-full capitalize">
             publish

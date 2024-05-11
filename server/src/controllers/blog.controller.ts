@@ -13,14 +13,7 @@ import logger from "../utils/logger";
 const SPECIAL_CHARS_REGEX = /[^a-zA-Z0-9]/g; // find all special characters
 const SPACE_REGEX = /\s+/g; // find one or more consecutives space
 
-export const validateCreateBlog = (blog: {
-  title: string;
-  description: string;
-  content: { blocks: [{ id: string; type: string; data: object }] };
-  coverImgURL: string;
-  tags: string[];
-  isDraft: boolean;
-}) => {
+const validateCreateBlog = (blog: any, isDraft: boolean) => {
   const contentSchema = Joi.object({
     blocks: Joi.array()
       .items(
@@ -33,7 +26,16 @@ export const validateCreateBlog = (blog: {
       .required(),
   });
 
-  const schema = Joi.object({
+  const draftBlogSchema = Joi.object({
+    title: Joi.string().required(),
+    description: Joi.string().min(0).max(200),
+    content: contentSchema,
+    tags: Joi.array().items(Joi.string()).max(10),
+    coverImgURL: Joi.string().min(0),
+    isDraft: Joi.boolean(),
+  });
+
+  const publishBlogSchema = Joi.object({
     title: Joi.string().required(),
     description: Joi.string().max(200).required(),
     content: contentSchema.required(),
@@ -42,30 +44,33 @@ export const validateCreateBlog = (blog: {
     isDraft: Joi.boolean(),
   });
 
-  return schema.validate(blog);
-};
+  const schema = isDraft ? draftBlogSchema : publishBlogSchema;
 
-const createBlog = async (req: Request, res: Response) => {
-  logger.debug(`POST Request on Route -> ${req.baseUrl}`);
-
-  // validate request body
-  const { error } = validateCreateBlog(req.body);
-
+  const { error } = schema.validate(blog);
   if (error) {
     let errorMessage = error.details[0].message;
     logger.error(`Input Validation Error! \n ${errorMessage}`);
     throw new BadRequestError(errorMessage);
   }
+};
+
+const createBlog = async (req: Request, res: Response) => {
+  logger.debug(`POST Request on Route -> ${req.baseUrl}`);
+
+  const isDraft = Boolean(req.body.isDraft);
+
+  // validate request body
+  validateCreateBlog(req.body, isDraft);
 
   const authorId = (req.user as JwtPayload).id;
-  let { title, description, content, coverImgURL, tags, isDraft } = req.body;
+  let { title, description, content, coverImgURL, tags } = req.body;
 
   // create unique blogId
   let blogId =
     title.replace(SPECIAL_CHARS_REGEX, " ").replace(SPACE_REGEX, "-").trim() +
     nanoid();
 
-  tags = tags.map((tag: string) => tag.toLowerCase());
+  tags = tags?.map((tag: string) => tag.toLowerCase());
 
   //create blog
   let blog = new Blog({

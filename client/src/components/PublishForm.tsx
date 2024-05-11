@@ -85,6 +85,7 @@ const PublishForm = () => {
 
       form.reset();
       toast.success("Published 🥳");
+      setIsPublish(false);
       // TODO: navigate to user dashboard
       navigate("/");
     } catch (error) {

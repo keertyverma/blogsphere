@@ -25,19 +25,15 @@ const blogSchema = new Schema(
     description: {
       type: String,
       maxlength: 200,
-      required: true,
     },
     content: {
       type: Array,
-      required: true,
     },
     coverImgURL: {
       type: String,
-      required: true,
     },
     tags: {
       type: [String],
-      required: true,
     },
     author: {
       type: Schema.Types.ObjectId,
