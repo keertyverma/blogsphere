@@ -191,6 +191,11 @@
   .file_uploader-box {
     @apply flex-center flex-col gap-2 p-7 h-20 sm:h-40 border-b border-border mt-4;
   }
+
+  /* Text Editor */
+  #text-editor img {
+    @apply aspect-video rounded-lg object-cover;
+  }
 }
 
 /* EditorJS Styles  */
