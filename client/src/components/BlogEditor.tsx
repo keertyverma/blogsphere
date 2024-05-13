@@ -103,7 +103,7 @@ const BlogEditor = () => {
         blog: {
           title,
           description,
-          content: { blocks: content?.blocks },
+          content: content ? { blocks: content?.blocks } : undefined,
           coverImgURL: coverImg,
           tags: tags,
           isDraft: true,
