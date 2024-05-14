@@ -38,10 +38,12 @@ export interface IAuthor {
 }
 
 export interface IBlog {
+  blogId?: string;
   title: string;
   coverImg: string;
   description: string;
   tags: string[];
   author: IAuthor;
   content: OutputData;
+  createdAt?: Date;
 }

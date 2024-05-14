@@ -1,6 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { IBlog, IFetchResponse, INewUser } from "@/types";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import apiClient from "../api-client";
-import { INewUser } from "@/types";
+import { QUERY_KEYS } from "./queryKeys";
 
 // ----------------- User -------------------
 export const useCreateUserAccount = () =>
@@ -37,4 +38,13 @@ export const useCreateBlog = () =>
           },
         })
         .then((res) => res.data),
+  });
+
+export const useGetLatestBlog = () =>
+  useQuery<IBlog[]>({
+    queryKey: [QUERY_KEYS.GET_LATEST_BLOG],
+    queryFn: () =>
+      apiClient
+        .get<IBlog[]>("/blogs/latest")
+        .then((res) => (res.data as IFetchResponse).data),
   });
