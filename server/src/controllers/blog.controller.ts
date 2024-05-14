@@ -117,4 +117,27 @@ const createBlog = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
-export { createBlog };
+const getLatestBlogs = async (req: Request, res: Response) => {
+  logger.debug(`GET Request on Route -> ${req.baseUrl}`);
+
+  const MAX_LIMIT = 2;
+
+  const bloges = await Blog.find({ isDraft: false })
+    .populate(
+      "author",
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+    )
+    .limit(MAX_LIMIT)
+    .sort({ createdAt: -1 })
+    .select("blogId title description coverImgURL tags createdAt -_id");
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: bloges,
+  };
+
+  return res.status(result.statusCode).json(result);
+};
+
+export { createBlog, getLatestBlogs };

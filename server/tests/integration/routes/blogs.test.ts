@@ -223,4 +223,75 @@ describe("/api/v1/blogs", () => {
       expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts + 1);
     });
   });
+
+  describe("GET /latest", () => {
+    it("should return all latest blogs", async () => {
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+          profileImage: "http://example-img.png",
+        },
+      });
+
+      // create a few draft and published blogs
+      const draftBlog = {
+        blogId: "my-draft-blog-sub125bfjvj",
+        title: "My draft blog",
+        author: user.id,
+        isDraft: true,
+      };
+
+      const publishedBlog = {
+        isDraft: false,
+        blogId: "how-to-setup-zustand-with-react-app-oki178bfopl",
+        title: "How to setup zustand ! with react app @ok ",
+        description: "some short description",
+        coverImgURL: "https://sample.jpg",
+        author: user.id,
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "this is how it is done",
+                level: 2,
+              },
+            },
+            {
+              id: "s-VOjHF8Kk",
+              type: "list",
+              data: {
+                style: "ordered",
+                items: ["step-1", "step-2", "step-3"],
+              },
+            },
+          ],
+        },
+        tags: ["tag1", "tag2", "tag3"],
+      };
+
+      await Blog.create([draftBlog, publishedBlog]);
+
+      const res = await request(server).get(`${endpoint}/latest`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+
+      // only published blog must be returned
+      expect(res.body.data).toHaveLength(1);
+      const {
+        blogId,
+        author: {
+          personalInfo: { username },
+        },
+      } = res.body.data[0];
+
+      expect(blogId).toBe(publishedBlog.blogId);
+      expect(username).toBe(user.personalInfo.username);
+    });
+  });
 });
