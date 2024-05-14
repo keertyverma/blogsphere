@@ -6,11 +6,11 @@ import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { editorJSTools } from "../lib/editorjs-tools";
-import AnimationWrapper from "./AnimationWrapper";
-import FileUploader from "./FileUploader";
-import Logo from "./Logo";
-import { Button } from "./ui/button";
+import { editorJSTools } from "../../lib/editorjs-tools";
+import AnimationWrapper from "../shared/AnimationWrapper";
+import FileUploader from "../shared/FileUploader";
+import Logo from "../shared/Logo";
+import { Button } from "../ui/button";
 
 const BlogEditor = () => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);

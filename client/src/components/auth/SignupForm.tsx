@@ -22,7 +22,7 @@ import {
   useCreateUserAccount,
   useLoginWithGoogle,
 } from "../../lib/react-query/queries";
-import AnimationWrapper from "../AnimationWrapper";
+import AnimationWrapper from "../shared/AnimationWrapper";
 import { Input } from "../ui/input";
 
 import { useAuthContext } from "@/context/authContext";

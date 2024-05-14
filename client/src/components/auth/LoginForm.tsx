@@ -20,7 +20,7 @@ import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import AnimationWrapper from "../AnimationWrapper";
+import AnimationWrapper from "../shared/AnimationWrapper";
 import { Input } from "../ui/input";
 import LoadingSpinner from "../ui/LoadingSpinner";
 

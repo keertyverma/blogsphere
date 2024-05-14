@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 
 import { useUpload } from "@/lib/react-query/queries";
 import { convertFileToUrl, fileToBase64 } from "@/lib/utils";
-import LoadingSpinner from "./ui/LoadingSpinner";
-import { Button } from "./ui/button";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import { Button } from "../ui/button";
 
 interface Props {
   onUpload: (url: string) => void;

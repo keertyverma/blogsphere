@@ -9,10 +9,10 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as z from "zod";
-import AnimationWrapper from "./AnimationWrapper";
+import AnimationWrapper from "../shared/AnimationWrapper";
 import Tag from "./Tag";
-import LoadingSpinner from "./ui/LoadingSpinner";
-import { Button } from "./ui/button";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -21,9 +21,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 const PublishForm = () => {
   const TAG_LIMIT = 10;

@@ -1,8 +1,8 @@
 import { useAuthContext } from "@/context/authContext";
 import { IUser } from "@/types";
 import { Link } from "react-router-dom";
-import AnimationWrapper from "./AnimationWrapper";
-import { Button } from "./ui/button";
+import AnimationWrapper from "../shared/AnimationWrapper";
+import { Button } from "../ui/button";
 import {
   Menubar,
   MenubarContent,
@@ -10,7 +10,7 @@ import {
   MenubarMenu,
   MenubarSeparator,
   MenubarTrigger,
-} from "./ui/menubar";
+} from "../ui/menubar";
 
 const UserNavigationPanel = () => {
   const {

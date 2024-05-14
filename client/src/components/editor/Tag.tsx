@@ -1,5 +1,5 @@
 import { IoClose } from "react-icons/io5";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useEditorContext } from "@/context/editorContext";
 
 const Tag = ({ name }: { name: string }) => {

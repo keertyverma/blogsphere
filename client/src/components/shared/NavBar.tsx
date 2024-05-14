@@ -5,7 +5,7 @@ import { useState } from "react";
 import { BsBell, BsPencilSquare, BsSearch } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import Logo from "./Logo";
-import UserNavigationPanel from "./UserNavigationPanel";
+import UserNavigationPanel from "../user-menu/UserNavigationPanel";
 
 const NavBar = () => {
   const [toggleSearch, setToggleSearch] = useState(false);
