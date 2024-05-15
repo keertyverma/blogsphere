@@ -56,12 +56,16 @@
     @apply m-0 p-0 box-border border-border scroll-smooth;
   }
 
+  ::selection {
+    @apply bg-primary/30;
+  }
+
   body {
     @apply min-h-screen font-inter font-normal text-foreground bg-background;
   }
 
   section {
-    @apply py-4 px-[5vw] md:px-[7vw] xl:px-[1vw];
+    @apply py-4 px-[6vw] md:px-[7vw] xl:px-[1vw];
   }
 }
 

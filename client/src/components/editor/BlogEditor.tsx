@@ -17,7 +17,7 @@ const BlogEditor = () => {
   const {
     setIsPublish,
     blog,
-    blog: { title, coverImg, content, tags, description },
+    blog: { title, coverImgURL, content, tags, description },
     setBlog,
     textEditor,
     setTextEditor,
@@ -60,7 +60,7 @@ const BlogEditor = () => {
       return toast.error("Add title to publish it");
     }
 
-    if (!coverImg.length) {
+    if (!coverImgURL.length) {
       return toast.error("Add cover image to publish it");
     }
 
@@ -104,7 +104,7 @@ const BlogEditor = () => {
           title,
           description,
           content: content ? { blocks: content?.blocks } : undefined,
-          coverImgURL: coverImg,
+          coverImgURL,
           tags: tags,
           isDraft: true,
         },
@@ -163,14 +163,14 @@ const BlogEditor = () => {
               <FileUploader
                 onUpload={(url) => {
                   setToggleFileUploader(false);
-                  setBlog({ ...blog, coverImg: url });
+                  setBlog({ ...blog, coverImgURL: url });
                 }}
               />
             </div>
           )}
-          {coverImg && (
+          {coverImgURL && (
             <img
-              src={coverImg}
+              src={coverImgURL}
               alt="cover image"
               className="cover-img mt-1 md:mt-4"
             />

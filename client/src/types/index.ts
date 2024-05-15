@@ -40,10 +40,10 @@ export interface IAuthor {
 export interface IBlog {
   blogId?: string;
   title: string;
-  coverImg: string;
+  coverImgURL: string;
   description: string;
   tags: string[];
   author: IAuthor;
   content: OutputData;
-  createdAt?: Date;
+  createdAt?: string; //timestamp
 }

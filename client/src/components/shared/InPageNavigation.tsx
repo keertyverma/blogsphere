@@ -36,7 +36,7 @@ const InPageNavigation = ({
 
   return (
     <>
-      <div className="relative flex flex-nowrap gap-3 mb-8 bg-white border-b border-border overflow-x-auto">
+      <div className="relative flex flex-nowrap gap-3 mb-5 bg-white border-b border-border overflow-x-auto">
         {routes.map((route, index) => (
           <Button
             ref={index === defaultActiveIndex ? activeTabRef : null}

@@ -1,3 +1,4 @@
+import BlogPostCard from "@/components/home/BlogPostCard";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -29,9 +30,13 @@ const Home = () => {
             {/* latest blogs */}
             <>
               {isLatestBlogLoading && <LoadingSpinner />}
-              <h1 className="text-xl font-semibold mb-2">Latest Blogs</h1>
               {blogs?.map((blog, index) => (
-                <h2 key={index}>{blog.title}</h2>
+                <AnimationWrapper
+                  key={index}
+                  transition={{ duration: 1, delay: index * 0.1 }}
+                >
+                  <BlogPostCard content={blog} author={blog.author} />
+                </AnimationWrapper>
               ))}
             </>
 

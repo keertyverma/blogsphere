@@ -29,7 +29,7 @@ const PublishForm = () => {
   const TAG_LIMIT = 10;
   const DESCRIPTION_CHAR_LIMIT = 200;
   const {
-    blog: { title, coverImg, description, tags, content },
+    blog: { title, coverImgURL, description, tags, content },
     blog,
     setIsPublish,
     setBlog,
@@ -76,7 +76,7 @@ const PublishForm = () => {
           title,
           description,
           content: { blocks: content.blocks },
-          coverImgURL: coverImg,
+          coverImgURL,
           tags: updatedBlog.tags,
           isDraft: false,
         },
@@ -182,9 +182,9 @@ const PublishForm = () => {
             Preview
           </p>
 
-          {coverImg && (
+          {coverImgURL && (
             <div className="w-full rounded-lg overflow-hidden bg-gray-200 mt-4">
-              <img src={coverImg} className="cover-img" />
+              <img src={coverImgURL} className="cover-img" />
             </div>
           )}
 

@@ -15,7 +15,7 @@ const editorContext = createContext<EditorContextType>({} as EditorContextType);
 
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [blog, setBlog] = useState<IBlog>({
-    coverImg: "",
+    coverImgURL: "",
     title: "",
     description: "",
     author: {} as IAuthor,
