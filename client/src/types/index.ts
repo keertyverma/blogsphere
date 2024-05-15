@@ -46,4 +46,8 @@ export interface IBlog {
   author: IAuthor;
   content: OutputData;
   createdAt?: string; //timestamp
+  activity?: {
+    totalLikes: number;
+    totalReads: number;
+  };
 }

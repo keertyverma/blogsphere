@@ -16,10 +16,8 @@ const BlogPostCard = ({ content, author }: Props) => {
     coverImgURL,
     tags,
     createdAt: publishedAt,
+    activity,
   } = content;
-
-  // TODO: take it from blog
-  const likeCount = 1;
 
   const {
     personalInfo: { fullname, profileImage },
@@ -63,7 +61,9 @@ const BlogPostCard = ({ content, author }: Props) => {
       <section className="flex justify-between p-0 max-lg:mb-6">
         <div className="flex items-center justify-center gap-1 text-muted-foreground">
           <FaRegHeart />
-          {likeCount > 0 && <p className="text-sm">{likeCount}</p>}
+          {activity && activity?.totalLikes > 0 && (
+            <p className="text-sm">{activity?.totalLikes}</p>
+          )}
         </div>
         <div className="flex gap-2">
           {tags?.slice(0, 2).map((tag, i) => (
