@@ -43,9 +43,7 @@ const BlogPostCard = ({ content, author }: Props) => {
         <Link to={`/blogs/${id}`}>
           <div className="w-full flex flex-col md:flex-row gap-2 sm:gap-3 md:gap-6 justify-between">
             <div>
-              <h1 className="font-bold text:base md:text-lg line-clamp-3 my-2">
-                {title}
-              </h1>
+              <h1 className="blog-title">{title}</h1>
               <p className="text:sm md:text-base text-accent-foreground max-sm:hidden line-clamp-2 leading-7">
                 {description}
               </p>

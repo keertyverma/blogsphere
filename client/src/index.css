@@ -200,6 +200,10 @@
   #text-editor img {
     @apply aspect-video rounded-lg object-cover;
   }
+
+  .blog-title {
+    @apply font-semibold sm:font-bold text-base md:text-lg line-clamp-3 my-2 text-slate-800;
+  }
 }
 
 /* EditorJS Styles  */

@@ -42,9 +42,18 @@ export const useCreateBlog = () =>
 
 export const useGetLatestBlog = () =>
   useQuery<IBlog[]>({
-    queryKey: [QUERY_KEYS.GET_LATEST_BLOG],
+    queryKey: [QUERY_KEYS.GET_LATEST_BLOGS],
     queryFn: () =>
       apiClient
         .get<IBlog[]>("/blogs/latest")
+        .then((res) => (res.data as IFetchResponse).data),
+  });
+
+export const useGetTrendingBlog = () =>
+  useQuery<IBlog[]>({
+    queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
+    queryFn: () =>
+      apiClient
+        .get<IBlog[]>("/blogs/trending")
         .then((res) => (res.data as IFetchResponse).data),
   });

@@ -1,9 +1,13 @@
 import BlogPostCard from "@/components/home/BlogPostCard";
+import TrendingBlogPost from "@/components/home/TrendingBlogPost";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useAuthContext } from "@/context/authContext";
-import { useGetLatestBlog } from "@/lib/react-query/queries";
+import {
+  useGetLatestBlog,
+  useGetTrendingBlog,
+} from "@/lib/react-query/queries";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
@@ -13,10 +17,16 @@ const Home = () => {
     isLoading: isLatestBlogLoading,
     error: latestBlogFetchError,
   } = useGetLatestBlog();
+  const {
+    data: trendingBlogs,
+    isLoading: isTrendingBlogLoading,
+    error: trendingBlogFetchError,
+  } = useGetTrendingBlog();
 
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   if (latestBlogFetchError) console.error(latestBlogFetchError);
+  if (trendingBlogFetchError) console.error(trendingBlogFetchError);
 
   return (
     <AnimationWrapper>
@@ -40,7 +50,18 @@ const Home = () => {
               ))}
             </>
 
-            <h1>Trending Blogs</h1>
+            {/* Trending blogs */}
+            <>
+              {isTrendingBlogLoading && <LoadingSpinner />}
+              {trendingBlogs?.map((blog, index) => (
+                <AnimationWrapper
+                  key={index}
+                  transition={{ duration: 1, delay: index * 0.1 }}
+                >
+                  <TrendingBlogPost blog={blog} index={index} />
+                </AnimationWrapper>
+              ))}
+            </>
           </InPageNavigation>
         </div>
 
