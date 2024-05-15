@@ -294,4 +294,95 @@ describe("/api/v1/blogs", () => {
       expect(username).toBe(user.personalInfo.username);
     });
   });
+
+  describe("GET /trending", () => {
+    it("should return latest trending blogs", async () => {
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+          profileImage: "http://example-img.png",
+        },
+      });
+
+      // create blogs
+      const blog1 = {
+        isDraft: false,
+        blogId: "blog-1-how-to-setup-zustand-with-react-app-oki178bfopl",
+        title: "blog-1-How to setup zustand ! with react app @ok ",
+        description: "some short description",
+        coverImgURL: "https://sample.jpg",
+        author: user.id,
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "this is how it is done",
+                level: 2,
+              },
+            },
+          ],
+        },
+        tags: ["tag1", "tag2", "tag3"],
+        activity: {
+          totalLikes: 1,
+          totalReads: 2,
+        },
+      };
+
+      const blog2 = {
+        isDraft: false,
+        blogId: "blog-2-how-to-setup-zustand-with-react-app-oki178bfopl",
+        title: "blog-2-How to setup zustand ! with react app @ok ",
+        description: "some short description",
+        coverImgURL: "https://sample.jpg",
+        author: user.id,
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "this is how it is done",
+                level: 2,
+              },
+            },
+            {
+              id: "s-VOjHF8Kk",
+              type: "list",
+              data: {
+                style: "ordered",
+                items: ["step-1", "step-2", "step-3"],
+              },
+            },
+          ],
+        },
+        tags: ["tag1", "tag2", "tag3"],
+        activity: {
+          totalLikes: 5,
+          totalReads: 5,
+        },
+      };
+
+      await Blog.create([blog1, blog2]);
+
+      const res = await request(server).get(`${endpoint}/trending`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+
+      // only published blog must be returned
+      expect(res.body.data).toHaveLength(2);
+
+      const b1 = res.body.data[0];
+      const b2 = res.body.data[1];
+      // blog2 likes and read are more than blog1
+      expect(b1.blogId).toBe(blog2.blogId);
+      expect(b2.blogId).toBe(blog1.blogId);
+    });
+  });
 });

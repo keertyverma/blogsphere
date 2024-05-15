@@ -9,6 +9,10 @@ interface IBlog {
   tags: string[];
   author: string;
   isDraft: boolean;
+  activity: {
+    totalLikes: number;
+    totalReads: number;
+  };
 }
 
 const blogSchema = new Schema(
@@ -43,6 +47,10 @@ const blogSchema = new Schema(
     isDraft: {
       type: Boolean,
       required: true,
+    },
+    activity: {
+      totalLikes: { type: Number, default: 0 },
+      totalReads: { type: Number, default: 0 },
     },
   },
   { timestamps: true }

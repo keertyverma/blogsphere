@@ -122,22 +122,49 @@ const getLatestBlogs = async (req: Request, res: Response) => {
 
   const MAX_LIMIT = 2;
 
-  const bloges = await Blog.find({ isDraft: false })
+  const blogs = await Blog.find({ isDraft: false })
     .populate(
       "author",
       "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
     )
-    .limit(MAX_LIMIT)
     .sort({ createdAt: -1 })
-    .select("blogId title description coverImgURL tags createdAt -_id");
+    .select("blogId title description coverImgURL tags createdAt -_id")
+    .limit(MAX_LIMIT);
 
   const result: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: bloges,
+    data: blogs,
   };
 
   return res.status(result.statusCode).json(result);
 };
 
-export { createBlog, getLatestBlogs };
+const getTrendingBlogs = async (req: Request, res: Response) => {
+  logger.debug(`GET Request on Route -> ${req.baseUrl}`);
+
+  const MAX_LIMIT = 5;
+
+  const blogs = await Blog.find({ isDraft: false })
+    .populate(
+      "author",
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+    )
+    .sort({
+      "activity.totalReads": -1,
+      "activity.totalLikes": -1,
+      createdAt: -1,
+    })
+    .select("blogId title createdAt -_id")
+    .limit(MAX_LIMIT);
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: blogs,
+  };
+
+  return res.status(result.statusCode).json(result);
+};
+
+export { createBlog, getLatestBlogs, getTrendingBlogs };
