@@ -22,7 +22,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
         {index + 1}
       </h1>
       <div>
-        <h1 className="blog-title !mt-1 sm:!mt-0">{title}</h1>
+        <h1 className="blog-title !mt-1 sm:!mt-0 !text-base">{title}</h1>
         <div className="flex flex-row gap-3 items-center">
           <img
             src={profileImage}

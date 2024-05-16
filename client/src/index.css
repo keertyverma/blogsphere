@@ -65,7 +65,7 @@
   }
 
   section {
-    @apply py-4 px-[6vw] md:px-[7vw] xl:px-[1vw];
+    @apply py-4 px-[6vw] md:px-[7vw] lg:px-[10vw];
   }
 }
 

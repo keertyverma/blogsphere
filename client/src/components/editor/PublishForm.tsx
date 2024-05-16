@@ -168,7 +168,7 @@ const PublishForm = () => {
 
   return (
     <AnimationWrapper>
-      <section className="w-screen grid lg:grid-cols-2 py-16 gap-2 lg:gap-1">
+      <section className="w-screen grid lg:grid-cols-2 py-16 xl:px-[1vw] gap-2 lg:gap-1">
         <Button
           variant="ghost"
           className="absolute right-[5vw] top-[1%] md:top-[2%] z-10"

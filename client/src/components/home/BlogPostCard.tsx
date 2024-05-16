@@ -67,7 +67,7 @@ const BlogPostCard = ({ content, author }: Props) => {
           {tags?.slice(0, 2).map((tag, i) => (
             <span
               key={i}
-              className="text-xs lg:text-sm font-medium text-muted-foreground bg-secondary p-1 px-2 rounded-full truncate max-w-[120px] lg:max-w-[240px]"
+              className="text-xs lg:text-sm font-medium text-muted-foreground bg-secondary p-1 px-2 rounded-full truncate max-w-[120px] lg:max-w-[240px] capitalize"
             >
               {tag}
             </span>

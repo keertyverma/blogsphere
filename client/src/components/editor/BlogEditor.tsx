@@ -141,7 +141,7 @@ const BlogEditor = () => {
       </nav>
 
       <AnimationWrapper>
-        <section className="mx-auto w-full max-w-[900px]">
+        <section className="xl:px-[1vw] mx-auto w-full max-w-[900px]">
           <Button
             variant="ghost"
             className="capitalize rounded-full flex-center gap-2 text-sm md:text-base text-secondary-foreground px-0"
