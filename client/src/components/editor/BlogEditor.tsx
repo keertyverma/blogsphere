@@ -60,10 +60,6 @@ const BlogEditor = () => {
       return toast.error("Add title to publish it");
     }
 
-    if (!coverImgURL.length) {
-      return toast.error("Add cover image to publish it");
-    }
-
     if (textEditor) {
       try {
         const data = await textEditor.save();

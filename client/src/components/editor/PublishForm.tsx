@@ -24,6 +24,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import { ICreateBlog } from "@/types";
 
 const PublishForm = () => {
   const TAG_LIMIT = 10;
@@ -58,11 +59,16 @@ const PublishForm = () => {
       return;
     }
 
-    const updatedBlog = {
+    const updatedBlog: ICreateBlog = {
       title,
       description,
+      content: { blocks: content.blocks },
       tags: blog.tags.length === 0 ? [tag] : blog.tags,
     };
+
+    if (coverImgURL) {
+      updatedBlog.coverImgURL = coverImgURL;
+    }
 
     setBlog((prevBlog) => ({
       ...prevBlog,
@@ -73,11 +79,7 @@ const PublishForm = () => {
     try {
       await createBlog({
         blog: {
-          title,
-          description,
-          content: { blocks: content.blocks },
-          coverImgURL,
-          tags: updatedBlog.tags,
+          ...updatedBlog,
           isDraft: false,
         },
         token,

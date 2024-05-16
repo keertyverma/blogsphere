@@ -42,17 +42,19 @@ const BlogPostCard = ({ content, author }: Props) => {
         </div>
         <Link to={`/blogs/${id}`}>
           <div className="w-full flex flex-col md:flex-row gap-2 sm:gap-3 md:gap-6 justify-between">
-            <div>
+            <div className="flex-1">
               <h1 className="blog-title">{title}</h1>
               <p className="text:sm md:text-base text-accent-foreground max-sm:hidden line-clamp-2 leading-7">
                 {description}
               </p>
             </div>
-            <img
-              src={coverImgURL}
-              alt="blog cover image"
-              className="aspect-video md:h-28 object-cover rounded-md"
-            />
+            {coverImgURL && (
+              <img
+                src={coverImgURL}
+                alt="blog cover image"
+                className="aspect-video md:h-28 object-cover rounded-md"
+              />
+            )}
           </div>
         </Link>
       </section>

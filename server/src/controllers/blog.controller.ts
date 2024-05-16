@@ -40,7 +40,7 @@ const validateCreateBlog = (blog: any, isDraft: boolean) => {
     description: Joi.string().max(200).required(),
     content: contentSchema.required(),
     tags: Joi.array().items(Joi.string().required()).max(10).required(),
-    coverImgURL: Joi.string().required(),
+    coverImgURL: Joi.string(),
     isDraft: Joi.boolean(),
   });
 

@@ -51,3 +51,11 @@ export interface IBlog {
     totalReads: number;
   };
 }
+
+export interface ICreateBlog {
+  title: string;
+  description: string;
+  content: OutputData;
+  coverImgURL?: string;
+  tags: string[];
+}
