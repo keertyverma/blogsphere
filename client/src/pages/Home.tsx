@@ -1,9 +1,9 @@
 import BlogPostCard from "@/components/home/BlogPostCard";
+import TagList from "@/components/home/TagList";
 import TrendingBlogPost from "@/components/home/TrendingBlogPost";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/authContext";
 import {
   useGetLatestBlog,
@@ -24,15 +24,6 @@ const Home = () => {
     isLoading: isTrendingBlogLoading,
     error: trendingBlogFetchError,
   } = useGetTrendingBlog();
-  const categories = [
-    "science",
-    "research",
-    "photography",
-    "art",
-    "creativity",
-    "inspiration",
-    "health",
-  ];
 
   if (!isAuthenticated) return <Navigate to="/login" />;
 
@@ -46,8 +37,8 @@ const Home = () => {
           {/* blogs */}
           <div className="w-full">
             <InPageNavigation
-              routes={["home", "trending blogs"]}
-              defaultHidden={["trending blogs"]}
+              routes={["home", "trending", "recommended topics"]}
+              defaultHidden={["trending", "recommended topics"]}
             >
               {/* latest blogs */}
               <>
@@ -74,6 +65,9 @@ const Home = () => {
                   </AnimationWrapper>
                 ))}
               </>
+
+              {/* Recommended topics on mobile screen */}
+              <TagList />
             </InPageNavigation>
           </div>
 
@@ -84,17 +78,7 @@ const Home = () => {
                 <h1 className="font-semibold text-xl mb-5">
                   Recommended Topics
                 </h1>
-                <div className="flex gap-3 flex-wrap">
-                  {categories.map((category, index) => (
-                    <Button
-                      variant="secondary"
-                      className="rounded-full capitalize px-4"
-                      key={index}
-                    >
-                      {category}
-                    </Button>
-                  ))}
-                </div>
+                <TagList />
               </div>
 
               {/* trending blogs on larger screen*/}

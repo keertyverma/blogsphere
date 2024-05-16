@@ -5,7 +5,7 @@ interface Props {
   routes: string[];
   children: ReactNode | ReactNode[];
   defaultActiveIndex?: number;
-  defaultHidden?: string[];
+  defaultHidden?: string[]; // hidden on larger screens
 }
 
 const InPageNavigation = ({
@@ -45,7 +45,7 @@ const InPageNavigation = ({
             onClick={(e) => {
               changePageState(e.target as HTMLButtonElement, index);
             }}
-            className={`font-semibold capitalize hover:no-underline ${
+            className={`font-semibold capitalize hover:no-underline p-0 ${
               activeNavIndex === index
                 ? "text-primary"
                 : "text-muted-foreground"

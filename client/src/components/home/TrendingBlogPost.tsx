@@ -18,11 +18,11 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
 
   return (
     <Link to={`/blogs/${id}`} className="flex gap-5 mb-5">
-      <h1 className="text-4xl sm:text-3xl font-bold text-primary/20 leading-none">
+      <h1 className="text-4xl sm:text-[30px] font-bold text-primary/20 leading-none">
         {index + 1}
       </h1>
       <div>
-        <h1 className="blog-title">{title}</h1>
+        <h1 className="blog-title !mt-1 sm:!mt-0">{title}</h1>
         <div className="flex flex-row gap-3 items-center">
           <img
             src={profileImage}
