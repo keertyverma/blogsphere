@@ -202,7 +202,7 @@
   }
 
   .blog-title {
-    @apply font-semibold sm:font-bold text-base md:text-lg line-clamp-3 my-2 text-slate-800;
+    @apply font-semibold sm:font-bold text-base md:text-lg 2xl:text-xl line-clamp-3 my-2 text-slate-800;
   }
 }
 

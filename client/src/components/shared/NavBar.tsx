@@ -16,7 +16,7 @@ const NavBar = () => {
     <nav className="navbar">
       <Logo />
       <div
-        className={`absolute md:relative left-0 top-full md:inset-0 w-full md:w-auto mt-0.5  py-4 px-[7vw] md:block md:p-0 md:show ${
+        className={`absolute md:relative left-0 top-full md:inset-0 w-full md:w-auto mt-0.5 py-4 px-[7vw] md:block md:p-0 md:show ${
           toggleSearch ? "show" : "hide"
         }`}
       >

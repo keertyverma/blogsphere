@@ -22,6 +22,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
         {index + 1}
       </h1>
       <div>
+        <h1 className="blog-title">{title}</h1>
         <div className="flex flex-row gap-3 items-center">
           <img
             src={profileImage}
@@ -37,7 +38,6 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
             </p>
           </div>
         </div>
-        <h1 className="blog-title">{title}</h1>
       </div>
     </Link>
   );
