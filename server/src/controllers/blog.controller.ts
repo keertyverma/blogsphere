@@ -120,7 +120,7 @@ const createBlog = async (req: Request, res: Response) => {
 const getLatestBlogs = async (req: Request, res: Response) => {
   logger.debug(`GET Request on Route -> ${req.baseUrl}`);
 
-  const MAX_LIMIT = 2;
+  const MAX_LIMIT = 5;
 
   const blogs = await Blog.find({ isDraft: false })
     .populate(
@@ -143,7 +143,7 @@ const getLatestBlogs = async (req: Request, res: Response) => {
 const getTrendingBlogs = async (req: Request, res: Response) => {
   logger.debug(`GET Request on Route -> ${req.baseUrl}`);
 
-  const MAX_LIMIT = 5;
+  const MAX_LIMIT = 10;
 
   const blogs = await Blog.find({ isDraft: false })
     .populate(
