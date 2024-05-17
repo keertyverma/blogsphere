@@ -24,7 +24,7 @@ app.use(compression());
 app.use(rateLimiter);
 
 // configure app routes
-const BASE_URL = `/${config.get("appName")}/api/v1`;
+const BASE_URL = `/api/v1`;
 
 app.get(BASE_URL, (req: Request, res: Response) => {
   res.send("Welcome to BlogSphere API");
