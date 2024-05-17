@@ -1,9 +1,10 @@
 import BlogPostCard from "@/components/home/BlogPostCard";
+import BlogPostCardSkeleton from "@/components/home/BlogPostCardSkeleton";
 import TagList from "@/components/home/TagList";
 import TrendingBlogPost from "@/components/home/TrendingBlogPost";
+import TrendingBlogPostSkeleton from "@/components/home/TrendingBlogPostSkeleton";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useAuthContext } from "@/context/authContext";
 import {
   useGetLatestBlog,
@@ -41,7 +42,7 @@ const Home = () => {
           >
             {/* latest blogs */}
             <>
-              {isLatestBlogLoading && <LoadingSpinner />}
+              {isLatestBlogLoading && <BlogPostCardSkeleton />}
               {blogs?.map((blog, index) => (
                 <AnimationWrapper
                   key={index}
@@ -54,7 +55,7 @@ const Home = () => {
 
             {/* Trending blogs on mobile screen*/}
             <>
-              {isTrendingBlogLoading && <LoadingSpinner />}
+              {isTrendingBlogLoading && <TrendingBlogPostSkeleton />}
               {trendingBlogs?.map((blog, index) => (
                 <AnimationWrapper
                   key={index}
@@ -84,7 +85,7 @@ const Home = () => {
                 Trending
                 <IoTrendingUpSharp className="text-muted-foreground" />
               </h1>
-              {isTrendingBlogLoading && <LoadingSpinner />}
+              {isTrendingBlogLoading && <TrendingBlogPostSkeleton />}
               {trendingBlogs?.map((blog, index) => (
                 <AnimationWrapper
                   key={index}
