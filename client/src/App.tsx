@@ -7,8 +7,12 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
 import Editor from "./pages/Editor";
 import Home from "./pages/Home";
+import { usePingServer } from "./lib/react-query/queries";
 
 const App = () => {
+  // to prevent the server from going into sleep mode due to inactivity.
+  usePingServer();
+
   return (
     <main className="w-full h-screen">
       <Routes>

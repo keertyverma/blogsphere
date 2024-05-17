@@ -4,6 +4,13 @@ import apiClient from "../api-client";
 import { QUERY_KEYS } from "./queryKeys";
 import ms from "ms";
 
+export const usePingServer = () => {
+  useQuery({
+    queryKey: ["ping-server"],
+    queryFn: () => apiClient.get("/").then((res) => res.data),
+  });
+};
+
 // ----------------- User -------------------
 export const useCreateUserAccount = () =>
   useMutation({
