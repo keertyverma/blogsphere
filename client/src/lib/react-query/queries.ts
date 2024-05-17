@@ -2,6 +2,7 @@ import { IBlog, IFetchResponse, INewUser } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import apiClient from "../api-client";
 import { QUERY_KEYS } from "./queryKeys";
+import ms from "ms";
 
 // ----------------- User -------------------
 export const useCreateUserAccount = () =>
@@ -47,6 +48,11 @@ export const useGetLatestBlog = () =>
       apiClient
         .get<IBlog[]>("/blogs/latest")
         .then((res) => (res.data as IFetchResponse).data),
+    staleTime: ms("1m"),
+    gcTime: ms("5m"),
+    refetchOnWindowFocus: true, // Refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
   });
 
 export const useGetTrendingBlog = () =>
@@ -56,4 +62,9 @@ export const useGetTrendingBlog = () =>
       apiClient
         .get<IBlog[]>("/blogs/trending")
         .then((res) => (res.data as IFetchResponse).data),
+    staleTime: ms("5m"),
+    gcTime: ms("10m"),
+    refetchOnWindowFocus: false, // No need to refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
   });

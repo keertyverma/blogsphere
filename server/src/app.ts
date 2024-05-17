@@ -21,8 +21,7 @@ app.use(cors({ exposedHeaders: ["x-auth-token"] }));
 
 app.use(helmet());
 app.use(compression());
-//TODO: enable rate limit
-// app.use(rateLimiter);
+app.use(rateLimiter);
 
 // configure app routes
 const BASE_URL = `/${config.get("appName")}/api/v1`;
