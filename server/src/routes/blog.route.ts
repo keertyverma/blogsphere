@@ -9,7 +9,7 @@ import { verifyToken } from "../middlewares";
 export const blogRouter = Router();
 
 // public routes
-blogRouter.get("/latest", getLatestBlogs);
+blogRouter.get("/", getLatestBlogs);
 blogRouter.get("/trending", getTrendingBlogs);
 
 // protected routes

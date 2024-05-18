@@ -10,7 +10,7 @@ import * as firebaseAuth from "../../../src/utils/firebase-auth";
 import FirebaseAuthError from "../../../src/utils/errors/firebase-error";
 
 let server: http.Server;
-let endpoint: string = `/${config.get("appName")}/api/v1/auth`;
+let endpoint: string = `/api/v1/auth`;
 
 type DecodedIdToken = {
   email: string;
@@ -135,7 +135,7 @@ describe("/api/v1/auth", () => {
     it("should authenticate user if request is valid", async () => {
       // call /register route so it can create user and store hash password
       const registerRes = await request(server)
-        .post(`/${config.get("appName")}/api/v1/users/register`)
+        .post(`/api/v1/users/register`)
         .send({
           fullname: "Mickey Mouse",
           password: "Pluto123",

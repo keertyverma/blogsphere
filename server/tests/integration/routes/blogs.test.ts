@@ -1,15 +1,91 @@
-import request from "supertest";
-import { disconnect } from "mongoose";
 import "dotenv/config";
-import config from "config";
 import http from "http";
+import { disconnect } from "mongoose";
+import request from "supertest";
 
 import appServer from "../../../src";
+import { Blog, IBlog } from "../../../src/models/blog.model";
 import { User } from "../../../src/models/user.model";
-import { Blog } from "../../../src/models/blog.model";
 
 let server: http.Server;
-let endpoint: string = `/${config.get("appName")}/api/v1/blogs`;
+let endpoint: string = `/api/v1/blogs`;
+
+const createUser = async () => {
+  const user = await User.create({
+    personalInfo: {
+      fullname: "Mickey Mouse",
+      password: "Clubhouse12",
+      email: "test@test.com",
+      username: "test",
+      profileImage: "http://example-img.png",
+    },
+  });
+  return user;
+};
+
+const createBlogs = async (userId: string) => {
+  // draft blog
+  const draftBlog = {
+    blogId: "my-draft-blog-sub125bfjvj",
+    title: "My draft blog",
+    author: userId,
+    isDraft: true,
+  };
+  // published blogs
+  const publishedBlog1 = {
+    isDraft: false,
+    blogId: "how-to-setup-zustand-with-react-app-oki178bfopl",
+    title: "How to setup zustand ! with react app @ok ",
+    description: "some short description",
+    coverImgURL: "https://sample.jpg",
+    author: userId,
+    content: {
+      blocks: [
+        {
+          id: "O8uS0t2SUk",
+          type: "header",
+          data: {
+            text: "this is how it is done",
+            level: 2,
+          },
+        },
+        {
+          id: "s-VOjHF8Kk",
+          type: "list",
+          data: {
+            style: "ordered",
+            items: ["step-1", "step-2", "step-3"],
+          },
+        },
+      ],
+    },
+    tags: ["tag1", "tag2", "tag3"],
+  };
+  const publishedBlog2 = {
+    isDraft: false,
+    blogId: "water-color-technique-oki178bfopl",
+    title: "Water color technique ",
+    description: "some short description",
+    author: userId,
+    content: {
+      blocks: [
+        {
+          id: "O8uS0t2SUk",
+          type: "header",
+          data: {
+            text: "this is how it is done",
+            level: 2,
+          },
+        },
+      ],
+    },
+    tags: ["art", "tag2"],
+  };
+
+  const blogs = [draftBlog, publishedBlog1, publishedBlog2];
+  await Blog.create(blogs);
+  return blogs as IBlog[];
+};
 
 describe("/api/v1/blogs", () => {
   afterAll(async () => {
@@ -224,74 +300,39 @@ describe("/api/v1/blogs", () => {
     });
   });
 
-  describe("GET /latest", () => {
-    it("should return all latest blogs", async () => {
-      const user = await User.create({
-        personalInfo: {
-          fullname: "Mickey Mouse",
-          password: "Clubhouse12",
-          email: "test@test.com",
-          username: "test",
-          profileImage: "http://example-img.png",
-        },
-      });
+  describe("GET /", () => {
+    let blogs: IBlog[];
 
-      // create a few draft and published blogs
-      const draftBlog = {
-        blogId: "my-draft-blog-sub125bfjvj",
-        title: "My draft blog",
-        author: user.id,
-        isDraft: true,
-      };
+    beforeAll(async () => {
+      const user = await createUser();
+      blogs = await createBlogs(user.id);
+    });
 
-      const publishedBlog = {
-        isDraft: false,
-        blogId: "how-to-setup-zustand-with-react-app-oki178bfopl",
-        title: "How to setup zustand ! with react app @ok ",
-        description: "some short description",
-        coverImgURL: "https://sample.jpg",
-        author: user.id,
-        content: {
-          blocks: [
-            {
-              id: "O8uS0t2SUk",
-              type: "header",
-              data: {
-                text: "this is how it is done",
-                level: 2,
-              },
-            },
-            {
-              id: "s-VOjHF8Kk",
-              type: "list",
-              data: {
-                style: "ordered",
-                items: ["step-1", "step-2", "step-3"],
-              },
-            },
-          ],
-        },
-        tags: ["tag1", "tag2", "tag3"],
-      };
-
-      await Blog.create([draftBlog, publishedBlog]);
-
-      const res = await request(server).get(`${endpoint}/latest`);
+    it("should return all latest published blogs", async () => {
+      const res = await request(server).get(`${endpoint}`);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.status).toBe("success");
+      const publishedBlogIds = blogs
+        .filter((blog) => blog.isDraft === false)
+        .map((blog) => blog.blogId);
+      expect(res.body.data).toHaveLength(publishedBlogIds.length);
 
       // only published blog must be returned
-      expect(res.body.data).toHaveLength(1);
-      const {
-        blogId,
-        author: {
-          personalInfo: { username },
-        },
-      } = res.body.data[0];
+      res.body.data.forEach((blog: IBlog) => {
+        expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
+      });
+    });
 
-      expect(blogId).toBe(publishedBlog.blogId);
-      expect(username).toBe(user.personalInfo.username);
+    it("should return filtered blogs by tag", async () => {
+      // filter by tag
+      const tag = "art";
+      const res = await request(server).get(`${endpoint}?tag=${tag}`);
+
+      expect(res.statusCode).toBe(200);
+      // blog with tag must be returned
+      res.body.data.forEach((blog: IBlog) => {
+        expect(blog.tags).toContain(tag);
+      });
     });
   });
 

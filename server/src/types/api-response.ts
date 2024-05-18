@@ -22,3 +22,8 @@ export interface IErrorCodeMessageMap {
     message: string;
   };
 }
+
+export interface IBlogFindQuery {
+  isDraft: boolean;
+  tags?: string;
+}

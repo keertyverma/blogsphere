@@ -53,7 +53,7 @@ export const useGetLatestBlog = () =>
     queryKey: [QUERY_KEYS.GET_LATEST_BLOGS],
     queryFn: () =>
       apiClient
-        .get<IBlog[]>("/blogs/latest")
+        .get<IBlog[]>("/blogs")
         .then((res) => (res.data as IFetchResponse).data),
     staleTime: ms("1m"),
     gcTime: ms("5m"),

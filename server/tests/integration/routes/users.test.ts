@@ -8,7 +8,7 @@ import appServer from "../../../src";
 import { User } from "../../../src/models/user.model";
 
 let server: http.Server;
-let endpoint: string = `/${config.get("appName")}/api/v1/users`;
+let endpoint: string = `/api/v1/users`;
 
 describe("/api/v1/users", () => {
   afterAll(async () => {

@@ -5,7 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
-import { APIResponse, APIStatus } from "../types/api-response";
+import { APIResponse, APIStatus, IBlogFindQuery } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import logger from "../utils/logger";
@@ -121,8 +121,14 @@ const getLatestBlogs = async (req: Request, res: Response) => {
   logger.debug(`GET Request on Route -> ${req.baseUrl}`);
 
   const MAX_LIMIT = 5;
+  const query: IBlogFindQuery = {
+    isDraft: false,
+  };
 
-  const blogs = await Blog.find({ isDraft: false })
+  const { tag } = req.query;
+  if (tag) query["tags"] = (tag as string).toLowerCase();
+
+  const blogs = await Blog.find(query)
     .populate(
       "author",
       "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"

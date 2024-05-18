@@ -9,7 +9,7 @@ import * as cloudinary from "../../../src/utils/cloudinary";
 import BadRequestError from "../../../src/utils/errors/bad-request";
 
 let server: http.Server;
-let endpoint: string = `/${config.get("appName")}/api/v1/upload/`;
+let endpoint: string = `/api/v1/upload/`;
 
 describe("/api/v1/upload", () => {
   afterAll(async () => {
