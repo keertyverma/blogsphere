@@ -33,15 +33,32 @@ const Home = () => {
 
   return (
     <AnimationWrapper>
-      <section className="h-cover flex justify-center gap-10">
-        {/* blogs */}
-        <div>
+      <section className="h-cover md:flex md:justify-center gap-10">
+        <div className="max-md:hidden">
+          {/* Filter */}
+          <TagList />
+
+          {/* blogs */}
+          {isLatestBlogLoading && <BlogPostCardSkeleton />}
+          {blogs?.map((blog, index) => (
+            <AnimationWrapper
+              key={index}
+              transition={{ duration: 1, delay: index * 0.1 }}
+            >
+              <BlogPostCard content={blog} author={blog.author} />
+            </AnimationWrapper>
+          ))}
+        </div>
+
+        {/* In page navigation on mobile screens */}
+        <div className="md:hidden">
           <InPageNavigation
-            routes={["home", "trending", "recommended topics"]}
-            defaultHidden={["trending", "recommended topics"]}
+            routes={["home", "trending"]}
+            defaultHidden={["trending"]}
           >
             {/* latest blogs */}
             <>
+              <TagList />
               {isLatestBlogLoading && <BlogPostCardSkeleton />}
               {blogs?.map((blog, index) => (
                 <AnimationWrapper
@@ -65,36 +82,25 @@ const Home = () => {
                 </AnimationWrapper>
               ))}
             </>
-
-            {/* Recommended topics on mobile screen */}
-            <TagList />
           </InPageNavigation>
         </div>
 
         <aside className="min-w-[40%] lg:min-w-[400px] max-w-min max-md:hidden border-l border-border pl-8 pt-3">
-          <div className="flex flex-col gap-14 mb-8">
-            {/* filters */}
-            <div>
-              <h1 className="font-semibold text-xl mb-5">Recommended Topics</h1>
-              <TagList />
-            </div>
-
-            {/* trending blogs on larger screen*/}
-            <div>
-              <h1 className="font-semibold text-xl mb-4 flex gap-2">
-                Trending
-                <IoTrendingUpSharp className="text-muted-foreground" />
-              </h1>
-              {isTrendingBlogLoading && <TrendingBlogPostSkeleton />}
-              {trendingBlogs?.map((blog, index) => (
-                <AnimationWrapper
-                  key={index}
-                  transition={{ duration: 1, delay: index * 0.1 }}
-                >
-                  <TrendingBlogPost blog={blog} index={index} />
-                </AnimationWrapper>
-              ))}
-            </div>
+          {/* trending blogs on larger screen*/}
+          <div>
+            <h1 className="font-semibold text-xl mb-4 flex gap-2">
+              Trending
+              <IoTrendingUpSharp className="text-muted-foreground" />
+            </h1>
+            {isTrendingBlogLoading && <TrendingBlogPostSkeleton />}
+            {trendingBlogs?.map((blog, index) => (
+              <AnimationWrapper
+                key={index}
+                transition={{ duration: 1, delay: index * 0.1 }}
+              >
+                <TrendingBlogPost blog={blog} index={index} />
+              </AnimationWrapper>
+            ))}
           </div>
         </aside>
       </section>
