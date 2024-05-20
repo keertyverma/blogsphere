@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
+import { SortOrder } from "mongoose";
 import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
@@ -120,22 +121,32 @@ const createBlog = async (req: Request, res: Response) => {
 const getLatestBlogs = async (req: Request, res: Response) => {
   logger.debug(`GET Request on Route -> ${req.baseUrl}`);
 
-  const MAX_LIMIT = 5;
-  const query: IBlogFindQuery = {
+  const { tag, ordering, limit } = req.query;
+
+  const max_limit = limit ? parseInt(limit as string) : 5;
+
+  const findQuery: IBlogFindQuery = {
     isDraft: false,
+    ...(tag && { tags: (tag as string).toLowerCase() }),
   };
 
-  const { tag } = req.query;
-  if (tag) query["tags"] = (tag as string).toLowerCase();
+  const sortQuery: { [key: string]: SortOrder } =
+    ordering && (ordering as string).toLowerCase() === "trending"
+      ? {
+          "activity.totalReads": -1,
+          "activity.totalLikes": -1,
+          createdAt: -1,
+        }
+      : { createdAt: -1 };
 
-  const blogs = await Blog.find(query)
+  const blogs = await Blog.find(findQuery)
     .populate(
       "author",
       "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
     )
-    .sort({ createdAt: -1 })
+    .sort(sortQuery)
     .select("blogId title description coverImgURL tags activity createdAt -_id")
-    .limit(MAX_LIMIT);
+    .limit(max_limit);
 
   const result: APIResponse = {
     status: APIStatus.SUCCESS,
@@ -146,31 +157,4 @@ const getLatestBlogs = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
-const getTrendingBlogs = async (req: Request, res: Response) => {
-  logger.debug(`GET Request on Route -> ${req.baseUrl}`);
-
-  const MAX_LIMIT = 10;
-
-  const blogs = await Blog.find({ isDraft: false })
-    .populate(
-      "author",
-      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
-    )
-    .sort({
-      "activity.totalReads": -1,
-      "activity.totalLikes": -1,
-      createdAt: -1,
-    })
-    .select("blogId title createdAt -_id")
-    .limit(MAX_LIMIT);
-
-  const result: APIResponse = {
-    status: APIStatus.SUCCESS,
-    statusCode: StatusCodes.OK,
-    data: blogs,
-  };
-
-  return res.status(result.statusCode).json(result);
-};
-
-export { createBlog, getLatestBlogs, getTrendingBlogs };
+export { createBlog, getLatestBlogs };

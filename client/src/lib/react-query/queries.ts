@@ -66,12 +66,15 @@ export const useGetLatestBlog = (tag: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
+// Get top 10 trending blog
 export const useGetTrendingBlog = () =>
   useQuery<IBlog[]>({
     queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
     queryFn: () =>
       apiClient
-        .get<IBlog[]>("/blogs/trending")
+        .get<IBlog[]>("/blogs", {
+          params: { ordering: "trending", limit: 10 },
+        })
         .then((res) => (res.data as IFetchResponse).data),
     staleTime: ms("5m"),
     gcTime: ms("10m"),

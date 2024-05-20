@@ -60,6 +60,10 @@ const createBlogs = async (userId: string) => {
       ],
     },
     tags: ["tag1", "tag2", "tag3"],
+    activity: {
+      totalLikes: 1,
+      totalReads: 2,
+    },
   };
   const publishedBlog2 = {
     isDraft: false,
@@ -80,6 +84,10 @@ const createBlogs = async (userId: string) => {
       ],
     },
     tags: ["art", "tag2"],
+    activity: {
+      totalLikes: 5,
+      totalReads: 5,
+    },
   };
 
   const blogs = [draftBlog, publishedBlog1, publishedBlog2];
@@ -97,14 +105,18 @@ describe("/api/v1/blogs", () => {
     server = appServer;
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     server.close();
-    // db cleanup
-    await User.deleteMany({});
-    await Blog.deleteMany({});
   });
 
   describe("POST /", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      server.close();
+    });
+
     let token: string;
     const exec = async (payload: any) => {
       return await request(server)
@@ -308,6 +320,12 @@ describe("/api/v1/blogs", () => {
       blogs = await createBlogs(user.id);
     });
 
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
     it("should return all latest published blogs", async () => {
       const res = await request(server).get(`${endpoint}`);
 
@@ -323,107 +341,37 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return filtered blogs by tag", async () => {
+    it("should return filtered blogs when tag query parameter is set", async () => {
       // filter by tag
       const tag = "art";
       const res = await request(server).get(`${endpoint}?tag=${tag}`);
 
       expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBeGreaterThan(0);
+
       // blog with tag must be returned
       res.body.data.forEach((blog: IBlog) => {
         expect(blog.tags).toContain(tag);
       });
     });
-  });
 
-  describe("GET /trending", () => {
-    it("should return latest trending blogs", async () => {
-      const user = await User.create({
-        personalInfo: {
-          fullname: "Mickey Mouse",
-          password: "Clubhouse12",
-          email: "test@test.com",
-          username: "test",
-          profileImage: "http://example-img.png",
-        },
-      });
-
-      // create blogs
-      const blog1 = {
-        isDraft: false,
-        blogId: "blog-1-how-to-setup-zustand-with-react-app-oki178bfopl",
-        title: "blog-1-How to setup zustand ! with react app @ok ",
-        description: "some short description",
-        coverImgURL: "https://sample.jpg",
-        author: user.id,
-        content: {
-          blocks: [
-            {
-              id: "O8uS0t2SUk",
-              type: "header",
-              data: {
-                text: "this is how it is done",
-                level: 2,
-              },
-            },
-          ],
-        },
-        tags: ["tag1", "tag2", "tag3"],
-        activity: {
-          totalLikes: 1,
-          totalReads: 2,
-        },
-      };
-
-      const blog2 = {
-        isDraft: false,
-        blogId: "blog-2-how-to-setup-zustand-with-react-app-oki178bfopl",
-        title: "blog-2-How to setup zustand ! with react app @ok ",
-        description: "some short description",
-        coverImgURL: "https://sample.jpg",
-        author: user.id,
-        content: {
-          blocks: [
-            {
-              id: "O8uS0t2SUk",
-              type: "header",
-              data: {
-                text: "this is how it is done",
-                level: 2,
-              },
-            },
-            {
-              id: "s-VOjHF8Kk",
-              type: "list",
-              data: {
-                style: "ordered",
-                items: ["step-1", "step-2", "step-3"],
-              },
-            },
-          ],
-        },
-        tags: ["tag1", "tag2", "tag3"],
-        activity: {
-          totalLikes: 5,
-          totalReads: 5,
-        },
-      };
-
-      await Blog.create([blog1, blog2]);
-
-      const res = await request(server).get(`${endpoint}/trending`);
+    it("should return latest trending blogs when ordering and limit query parameters are set", async () => {
+      const res = await request(server).get(
+        `${endpoint}?ordering=trending&limit=2`
+      );
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.status).toBe("success");
 
-      // only published blog must be returned
+      // check limit = 2
       expect(res.body.data).toHaveLength(2);
 
-      const b1 = res.body.data[0];
-      const b2 = res.body.data[1];
-      // blog2 likes and read are more than blog1
-      expect(b1.blogId).toBe(blog2.blogId);
-      expect(b2.blogId).toBe(blog1.blogId);
+      const [blog1, blog2] = res.body.data;
+      expect(blog1.activity.totalLikes).toBeGreaterThan(
+        blog2.activity.totalLikes
+      );
+      expect(blog1.activity.totalReads).toBeGreaterThan(
+        blog2.activity.totalReads
+      );
     });
   });
 });
