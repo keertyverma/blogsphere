@@ -59,3 +59,7 @@ export interface ICreateBlog {
   coverImgURL?: string;
   tags: string[];
 }
+
+export interface IBlogQuery {
+  tag?: string;
+}

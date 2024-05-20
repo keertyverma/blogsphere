@@ -1,4 +1,4 @@
-import { IBlog, IFetchResponse, INewUser } from "@/types";
+import { IBlog, IBlogQuery, IFetchResponse, INewUser } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import apiClient from "../api-client";
 import { QUERY_KEYS } from "./queryKeys";
@@ -48,13 +48,17 @@ export const useCreateBlog = () =>
         .then((res) => res.data),
   });
 
-export const useGetLatestBlog = () =>
+export const useGetLatestBlog = (tag: string) =>
   useQuery<IBlog[]>({
-    queryKey: [QUERY_KEYS.GET_LATEST_BLOGS],
-    queryFn: () =>
-      apiClient
-        .get<IBlog[]>("/blogs")
-        .then((res) => (res.data as IFetchResponse).data),
+    queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, tag],
+    queryFn: async () => {
+      const params: IBlogQuery = {};
+      if (tag !== "all") params.tag = tag;
+
+      return await apiClient
+        .get<IBlog[]>("/blogs", { params })
+        .then((res) => (res.data as IFetchResponse).data);
+    },
     staleTime: ms("1m"),
     gcTime: ms("5m"),
     refetchOnWindowFocus: true, // Refetch on window focus

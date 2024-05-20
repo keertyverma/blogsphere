@@ -10,16 +10,20 @@ import {
   useGetLatestBlog,
   useGetTrendingBlog,
 } from "@/lib/react-query/queries";
+import { useState } from "react";
 import { IoTrendingUpSharp } from "react-icons/io5";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
   const { isAuthenticated } = useAuthContext();
+  const [selectedTag, setSelectedTag] = useState("all");
+
   const {
     data: blogs,
     isLoading: isLatestBlogLoading,
     error: latestBlogFetchError,
-  } = useGetLatestBlog();
+  } = useGetLatestBlog(selectedTag);
+
   const {
     data: trendingBlogs,
     isLoading: isTrendingBlogLoading,
@@ -36,18 +40,27 @@ const Home = () => {
       <section className="h-cover md:flex md:justify-center gap-10 py-16 ">
         <div className="max-md:hidden">
           {/* Filter */}
-          <TagList />
+          <TagList
+            selectedTag={selectedTag}
+            onSelect={(tag: string) => setSelectedTag(tag)}
+          />
 
           {/* blogs */}
           {isLatestBlogLoading && <BlogPostCardSkeleton />}
-          {blogs?.map((blog, index) => (
-            <AnimationWrapper
-              key={index}
-              transition={{ duration: 1, delay: index * 0.1 }}
-            >
-              <BlogPostCard content={blog} author={blog.author} />
-            </AnimationWrapper>
-          ))}
+          {blogs?.length ? (
+            blogs.map((blog, index) => (
+              <AnimationWrapper
+                key={index}
+                transition={{ duration: 1, delay: index * 0.1 }}
+              >
+                <BlogPostCard content={blog} author={blog.author} />
+              </AnimationWrapper>
+            ))
+          ) : (
+            <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
+              <p>No blogs available</p>
+            </div>
+          )}
         </div>
 
         {/* In page navigation on mobile screens */}
@@ -56,18 +69,28 @@ const Home = () => {
             routes={["home", "trending"]}
             defaultHidden={["trending"]}
           >
-            {/* latest blogs */}
             <>
-              <TagList />
+              <TagList
+                selectedTag={selectedTag}
+                onSelect={(tag: string) => setSelectedTag(tag)}
+              />
+
+              {/* latest blogs */}
               {isLatestBlogLoading && <BlogPostCardSkeleton />}
-              {blogs?.map((blog, index) => (
-                <AnimationWrapper
-                  key={index}
-                  transition={{ duration: 1, delay: index * 0.1 }}
-                >
-                  <BlogPostCard content={blog} author={blog.author} />
-                </AnimationWrapper>
-              ))}
+              {blogs?.length ? (
+                blogs.map((blog, index) => (
+                  <AnimationWrapper
+                    key={index}
+                    transition={{ duration: 1, delay: index * 0.1 }}
+                  >
+                    <BlogPostCard content={blog} author={blog.author} />
+                  </AnimationWrapper>
+                ))
+              ) : (
+                <div className="text-center w-full p-2 rounded-full bg-muted mt-10">
+                  <p className="text-sm md:text-base">No blogs available</p>
+                </div>
+              )}
             </>
 
             {/* Trending blogs on mobile screen*/}

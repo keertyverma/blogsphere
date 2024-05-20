@@ -2,24 +2,30 @@ import { useEffect, useRef, useState } from "react";
 import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 import { Button } from "../ui/button";
 
-const TagList = () => {
+interface Props {
+  selectedTag: string;
+  onSelect: (tag: string) => void;
+}
+
+const TagList = ({ selectedTag, onSelect }: Props) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
+  // TODO: Fetch popular tags from server
   const categories = [
-    "All",
+    "all",
     "science",
     "research",
     "photography",
     "art",
     "creativity",
     "inspiration",
-    "health",
-    "art",
-    "creativity",
-    "inspiration",
-    "health",
+    "artifical intelligence",
+    "react js",
+    "javacript",
+    "typescript",
+    "next js",
   ];
 
   const handleScroll = (direction: "left" | "right") => {
@@ -78,8 +84,20 @@ const TagList = () => {
           <Button
             variant="secondary"
             size="sm"
-            className="h-6 md:h-8 text-xs md:text-sm rounded-[8px] capitalize px-2 md:px-3 m-1 ml-0"
+            className={`h-6 md:h-8 text-xs md:text-sm rounded-[8px] capitalize px-2 md:px-3 m-1 ml-0 ${
+              selectedTag === category
+                ? "bg-slate-600 text-white hover:bg-slate-500"
+                : " "
+            }`}
             key={index}
+            onClick={() => {
+              if (selectedTag === category) {
+                // deselect
+                onSelect("all");
+              } else {
+                onSelect(category);
+              }
+            }}
           >
             {category}
           </Button>
