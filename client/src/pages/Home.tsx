@@ -33,7 +33,7 @@ const Home = () => {
 
   return (
     <AnimationWrapper>
-      <section className="h-cover md:flex md:justify-center gap-10">
+      <section className="h-cover md:flex md:justify-center gap-10 py-16 ">
         <div className="max-md:hidden">
           {/* Filter */}
           <TagList />
@@ -85,7 +85,7 @@ const Home = () => {
           </InPageNavigation>
         </div>
 
-        <aside className="min-w-[40%] lg:min-w-[400px] max-w-min max-md:hidden border-l border-border pl-8 pt-3">
+        <aside className="min-w-[40%] lg:min-w-[400px] max-w-min max-md:hidden border-l border-border pl-8 pt-3 mt-4">
           {/* trending blogs on larger screen*/}
           <div>
             <h1 className="font-semibold text-xl mb-4 flex gap-2">

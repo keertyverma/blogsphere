@@ -65,7 +65,7 @@
   }
 
   section {
-    @apply py-4 px-[6vw] md:px-[7vw] lg:px-[10vw];
+    @apply py-20 px-[6vw] md:px-[7vw] lg:px-[10vw];
   }
 }
 
@@ -76,7 +76,7 @@
   }
 
   .navbar {
-    @apply w-full h-[70px] sticky top-0 z-10 flex items-center px-[5vw] py-4 border-b border-border bg-background;
+    @apply w-full h-[70px] fixed top-0 z-50 flex items-center px-[5vw] py-4 border-b border-border bg-background;
   }
 
   /* SHADCN COMPONENTS */

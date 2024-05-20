@@ -17,20 +17,18 @@ const TagList = () => {
   ];
 
   return (
-    <div className="flex max-w-[400px] md:max-w-[800px] m-0 mb-4">
-      <div className="m-0 overflow-x-auto p-0 text-nowrap">
-        <div className="inline-block">
-          {categories.map((category, index) => (
-            <Button
-              variant="secondary"
-              size="sm"
-              className="text-xs md:text-sm rounded-3xl capitalize px-2 md:px-4 ml-1"
-              key={index}
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
+    <div className="w-full max-w-[90%] md:max-w-[800px] p-0 md:mt-4 mb-4 overflow-x-auto text-nowrap">
+      <div className="flex gap-1">
+        {categories.map((category, index) => (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-6 md:h-8 text-xs md:text-sm rounded-[8px] capitalize px-2 md:px-3 m-1 ml-0"
+            key={index}
+          >
+            {category}
+          </Button>
+        ))}
       </div>
     </div>
   );

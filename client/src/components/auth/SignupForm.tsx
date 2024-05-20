@@ -133,7 +133,7 @@ const SignupForm = () => {
 
   return (
     <AnimationWrapper>
-      <section className="h-cover flex-center">
+      <section className="h-cover flex-center py-[20vh]">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignup)}
