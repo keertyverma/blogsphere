@@ -64,7 +64,7 @@ const TagList = ({ selectedTag, onSelect }: Props) => {
   }, []);
 
   return (
-    <div className="relative w-full max-w-[90%] md:max-w-[800px] p-0 md:mt-4 mb-4">
+    <div className="relative w-full max-w-[90%] md:max-w-[400px] lg:max-w-[500px] xl:max-w-[800px] p-0 md:mt-4 mb-4">
       {showLeftArrow && (
         <Button
           variant={"secondary"}
