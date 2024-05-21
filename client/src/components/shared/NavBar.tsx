@@ -1,36 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/context/authContext";
-import { useState } from "react";
 import { BsBell, BsPencilSquare, BsSearch } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import Logo from "./Logo";
 import UserNavigationPanel from "../user-menu/UserNavigationPanel";
+import Logo from "./Logo";
+import SearchInputBox from "./SearchInputBox";
 
 const NavBar = () => {
-  const [toggleSearch, setToggleSearch] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthContext();
 
   return (
     <nav className="navbar">
       <Logo />
-      <div
-        className={`absolute md:relative left-0 top-full md:inset-0 w-full md:w-auto mt-0.5 py-4 px-[7vw] md:block md:p-0 md:show ${
-          toggleSearch ? "show" : "hide"
-        }`}
-      >
-        <BsSearch className="absolute left-[10%] md:left-5 top-1/2 md:pointer-events-none -translate-y-1/2 text-l text-muted-foreground" />
-        <Input
-          className="bg-accent pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
-          placeholder="Search"
-        />
+      <div className="max-md:hidden">
+        <SearchInputBox />
       </div>
       <div className="flex items-center gap-1 md:gap-4 ml-auto">
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setToggleSearch((prev) => !prev)}
+          onClick={() => navigate("/search")}
           className="md:hidden bg-accent rounded-full flex-center"
         >
           <BsSearch className="text-l text-muted-foreground" />

@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import LoginForm from "./components/auth/LoginForm";
 import SignupForm from "./components/auth/SignupForm";
 import Layout from "./pages/Layout";
+import Search from "./pages/Search";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
@@ -18,8 +19,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="/signup" element={<SignupForm />} />
-          <Route path="/login" element={<LoginForm />} />
+          <Route path="signup" element={<SignupForm />} />
+          <Route path="login" element={<LoginForm />} />
+          <Route path="search" element={<Search />} />
         </Route>
 
         <Route path="/editor" element={<Editor />} />

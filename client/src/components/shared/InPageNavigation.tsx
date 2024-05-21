@@ -36,7 +36,7 @@ const InPageNavigation = ({
 
   return (
     <>
-      <div className="relative max-sm:sticky max-sm:top-16 max-sm:z-10 flex flex-nowrap gap-6 mb-2 md:mb-5 bg-white border-b border-border overflow-x-auto">
+      <div className="relative max-sm:sticky max-sm:top-16 max-sm:z-10 flex flex-nowrap gap-6 mb-2 md:mb-5 mt-4 bg-white border-b border-border overflow-x-auto">
         {routes.map((route, index) => (
           <Button
             ref={index === defaultActiveIndex ? activeTabRef : null}
