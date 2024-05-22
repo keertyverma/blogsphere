@@ -7,7 +7,7 @@ interface Props {
   searchTerm: string;
 }
 
-const GetSearchedBlog = ({ searchTerm }: Props) => {
+const SearchedBlogList = ({ searchTerm }: Props) => {
   const { data: blogs, isLoading, error } = useGetSearchedBlogs(searchTerm);
 
   if (isLoading) return <BlogPostCardSkeleton />;
@@ -32,4 +32,4 @@ const GetSearchedBlog = ({ searchTerm }: Props) => {
   ));
 };
 
-export default GetSearchedBlog;
+export default SearchedBlogList;

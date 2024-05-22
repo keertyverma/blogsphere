@@ -1,8 +1,8 @@
-import { IBlog, IBlogQuery, IFetchResponse, INewUser } from "@/types";
+import { IAuthor, IBlog, IBlogQuery, IFetchResponse, INewUser } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import ms from "ms";
 import apiClient from "../api-client";
 import { QUERY_KEYS } from "./queryKeys";
-import ms from "ms";
 
 export const usePingServer = () => {
   useQuery({
@@ -33,6 +33,25 @@ export const useUpload = () =>
   useMutation({
     mutationFn: (data: string) =>
       apiClient.post("/upload", { data }).then((res) => res.data),
+  });
+
+export const useGetSearchedUsers = (searchTerm: string) =>
+  useQuery<IAuthor[]>({
+    queryKey: [QUERY_KEYS.GET_SEARCHED_USERS, searchTerm],
+    queryFn: () =>
+      apiClient
+        .get<IAuthor[]>("/users", {
+          params: {
+            search: searchTerm,
+            limit: 20,
+          },
+        })
+        .then((res) => (res.data as IFetchResponse).data),
+    staleTime: ms("5m"),
+    gcTime: ms("10m"),
+    refetchOnWindowFocus: false, // No need to refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
   });
 
 // ----------------- Blog -------------------

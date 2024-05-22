@@ -1,4 +1,5 @@
-import GetSearchedBlog from "@/components/search/GetSearchedBlog";
+import SearchedBlogList from "@/components/search/SearchedBlogList";
+import SearchedUserList from "@/components/search/SearchedUserList";
 import InPageNavigation from "@/components/shared/InPageNavigation";
 import SearchInputBox from "@/components/shared/SearchInputBox";
 import { useAuthContext } from "@/context/authContext";
@@ -22,12 +23,16 @@ const Search = () => {
           {/* search in latest blogs */}
           {searchTerm && (
             <div className="mt-6">
-              <GetSearchedBlog searchTerm={searchTerm} />
+              <SearchedBlogList searchTerm={searchTerm} />
             </div>
           )}
 
           {/* search by people */}
-          <div>Fetch people ...</div>
+          {searchTerm && (
+            <div>
+              <SearchedUserList searchTerm={searchTerm} />
+            </div>
+          )}
         </InPageNavigation>
 
         {!searchTerm && (
