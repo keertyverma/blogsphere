@@ -121,13 +121,14 @@ const createBlog = async (req: Request, res: Response) => {
 const getLatestBlogs = async (req: Request, res: Response) => {
   logger.debug(`GET Request on Route -> ${req.baseUrl}`);
 
-  const { tag, ordering, limit } = req.query;
+  const { tag, search, ordering, limit } = req.query;
 
   const max_limit = limit ? parseInt(limit as string) : 5;
 
   const findQuery: IBlogFindQuery = {
     isDraft: false,
     ...(tag && { tags: (tag as string).toLowerCase() }),
+    ...(search && { title: new RegExp(`${search}`, "i") }),
   };
 
   const sortQuery: { [key: string]: SortOrder } =

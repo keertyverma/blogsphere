@@ -373,5 +373,19 @@ describe("/api/v1/blogs", () => {
         blog2.activity.totalReads
       );
     });
+
+    it("should return searched blogs when search query parameter is set", async () => {
+      // search blog
+      const searchTerm = "react";
+      const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBeGreaterThan(0);
+
+      // blog with tag must be returned
+      res.body.data.forEach((blog: IBlog) => {
+        expect(blog.title).toContain(searchTerm);
+      });
+    });
   });
 });
