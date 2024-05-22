@@ -1,16 +1,20 @@
-import { IBlog } from "@/types";
+import { useGetSearchedBlogs } from "@/lib/react-query/queries";
 import BlogPostCard from "../home/BlogPostCard";
 import BlogPostCardSkeleton from "../home/BlogPostCardSkeleton";
 import AnimationWrapper from "../shared/AnimationWrapper";
 
-const GetSearchedBlog = () => {
-  // TODO: fetch search results
-  const blogs: IBlog[] = [];
-  const isLoading = false;
+interface Props {
+  searchTerm: string;
+}
+
+const GetSearchedBlog = ({ searchTerm }: Props) => {
+  const { data: blogs, isLoading, error } = useGetSearchedBlogs(searchTerm);
 
   if (isLoading) return <BlogPostCardSkeleton />;
 
-  if (!blogs.length)
+  if (error) console.error(error);
+
+  if (!blogs?.length)
     return (
       <div className="text-lg md:text-2xl text-muted-foreground font-medium text-center py-10 flex-center flex-col md:flex-row gap-2 md:gap-1">
         <p>No results found.</p>

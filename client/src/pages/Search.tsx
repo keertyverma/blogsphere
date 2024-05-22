@@ -7,12 +7,9 @@ import { Navigate, useSearchParams } from "react-router-dom";
 const Search = () => {
   const { isAuthenticated } = useAuthContext();
   const [searchParams] = useSearchParams();
-  // const [searchText, setSearchText] = useState(searchParams.get("q") || "");
 
-  const searchText = searchParams.get("q") || "";
   if (!isAuthenticated) return <Navigate to="/login" />;
-
-  console.log("searchText = ", searchText);
+  const searchTerm = searchParams.get("q") || "";
 
   return (
     <div className="h-cover px-0 md:px-10 lg:px-40 xl:px-40 2xl:px-52">
@@ -23,13 +20,17 @@ const Search = () => {
 
         <InPageNavigation routes={["latest", "people"]}>
           {/* search in latest blogs */}
-          {searchText && <GetSearchedBlog />}
+          {searchTerm && (
+            <div className="mt-6">
+              <GetSearchedBlog searchTerm={searchTerm} />
+            </div>
+          )}
 
           {/* search by people */}
           <div>Fetch people ...</div>
         </InPageNavigation>
 
-        {!searchText && (
+        {!searchTerm && (
           <h1 className="text-lg md:text-2xl text-muted-foreground font-medium text-center py-10">
             Search for articles, people and tags
           </h1>

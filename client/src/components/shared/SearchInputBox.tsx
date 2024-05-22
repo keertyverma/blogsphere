@@ -1,4 +1,4 @@
-import { KeyboardEvent, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,10 @@ import { Input } from "../ui/input";
 const SearchInputBox = () => {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    if (!searchInput) navigate("/search");
+  }, [searchInput, navigate]);
 
   const handleSearch = (e: KeyboardEvent<HTMLInputElement>) => {
     const input = e.target as HTMLInputElement;
@@ -30,9 +34,7 @@ const SearchInputBox = () => {
         className="bg-accent pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
         placeholder="Search"
         value={searchInput}
-        onChange={(e) => {
-          setSearchInput(e.target.value);
-        }}
+        onChange={(e) => setSearchInput(e.target.value)}
         onKeyDown={handleSearch}
       />
       {searchInput && (

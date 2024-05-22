@@ -82,3 +82,22 @@ export const useGetTrendingBlog = () =>
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
+
+export const useGetSearchedBlogs = (searchTerm: string) =>
+  useQuery<IBlog[]>({
+    queryKey: [QUERY_KEYS.GET_SEARCHED_BLOGS, searchTerm],
+    queryFn: () =>
+      apiClient
+        .get<IBlog[]>("/blogs", {
+          params: {
+            search: searchTerm,
+            limit: 10,
+          },
+        })
+        .then((res) => (res.data as IFetchResponse).data),
+    staleTime: ms("5m"),
+    gcTime: ms("10m"),
+    refetchOnWindowFocus: false, // No need to refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });

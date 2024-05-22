@@ -62,4 +62,5 @@ export interface ICreateBlog {
 
 export interface IBlogQuery {
   tag?: string;
+  search?: string;
 }
