@@ -58,3 +58,34 @@ export const createUser = async (req: Request, res: Response) => {
     .status(result.statusCode)
     .json(result);
 };
+
+export const getUsers = async (req: Request, res: Response) => {
+  logger.debug(`GET Request on Route -> ${req.baseUrl}`);
+
+  const { search, limit } = req.query;
+
+  const max_limit = limit ? parseInt(limit as string) : 10;
+
+  const findQuery = {
+    ...(search && {
+      $or: [
+        { "personalInfo.username": new RegExp(`${search}`, "i") },
+        { "personalInfo.fullname": new RegExp(`${search}`, "i") },
+      ],
+    }),
+  };
+
+  const users = await User.find(findQuery)
+    .limit(max_limit)
+    .select(
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+    );
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: users,
+  };
+
+  return res.status(result.statusCode).json(result);
+};

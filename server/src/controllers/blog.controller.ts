@@ -146,8 +146,10 @@ const getLatestBlogs = async (req: Request, res: Response) => {
       "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
     )
     .sort(sortQuery)
-    .select("blogId title description coverImgURL tags activity createdAt -_id")
-    .limit(max_limit);
+    .limit(max_limit)
+    .select(
+      "blogId title description coverImgURL tags activity createdAt -_id"
+    );
 
   const result: APIResponse = {
     status: APIStatus.SUCCESS,

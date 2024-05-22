@@ -1,14 +1,38 @@
 import request from "supertest";
 import { disconnect } from "mongoose";
 import "dotenv/config";
-import config from "config";
 import http from "http";
 
 import appServer from "../../../src";
-import { User } from "../../../src/models/user.model";
+import { IUser, User } from "../../../src/models/user.model";
 
 let server: http.Server;
 let endpoint: string = `/api/v1/users`;
+
+const createUser = async () => {
+  const user1 = {
+    personalInfo: {
+      fullname: "Mickey Mouse",
+      password: "Clubhouse12",
+      email: "mickey@test.com",
+      username: "mickey",
+      profileImage: "http://example-img1.png",
+    },
+  };
+  const user2 = {
+    personalInfo: {
+      fullname: "Donald Duck",
+      password: "Letsgo1234",
+      email: "donald@test.com",
+      username: "donald",
+      profileImage: "http://example-img2.png",
+    },
+  };
+
+  const users = [user1, user2];
+  await User.create(users);
+  return users as IUser[];
+};
 
 describe("/api/v1/users", () => {
   afterAll(async () => {
@@ -22,11 +46,14 @@ describe("/api/v1/users", () => {
 
   afterEach(async () => {
     server.close();
-    // db cleanup
-    await User.deleteMany({});
   });
 
   describe("POST /register", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
     it("should return BadRequest-400 if email parameter is not passed", async () => {
       // name, email and password are the required parameter to create user.
       const userData = {
@@ -140,6 +167,52 @@ describe("/api/v1/users", () => {
       expect(id).toBeDefined();
       expect(username).not.toBe(userData.email.split("@")[0]);
       expect(username).toMatch(/test/);
+    });
+  });
+
+  describe("GET /", () => {
+    let users: IUser[];
+
+    beforeAll(async () => {
+      users = await createUser();
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    it("should return all userst", async () => {
+      const res = await request(server).get(`${endpoint}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBe(2);
+
+      const usernames = users.map((user) => user.personalInfo.username);
+
+      res.body.data.forEach((user: IUser) => {
+        expect(usernames.includes(user.personalInfo.username)).toBe(true);
+      });
+    });
+
+    it("should return searched users when search query parameter is set", async () => {
+      // search blog
+      const searchTerm = "mickey";
+      const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBe(1);
+      const [user] = res.body.data;
+      const [existingUser] = users.filter(
+        (user) => user.personalInfo.username === "mickey"
+      );
+
+      expect(user.personalInfo.fullname).toBe(
+        existingUser.personalInfo.fullname.toLowerCase()
+      );
+      expect(user.personalInfo.username).toBe(
+        existingUser.personalInfo.username
+      );
     });
   });
 });
