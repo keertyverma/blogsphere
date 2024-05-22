@@ -40,7 +40,7 @@ const Home = () => {
         </aside>
 
         {/* In page navigation on mobile screens */}
-        <div className="md:hidden">
+        <div className="md:hidden mt-4">
           <InPageNavigation routes={["home", "trending"]}>
             <>
               <TagList

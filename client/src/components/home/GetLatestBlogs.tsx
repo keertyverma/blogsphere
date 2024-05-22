@@ -10,25 +10,27 @@ interface Props {
 const GetLatestBlogs = ({ selectedTag }: Props) => {
   const { data: blogs, isLoading, error } = useGetLatestBlog(selectedTag);
 
+  if (isLoading) return <BlogPostCardSkeleton />;
+
   if (error) console.error(error);
+
+  if (!blogs?.length)
+    return (
+      <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
+        <p>No blogs available</p>
+      </div>
+    );
 
   return (
     <>
-      {isLoading && <BlogPostCardSkeleton />}
-      {blogs?.length ? (
-        blogs.map((blog, index) => (
-          <AnimationWrapper
-            key={index}
-            transition={{ duration: 1, delay: index * 0.1 }}
-          >
-            <BlogPostCard content={blog} author={blog.author} />
-          </AnimationWrapper>
-        ))
-      ) : (
-        <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
-          <p>No blogs available</p>
-        </div>
-      )}
+      {blogs.map((blog, index) => (
+        <AnimationWrapper
+          key={index}
+          transition={{ duration: 1, delay: index * 0.1 }}
+        >
+          <BlogPostCard content={blog} author={blog.author} />
+        </AnimationWrapper>
+      ))}
     </>
   );
 };

@@ -6,11 +6,12 @@ import TrendingBlogPostSkeleton from "./TrendingBlogPostSkeleton";
 const GetTrendingBlog = () => {
   const { data: trendingBlogs, isLoading, error } = useGetTrendingBlog();
 
+  if (isLoading) return <TrendingBlogPostSkeleton />;
+
   if (error) console.error(error);
 
   return (
     <>
-      {isLoading && <TrendingBlogPostSkeleton />}
       {trendingBlogs?.map((blog, index) => (
         <AnimationWrapper
           key={index}

@@ -4,7 +4,6 @@ import { BsBell, BsPencilSquare, BsSearch } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import UserNavigationPanel from "../user-menu/UserNavigationPanel";
 import Logo from "./Logo";
-import SearchInputBox from "./SearchInputBox";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -13,15 +12,12 @@ const NavBar = () => {
   return (
     <nav className="navbar">
       <Logo />
-      <div className="max-md:hidden">
-        <SearchInputBox />
-      </div>
       <div className="flex items-center gap-1 md:gap-4 ml-auto">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate("/search")}
-          className="md:hidden bg-accent rounded-full flex-center"
+          className="bg-accent rounded-full flex-center"
         >
           <BsSearch className="text-l text-muted-foreground" />
         </Button>
