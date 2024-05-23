@@ -9,6 +9,7 @@ import "react-toastify/ReactToastify.css";
 import Editor from "./pages/Editor";
 import Home from "./pages/Home";
 import { usePingServer } from "./lib/react-query/queries";
+import ErrorPage from "./pages/ErrorPage";
 
 const App = () => {
   // to prevent the server from going into sleep mode due to inactivity.
@@ -25,6 +26,7 @@ const App = () => {
         </Route>
 
         <Route path="/editor" element={<Editor />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
 
       <ToastContainer hideProgressBar={true} />

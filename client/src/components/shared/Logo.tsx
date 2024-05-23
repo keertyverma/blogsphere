@@ -4,7 +4,7 @@ const Logo = () => {
   return (
     <Link to="/" className="flex items-center md:mr-12">
       <img
-        src="assets/images/logo.png"
+        src="/assets/images/logo.png"
         alt="logo"
         width={60}
         height={60}
