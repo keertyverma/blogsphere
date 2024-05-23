@@ -10,6 +10,7 @@ import Editor from "./pages/Editor";
 import Home from "./pages/Home";
 import { usePingServer } from "./lib/react-query/queries";
 import ErrorPage from "./pages/ErrorPage";
+import UserProfile from "./pages/UserProfile";
 
 const App = () => {
   // to prevent the server from going into sleep mode due to inactivity.
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="signup" element={<SignupForm />} />
           <Route path="login" element={<LoginForm />} />
           <Route path="search" element={<Search />} />
+          <Route path="user/:username" element={<UserProfile />} />
         </Route>
 
         <Route path="/editor" element={<Editor />} />

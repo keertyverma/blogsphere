@@ -20,26 +20,28 @@ const BlogPostCard = ({ content, author }: Props) => {
   } = content;
 
   const {
-    personalInfo: { fullname, profileImage },
+    personalInfo: { fullname, username, profileImage },
   } = author;
   return (
     <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 md:gap-5 pt-0 md:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
       <section className="p-0">
-        <div className="flex flex-row gap-3 items-center">
-          <img
-            src={profileImage}
-            alt="user profile image"
-            className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
-          />
-          <div className="flex-col text-sm ">
-            <p className="text-secondary-foreground font-semibold capitalize">
-              {fullname}
-            </p>
-            <p className="text-muted-foreground font-normal">
-              {publishedAt && formatDate(publishedAt)}
-            </p>
+        <Link to={`/user/${username}`}>
+          <div className="flex flex-row gap-3 items-center">
+            <img
+              src={profileImage}
+              alt="user profile image"
+              className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
+            />
+            <div className="flex-col text-sm ">
+              <p className="text-secondary-foreground font-semibold capitalize">
+                {fullname}
+              </p>
+              <p className="text-muted-foreground font-normal">
+                {publishedAt && formatDate(publishedAt)}
+              </p>
+            </div>
           </div>
-        </div>
+        </Link>
         <Link to={`/blogs/${id}`}>
           <div className="w-full flex flex-row gap-2 sm:gap-3 md:gap-6 justify-between">
             <div className="flex-1">

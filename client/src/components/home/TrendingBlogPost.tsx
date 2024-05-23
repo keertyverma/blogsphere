@@ -11,7 +11,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
     blogId: id,
     title,
     authorDetails: {
-      personalInfo: { fullname, profileImage },
+      personalInfo: { fullname, profileImage, username },
     },
     createdAt: publishedAt,
   } = blog;
@@ -23,21 +23,23 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
       </h1>
       <div>
         <h1 className="blog-title !mt-1 sm:!mt-0 !text-base">{title}</h1>
-        <div className="flex flex-row gap-3 items-center">
-          <img
-            src={profileImage}
-            alt="user profile image"
-            className="w-7 h-7 object-cover rounded-full border-[1px] border-border"
-          />
-          <div className="flex-col text-sm ">
-            <p className="text-secondary-foreground font-semibold capitalize">
-              {fullname}
-            </p>
-            <p className="text-muted-foreground font-normal">
-              {publishedAt && formatDate(publishedAt)}
-            </p>
+        <Link to={`/user/${username}`}>
+          <div className="flex flex-row gap-3 items-center">
+            <img
+              src={profileImage}
+              alt="user profile image"
+              className="w-7 h-7 object-cover rounded-full border-[1px] border-border"
+            />
+            <div className="flex-col text-sm ">
+              <p className="text-secondary-foreground font-semibold capitalize">
+                {fullname}
+              </p>
+              <p className="text-muted-foreground font-normal">
+                {publishedAt && formatDate(publishedAt)}
+              </p>
+            </div>
           </div>
-        </div>
+        </Link>
       </div>
     </Link>
   );
