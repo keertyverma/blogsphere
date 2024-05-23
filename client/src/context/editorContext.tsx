@@ -18,7 +18,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     coverImgURL: "",
     title: "",
     description: "",
-    author: {} as IAuthor,
+    authorDetails: {} as IAuthor,
     tags: [],
     content: {} as OutputData,
   });

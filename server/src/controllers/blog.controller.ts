@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
-import { SortOrder } from "mongoose";
 import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
@@ -10,6 +9,7 @@ import { APIResponse, APIStatus, IBlogFindQuery } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import logger from "../utils/logger";
+import { SortQuery } from "../types";
 
 const SPECIAL_CHARS_REGEX = /[^a-zA-Z0-9]/g; // find all special characters
 const SPACE_REGEX = /\s+/g; // find one or more consecutives space
@@ -125,13 +125,26 @@ const getLatestBlogs = async (req: Request, res: Response) => {
 
   const max_limit = limit ? parseInt(limit as string) : 5;
 
-  const findQuery: IBlogFindQuery = {
+  const matchQuery: any = {
     isDraft: false,
     ...(tag && { tags: (tag as string).toLowerCase() }),
-    ...(search && { title: new RegExp(`${search}`, "i") }),
   };
 
-  const sortQuery: { [key: string]: SortOrder } =
+  const searchQuery: any = search
+    ? {
+        $or: [
+          { title: new RegExp(`${search}`, "i") },
+          {
+            "authorDetails.personalInfo.fullname": new RegExp(`${search}`, "i"),
+          },
+          {
+            "authorDetails.personalInfo.username": new RegExp(`${search}`, "i"),
+          },
+        ],
+      }
+    : {};
+
+  const sortQuery: SortQuery =
     ordering && (ordering as string).toLowerCase() === "trending"
       ? {
           "activity.totalReads": -1,
@@ -140,16 +153,46 @@ const getLatestBlogs = async (req: Request, res: Response) => {
         }
       : { createdAt: -1 };
 
-  const blogs = await Blog.find(findQuery)
-    .populate(
-      "author",
-      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
-    )
-    .sort(sortQuery)
-    .limit(max_limit)
-    .select(
-      "blogId title description coverImgURL tags activity createdAt -_id"
-    );
+  const blogs = await Blog.aggregate([
+    {
+      $match: matchQuery,
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "authorDetails",
+      },
+    },
+    {
+      $unwind: "$authorDetails",
+    },
+    {
+      $match: searchQuery,
+    },
+    {
+      $sort: sortQuery,
+    },
+    {
+      $limit: max_limit,
+    },
+    {
+      $project: {
+        _id: 0,
+        blogId: 1,
+        title: 1,
+        description: 1,
+        coverImgURL: 1,
+        tags: 1,
+        activity: 1,
+        createdAt: 1,
+        "authorDetails.personalInfo.fullname": 1,
+        "authorDetails.personalInfo.username": 1,
+        "authorDetails.personalInfo.profileImage": 1,
+      },
+    },
+  ]);
 
   const result: APIResponse = {
     status: APIStatus.SUCCESS,

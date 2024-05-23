@@ -10,7 +10,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
   const {
     blogId: id,
     title,
-    author: {
+    authorDetails: {
       personalInfo: { fullname, profileImage },
     },
     createdAt: publishedAt,
