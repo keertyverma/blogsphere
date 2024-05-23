@@ -3,9 +3,10 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
-import BadRequestError from "../utils/errors/bad-request";
-import logger from "../utils/logger";
 import { generateUsername } from "../utils";
+import BadRequestError from "../utils/errors/bad-request";
+import NotFoundError from "../utils/errors/not-found";
+import logger from "../utils/logger";
 
 export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);
@@ -87,5 +88,26 @@ export const getUsers = async (req: Request, res: Response) => {
     data: users,
   };
 
+  return res.status(result.statusCode).json(result);
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+  logger.debug(`GET By Id Request on Route -> ${req.baseUrl}`);
+
+  const { id: username } = req.params;
+
+  const user = await User.findOne({ "personalInfo.username": username }).select(
+    "-personalInfo.password -googleAuth -blogs -updatedAt -__v"
+  );
+  if (!user)
+    throw new NotFoundError(
+      `User with username = ${username} does not exists!`
+    );
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: user,
+  };
   return res.status(result.statusCode).json(result);
 };

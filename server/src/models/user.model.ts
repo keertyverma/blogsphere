@@ -18,7 +18,6 @@ interface IUser {
     totalReads: number;
   };
   blogs: string[];
-  joinedAt: Date;
   updatedAt: Date;
 }
 

@@ -215,4 +215,49 @@ describe("/api/v1/users", () => {
       );
     });
   });
+
+  describe("GET /:id", () => {
+    let users: IUser[];
+
+    beforeAll(async () => {
+      users = await createUser();
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    it("should return BadRequest-400 if user with given username does not exists", async () => {
+      const username = "invalid-user";
+      const res = await request(server).get(`${endpoint}/${username}`);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `User with username = ${username} does not exists!`,
+      });
+    });
+
+    it("should return user with given username", async () => {
+      const username = "mickey";
+      const res = await request(server).get(`${endpoint}/${username}`);
+
+      expect(res.statusCode).toBe(200);
+      const {
+        personalInfo: { email, password },
+        googleAuth,
+        blogs,
+      } = res.body.data;
+
+      const [existingUser] = users.filter(
+        (u) => u.personalInfo.username === username
+      );
+      expect(email).toBe(existingUser.personalInfo.email);
+      expect(password).toBeUndefined;
+      expect(googleAuth).toBeUndefined;
+      expect(blogs).toBeUndefined;
+    });
+  });
 });
