@@ -36,6 +36,7 @@ export interface SocialLink {
 }
 
 export interface IAuthor {
+  _id: string;
   personalInfo: {
     fullname: string;
     email: string;

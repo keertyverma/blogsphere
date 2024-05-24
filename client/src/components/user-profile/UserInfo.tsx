@@ -1,40 +1,20 @@
 import { useAuthContext } from "@/context/authContext";
-import { useGetUser } from "@/lib/react-query/queries";
 import { formatDate, formateNumber } from "@/lib/utils";
+import { IAuthor } from "@/types";
 import { LuCalendarDays } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import UserListSkeleton from "../search/UserListSkeleton";
 import { Button } from "../ui/button";
 import SocialLinks from "./SocialLinks";
 
 interface Props {
   profileId: string;
+  user: IAuthor;
 }
-const UserInfo = ({ profileId }: Props) => {
+const UserInfo = ({ profileId, user }: Props) => {
   const navigate = useNavigate();
   const {
     user: { username },
   } = useAuthContext();
-
-  const { data: user, isLoading, error } = useGetUser(profileId);
-
-  if (isLoading)
-    return (
-      <section>
-        <UserListSkeleton count={1} />
-      </section>
-    );
-
-  if (error) console.error(error);
-
-  if (!user)
-    return (
-      <section>
-        <div className="text-center p-3 rounded-full bg-muted mt-10">
-          <p>No user available</p>
-        </div>
-      </section>
-    );
 
   const {
     personalInfo: { fullname, profileImage, bio },
