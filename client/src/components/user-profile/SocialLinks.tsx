@@ -20,12 +20,12 @@ const SocialLinks = ({ links }: Props) => {
   };
 
   return (
-    <ul className="flex gap-3 items-center text-muted-foreground mt-3">
+    <ul className="flex gap-4 md:gap-3 items-center text-muted-foreground mt-3">
       {Object.keys(links).map((key) => {
         const link = links[key as keyof SocialLink];
         if (link) {
           return (
-            <li key={key} className="text-base md:text-lg">
+            <li key={key} className="text-lg">
               <Link to={link} target="_blank">
                 {socialIconsMap[key]}
               </Link>
