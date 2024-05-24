@@ -26,6 +26,15 @@ export interface IUser {
   profileImage: string;
 }
 
+export interface SocialLink {
+  youtube: string;
+  instagram: string;
+  facebook: string;
+  twitter: string;
+  github: string;
+  website: string;
+}
+
 export interface IAuthor {
   personalInfo: {
     fullname: string;
@@ -39,6 +48,7 @@ export interface IAuthor {
     totalPosts: number;
     totalReads: number;
   };
+  socialLinks: SocialLink;
   createdAt: string;
 }
 

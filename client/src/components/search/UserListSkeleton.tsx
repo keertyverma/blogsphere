@@ -1,7 +1,10 @@
 import { Skeleton } from "../ui/skeleton";
 
-const UserListSkeleton = () => {
-  const skeletonCount = [1, 2, 3, 4, 5];
+interface Props {
+  count?: number;
+}
+const UserListSkeleton = ({ count = 5 }: Props) => {
+  const skeletonCount = Array.from({ length: count }, (_, i) => i + 1);
 
   return skeletonCount.map((i) => (
     <div
