@@ -35,6 +35,11 @@ export interface IAuthor {
     bio?: string;
     profileImage: string;
   };
+  accountInfo: {
+    totalPosts: number;
+    totalReads: number;
+  };
+  createdAt: string;
 }
 
 export interface IBlog {

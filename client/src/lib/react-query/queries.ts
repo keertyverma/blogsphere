@@ -54,6 +54,20 @@ export const useGetSearchedUsers = (searchTerm: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
+export const useGetUser = (profileId: string) =>
+  useQuery<IAuthor>({
+    queryKey: [QUERY_KEYS.GET_USER_BY_ID, profileId],
+    queryFn: () =>
+      apiClient
+        .get<IAuthor>(`/users/${profileId}`)
+        .then((res) => (res.data as IFetchResponse).data),
+    staleTime: ms("5m"),
+    gcTime: ms("10m"),
+    refetchOnWindowFocus: false, // No need to refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });
+
 // ----------------- Blog -------------------
 export const useCreateBlog = () =>
   useMutation({

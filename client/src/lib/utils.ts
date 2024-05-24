@@ -45,3 +45,19 @@ export const formatDate = (timestamp: string) => {
 
   return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 };
+
+export const formateNumber = (num: number): string => {
+  if (num >= 1000 && num < 1000000) {
+    // For numbers between 1,000 and 999,999
+    return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+  } else if (num >= 1000000 && num < 1000000000) {
+    // For numbers between 1,000,000 and 999,999,999
+    return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+  } else if (num >= 1000000000) {
+    // For numbers 1,000,000,000 and above
+    return (num / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+  } else {
+    // For numbers less than 1,000
+    return num.toString();
+  }
+};

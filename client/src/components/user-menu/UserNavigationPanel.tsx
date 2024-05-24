@@ -56,26 +56,17 @@ const UserNavigationPanel = () => {
               </div>
             </MenubarItem>
             <MenubarSeparator />
-            <MenubarItem>
-              <Link to={`/user/${username}`} className="text-muted-foreground">
-                Profile
-              </Link>
-            </MenubarItem>
+            <Link to={`/user/${username}`} className="text-muted-foreground">
+              <MenubarItem>Profile</MenubarItem>
+            </Link>
             <MenubarSeparator />
-            <MenubarItem>
-              <Link to="/dashboard/blogs" className="text-muted-foreground">
-                Dashboard
-              </Link>
-            </MenubarItem>
+            <Link to="/dashboard/blogs" className="text-muted-foreground">
+              <MenubarItem>Dashboard</MenubarItem>
+            </Link>
             <MenubarSeparator />
-            <MenubarItem>
-              <Link
-                to="/settings/edit-profile"
-                className="text-muted-foreground"
-              >
-                Settings
-              </Link>
-            </MenubarItem>
+            <Link to="/settings/edit-profile" className="text-muted-foreground">
+              <MenubarItem>Settings</MenubarItem>
+            </Link>
             <MenubarSeparator />
             <MenubarItem className="py-0" onClick={() => logoutUser()}>
               <Button
