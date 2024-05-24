@@ -19,6 +19,14 @@ interface IUser {
   };
   blogs: string[];
   updatedAt: Date;
+  socialLinks: {
+    youtube: string;
+    instagram: string;
+    facebook: string;
+    twitter: string;
+    github: string;
+    website: string;
+  };
 }
 
 interface IUserDocument extends IUser, Document {
@@ -86,6 +94,32 @@ const userSchema = new Schema(
         ref: "Blog",
       },
     ],
+    socialLinks: {
+      youtube: {
+        type: String,
+        default: "",
+      },
+      instagram: {
+        type: String,
+        default: "",
+      },
+      facebook: {
+        type: String,
+        default: "",
+      },
+      twitter: {
+        type: String,
+        default: "",
+      },
+      github: {
+        type: String,
+        default: "",
+      },
+      website: {
+        type: String,
+        default: "",
+      },
+    },
   },
   { timestamps: true }
 );
