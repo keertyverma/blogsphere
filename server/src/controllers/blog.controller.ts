@@ -2,14 +2,16 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
+import { Types, isValidObjectId } from "mongoose";
 import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
-import { APIResponse, APIStatus, IBlogFindQuery } from "../types/api-response";
+import { SortQuery } from "../types";
+import { APIResponse, APIStatus } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
+import { mongoIdValidator } from "../utils/joi-custom-types";
 import logger from "../utils/logger";
-import { SortQuery } from "../types";
 
 const SPECIAL_CHARS_REGEX = /[^a-zA-Z0-9]/g; // find all special characters
 const SPACE_REGEX = /\s+/g; // find one or more consecutives space
@@ -118,15 +120,36 @@ const createBlog = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
+const validateBlogQueryParams = (query: any) => {
+  const schema = Joi.object({
+    tag: Joi.string(),
+    search: Joi.string(),
+    ordering: Joi.string(),
+    authorId: mongoIdValidator.objectId(),
+    limit: Joi.number(),
+  });
+
+  const { error } = schema.validate(query);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+};
+
 const getLatestBlogs = async (req: Request, res: Response) => {
   logger.debug(`GET Request on Route -> ${req.baseUrl}`);
 
-  const { tag, search, ordering, limit } = req.query;
+  // validate request query params
+  validateBlogQueryParams(req.query);
+
+  const { tag, authorId, search, ordering, limit } = req.query;
 
   const max_limit = limit ? parseInt(limit as string) : 5;
 
   const matchQuery: any = {
     isDraft: false,
+    ...(authorId && { author: new Types.ObjectId(authorId as string) }),
     ...(tag && { tags: (tag as string).toLowerCase() }),
   };
 
