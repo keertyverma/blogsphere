@@ -30,17 +30,19 @@ const UserProfile = () => {
 
   return (
     <AnimationWrapper>
-      <section className="h-cover flex flex-col md:flex-row-reverse gap-5 lg:gap-10 py-24">
-        {/* user info */}
-        {profileId && <UserInfo profileId={profileId} user={user} />}
+      <div className="h-cover px-0 md:px-10">
+        <section className="px-4 mx-auto md:max-w-[728px] flex flex-col gap-5 py-24">
+          {/* user info */}
+          {profileId && <UserInfo profileId={profileId} user={user} />}
 
-        {/* user published blogs */}
-        <div className="w-full">
-          <InPageNavigation routes={["Blogs"]}>
-            <UserBlogList authorId={user._id} />
-          </InPageNavigation>
-        </div>
-      </section>
+          {/* user published blogs */}
+          <div className="w-full">
+            <InPageNavigation routes={["Blogs"]}>
+              <UserBlogList authorId={user._id} />
+            </InPageNavigation>
+          </div>
+        </section>
+      </div>
     </AnimationWrapper>
   );
 };

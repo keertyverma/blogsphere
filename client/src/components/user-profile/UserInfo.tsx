@@ -24,7 +24,7 @@ const UserInfo = ({ profileId, user }: Props) => {
   } = user;
 
   return (
-    <div className="border-b border-border md:border-b-0 md:border-l min-w-[250px] md:min-w-[350px] md:px-4">
+    <div className="w-full md:w-[70%] md:px-4 max-sm:border-b border-border">
       <div className="flex gap-3">
         <img
           src={profileImage}
@@ -34,7 +34,7 @@ const UserInfo = ({ profileId, user }: Props) => {
           <h1 className="text-xl font-semibold capitalize line-clamp-2">
             {fullname}
           </h1>
-          <p className="text-muted-foreground leading-5 line-clamp-2 md:line-clamp-3 max-w-[250px]">
+          <p className="text-muted-foreground leading-5 line-clamp-2 md:line-clamp-3">
             {bio}
           </p>
           <p className="text-sm text-muted-foreground mt-1">
