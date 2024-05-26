@@ -12,6 +12,7 @@ import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import { mongoIdValidator } from "../utils/joi-custom-types";
 import logger from "../utils/logger";
+import NotFoundError from "../utils/errors/not-found";
 
 const SPECIAL_CHARS_REGEX = /[^a-zA-Z0-9]/g; // find all special characters
 const SPACE_REGEX = /\s+/g; // find one or more consecutives space
@@ -226,4 +227,28 @@ const getLatestBlogs = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
-export { createBlog, getLatestBlogs };
+const getBlogById = async (req: Request, res: Response) => {
+  logger.debug(`GET Request on Route -> ${req.baseUrl}/:blogId`);
+
+  const { blogId } = req.params;
+  const blog = await Blog.findOne({ blogId })
+    .populate(
+      "author",
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+    )
+    .select(
+      "blogId title description content coverImgURL tags activity createdAt -_id"
+    );
+
+  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: blog,
+  };
+
+  return res.status(result.statusCode).json(result);
+};
+
+export { createBlog, getLatestBlogs, getBlogById };
