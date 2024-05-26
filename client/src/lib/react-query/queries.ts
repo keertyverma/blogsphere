@@ -153,3 +153,17 @@ export const useGetUserBlogs = (authorId: string) =>
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
+
+export const useGetBlog = (blogId: string) =>
+  useQuery<IBlog>({
+    queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+    queryFn: () =>
+      apiClient
+        .get<IBlog>(`/blogs/${blogId}`)
+        .then((res) => (res.data as IFetchResponse).data),
+    staleTime: ms("10m"),
+    gcTime: ms("30m"),
+    refetchOnWindowFocus: false, // No need to refetch on window focus
+    refetchOnMount: false, // No need to refetch on component mount
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });
