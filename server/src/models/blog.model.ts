@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { IUser } from "./user.model";
 
 interface IBlog {
   blogId: string;
@@ -7,7 +8,7 @@ interface IBlog {
   content: [];
   coverImgURL: string;
   tags: string[];
-  author: string;
+  author: string | IUser["_id"];
   isDraft: boolean;
   activity: {
     totalLikes: number;

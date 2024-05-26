@@ -109,285 +109,285 @@ describe("/api/v1/blogs", () => {
     server.close();
   });
 
-  // describe("POST /", () => {
-  //   afterEach(async () => {
-  //     // db cleanup
-  //     await User.deleteMany({});
-  //     await Blog.deleteMany({});
-  //     server.close();
-  //   });
+  describe("POST /", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      server.close();
+    });
 
-  //   let token: string;
-  //   const exec = async (payload: any) => {
-  //     return await request(server)
-  //       .post(endpoint)
-  //       .set("authorization", token)
-  //       .send(payload);
-  //   };
+    let token: string;
+    const exec = async (payload: any) => {
+      return await request(server)
+        .post(endpoint)
+        .set("authorization", token)
+        .send(payload);
+    };
 
-  //   beforeEach(async () => {
-  //     const user = new User();
-  //     token = `Bearer ${user.generateAuthToken()}`;
-  //   });
+    beforeEach(async () => {
+      const user = new User();
+      token = `Bearer ${user.generateAuthToken()}`;
+    });
 
-  //   it("should return UnAuthorized-401 if user is not authorized", async () => {
-  //     // token is not passed in request header
-  //     token = "";
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
 
-  //     const res = await exec({ title: "blog-1" });
+      const res = await exec({ title: "blog-1" });
 
-  //     expect(res.statusCode).toBe(401);
-  //     expect(res.text).toBe("Access Denied.Token is not provided.");
-  //   });
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
 
-  //   it("should return BadRequest-400 if token is invalid", async () => {
-  //     token = "invalid token";
+    it("should return BadRequest-400 if token is invalid", async () => {
+      token = "invalid token";
 
-  //     const res = await exec({ title: "blog-1" });
+      const res = await exec({ title: "blog-1" });
 
-  //     expect(res.statusCode).toBe(400);
-  //     expect(res.text).toBe("Invalid token.");
-  //   });
+      expect(res.statusCode).toBe(400);
+      expect(res.text).toBe("Invalid token.");
+    });
 
-  //   it("should return BadRequest-400 if required parameter is not passed", async () => {
-  //     // title, description and content are the required parameter to create blog.
-  //     const res = await exec({ title: "Blog-1" });
+    it("should return BadRequest-400 if required parameter is not passed", async () => {
+      // title, description and content are the required parameter to create blog.
+      const res = await exec({ title: "Blog-1" });
 
-  //     expect(res.statusCode).toBe(400);
-  //     expect(res.body.error).toMatchObject({
-  //       code: "BAD_REQUEST",
-  //       message: "Invalid input data",
-  //       details: '"description" is required',
-  //     });
-  //   });
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"description" is required',
+      });
+    });
 
-  //   it("should return BadRequest-400 if description exceeds 200 characters limit is not passed", async () => {
-  //     const res = await exec({ title: "Blog-1", description: "a".repeat(201) });
+    it("should return BadRequest-400 if description exceeds 200 characters limit is not passed", async () => {
+      const res = await exec({ title: "Blog-1", description: "a".repeat(201) });
 
-  //     expect(res.statusCode).toBe(400);
-  //     expect(res.body.error).toMatchObject({
-  //       code: "BAD_REQUEST",
-  //       message: "Invalid input data",
-  //       details:
-  //         '"description" length must be less than or equal to 200 characters long',
-  //     });
-  //   });
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details:
+          '"description" length must be less than or equal to 200 characters long',
+      });
+    });
 
-  //   it("should return BadRequest-400 if tags are more than 10", async () => {
-  //     const res = await exec({
-  //       title: "Blog-1",
-  //       description: "short blog description in few words",
-  //       tags: new Array(11).fill("some-tag"),
-  //       content: {
-  //         blocks: [
-  //           {
-  //             id: "O8uS0t2SUk",
-  //             type: "header",
-  //             data: {
-  //               text: "let's setup",
-  //               level: 2,
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     });
+    it("should return BadRequest-400 if tags are more than 10", async () => {
+      const res = await exec({
+        title: "Blog-1",
+        description: "short blog description in few words",
+        tags: new Array(11).fill("some-tag"),
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "let's setup",
+                level: 2,
+              },
+            },
+          ],
+        },
+      });
 
-  //     expect(res.statusCode).toBe(400);
-  //     expect(res.body.error).toMatchObject({
-  //       code: "BAD_REQUEST",
-  //       message: "Invalid input data",
-  //       details: '"tags" must contain less than or equal to 10 items',
-  //     });
-  //   });
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"tags" must contain less than or equal to 10 items',
+      });
+    });
 
-  //   it("should create draft blog if request is valid", async () => {
-  //     // create a valid user
-  //     const user = await User.create({
-  //       personalInfo: {
-  //         fullname: "Mickey Mouse",
-  //         password: "Clubhouse12",
-  //         email: "test@test.com",
-  //         username: "test",
-  //       },
-  //     });
-  //     token = `Bearer ${user.generateAuthToken()}`;
-  //     const totalPosts = user.accountInfo.totalPosts;
+    it("should create draft blog if request is valid", async () => {
+      // create a valid user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+      const totalPosts = user.accountInfo.totalPosts;
 
-  //     const blog = {
-  //       isDraft: true,
-  //       title: "How to setup zustand ! with react app @ok ",
-  //       coverImgURL: "https://sample.jpg",
-  //       content: {
-  //         blocks: [
-  //           {
-  //             id: "O8uS0t2SUk",
-  //             type: "header",
-  //             data: {
-  //               text: "this is how it is done",
-  //               level: 2,
-  //             },
-  //           },
-  //           {
-  //             id: "s-VOjHF8Kk",
-  //             type: "list",
-  //             data: {
-  //               style: "ordered",
-  //               items: ["step-1", "step-2", "step-3"],
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     };
+      const blog = {
+        isDraft: true,
+        title: "How to setup zustand ! with react app @ok ",
+        coverImgURL: "https://sample.jpg",
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "this is how it is done",
+                level: 2,
+              },
+            },
+            {
+              id: "s-VOjHF8Kk",
+              type: "list",
+              data: {
+                style: "ordered",
+                items: ["step-1", "step-2", "step-3"],
+              },
+            },
+          ],
+        },
+      };
 
-  //     const res = await exec(blog);
+      const res = await exec(blog);
 
-  //     expect(res.statusCode).toBe(201);
-  //     expect(res.body.status).toBe("success");
+      expect(res.statusCode).toBe(201);
+      expect(res.body.status).toBe("success");
 
-  //     const { id } = res.body.data;
-  //     expect(id).toBeDefined();
+      const { id } = res.body.data;
+      expect(id).toBeDefined();
 
-  //     // check user
-  //     const updatedUser = await User.findById(user.id);
-  //     // draft blog must be added to blogs
-  //     expect(updatedUser?.blogs).toHaveLength(1);
-  //     // total posts should not increase
-  //     expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts);
-  //   });
+      // check user
+      const updatedUser = await User.findById(user.id);
+      // draft blog must be added to blogs
+      expect(updatedUser?.blogs).toHaveLength(1);
+      // total posts should not increase
+      expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts);
+    });
 
-  //   it("should create publish blog if request is valid", async () => {
-  //     // create a valid user
-  //     const user = await User.create({
-  //       personalInfo: {
-  //         fullname: "Mickey Mouse",
-  //         password: "Clubhouse12",
-  //         email: "test@test.com",
-  //         username: "test",
-  //       },
-  //     });
-  //     token = `Bearer ${user.generateAuthToken()}`;
-  //     const totalPosts = user.accountInfo.totalPosts;
+    it("should create publish blog if request is valid", async () => {
+      // create a valid user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+      const totalPosts = user.accountInfo.totalPosts;
 
-  //     const blog = {
-  //       title: "How to setup zustand ! with react app @ok ",
-  //       description: "This is a short tutorial with required steps to setup",
-  //       coverImgURL: "https://sample.jpg",
-  //       tags: ["zustand", "reactjs"],
-  //       content: {
-  //         blocks: [
-  //           {
-  //             id: "O8uS0t2SUk",
-  //             type: "header",
-  //             data: {
-  //               text: "this is how it is done",
-  //               level: 2,
-  //             },
-  //           },
-  //           {
-  //             id: "s-VOjHF8Kk",
-  //             type: "list",
-  //             data: {
-  //               style: "ordered",
-  //               items: ["step-1", "step-2", "step-3"],
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     };
+      const blog = {
+        title: "How to setup zustand ! with react app @ok ",
+        description: "This is a short tutorial with required steps to setup",
+        coverImgURL: "https://sample.jpg",
+        tags: ["zustand", "reactjs"],
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "this is how it is done",
+                level: 2,
+              },
+            },
+            {
+              id: "s-VOjHF8Kk",
+              type: "list",
+              data: {
+                style: "ordered",
+                items: ["step-1", "step-2", "step-3"],
+              },
+            },
+          ],
+        },
+      };
 
-  //     const res = await exec(blog);
+      const res = await exec(blog);
 
-  //     expect(res.statusCode).toBe(201);
-  //     expect(res.body.status).toBe("success");
+      expect(res.statusCode).toBe(201);
+      expect(res.body.status).toBe("success");
 
-  //     const { id } = res.body.data;
-  //     expect(id).toBeDefined();
+      const { id } = res.body.data;
+      expect(id).toBeDefined();
 
-  //     // check user
-  //     const updatedUser = await User.findById(user.id);
-  //     // draft blog must be added to blogs
-  //     expect(updatedUser?.blogs).toHaveLength(1);
-  //     // total posts should not increase
-  //     expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts + 1);
-  //   });
-  // });
+      // check user
+      const updatedUser = await User.findById(user.id);
+      // draft blog must be added to blogs
+      expect(updatedUser?.blogs).toHaveLength(1);
+      // total posts should not increase
+      expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts + 1);
+    });
+  });
 
-  // describe("GET /", () => {
-  //   let blogs: IBlog[];
+  describe("GET /", () => {
+    let blogs: IBlog[];
 
-  //   beforeAll(async () => {
-  //     const user = await createUser();
-  //     blogs = await createBlogs(user.id);
-  //   });
+    beforeAll(async () => {
+      const user = await createUser();
+      blogs = await createBlogs(user.id);
+    });
 
-  //   afterAll(async () => {
-  //     // db cleanup
-  //     await User.deleteMany({});
-  //     await Blog.deleteMany({});
-  //   });
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
 
-  //   it("should return all latest published blogs", async () => {
-  //     const res = await request(server).get(`${endpoint}`);
+    it("should return all latest published blogs", async () => {
+      const res = await request(server).get(`${endpoint}`);
 
-  //     expect(res.statusCode).toBe(200);
-  //     const publishedBlogIds = blogs
-  //       .filter((blog) => blog.isDraft === false)
-  //       .map((blog) => blog.blogId);
-  //     expect(res.body.data).toHaveLength(publishedBlogIds.length);
+      expect(res.statusCode).toBe(200);
+      const publishedBlogIds = blogs
+        .filter((blog) => blog.isDraft === false)
+        .map((blog) => blog.blogId);
+      expect(res.body.data).toHaveLength(publishedBlogIds.length);
 
-  //     // only published blog must be returned
-  //     res.body.data.forEach((blog: IBlog) => {
-  //       expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
-  //     });
-  //   });
+      // only published blog must be returned
+      res.body.data.forEach((blog: IBlog) => {
+        expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
+      });
+    });
 
-  //   it("should return filtered blogs when tag query parameter is set", async () => {
-  //     // filter by tag
-  //     const tag = "art";
-  //     const res = await request(server).get(`${endpoint}?tag=${tag}`);
+    it("should return filtered blogs when tag query parameter is set", async () => {
+      // filter by tag
+      const tag = "art";
+      const res = await request(server).get(`${endpoint}?tag=${tag}`);
 
-  //     expect(res.statusCode).toBe(200);
-  //     expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBeGreaterThan(0);
 
-  //     // blog with tag must be returned
-  //     res.body.data.forEach((blog: IBlog) => {
-  //       expect(blog.tags).toContain(tag);
-  //     });
-  //   });
+      // blog with tag must be returned
+      res.body.data.forEach((blog: IBlog) => {
+        expect(blog.tags).toContain(tag);
+      });
+    });
 
-  //   it("should return latest trending blogs when ordering and limit query parameters are set", async () => {
-  //     const res = await request(server).get(
-  //       `${endpoint}?ordering=trending&limit=2`
-  //     );
+    it("should return latest trending blogs when ordering and limit query parameters are set", async () => {
+      const res = await request(server).get(
+        `${endpoint}?ordering=trending&limit=2`
+      );
 
-  //     expect(res.statusCode).toBe(200);
+      expect(res.statusCode).toBe(200);
 
-  //     // check limit = 2
-  //     expect(res.body.data).toHaveLength(2);
+      // check limit = 2
+      expect(res.body.data).toHaveLength(2);
 
-  //     const [blog1, blog2] = res.body.data;
-  //     expect(blog1.activity.totalLikes).toBeGreaterThan(
-  //       blog2.activity.totalLikes
-  //     );
-  //     expect(blog1.activity.totalReads).toBeGreaterThan(
-  //       blog2.activity.totalReads
-  //     );
-  //   });
+      const [blog1, blog2] = res.body.data;
+      expect(blog1.activity.totalLikes).toBeGreaterThan(
+        blog2.activity.totalLikes
+      );
+      expect(blog1.activity.totalReads).toBeGreaterThan(
+        blog2.activity.totalReads
+      );
+    });
 
-  //   it("should return searched blogs when search query parameter is set", async () => {
-  //     // search blog
-  //     const searchTerm = "react";
-  //     const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
+    it("should return searched blogs when search query parameter is set", async () => {
+      // search blog
+      const searchTerm = "react";
+      const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
 
-  //     expect(res.statusCode).toBe(200);
-  //     expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBeGreaterThan(0);
 
-  //     // blog with tag must be returned
-  //     res.body.data.forEach((blog: IBlog) => {
-  //       expect(blog.title).toContain(searchTerm);
-  //     });
-  //   });
-  // });
+      // blog with tag must be returned
+      res.body.data.forEach((blog: IBlog) => {
+        expect(blog.title).toContain(searchTerm);
+      });
+    });
+  });
 
   describe("GET /:blogId", () => {
     let blogs: IBlog[];
@@ -424,6 +424,77 @@ describe("/api/v1/blogs", () => {
       const { title, blogId: id } = res.body.data;
       expect(id).toBe(blogId);
       expect(title).toBe(existingBlog.title);
+    });
+  });
+
+  describe("PATCH /:blogId/readCount", () => {
+    let blogs: IBlog[];
+    let user: any;
+
+    beforeAll(async () => {
+      user = await createUser();
+      blogs = await createBlogs(user.id);
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (blogId: string) => {
+      return await request(server)
+        .patch(`${endpoint}/${blogId}/readCount`)
+        .set("authorization", token);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+
+      const res = await exec("invalid-blogId");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return 404-NotFound if blog with given blogId is not found", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const blogId = "invalid-blogId";
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `No blog found with blogId = ${blogId}`,
+      });
+    });
+
+    it("should update read count of blog and user", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+      const {
+        blogId,
+        activity: { totalReads: BlogTotalReads },
+      } = blogs[1];
+      const UserTotalReads = user.accountInfo.totalReads;
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.activity.totalReads).toBe(BlogTotalReads + 1);
+
+      // check blog total read increment by 1
+      const blog = await Blog.findOne({ blogId });
+      expect(blog).not.toBeNull();
+      expect(blog?.activity.totalReads).toBe(BlogTotalReads + 1);
+
+      // check user total read increment by 1
+      const author = await User.findById(user.id);
+      expect(author).not.toBeNull();
+      expect(author?.accountInfo.totalReads).toBe(UserTotalReads + 1);
     });
   });
 });

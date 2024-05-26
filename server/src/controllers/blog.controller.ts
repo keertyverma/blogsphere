@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
-import { Types, isValidObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
@@ -10,9 +10,9 @@ import { SortQuery } from "../types";
 import { APIResponse, APIStatus } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
+import NotFoundError from "../utils/errors/not-found";
 import { mongoIdValidator } from "../utils/joi-custom-types";
 import logger from "../utils/logger";
-import NotFoundError from "../utils/errors/not-found";
 
 const SPECIAL_CHARS_REGEX = /[^a-zA-Z0-9]/g; // find all special characters
 const SPACE_REGEX = /\s+/g; // find one or more consecutives space
@@ -251,4 +251,45 @@ const getBlogById = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
-export { createBlog, getLatestBlogs, getBlogById };
+const updateReadCount = async (req: Request, res: Response) => {
+  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId`);
+
+  const { blogId } = req.params;
+
+  // Increment total read count of blog by 1
+  const blog = await Blog.findOneAndUpdate(
+    { blogId },
+    { $inc: { "activity.totalReads": 1 } },
+    { new: true }
+  )
+    .populate("author", "personalInfo.fullname personalInfo.username -_id")
+    .select("blogId title activity createdAt -_id");
+
+  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  // Increment total read count of user by 1
+  const user = await User.findOneAndUpdate(
+    {
+      "personalInfo.username": blog.author.personalInfo.username,
+    },
+    { $inc: { "accountInfo.totalReads": 1 } },
+    { new: true }
+  );
+
+  if (!user) throw new Error("User not found. Unable to update read counts");
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: {
+      blogId: blog.blogId,
+      title: blog.title,
+      author: blog.author,
+      activity: blog.activity,
+    },
+  };
+
+  return res.status(result.statusCode).json(result);
+};
+
+export { createBlog, getBlogById, getLatestBlogs, updateReadCount };

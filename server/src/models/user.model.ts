@@ -3,7 +3,7 @@ import Joi from "joi";
 import jwt from "jsonwebtoken";
 import config from "config";
 
-interface IUser {
+interface IUser extends Document {
   personalInfo: {
     fullname: string;
     email: string;
