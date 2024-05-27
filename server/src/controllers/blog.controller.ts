@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
 import { SortQuery } from "../types";
-import { APIResponse, APIStatus } from "../types/api-response";
+import { APIResponse, APIStatus, IBlogResult } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
@@ -242,10 +242,16 @@ const getBlogById = async (req: Request, res: Response) => {
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
+  // Rename the author field to authorDetails
+  // This is done to make response consistent with GET /blogs endpoint response
+  const blogObject: IBlogResult = blog.toObject();
+  blogObject.authorDetails = blogObject.author;
+  delete blogObject.author;
+
   const result: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: blog,
+    data: blogObject,
   };
 
   return res.status(result.statusCode).json(result);

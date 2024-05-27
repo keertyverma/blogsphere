@@ -1,3 +1,6 @@
+import { IBlog } from "../models/blog.model";
+import { IUser } from "../models/user.model";
+
 export enum APIStatus {
   SUCCESS = "success",
   ERROR = "error",
@@ -26,4 +29,8 @@ export interface IErrorCodeMessageMap {
 export interface IBlogFindQuery {
   isDraft: boolean;
   tags?: string;
+}
+
+export interface IBlogResult extends IBlog {
+  authorDetails: IUser;
 }

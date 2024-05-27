@@ -46,11 +46,12 @@ const BlogPage = () => {
   const {
     title,
     coverImgURL,
-    author: {
+    authorDetails: {
       personalInfo: { fullname, username, profileImage },
     },
     createdAt: publishedAt,
   } = blog;
+
   return (
     <section className="max-w-[900px] center ">
       {coverImgURL && (
