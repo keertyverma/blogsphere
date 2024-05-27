@@ -2,14 +2,10 @@ import SearchedBlogList from "@/components/search/SearchedBlogList";
 import SearchedUserList from "@/components/search/SearchedUserList";
 import InPageNavigation from "@/components/shared/InPageNavigation";
 import SearchInputBox from "@/components/shared/SearchInputBox";
-import { useAuthContext } from "@/context/authContext";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const Search = () => {
-  const { isAuthenticated } = useAuthContext();
   const [searchParams] = useSearchParams();
-
-  if (!isAuthenticated) return <Navigate to="/login" />;
   const searchTerm = searchParams.get("q") || "";
 
   return (
