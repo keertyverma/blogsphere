@@ -1,11 +1,23 @@
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useGetBlog } from "@/lib/react-query/queries";
+import { useAuthContext } from "@/context/authContext";
+import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const BlogPage = () => {
   const { blogId } = useParams();
 
+  const { token } = useAuthContext();
   const { data: blog, isLoading, error } = useGetBlog(blogId || "default");
+  const updateReads = useUpdateReads();
+
+  useEffect(() => {
+    // update read count for authenticated users
+    if (token && blogId) {
+      console.log("udpdating read count ....");
+      updateReads.mutate({ token, blogId });
+    }
+  }, []);
 
   if (!blogId) return null;
 

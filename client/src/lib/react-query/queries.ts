@@ -167,3 +167,19 @@ export const useGetBlog = (blogId: string) =>
     refetchOnMount: false, // No need to refetch on component mount
     refetchOnReconnect: true, // Refetch on network reconnect
   });
+
+export const useUpdateReads = () =>
+  useMutation({
+    mutationFn: (data: { token: string; blogId: string }) =>
+      apiClient
+        .patch(
+          `/blogs/${data.blogId}/readCount`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }
+        )
+        .then((res) => res.data),
+  });

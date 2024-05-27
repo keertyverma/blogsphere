@@ -6,7 +6,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {
   user: IUser;
@@ -31,8 +30,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.getItem("blogsphere_user") ? true : false
   );
 
-  const navigate = useNavigate();
-
   const setUserAndToken = (user: IUser, token: string) => {
     setUser({ ...user });
     setToken(token);
@@ -50,9 +47,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (loggedInUser) {
       const { user, token } = JSON.parse(loggedInUser);
       setUserAndToken(user, token);
-    } else {
-      navigate("/login");
     }
+    // // remove automatic navigating to login page
+    // else {
+    //   navigate("/login");
+    // }
   }, []);
 
   return (
