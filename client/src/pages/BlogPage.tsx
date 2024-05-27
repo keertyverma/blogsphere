@@ -12,12 +12,15 @@ const BlogPage = () => {
   const updateReads = useUpdateReads();
 
   useEffect(() => {
+    // Check if read count has already been updated for this blog in the current session
+    const readCountKey = `hasUpdatedReadCount_${blogId}`;
+    const hasUpdatedReadCount = sessionStorage.getItem(readCountKey);
     // update read count for authenticated users
-    if (token && blogId) {
-      console.log("udpdating read count ....");
+    if (token && blogId && !hasUpdatedReadCount) {
       updateReads.mutate({ token, blogId });
+      sessionStorage.setItem(readCountKey, "true"); // Set the flag after updating read count
     }
-  }, []);
+  }, [token, blogId]);
 
   if (!blogId) return null;
 
