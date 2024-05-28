@@ -5,7 +5,9 @@ interface IBlog {
   blogId: string;
   title: string;
   description: string;
-  content: [];
+  content: {
+    blocks: [];
+  };
   coverImgURL: string;
   tags: string[];
   author: string | IUser["_id"];
@@ -32,7 +34,7 @@ const blogSchema = new Schema(
       maxlength: 200,
     },
     content: {
-      type: Array,
+      blocks: { type: Array },
     },
     coverImgURL: {
       type: String,

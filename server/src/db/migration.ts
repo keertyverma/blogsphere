@@ -11,6 +11,7 @@ db.once("open", async () => {
   try {
     await addActivityFieldToBlog();
     await addSocialLinksFieldToUser();
+    // await updateContentFieldType();
 
     console.log("Migration completed successfully!");
   } catch (error) {
@@ -45,5 +46,26 @@ const addSocialLinksFieldToUser = async () => {
       website: "",
     };
     await user.save();
+  }
+};
+
+const updateContentFieldType = async () => {
+  // Change content from array to object
+  const blogs = await Blog.find({ isDraft: false });
+  for (const blog of blogs) {
+    // Ensure the content block is treated as an array
+    let contentArray: any[];
+    if (!Array.isArray(blog.content.blocks)) {
+      contentArray = [blog.content.blocks];
+    } else {
+      contentArray = blog.content.blocks;
+    }
+
+    if (Array.isArray(contentArray) && contentArray.length > 0) {
+      const newContent = { blocks: contentArray[0] };
+      blog.content = newContent;
+      await blog.save();
+      console.log(`Updated content for blog with id: ${blog._id}`);
+    }
   }
 };
