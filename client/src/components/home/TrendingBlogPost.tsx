@@ -17,12 +17,16 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
   } = blog;
 
   return (
-    <Link to={`/blogs/${id}`} className="flex gap-5 mb-5">
+    <div className="flex gap-5 mb-5">
       <h1 className="text-4xl sm:text-[30px] font-bold text-primary/20 leading-none">
         {index + 1}
       </h1>
+
       <div>
-        <h1 className="blog-title !mt-1 sm:!mt-0 !text-base">{title}</h1>
+        <Link to={`/blogs/${id}`}>
+          <h2 className="blog-title !mt-1 sm:!mt-0 !text-base">{title}</h2>
+        </Link>
+
         <Link to={`/user/${username}`}>
           <div className="flex flex-row gap-3 items-center">
             <img
@@ -41,7 +45,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
           </div>
         </Link>
       </div>
-    </Link>
+    </div>
   );
 };
 
