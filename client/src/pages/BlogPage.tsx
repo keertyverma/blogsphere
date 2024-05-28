@@ -1,3 +1,4 @@
+import BlogContent from "@/components/blog/BlogContent";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useAuthContext } from "@/context/authContext";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
@@ -49,12 +50,14 @@ const BlogPage = () => {
     authorDetails: {
       personalInfo: { fullname, username, profileImage },
     },
+    content,
     createdAt: publishedAt,
   } = blog;
 
   return (
     <section className="max-w-[680px] px-0 center">
       <div className="mx-4">
+        {/* blog basic information */}
         {coverImgURL && (
           <img
             src={coverImgURL}
@@ -89,6 +92,15 @@ const BlogPage = () => {
           </Link>
         </div>
         <hr className="border-border" />
+
+        {/* blog content */}
+        <div className="my-6 blog-page-content">
+          {content.blocks?.map((block, i) => (
+            <div key={i} className="my-2 md:my-3">
+              <BlogContent block={block} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

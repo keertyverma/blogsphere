@@ -165,11 +165,13 @@ const BlogEditor = () => {
             </div>
           )}
           {coverImgURL && (
-            <img
-              src={coverImgURL}
-              alt="cover image"
-              className="cover-img mt-1 md:mt-4"
-            />
+            <div className="w-full">
+              <img
+                src={coverImgURL}
+                alt="cover image"
+                className="cover-img mt-1 md:mt-4"
+              />
+            </div>
           )}
           <div className="px-4">
             <textarea
