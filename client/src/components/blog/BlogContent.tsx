@@ -1,6 +1,8 @@
 import { OutputBlockData } from "@editorjs/editorjs";
 import DOMPurify from "dompurify";
 import BlockImage from "./BlockImage";
+import BlockList from "./BlockList";
+import BlockQuote from "./BlockQuote";
 
 interface Props {
   block: OutputBlockData;
@@ -24,6 +26,12 @@ const BlogContent = ({ block }: Props) => {
 
   if (type === "image")
     return <BlockImage url={data.file.url} caption={data.caption} />;
+
+  if (type === "quote")
+    return <BlockQuote quote={safeHTML} caption={data.caption} />;
+
+  if (type === "list")
+    return <BlockList style={data.style} items={data.items} />;
 
   return <div>block content ...</div>;
 };
