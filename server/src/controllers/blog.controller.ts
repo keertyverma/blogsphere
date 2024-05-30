@@ -128,6 +128,7 @@ const validateBlogQueryParams = (query: any) => {
     ordering: Joi.string(),
     authorId: mongoIdValidator.objectId(),
     limit: Joi.number(),
+    draft: Joi.boolean(),
   });
 
   const { error } = schema.validate(query);
@@ -144,12 +145,16 @@ const getLatestBlogs = async (req: Request, res: Response) => {
   // validate request query params
   validateBlogQueryParams(req.query);
 
-  const { tag, authorId, search, ordering, limit } = req.query;
+  const { tag, authorId, search, ordering, limit, draft } = req.query;
 
   const max_limit = limit ? parseInt(limit as string) : 5;
 
   const matchQuery: any = {
-    isDraft: false,
+    isDraft: draft
+      ? (draft as string).toLowerCase() === "true"
+        ? true
+        : false
+      : false,
     ...(authorId && { author: new Types.ObjectId(authorId as string) }),
     ...(tag && { tags: (tag as string).toLowerCase() }),
   };

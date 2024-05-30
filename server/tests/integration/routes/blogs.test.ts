@@ -387,6 +387,22 @@ describe("/api/v1/blogs", () => {
         expect(blog.title).toContain(searchTerm);
       });
     });
+
+    it("should return all draft blogs", async () => {
+      const res = await request(server).get(`${endpoint}?draft=true`);
+
+      expect(res.statusCode).toBe(200);
+      const draftBlogIds = blogs
+        .filter((blog) => blog.isDraft === true)
+        .map((blog) => blog.blogId);
+
+      expect(res.body.data).toHaveLength(draftBlogIds.length);
+
+      // only draft blog must be returned
+      res.body.data.forEach((blog: IBlog) => {
+        expect(draftBlogIds.includes(blog.blogId)).toBe(true);
+      });
+    });
   });
 
   describe("GET /:blogId", () => {
