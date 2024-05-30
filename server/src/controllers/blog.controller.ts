@@ -263,7 +263,7 @@ const getBlogById = async (req: Request, res: Response) => {
 };
 
 const updateReadCount = async (req: Request, res: Response) => {
-  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId`);
+  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId/readCount`);
 
   const { blogId } = req.params;
 
@@ -303,4 +303,72 @@ const updateReadCount = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
-export { createBlog, getBlogById, getLatestBlogs, updateReadCount };
+const validateUpdateBlog = (blog: any) => {
+  const contentSchema = Joi.object({
+    blocks: Joi.array()
+      .items(
+        Joi.object({
+          id: Joi.string(),
+          type: Joi.string().required(),
+          data: Joi.object().required(),
+        }).required()
+      )
+      .required(),
+  });
+
+  const schema = Joi.object({
+    title: Joi.string(),
+    description: Joi.string().max(200),
+    content: contentSchema,
+    tags: Joi.array().items(Joi.string()).max(10),
+    coverImgURL: Joi.string(),
+    isDraft: Joi.boolean(),
+  });
+
+  const { error } = schema.validate(blog);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+};
+
+const updateBlogById = async (req: Request, res: Response) => {
+  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId`);
+
+  // validate request body
+  validateUpdateBlog(req.body);
+
+  const { blogId } = req.params;
+  let { tags } = req.body;
+
+  tags = tags?.map((tag: string) => tag.toLowerCase());
+  const updatedBlog = await Blog.findOneAndUpdate(
+    { blogId },
+    { ...req.body, tags },
+    {
+      new: true,
+    }
+  ).select(
+    "blogId title description content coverImgURL tags author activity createdAt isDraft -_id"
+  );
+
+  if (!updatedBlog)
+    throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: updatedBlog,
+  };
+
+  return res.status(result.statusCode).json(result);
+};
+
+export {
+  createBlog,
+  getBlogById,
+  getLatestBlogs,
+  updateReadCount,
+  updateBlogById,
+};

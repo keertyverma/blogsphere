@@ -513,4 +513,101 @@ describe("/api/v1/blogs", () => {
       expect(author?.accountInfo.totalReads).toBe(UserTotalReads + 1);
     });
   });
+
+  describe("PATCH /:blogId", () => {
+    let blogs: IBlog[];
+    let user: any;
+
+    beforeAll(async () => {
+      user = await createUser();
+      blogs = await createBlogs(user.id);
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (blogId: string, payload: object = {}) => {
+      return await request(server)
+        .patch(`${endpoint}/${blogId}`)
+        .send(payload)
+        .set("authorization", token);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+
+      const res = await exec("invalid-blogId");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return 404-NotFound if blog with given blogId is not found", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const blogId = "invalid-blogId";
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `No blog found with blogId = ${blogId}`,
+      });
+    });
+
+    it("should return BadRequest-400 if description exceeds 200 characters limit is not passed", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const blogId = "some-blogId";
+      const res = await exec(blogId, { description: "a".repeat(201) });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details:
+          '"description" length must be less than or equal to 200 characters long',
+      });
+    });
+
+    it("should update draft blog and publish it", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+      const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
+      const toUpdate = {
+        description: "some meaningful short description",
+        tags: ["tag1", "tag2"],
+        isDraft: false,
+      };
+
+      const res = await exec(draftBlog.blogId, toUpdate);
+
+      expect(res.statusCode).toBe(200);
+      const { blogId, description, tags, isDraft } = res.body.data;
+      expect(blogId).toBe(draftBlog.blogId);
+      expect(description).toBe(toUpdate.description);
+      expect(tags).toEqual(toUpdate.tags);
+      expect(isDraft).toBe(toUpdate.isDraft);
+    });
+
+    it("should update blog state from publish to draft", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+      const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
+      const toUpdate = {
+        isDraft: true,
+      };
+
+      const res = await exec(publishedBlog.blogId, toUpdate);
+
+      expect(res.statusCode).toBe(200);
+      const { blogId, isDraft } = res.body.data;
+      expect(blogId).toBe(publishedBlog.blogId);
+      expect(isDraft).toBe(toUpdate.isDraft);
+    });
+  });
 });

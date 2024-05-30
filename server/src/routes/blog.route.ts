@@ -4,6 +4,7 @@ import {
   getLatestBlogs,
   getBlogById,
   updateReadCount,
+  updateBlogById,
 } from "../controllers/blog.controller";
 import { verifyToken } from "../middlewares";
 
@@ -15,4 +16,5 @@ blogRouter.get("/:blogId", getBlogById);
 
 // protected routes
 blogRouter.post("/", verifyToken, createBlog);
+blogRouter.patch("/:blogId", verifyToken, updateBlogById);
 blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount);
