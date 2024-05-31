@@ -57,7 +57,7 @@ const BlogPage = () => {
   } = blog;
 
   return (
-    <section className="max-w-[680px] px-0 center">
+    <section className="md:max-w-[680px] lg:max-w-[800px] max-sm:px-1 px-0 center">
       <div className="mx-4">
         {/* blog basic information */}
         {coverImgURL && (
@@ -109,7 +109,7 @@ const BlogPage = () => {
         {/* blog content */}
         <div className="my-6 blog-page-content">
           {content.blocks?.map((block, i) => (
-            <div key={i} className="my-2 md:my-3">
+            <div key={i} className="my-3 lg:my-6">
               <BlogContent block={block} />
             </div>
           ))}

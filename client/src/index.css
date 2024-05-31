@@ -199,7 +199,7 @@
   /* Text Editor */
   #text-editor *,
   .blog-page-content * {
-    @apply text-lg lg:text-xl leading-7 lg:leading-8;
+    @apply text-base lg:text-xl leading-6 lg:leading-8;
   }
 
   #text-editor h1,

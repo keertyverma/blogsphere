@@ -181,7 +181,7 @@ const BlogEditor = () => {
               />
             </div>
           )}
-          <div className="px-4">
+          <div>
             <textarea
               defaultValue={title}
               placeholder="Title ..."
