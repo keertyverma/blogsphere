@@ -1,17 +1,19 @@
 import BlogContent from "@/components/blog/BlogContent";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/authContext";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
 import { formatDate } from "@/lib/utils";
 import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const BlogPage = () => {
   const { blogId } = useParams();
 
-  const { token } = useAuthContext();
+  const { user, token } = useAuthContext();
   const { data: blog, isLoading, error } = useGetBlog(blogId || "default");
   const updateReads = useUpdateReads();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if read count has already been updated for this blog in the current session
@@ -91,6 +93,17 @@ const BlogPage = () => {
             </div>
           </Link>
         </div>
+        <hr className="border-border" />
+        {user.username === username && (
+          <div className="my-2 flex flex-row-reverse justify-between">
+            <Button
+              className="rounded-full"
+              onClick={() => navigate(`/editor/${blogId}`)}
+            >
+              Edit
+            </Button>
+          </div>
+        )}
         <hr className="border-border" />
 
         {/* blog content */}

@@ -1,10 +1,11 @@
 import { useAuthContext } from "@/context/authContext";
 import { useEditorContext } from "@/context/editorContext";
-import { useCreateBlog } from "@/lib/react-query/queries";
+import { useCreateBlog, useGetBlog } from "@/lib/react-query/queries";
+import { IBlog } from "@/types";
 import EditorJS from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { editorJSTools } from "../../lib/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -25,14 +26,17 @@ const BlogEditor = () => {
   const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
   const { token } = useAuthContext();
   const navigate = useNavigate();
+  const { blogId } = useParams();
+  const { data } = useGetBlog(blogId || "default");
 
   const isReady = useRef(false);
   useEffect(() => {
     if (!isReady.current) {
+      if (data) setBlog(data);
       setTextEditor(
         new EditorJS({
           holder: "text-editor",
-          data: content,
+          data: data?.content || content,
           tools: editorJSTools,
           placeholder: "Type '/' for commands.",
         })
@@ -60,6 +64,8 @@ const BlogEditor = () => {
       return toast.error("Add title to publish it");
     }
 
+    // TODO: handle blog edit
+
     if (textEditor) {
       try {
         const data = await textEditor.save();
@@ -80,6 +86,7 @@ const BlogEditor = () => {
       return toast.error("Add title to save the blog");
     }
 
+    // TODO: handle blog edit
     let content;
     if (textEditor) {
       try {
@@ -106,11 +113,12 @@ const BlogEditor = () => {
         },
         token,
       });
-
       toast.success("Saved 👍");
       navigate("/");
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
+    } finally {
+      setBlog({} as IBlog);
     }
   };
 

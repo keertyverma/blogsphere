@@ -30,6 +30,7 @@ const App = () => {
         </Route>
 
         <Route path="/editor" element={<Editor />} />
+        <Route path="/editor/:blogId" element={<Editor />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 
