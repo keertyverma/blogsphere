@@ -5,6 +5,7 @@ import { useAuthContext } from "@/context/authContext";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
 import { formatDate } from "@/lib/utils";
 import { useEffect } from "react";
+import { FaRegHeart } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 const BlogPage = () => {
@@ -54,6 +55,7 @@ const BlogPage = () => {
     },
     content,
     createdAt: publishedAt,
+    activity,
   } = blog;
 
   return (
@@ -95,7 +97,13 @@ const BlogPage = () => {
         </div>
         <hr className="border-border" />
         {user.username === username && (
-          <div className="my-2 flex flex-row-reverse justify-between">
+          <div className="my-2 flex flex-row justify-between items-center">
+            <div className="flex-center gap-1 text-muted-foreground">
+              <FaRegHeart className="text-lg" />
+              {activity && activity?.totalLikes > 0 && (
+                <p className="text-sm">{activity?.totalLikes}</p>
+              )}
+            </div>
             <Button
               className="rounded-full"
               onClick={() => navigate(`/editor/${blogId}`)}
