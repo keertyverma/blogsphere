@@ -27,7 +27,7 @@ const BlogEditor = () => {
   const { token } = useAuthContext();
   const navigate = useNavigate();
   const { blogId } = useParams();
-  const { data } = useGetBlog(blogId || "default");
+  const { data } = useGetBlog(blogId);
 
   const isReady = useRef(false);
   useEffect(() => {
@@ -44,7 +44,7 @@ const BlogEditor = () => {
 
       isReady.current = true;
     }
-  }, []);
+  }, [data]);
 
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {

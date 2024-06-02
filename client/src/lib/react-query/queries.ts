@@ -154,7 +154,7 @@ export const useGetUserBlogs = (authorId: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-export const useGetBlog = (blogId: string) =>
+export const useGetBlog = (blogId?: string) =>
   useQuery<IBlog>({
     queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
     queryFn: () =>
@@ -166,6 +166,7 @@ export const useGetBlog = (blogId: string) =>
     refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: false, // No need to refetch on component mount
     refetchOnReconnect: true, // Refetch on network reconnect
+    enabled: !!blogId, // Query only runs if blogId is truthy
   });
 
 export const useUpdateReads = () =>
