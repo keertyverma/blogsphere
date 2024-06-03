@@ -2,7 +2,7 @@ import { useAuthContext } from "@/context/authContext";
 import { useEditorContext } from "@/context/editorContext";
 import { useCreateBlog, useGetBlog } from "@/lib/react-query/queries";
 import { IBlog } from "@/types";
-import EditorJS from "@editorjs/editorjs";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,7 +18,7 @@ const BlogEditor = () => {
   const {
     setIsPublish,
     blog,
-    blog: { title, coverImgURL, content, tags, description },
+    blog: { title, coverImgURL, tags, description },
     setBlog,
     textEditor,
     setTextEditor,
@@ -29,22 +29,35 @@ const BlogEditor = () => {
   const { blogId } = useParams();
   const { data } = useGetBlog(blogId);
 
+  const initializeEditor = (content = {} as OutputData) => {
+    if (textEditor) {
+      textEditor.clear();
+    }
+
+    setTextEditor(
+      new EditorJS({
+        holder: "text-editor",
+        data: content,
+        tools: editorJSTools,
+        placeholder: "Type '/' for commands.",
+      })
+    );
+  };
+
   const isReady = useRef(false);
   useEffect(() => {
     if (!isReady.current) {
-      if (data) setBlog(data);
-      setTextEditor(
-        new EditorJS({
-          holder: "text-editor",
-          data: data?.content || content,
-          tools: editorJSTools,
-          placeholder: "Type '/' for commands.",
-        })
-      );
+      if (blogId && data) {
+        // edit mode
+        initializeEditor(data.content);
+      } else {
+        // create mode
+        initializeEditor();
+      }
 
       isReady.current = true;
     }
-  }, [data]);
+  }, [blogId, data]);
 
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
@@ -183,7 +196,7 @@ const BlogEditor = () => {
           )}
           <div>
             <textarea
-              defaultValue={title}
+              value={title}
               placeholder="Title ..."
               className="w-full h-11 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"
               onKeyDown={handleTitleKeyDown}
