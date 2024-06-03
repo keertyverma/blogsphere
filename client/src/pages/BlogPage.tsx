@@ -12,7 +12,7 @@ const BlogPage = () => {
   const { blogId } = useParams();
 
   const { user, token } = useAuthContext();
-  const { data: blog, isLoading, error } = useGetBlog(blogId || "default");
+  const { data: blog, isLoading, error } = useGetBlog(blogId);
   const updateReads = useUpdateReads();
   const navigate = useNavigate();
 

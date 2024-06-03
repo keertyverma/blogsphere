@@ -92,7 +92,7 @@ export const useGetLatestBlog = (tag: string) =>
         .get<IBlog[]>("/blogs", { params })
         .then((res) => (res.data as IFetchResponse).data);
     },
-    staleTime: ms("1m"),
+    // staleTime: ms("1m"),
     gcTime: ms("5m"),
     refetchOnWindowFocus: true, // Refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
@@ -161,10 +161,10 @@ export const useGetBlog = (blogId?: string) =>
       apiClient
         .get<IBlog>(`/blogs/${blogId}`)
         .then((res) => (res.data as IFetchResponse).data),
-    staleTime: ms("10m"),
+    // staleTime: ms("10m"),
     gcTime: ms("30m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
-    refetchOnMount: false, // No need to refetch on component mount
+    refetchOnMount: true, // Refetch on component mount to get updated blog after edit
     refetchOnReconnect: true, // Refetch on network reconnect
     enabled: !!blogId, // Query only runs if blogId is truthy
   });
@@ -182,5 +182,17 @@ export const useUpdateReads = () =>
             },
           }
         )
+        .then((res) => res.data),
+  });
+
+export const useUpdateDraftBlog = () =>
+  useMutation({
+    mutationFn: (data: { blogId: string; token: string; blog: object }) =>
+      apiClient
+        .patch(`/blogs/${data.blogId}`, data.blog, {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        })
         .then((res) => res.data),
   });

@@ -1,16 +1,16 @@
 import { useAuthContext } from "@/context/authContext";
 import { useEditorContext } from "@/context/editorContext";
-import { useCreateBlog } from "@/lib/react-query/queries";
+import { useCreateBlog, useUpdateDraftBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
+import { ICreateBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
-import Tag from "./Tag";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 import {
@@ -24,7 +24,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { ICreateBlog } from "@/types";
+import Tag from "./Tag";
 
 const PublishForm = () => {
   const TAG_LIMIT = 10;
@@ -38,8 +38,13 @@ const PublishForm = () => {
   const [titleValue, setTitleValue] = useState(title);
   const [descriptionValue, setDescriptionValue] = useState(description);
   const { token } = useAuthContext();
+
   const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
+  const { mutateAsync: updatePublishedBlog, isPending: isUpdating } =
+    useUpdateDraftBlog();
+
   const navigate = useNavigate();
+  const { blogId } = useParams();
 
   const form = useForm<z.infer<typeof BlogValidation>>({
     resolver: zodResolver(BlogValidation),
@@ -75,15 +80,26 @@ const PublishForm = () => {
       ...updatedBlog,
     }));
 
-    // publish blog
+    const publishedBlog = {
+      ...updatedBlog,
+      isDraft: false,
+    };
+
     try {
-      await createBlog({
-        blog: {
-          ...updatedBlog,
-          isDraft: false,
-        },
-        token,
-      });
+      if (blogId) {
+        // edit mode - publish updated blog
+        await updatePublishedBlog({
+          blogId,
+          blog: publishedBlog,
+          token,
+        });
+      } else {
+        // create mode - publish new blog
+        await createBlog({
+          blog: publishedBlog,
+          token,
+        });
+      }
 
       form.reset();
       toast.success("Published 🥳");
@@ -203,7 +219,9 @@ const PublishForm = () => {
             className="p-2 lg:p-6 border-[1px] border-border rounded-lg lg:shadow-md flex flex-col gap-4 md:gap-3 max-sm:mt-5 md:max-w-[700px]"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            {isPublishing && <LoadingSpinner className="flex-col m-auto" />}
+            {(isPublishing || isUpdating) && (
+              <LoadingSpinner className="flex-col m-auto" />
+            )}
             <FormField
               control={form.control}
               name="title"
@@ -300,9 +318,9 @@ const PublishForm = () => {
               <Button
                 type="submit"
                 className="h-12 px-6 md:px-8 rounded-full text-sm md:text-base"
-                disabled={isPublishing}
+                disabled={isPublishing || isPublishing}
               >
-                {isPublishing ? "Publishing" : "Publish"}
+                {isPublishing || isPublishing ? "Publishing" : "Publish"}
               </Button>
             </div>
           </form>
