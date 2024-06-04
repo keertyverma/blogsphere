@@ -1,20 +1,18 @@
 import BlogContent from "@/components/blog/BlogContent";
+import BlogInteraction from "@/components/blog/BlogInteraction";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/authContext";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
 import { formatDate } from "@/lib/utils";
 import { useEffect } from "react";
-import { FaRegHeart } from "react-icons/fa";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const BlogPage = () => {
   const { blogId } = useParams();
 
-  const { user, token } = useAuthContext();
+  const { token } = useAuthContext();
   const { data: blog, isLoading, error } = useGetBlog(blogId);
   const updateReads = useUpdateReads();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if read count has already been updated for this blog in the current session
@@ -95,24 +93,11 @@ const BlogPage = () => {
             </div>
           </Link>
         </div>
-        <hr className="border-border" />
-        {user.username === username && (
-          <div className="my-2 flex flex-row justify-between items-center">
-            <div className="flex-center gap-1 text-muted-foreground">
-              <FaRegHeart className="text-lg" />
-              {activity && activity?.totalLikes > 0 && (
-                <p className="text-sm">{activity?.totalLikes}</p>
-              )}
-            </div>
-            <Button
-              className="rounded-full"
-              onClick={() => navigate(`/editor/${blogId}`)}
-            >
-              Edit
-            </Button>
-          </div>
-        )}
-        <hr className="border-border" />
+        <BlogInteraction
+          blogId={blogId}
+          authorUsername={username}
+          totalLikes={activity?.totalLikes}
+        />
 
         {/* blog content */}
         <div className="my-6 blog-page-content">

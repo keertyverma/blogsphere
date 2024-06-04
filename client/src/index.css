@@ -258,3 +258,18 @@
 .cdx-list {
   padding: 0;
 }
+
+@keyframes heart-bounce {
+  40% {
+    transform: scale(1.1);
+  }
+  0%,
+  80%,
+  100% {
+    transform: scale(1);
+  }
+}
+
+.like-animation {
+  animation: heart-bounce 0.4s ease-in-out;
+}
