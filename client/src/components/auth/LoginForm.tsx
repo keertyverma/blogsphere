@@ -25,7 +25,7 @@ import { Input } from "../ui/input";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
 const LoginForm = () => {
-  const [passwordVisible, setPasswordVisible] = useState(true);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const { mutateAsync: login, isPending: isLoginUser } = useLogin();
   const { mutateAsync: loginWithGoogle, isPending: isGoogleLoginUser } =

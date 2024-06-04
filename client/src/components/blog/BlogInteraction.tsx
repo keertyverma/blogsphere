@@ -3,6 +3,7 @@ import { formateNumber } from "@/lib/utils";
 import { useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 
 interface Props {
@@ -12,13 +13,27 @@ interface Props {
 }
 
 const BlogInteraction = ({ blogId, authorUsername, totalLikes }: Props) => {
+  const [postLikes, setPostLikes] = useState(totalLikes || 0);
   const [isLikedByUser, setIsLikedByUser] = useState(false);
-  const { user } = useAuthContext();
+
+  const { user, isAuthenticated } = useAuthContext();
   const navigate = useNavigate();
 
-  const handlePostLike = () => {
+  const handlePostLikeUnlike = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error("Please login to like this blog");
+      return navigate("/login");
+    }
+
     // TODO: call api and update post like count in backend
     setIsLikedByUser((prev) => !prev);
+    !isLikedByUser
+      ? setPostLikes((prev) => prev + 1)
+      : setPostLikes((prev) => prev - 1);
   };
 
   return (
@@ -30,7 +45,7 @@ const BlogInteraction = ({ blogId, authorUsername, totalLikes }: Props) => {
             variant="secondary"
             size="sm"
             className="text-lg px-0 bg-transparent hover:bg-transparent text-inherit"
-            onClick={handlePostLike}
+            onClick={handlePostLikeUnlike}
             aria-label="like this blog"
           >
             {isLikedByUser ? (
@@ -39,8 +54,8 @@ const BlogInteraction = ({ blogId, authorUsername, totalLikes }: Props) => {
               <FaRegHeart />
             )}
           </Button>
-          {totalLikes && totalLikes > 0 && (
-            <p className="text-sm">{formateNumber(totalLikes)}</p>
+          {postLikes && postLikes > 0 && (
+            <p className="text-sm">{formateNumber(postLikes)}</p>
           )}
         </div>
 

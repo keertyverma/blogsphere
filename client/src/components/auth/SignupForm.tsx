@@ -31,7 +31,7 @@ import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
 const SignupForm = () => {
-  const [passwordVisible, setPasswordVisible] = useState(true);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
     useCreateUserAccount();
