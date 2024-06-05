@@ -1,6 +1,6 @@
 import BlogContent from "@/components/blog/BlogContent";
 import BlogInteraction from "@/components/blog/BlogInteraction";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
 import { useAuthContext } from "@/context/authContext";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
 import { formatDate } from "@/lib/utils";
@@ -27,12 +27,7 @@ const BlogPage = () => {
 
   if (!blogId) return null;
 
-  if (isLoading)
-    return (
-      <section>
-        <LoadingSpinner className="mx-auto" />
-      </section>
-    );
+  if (isLoading) return <BlogPageSkeleton />;
 
   if (error) console.error(error);
 
