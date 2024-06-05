@@ -53,7 +53,7 @@ const BlogPage = () => {
     },
     content,
     createdAt: publishedAt,
-    activity,
+    likes,
   } = blog;
 
   return (
@@ -96,7 +96,7 @@ const BlogPage = () => {
         <BlogInteraction
           blogId={blogId}
           authorUsername={username}
-          totalLikes={activity?.totalLikes}
+          likes={likes}
         />
 
         {/* blog content */}

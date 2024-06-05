@@ -66,6 +66,7 @@ export interface IBlog {
     totalLikes: number;
     totalReads: number;
   };
+  likes?: { [key: string]: boolean };
 }
 
 export interface ICreateBlog {

@@ -1,6 +1,7 @@
 import { useAuthContext } from "@/context/authContext";
-import { formateNumber } from "@/lib/utils";
-import { useState } from "react";
+import { useLikePost } from "@/lib/react-query/queries";
+import { checkIsLiked, formateNumber } from "@/lib/utils";
+import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -9,17 +10,22 @@ import { Button } from "../ui/button";
 interface Props {
   blogId: string;
   authorUsername: string;
-  totalLikes?: number;
+  likes?: { [key: string]: boolean };
 }
 
-const BlogInteraction = ({ blogId, authorUsername, totalLikes }: Props) => {
-  const [postLikes, setPostLikes] = useState(totalLikes || 0);
-  const [isLikedByUser, setIsLikedByUser] = useState(false);
-
-  const { user, isAuthenticated } = useAuthContext();
+const BlogInteraction = ({ blogId, authorUsername, likes }: Props) => {
+  const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
+  const { user, isAuthenticated, token } = useAuthContext();
+  const { mutateAsync: likePost } = useLikePost();
   const navigate = useNavigate();
 
-  const handlePostLikeUnlike = (
+  useEffect(() => {
+    if (likes) {
+      setBlogLikes(likes);
+    }
+  }, [likes]);
+
+  const handlePostLikeUnlike = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.stopPropagation();
@@ -29,11 +35,21 @@ const BlogInteraction = ({ blogId, authorUsername, totalLikes }: Props) => {
       return navigate("/login");
     }
 
-    // TODO: call api and update post like count in backend
-    setIsLikedByUser((prev) => !prev);
-    !isLikedByUser
-      ? setPostLikes((prev) => prev + 1)
-      : setPostLikes((prev) => prev - 1);
+    // update like count in UI
+    setBlogLikes((prevLikes) => {
+      const likeObj = { ...prevLikes };
+      if (checkIsLiked(likeObj, user.id)) {
+        // unlike
+        delete likeObj[user.id];
+      } else {
+        // like
+        likeObj[user.id] = true;
+      }
+      return likeObj;
+    });
+
+    // update like count in backend server
+    await likePost({ token, blogId });
   };
 
   return (
@@ -48,14 +64,16 @@ const BlogInteraction = ({ blogId, authorUsername, totalLikes }: Props) => {
             onClick={handlePostLikeUnlike}
             aria-label="like this blog"
           >
-            {isLikedByUser ? (
+            {checkIsLiked(blogLikes, user.id) ? (
               <FaHeart className="text-red-600 hover:text-red-500 like-animation" />
             ) : (
               <FaRegHeart />
             )}
           </Button>
-          {postLikes && postLikes > 0 && (
-            <p className="text-sm">{formateNumber(postLikes)}</p>
+          {Object.keys(blogLikes).length > 0 && (
+            <p className="text-sm">
+              {formateNumber(Object.keys(blogLikes).length)}
+            </p>
           )}
         </div>
 

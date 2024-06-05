@@ -196,3 +196,20 @@ export const useUpdateDraftBlog = () =>
         })
         .then((res) => res.data),
   });
+
+export const useLikePost = () => {
+  return useMutation({
+    mutationFn: (data: { token: string; blogId: string }) =>
+      apiClient
+        .patch(
+          `/blogs/${data.blogId}/like`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }
+        )
+        .then((res) => res.data),
+  });
+};

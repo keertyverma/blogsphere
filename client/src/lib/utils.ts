@@ -61,3 +61,10 @@ export const formateNumber = (num: number): string => {
     return num.toString();
   }
 };
+
+export const checkIsLiked = (
+  likes: { [key: string]: boolean },
+  userId: string
+) => {
+  return userId in likes;
+};
