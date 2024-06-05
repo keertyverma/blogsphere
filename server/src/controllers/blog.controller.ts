@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
 import { SortQuery } from "../types";
-import { APIResponse, APIStatus, IBlogResult } from "../types/api-response";
+import { APIResponse, APIStatus } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
@@ -242,21 +242,15 @@ const getBlogById = async (req: Request, res: Response) => {
       "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
     )
     .select(
-      "blogId title description content coverImgURL tags activity createdAt -_id"
+      "blogId title description content coverImgURL tags activity createdAt likes -_id"
     );
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
-  // Rename the author field to authorDetails
-  // This is done to make response consistent with GET /blogs endpoint response
-  const blogObject: IBlogResult = blog.toObject();
-  blogObject.authorDetails = blogObject.author;
-  delete blogObject.author;
-
   const result: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: blogObject,
+    data: blog.toJSON(),
   };
 
   return res.status(result.statusCode).json(result);
@@ -365,10 +359,48 @@ const updateBlogById = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
+const updateLike = async (req: Request, res: Response) => {
+  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId/like`);
+
+  const userId = (req.user as JwtPayload).id;
+  const { blogId } = req.params;
+
+  // get blog
+  const blog = await Blog.findOne({ blogId }).select("likes");
+  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  const isLiked = blog.likes.get(userId);
+  if (isLiked) {
+    // unlike blog
+    blog.likes.delete(userId);
+  } else {
+    // like blog
+    blog.likes.set(userId, true);
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    blog.id,
+    {
+      likes: blog.likes,
+      $inc: { "activity.totalLikes": isLiked ? -1 : 1 },
+    },
+    { new: true }
+  ).select("blogId title activity -_id");
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: updatedBlog,
+  };
+
+  return res.status(result.statusCode).json(result);
+};
+
 export {
   createBlog,
   getBlogById,
   getLatestBlogs,
-  updateReadCount,
   updateBlogById,
+  updateLike,
+  updateReadCount,
 };

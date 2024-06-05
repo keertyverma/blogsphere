@@ -5,6 +5,7 @@ import {
   getBlogById,
   updateReadCount,
   updateBlogById,
+  updateLike,
 } from "../controllers/blog.controller";
 import { verifyToken } from "../middlewares";
 
@@ -18,3 +19,4 @@ blogRouter.get("/:blogId", getBlogById);
 blogRouter.post("/", verifyToken, createBlog);
 blogRouter.patch("/:blogId", verifyToken, updateBlogById);
 blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount);
+blogRouter.patch("/:blogId/like", verifyToken, updateLike);

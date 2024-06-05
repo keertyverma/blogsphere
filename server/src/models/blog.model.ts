@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 import { IUser } from "./user.model";
 
-interface IBlog {
+interface IBlog extends Document {
   blogId: string;
   title: string;
   description: string;
@@ -16,6 +16,7 @@ interface IBlog {
     totalLikes: number;
     totalReads: number;
   };
+  likes: Map<string, boolean>;
 }
 
 const blogSchema = new Schema(
@@ -55,10 +56,29 @@ const blogSchema = new Schema(
       totalLikes: { type: Number, default: 0 },
       totalReads: { type: Number, default: 0 },
     },
+    likes: {
+      type: Map,
+      of: Boolean,
+      default: {},
+    },
   },
   { timestamps: true }
 );
 
+// Customize 'toJSON' method to convert Map to plain object
+blogSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    if (ret.likes instanceof Map) {
+      ret.likes = Object.fromEntries(ret.likes);
+    }
+    if (ret.author) {
+      ret.authorDetails = ret.author;
+      delete ret.author;
+    }
+    return ret;
+  },
+});
+
 const Blog = model<IBlog>("Blog", blogSchema);
 
-export { IBlog, Blog };
+export { Blog, IBlog };

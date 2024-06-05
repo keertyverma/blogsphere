@@ -11,7 +11,8 @@ db.once("open", async () => {
   try {
     await addActivityFieldToBlog();
     await addSocialLinksFieldToUser();
-    // await updateContentFieldType();
+    //  await updateContentFieldType();
+    await addLikesFieldToBlog();
 
     console.log("Migration completed successfully!");
   } catch (error) {
@@ -66,6 +67,17 @@ const updateContentFieldType = async () => {
       blog.content = newContent;
       await blog.save();
       console.log(`Updated content for blog with id: ${blog._id}`);
+    }
+  }
+};
+
+const addLikesFieldToBlog = async () => {
+  // Find blogs without the 'likes' field and set it to empty Map
+  const blogsToUpdate = await Blog.find({ likes: { $exists: false } });
+  for (const blog of blogsToUpdate) {
+    if (!blog.likes) {
+      blog.likes = new Map<string, boolean>();
+      await blog.save();
     }
   }
 };

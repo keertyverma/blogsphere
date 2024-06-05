@@ -610,4 +610,96 @@ describe("/api/v1/blogs", () => {
       expect(isDraft).toBe(toUpdate.isDraft);
     });
   });
+
+  describe("PATCH /:blogId/like", () => {
+    let blogs: IBlog[];
+    let user: any;
+
+    beforeAll(async () => {
+      user = await createUser();
+      blogs = await createBlogs(user.id);
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (blogId: string) => {
+      return await request(server)
+        .patch(`${endpoint}/${blogId}/like`)
+        .set("authorization", token);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+
+      const res = await exec("invalid-blogId");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return 404-NotFound if blog with given blogId is not found", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const blogId = "invalid-blogId";
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `No blog found with blogId = ${blogId}`,
+      });
+    });
+
+    it("should like blog if user has not already liked", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+      const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
+
+      const res = await exec(publishedBlog.blogId);
+
+      expect(res.statusCode).toBe(200);
+      const {
+        blogId,
+        activity: { totalLikes },
+      } = res.body.data;
+      expect(blogId).toBe(publishedBlog.blogId);
+      expect(totalLikes).toBe(publishedBlog.activity.totalLikes + 1);
+
+      // check user added in blog likes in db
+      const blog = await Blog.findOne({ blogId: publishedBlog.blogId });
+      const likes = blog?.toJSON().likes;
+      expect(likes?.hasOwnProperty(user.id)).toBe(true);
+    });
+
+    it("should unlike blog if user has already liked", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+      const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
+      // add user in blog likes map
+      let existingBlog = await Blog.findOne({ blogId: publishedBlog.blogId });
+      existingBlog?.likes.set(user.id, true);
+      await existingBlog?.save();
+      const expectedTotalLikes = publishedBlog.activity.totalLikes + 1 - 1;
+
+      const res = await exec(publishedBlog.blogId);
+
+      expect(res.statusCode).toBe(200);
+      const {
+        blogId,
+        activity: { totalLikes },
+      } = res.body.data;
+      expect(blogId).toBe(publishedBlog.blogId);
+      expect(totalLikes).toBe(expectedTotalLikes);
+
+      // check user removed from blog likes in db
+      const blog = await Blog.findOne({ blogId: publishedBlog.blogId });
+      const likes = blog?.toJSON().likes;
+      expect(likes?.hasOwnProperty(user.id)).toBe(false);
+    });
+  });
 });
