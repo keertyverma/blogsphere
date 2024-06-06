@@ -251,12 +251,18 @@
   max-width: 900px;
 }
 
-.ce-paragraph {
+/* .ce-paragraph {
   padding: 0;
-}
+} */
 
 .cdx-list {
   padding: 0;
+}
+
+.cdx-settings-button[data-tune="withBorder"],
+.cdx-settings-button[data-tune="withBackground"],
+.cdx-settings-button[data-tune="stretched"] {
+  display: none;
 }
 
 @keyframes heart-bounce {

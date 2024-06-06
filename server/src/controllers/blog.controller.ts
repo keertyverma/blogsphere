@@ -242,7 +242,7 @@ const getBlogById = async (req: Request, res: Response) => {
       "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
     )
     .select(
-      "blogId title description content coverImgURL tags activity createdAt likes -_id"
+      "blogId title description content coverImgURL tags activity createdAt likes isDraft -_id"
     );
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);

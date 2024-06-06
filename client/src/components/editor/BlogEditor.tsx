@@ -8,7 +8,7 @@ import {
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { editorJSTools } from "../../lib/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -21,7 +21,7 @@ const BlogEditor = () => {
   const {
     setIsPublish,
     blog,
-    blog: { title, coverImgURL, tags, description },
+    blog: { title, coverImgURL, tags, description, isDraft },
     setBlog,
     textEditor,
     setTextEditor,
@@ -30,7 +30,6 @@ const BlogEditor = () => {
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
     useUpdateDraftBlog();
   const { token } = useAuthContext();
-  const navigate = useNavigate();
   const { blogId } = useParams();
   const { data } = useGetBlog(blogId);
 
@@ -104,7 +103,6 @@ const BlogEditor = () => {
       return toast.error("Add title to save the blog");
     }
 
-    // TODO: handle blog edit
     let content;
     if (textEditor) {
       try {
@@ -143,11 +141,13 @@ const BlogEditor = () => {
         });
       }
       toast.success("Saved 👍");
-      navigate("/");
+      // TODO: navigate to user profile -> draft blog section
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
     }
   };
+
+  console.log("isDraft = ", isDraft);
 
   return (
     <>
@@ -157,16 +157,19 @@ const BlogEditor = () => {
           {title?.length ? title : "New Blog"}
         </p>
         <div className="flex gap-2 ml-auto">
-          <Button
-            variant="secondary"
-            className="rounded-full capitalize border-b border-border"
-            onClick={handleSaveDraft}
-            disabled={isSaving || isUpdating}
-          >
-            {isSaving || isUpdating ? "saving draft" : "save draft"}
-          </Button>
+          {(!blogId || (blogId && isDraft === true)) && (
+            <Button
+              variant="secondary"
+              className="rounded-full capitalize border-b border-border"
+              onClick={handleSaveDraft}
+              disabled={isSaving || isUpdating}
+            >
+              {blogId && isDraft ? "update" : "save draft"}
+            </Button>
+          )}
+
           <Button onClick={handlePublish} className="rounded-full capitalize">
-            publish
+            {blogId && !isDraft ? "update" : "publish"}
           </Button>
         </div>
       </nav>

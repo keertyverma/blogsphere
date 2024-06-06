@@ -67,6 +67,7 @@ export interface IBlog {
     totalReads: number;
   };
   likes?: { [key: string]: boolean };
+  isDraft?: boolean;
 }
 
 export interface ICreateBlog {
