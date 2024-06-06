@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -30,7 +30,7 @@ const PublishForm = () => {
   const TAG_LIMIT = 10;
   const DESCRIPTION_CHAR_LIMIT = 200;
   const {
-    blog: { title, coverImgURL, description, tags, content },
+    blog: { title, coverImgURL, description, tags, content, isDraft },
     blog,
     setIsPublish,
     setBlog,
@@ -43,7 +43,6 @@ const PublishForm = () => {
   const { mutateAsync: updatePublishedBlog, isPending: isUpdating } =
     useUpdateDraftBlog();
 
-  const navigate = useNavigate();
   const { blogId } = useParams();
 
   const form = useForm<z.infer<typeof BlogValidation>>({
@@ -93,19 +92,20 @@ const PublishForm = () => {
           blog: publishedBlog,
           token,
         });
+        toast.success("Blog Updated");
       } else {
         // create mode - publish new blog
         await createBlog({
           blog: publishedBlog,
           token,
         });
+        toast.success("Published 🥳");
       }
 
       form.reset();
-      toast.success("Published 🥳");
+
       setIsPublish(false);
-      // TODO: navigate to user dashboard
-      navigate("/");
+      // TODO: navigate to user profile -> published blog section
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
     }
@@ -318,9 +318,9 @@ const PublishForm = () => {
               <Button
                 type="submit"
                 className="h-12 px-6 md:px-8 rounded-full text-sm md:text-base"
-                disabled={isPublishing || isPublishing}
+                disabled={isPublishing || isUpdating}
               >
-                {isPublishing || isPublishing ? "Publishing" : "Publish"}
+                {blogId && !isDraft ? "update" : "publish"}
               </Button>
             </div>
           </form>

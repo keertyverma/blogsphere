@@ -133,21 +133,20 @@ const BlogEditor = () => {
           blog: draftBlog,
           token,
         });
+        toast.success("Blog Updated");
       } else {
         // create mode - save new blog as draft
         await saveBlog({
           blog: draftBlog,
           token,
         });
+        toast.success("Saved 👍");
       }
-      toast.success("Saved 👍");
       // TODO: navigate to user profile -> draft blog section
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
     }
   };
-
-  console.log("isDraft = ", isDraft);
 
   return (
     <>
