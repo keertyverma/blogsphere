@@ -32,6 +32,7 @@ const BlogEditor = () => {
   const { token } = useAuthContext();
   const { blogId } = useParams();
   const { data } = useGetBlog(blogId);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const initializeEditor = (content = {} as OutputData) => {
     if (textEditor) {
@@ -63,6 +64,17 @@ const BlogEditor = () => {
     }
   }, [blogId, data]);
 
+  useEffect(() => {
+    if (title && textareaRef.current) {
+      autoResizeTextarea(textareaRef.current);
+    }
+  }, [title]);
+
+  const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto"; // Reset height to auto
+    textarea.style.height = `${textarea.scrollHeight}px`; // Set height to scroll height
+  };
+
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -71,7 +83,7 @@ const BlogEditor = () => {
 
   const handleTitleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const input = e.target;
-    input.style.height = `${input.scrollHeight}px`;
+    autoResizeTextarea(input);
     setBlog({ ...blog, title: input.value });
   };
 
@@ -181,7 +193,7 @@ const BlogEditor = () => {
             onClick={() => setToggleFileUploader((prev) => !prev)}
           >
             <IoImageOutline className="text-xl md:text-2xl text-secondary-foreground" />
-            add cover
+            {blogId ? "edit" : "add"} cover
           </Button>
           {toggleFileUploader && (
             <div className="border-[1px] border-border rounded-lg shadow-md w-full max-w-[725px]">
@@ -212,6 +224,7 @@ const BlogEditor = () => {
           )}
           <div>
             <textarea
+              ref={textareaRef}
               value={title}
               placeholder="Title ..."
               className="w-full h-11 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"

@@ -210,8 +210,7 @@ const PublishForm = () => {
             </div>
           )}
 
-          <h1 className="h1-medium mt-2 line-clamp-2">{titleValue}</h1>
-
+          <h1 className="h1-medium mt-2">{titleValue}</h1>
           <p className="text-base md:text-lg line-clamp-2 md:line-clamp-4 leading-7 mt-4 overflow-hidden">
             {descriptionValue}
           </p>
@@ -232,7 +231,7 @@ const PublishForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-muted-foreground">
-                    Blog Title
+                    Blog Title <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -257,7 +256,7 @@ const PublishForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-muted-foreground">
-                    Blog Summary
+                    Blog Summary <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Textarea
@@ -288,7 +287,8 @@ const PublishForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-muted-foreground">
-                    Tags - (Enhances blog searchability and ranking)
+                    Tags - (Enhances blog searchability and ranking){" "}
+                    <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <div className="relative input-box bg-muted">
