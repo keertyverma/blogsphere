@@ -3,6 +3,7 @@ import DOMPurify from "dompurify";
 import BlockImage from "./BlockImage";
 import BlockList from "./BlockList";
 import BlockQuote from "./BlockQuote";
+import BlockCode from "./BlockCode";
 
 interface Props {
   block: OutputBlockData;
@@ -32,6 +33,8 @@ const BlogContent = ({ block }: Props) => {
 
   if (type === "list")
     return <BlockList style={data.style} items={data.items} />;
+
+  if (type === "code") return <BlockCode code={data.code} />;
 
   return <div>block content ...</div>;
 };

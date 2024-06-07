@@ -97,7 +97,7 @@ const BlogPage = () => {
         {/* blog content */}
         <div className="my-6 blog-page-content">
           {content.blocks?.map((block, i) => (
-            <div key={i} className="my-3 lg:my-6">
+            <div key={i} className="my-3 lg:my-4">
               <BlogContent block={block} />
             </div>
           ))}

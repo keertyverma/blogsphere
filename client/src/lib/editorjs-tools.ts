@@ -5,6 +5,7 @@ import InlineCode from "@editorjs/inline-code";
 import List from "@editorjs/list";
 import Marker from "@editorjs/marker";
 import Quote from "@editorjs/quote";
+import Code from "@editorjs/code";
 import { fileToBase64 } from "./utils";
 import apiClient from "./api-client";
 
@@ -82,6 +83,7 @@ export const editorJSTools = {
     class: Quote,
     inlineToolbar: true,
   },
+  code: Code,
   marker: Marker,
   inlineCode: InlineCode,
   embed: Embed,
