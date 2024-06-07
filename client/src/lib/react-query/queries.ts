@@ -78,7 +78,7 @@ export const useCreateBlog = () =>
             Authorization: `Bearer ${data.token}`,
           },
         })
-        .then((res) => res.data),
+        .then((res) => res.data.data),
   });
 
 export const useGetLatestBlog = (tag: string) =>
@@ -185,7 +185,7 @@ export const useUpdateReads = () =>
         .then((res) => res.data),
   });
 
-export const useUpdateDraftBlog = () =>
+export const useUpdateBlog = () =>
   useMutation({
     mutationFn: (data: { blogId: string; token: string; blog: object }) =>
       apiClient
@@ -194,7 +194,7 @@ export const useUpdateDraftBlog = () =>
             Authorization: `Bearer ${data.token}`,
           },
         })
-        .then((res) => res.data),
+        .then((res) => res.data.data),
   });
 
 export const useLikePost = () => {

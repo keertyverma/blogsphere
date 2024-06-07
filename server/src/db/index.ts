@@ -8,8 +8,6 @@ const MONGODB_URI = `mongodb+srv://${config.get("database.user")}:${config.get(
   "database.name"
 )}?retryWrites=true&w=majority&appName=blogsphere`;
 
-console.log("MONGODB_URI = ", MONGODB_URI);
-
 const connectDB = async () => {
   try {
     await connect(MONGODB_URI, { autoIndex: true });

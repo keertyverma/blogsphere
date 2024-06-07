@@ -147,7 +147,7 @@ const getLatestBlogs = async (req: Request, res: Response) => {
 
   const { tag, authorId, search, ordering, limit, draft } = req.query;
 
-  const max_limit = limit ? parseInt(limit as string) : 5;
+  const max_limit = limit ? parseInt(limit as string) : 10;
 
   const matchQuery: any = {
     isDraft: draft
@@ -297,41 +297,12 @@ const updateReadCount = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
-const validateUpdateBlog = (blog: any) => {
-  const contentSchema = Joi.object({
-    blocks: Joi.array()
-      .items(
-        Joi.object({
-          id: Joi.string(),
-          type: Joi.string().required(),
-          data: Joi.object().required(),
-        }).required()
-      )
-      .required(),
-  });
-
-  const schema = Joi.object({
-    title: Joi.string(),
-    description: Joi.string().max(200),
-    content: contentSchema,
-    tags: Joi.array().items(Joi.string()).max(10),
-    coverImgURL: Joi.string(),
-    isDraft: Joi.boolean(),
-  });
-
-  const { error } = schema.validate(blog);
-  if (error) {
-    let errorMessage = error.details[0].message;
-    logger.error(`Input Validation Error! \n ${errorMessage}`);
-    throw new BadRequestError(errorMessage);
-  }
-};
-
 const updateBlogById = async (req: Request, res: Response) => {
   logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId`);
 
+  const isDraft = Boolean(req.body.isDraft);
   // validate request body
-  validateUpdateBlog(req.body);
+  validateCreateBlog(req.body, isDraft);
 
   const { blogId } = req.params;
   let { tags } = req.body;

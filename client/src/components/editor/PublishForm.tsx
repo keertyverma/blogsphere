@@ -1,13 +1,13 @@
 import { useAuthContext } from "@/context/authContext";
 import { useEditorContext } from "@/context/editorContext";
-import { useCreateBlog, useUpdateDraftBlog } from "@/lib/react-query/queries";
+import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
 import { ICreateBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -41,9 +41,10 @@ const PublishForm = () => {
 
   const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
   const { mutateAsync: updatePublishedBlog, isPending: isUpdating } =
-    useUpdateDraftBlog();
+    useUpdateBlog();
 
   const { blogId } = useParams();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof BlogValidation>>({
     resolver: zodResolver(BlogValidation),
@@ -85,27 +86,30 @@ const PublishForm = () => {
     };
 
     try {
+      let message = "";
+      let blogUrl = "";
       if (blogId) {
         // edit mode - publish updated blog
-        await updatePublishedBlog({
+        const updatedBlog = await updatePublishedBlog({
           blogId,
           blog: publishedBlog,
           token,
         });
-        toast.success("Blog Updated");
+        message = "Blog Updated";
+        blogUrl = `/blogs/${updatedBlog.blogId}`;
       } else {
         // create mode - publish new blog
-        await createBlog({
+        const newBlog = await createBlog({
           blog: publishedBlog,
           token,
         });
-        toast.success("Published 🥳");
+        message = "Blog Published 🥳";
+        blogUrl = `/blogs/${newBlog.id}`;
       }
-
+      toast.success(message);
+      navigate(blogUrl);
       form.reset();
-
       setIsPublish(false);
-      // TODO: navigate to user profile -> published blog section
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
     }

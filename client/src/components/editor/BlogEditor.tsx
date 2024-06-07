@@ -3,7 +3,7 @@ import { useEditorContext } from "@/context/editorContext";
 import {
   useCreateBlog,
   useGetBlog,
-  useUpdateDraftBlog,
+  useUpdateBlog,
 } from "@/lib/react-query/queries";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
@@ -28,7 +28,7 @@ const BlogEditor = () => {
   } = useEditorContext();
   const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
-    useUpdateDraftBlog();
+    useUpdateBlog();
   const { token } = useAuthContext();
   const { blogId } = useParams();
   const { data } = useGetBlog(blogId);
