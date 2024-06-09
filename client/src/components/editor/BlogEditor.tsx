@@ -93,8 +93,6 @@ const BlogEditor = () => {
       return toast.error("Add title to publish it");
     }
 
-    // TODO: handle blog edit
-
     if (textEditor) {
       try {
         const data = await textEditor.save();

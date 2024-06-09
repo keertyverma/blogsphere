@@ -25,6 +25,12 @@ const Editor = () => {
     setIsPublish(false);
   }, [blogId, data]);
 
+  useEffect(() => {
+    if (isPublish) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [isPublish]);
+
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   return isPublish ? <PublishForm /> : <BlogEditor />;
