@@ -321,7 +321,7 @@ const PublishForm = () => {
             <div className="flex-center">
               <Button
                 type="submit"
-                className="h-12 px-6 md:px-8 rounded-full text-sm md:text-base"
+                className="rounded-full text-sm md:text-base capitalize"
                 disabled={isPublishing || isUpdating}
               >
                 {blogId && !isDraft ? "update" : "publish"}
