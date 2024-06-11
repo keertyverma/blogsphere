@@ -1,4 +1,4 @@
-import { useGetUserBlogs } from "@/lib/react-query/queries";
+import { useGetUserDraftBlogs } from "@/lib/react-query/queries";
 import BlogPostCard from "../home/BlogPostCard";
 import BlogPostCardSkeleton from "../home/BlogPostCardSkeleton";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -6,8 +6,8 @@ import AnimationWrapper from "../shared/AnimationWrapper";
 interface Props {
   authorId: string;
 }
-const UserBlogList = ({ authorId }: Props) => {
-  const { data: blogs, isLoading, error } = useGetUserBlogs(authorId);
+const UserDraftBlogList = ({ authorId }: Props) => {
+  const { data: blogs, isLoading, error } = useGetUserDraftBlogs(authorId);
 
   if (isLoading) return <BlogPostCardSkeleton />;
 
@@ -16,7 +16,7 @@ const UserBlogList = ({ authorId }: Props) => {
   if (!blogs?.length)
     return (
       <div className="text-base md:text-xl text-muted-foreground font-medium text-center py-10 flex-center flex-col md:flex-row gap-2 md:gap-1">
-        <p>No blog published yet.</p>
+        <p>No draft blog yet.</p>
       </div>
     );
 
@@ -30,4 +30,4 @@ const UserBlogList = ({ authorId }: Props) => {
   ));
 };
 
-export default UserBlogList;
+export default UserDraftBlogList;

@@ -1,10 +1,11 @@
 import UserListSkeleton from "@/components/search/UserListSkeleton";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
-import UserBlogList from "@/components/user-profile/UserBlogList";
+import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogList";
 import UserInfo from "@/components/user-profile/UserInfo";
 import { useGetUser } from "@/lib/react-query/queries";
 import { useParams } from "react-router-dom";
+import UserDraftBlogList from "@/components/user-profile/UserDraftBlogList";
 
 const UserProfile = () => {
   const { username: profileId } = useParams();
@@ -37,8 +38,9 @@ const UserProfile = () => {
 
           {/* user published blogs */}
           <div className="w-full">
-            <InPageNavigation routes={["Blogs"]}>
-              <UserBlogList authorId={user._id} />
+            <InPageNavigation routes={["Published", "Draft"]}>
+              <UserPublishedBlogList authorId={user._id} />
+              <UserDraftBlogList authorId={user._id} />
             </InPageNavigation>
           </div>
         </section>

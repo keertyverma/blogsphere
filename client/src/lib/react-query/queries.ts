@@ -135,15 +135,34 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-export const useGetUserBlogs = (authorId: string) =>
+export const useGetUserPublishedBlogs = (authorId: string) =>
   useQuery<IBlog[]>({
-    queryKey: [QUERY_KEYS.GET_USER_BLOGS, authorId],
+    queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
     queryFn: () =>
       apiClient
         .get<IBlog[]>("/blogs", {
           params: {
             authorId,
             limit: 10,
+          },
+        })
+        .then((res) => (res.data as IFetchResponse).data),
+    staleTime: ms("5m"),
+    gcTime: ms("10m"),
+    refetchOnWindowFocus: false, // No need to refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });
+
+export const useGetUserDraftBlogs = (authorId: string) =>
+  useQuery<IBlog[]>({
+    queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
+    queryFn: () =>
+      apiClient
+        .get<IBlog[]>("/blogs", {
+          params: {
+            authorId,
+            draft: true,
           },
         })
         .then((res) => (res.data as IFetchResponse).data),
