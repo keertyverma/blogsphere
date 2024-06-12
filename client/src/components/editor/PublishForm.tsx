@@ -34,6 +34,7 @@ const PublishForm = () => {
     blog,
     setIsPublish,
     setBlog,
+    setIsPublishClose,
   } = useEditorContext();
   const [titleValue, setTitleValue] = useState(title);
   const [descriptionValue, setDescriptionValue] = useState(description);
@@ -194,7 +195,10 @@ const PublishForm = () => {
         <Button
           variant="ghost"
           className="absolute right-[5vw] top-[1%] md:top-[2%] z-10"
-          onClick={() => setIsPublish(false)}
+          onClick={() => {
+            setIsPublish(false);
+            setIsPublishClose(true);
+          }}
         >
           <IoClose className="text-xl md:text-2xl" />
         </Button>

@@ -25,6 +25,8 @@ const BlogEditor = () => {
     setBlog,
     textEditor,
     setTextEditor,
+    isPublishClose,
+    setIsPublishClose,
   } = useEditorContext();
   const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
@@ -49,21 +51,30 @@ const BlogEditor = () => {
     );
   };
 
+  // Initialize isPublishClose once on mount
+  useEffect(() => {
+    setIsPublishClose(false);
+  }, []);
+
   const isReady = useRef(false);
+  // Handle editor initialization
   useEffect(() => {
     if (!isReady.current) {
+      let blogContent = {} as OutputData;
       if (blogId && data) {
         // edit mode
-        initializeEditor(data.content);
-      } else {
-        // create mode
-        initializeEditor();
+        blogContent = isPublishClose ? blog.content : data.content;
+      } else if (isPublishClose && blog.content) {
+        // write mode
+        blogContent = blog.content;
       }
 
+      initializeEditor(blogContent);
       isReady.current = true;
     }
   }, [blogId, data]);
 
+  // Handle textarea auto-resize
   useEffect(() => {
     if (title && textareaRef.current) {
       autoResizeTextarea(textareaRef.current);

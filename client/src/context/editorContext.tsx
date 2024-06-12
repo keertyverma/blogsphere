@@ -18,6 +18,8 @@ type EditorContextType = {
   setIsPublish: React.Dispatch<React.SetStateAction<boolean>>;
   textEditor: EditorJS | null;
   setTextEditor: React.Dispatch<React.SetStateAction<EditorJS | null>>;
+  isPublishClose: boolean;
+  setIsPublishClose: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const editorContext = createContext<EditorContextType>({} as EditorContextType);
@@ -26,6 +28,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [blog, setBlog] = useState<IBlog>(INITIAL_BLOG);
   const [isPublish, setIsPublish] = useState<boolean>(false);
   const [textEditor, setTextEditor] = useState<EditorJS | null>(null);
+  const [isPublishClose, setIsPublishClose] = useState<boolean>(false);
 
   return (
     <editorContext.Provider
@@ -36,6 +39,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         setIsPublish,
         textEditor,
         setTextEditor,
+        isPublishClose,
+        setIsPublishClose,
       }}
     >
       {children}
