@@ -1,7 +1,7 @@
 import { useAuthContext } from "@/context/authContext";
 import { useEffect, useRef, useState } from "react";
 import { BsLayoutTextSidebarReverse, BsPencilSquare } from "react-icons/bs";
-import { HiOutlineUserCircle } from "react-icons/hi2";
+import { FaRegUserCircle } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdOutlineLock } from "react-icons/md";
 import { NavLink, Navigate, Outlet } from "react-router-dom";
@@ -115,7 +115,7 @@ const SideNavbar = () => {
             }
             className="sidebar-link"
           >
-            <HiOutlineUserCircle className="text-xl" /> Edit Profile
+            <FaRegUserCircle className="text-xl" /> Edit Profile
           </NavLink>
           <NavLink
             to="/settings/change-password"

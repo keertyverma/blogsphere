@@ -28,3 +28,13 @@ export const BlogValidation = z.object({
     .max(200, { message: "Short description must be within 200 characters." }),
   tag: z.string(),
 });
+
+export const ChangePasswordValidation = z.object({
+  currentPassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." }),
+  newPassword: z.string().regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/, {
+    message:
+      "New Password should be 8 to 20 characters long with atleast 1 numeric, 1 lowercase and 1 uppercase letters.",
+  }),
+});
