@@ -26,7 +26,7 @@ const NavBar = () => {
           onClick={() => navigate("/editor")}
           className="sm:flex-center max-sm:hidden rounded-full gap-2 ml-2"
         >
-          <BsPencilSquare className="text-l" />
+          <BsPencilSquare />
           Write
         </Button>
 
