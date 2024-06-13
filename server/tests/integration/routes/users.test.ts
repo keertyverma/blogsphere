@@ -260,4 +260,135 @@ describe("/api/v1/users", () => {
       expect(blogs).toBeUndefined;
     });
   });
+
+  describe("POST /changePassword", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (payload: any = {}) => {
+      return await request(server)
+        .post(`${endpoint}/changePassword`)
+        .set("authorization", token)
+        .send(payload);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return BadRequest-400 if token is invalid", async () => {
+      token = "invalid token";
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(400);
+      expect(res.text).toBe("Invalid token.");
+    });
+
+    it("should return BadRequest-400 if new password required parameter is not passed", async () => {
+      // create a dummy user to get token
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const res = await exec({ currentPassword: "Clubhouse12" });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"newPassword" is required',
+      });
+    });
+
+    it("should return Forbidden-403 if user registered with google account tries to update password", async () => {
+      // create a dummy user to get token
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Donald Duck",
+          email: "donald@gmail.com",
+          username: "donald",
+        },
+        googleAuth: true,
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const res = await exec({
+        currentPassword: "Clubhouse12",
+        newPassword: "NewClubhouse12",
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details:
+          "You can not update the account password because you logged in using Google.",
+      });
+    });
+
+    it("should return BadRequest-400 if current password is incorrect", async () => {
+      // create new user and get token
+      const createUserRes = await request(server)
+        .post(`${endpoint}/register`)
+        .send({
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+        });
+      expect(createUserRes.statusCode).toBe(201);
+      expect(createUserRes.header["x-auth-token"]).not.toBeNull();
+      token = `Bearer ${createUserRes.header["x-auth-token"]}`;
+
+      //  update password request
+      const res = await exec({
+        currentPassword: "IncorrectPassword12",
+        newPassword: "NewClubhouse12",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Incorrect current password",
+      });
+    });
+
+    it("should update password successfully if valid data is passed", async () => {
+      // create new user and get token
+      const createUserRes = await request(server)
+        .post(`${endpoint}/register`)
+        .send({
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+        });
+      expect(createUserRes.statusCode).toBe(201);
+      expect(createUserRes.header["x-auth-token"]).not.toBeNull();
+      token = `Bearer ${createUserRes.header["x-auth-token"]}`;
+
+      const res = await exec({
+        currentPassword: "Clubhouse12",
+        newPassword: "NewClubhouse12",
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.message).toBe("Password is changed successfully");
+    });
+  });
 });
