@@ -19,7 +19,7 @@ const NavBar = () => {
           onClick={() => navigate("/search")}
           className="bg-accent rounded-full flex-center"
         >
-          <BsSearch className="text-l text-muted-foreground" />
+          <BsSearch className="text-muted-foreground" />
         </Button>
 
         <Button
@@ -48,7 +48,7 @@ const NavBar = () => {
               size="icon"
               className="rounded-full md:bg-accent flex-center"
             >
-              <BsBell className="text-xl md:text-l text-muted-foreground" />
+              <BsBell className="text-xl md:text-lg text-muted-foreground" />
             </Button>
 
             <UserNavigationPanel />

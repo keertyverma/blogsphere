@@ -184,7 +184,7 @@
   }
 
   .sidebar-link {
-    @apply flex gap-4 items-center py-2 md:py-5 pb-5 md:pb-8 text-muted-foreground hover:text-black capitalize;
+    @apply flex gap-4 items-center py-2 md:py-5 pb-5 text-muted-foreground hover:text-black capitalize text-nowrap;
   }
 
   .sidebar-link.active {
