@@ -11,14 +11,22 @@ import {
   FormMessage,
 } from "../ui/form";
 
+import { useAuthContext } from "@/context/authContext";
+import { useUpdatePassword } from "@/lib/react-query/queries";
+import { AxiosError } from "axios";
 import { useState } from "react";
 import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
 const ChangePassword = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const { token } = useAuthContext();
+  const { mutateAsync: updatePassword, isPending: isUpdatingPassword } =
+    useUpdatePassword();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof ChangePasswordValidation>>({
     resolver: zodResolver(ChangePasswordValidation),
@@ -31,15 +39,37 @@ const ChangePassword = () => {
   const handlePasswordChange = async (
     data: z.infer<typeof ChangePasswordValidation>
   ) => {
+    const loadingToast = toast.loading("Updating...");
     try {
-      console.log("form data = ", data);
-      throw new Error("some");
+      const { currentPassword, newPassword } = data;
+      await updatePassword({
+        token,
+        currentPassword,
+        newPassword,
+      });
 
-      // form.reset();
-      // navigate("/login");
+      toast.dismiss(loadingToast);
+      toast.success("Password Updated. Please login again.");
+      form.reset();
+      navigate("/login");
     } catch (error) {
-      const errorMessage = "An error occurred. Please try again later.";
-      //   TODO: handle error from api response
+      let errorMessage = "An error occurred. Please try again later.";
+      if (error instanceof AxiosError && error.response) {
+        const {
+          response: {
+            status,
+            data: {
+              error: { details },
+            },
+          },
+        } = error;
+
+        if (status === 403 || status === 400) {
+          errorMessage = details;
+        }
+      }
+
+      toast.dismiss(loadingToast);
       toast.error(errorMessage, {
         position: "top-right",
         className: "mt-20",
@@ -129,7 +159,7 @@ const ChangePassword = () => {
             <Button
               type="submit"
               className="h-12 rounded-full mt-2 text-sm md:text-base"
-              //   disabled={isLoading}
+              disabled={isUpdatingPassword}
             >
               Update
             </Button>

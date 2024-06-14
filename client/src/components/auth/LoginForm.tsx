@@ -105,7 +105,6 @@ const LoginForm = () => {
       if (userData && authToken) {
         setUserAndToken({ ...userData }, authToken);
         setIsAuthenticated(true);
-        // TODO: navigate to dashboard
         navigate("/");
       }
     } catch (error) {

@@ -68,6 +68,29 @@ export const useGetUser = (profileId: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
+export const useUpdatePassword = () =>
+  useMutation({
+    mutationFn: (data: {
+      token: string;
+      currentPassword: string;
+      newPassword: string;
+    }) =>
+      apiClient
+        .post(
+          "/users/changePassword",
+          {
+            currentPassword: data.currentPassword,
+            newPassword: data.newPassword,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }
+        )
+        .then((res) => res.data.data),
+  });
+
 // ----------------- Blog -------------------
 export const useCreateBlog = () =>
   useMutation({
