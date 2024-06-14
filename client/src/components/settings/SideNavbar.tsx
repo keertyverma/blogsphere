@@ -40,7 +40,7 @@ const SideNavbar = () => {
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   return (
-    <section className="relative flex max-md:flex-col gap-10 py-0 pt-20 m-0 ">
+    <section className="relative flex max-md:flex-col gap-10 py-0 pt-20 m-0">
       {/* Side Navigation Bar */}
       <div className="sticky top-[80px] z-30">
         {/* Mobile screens side nav buttons*/}

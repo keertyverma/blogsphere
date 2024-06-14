@@ -54,7 +54,7 @@ export const useGetSearchedUsers = (searchTerm: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-export const useGetUser = (profileId: string) =>
+export const useGetUser = (profileId?: string) =>
   useQuery<IAuthor>({
     queryKey: [QUERY_KEYS.GET_USER_BY_ID, profileId],
     queryFn: () =>
@@ -66,6 +66,7 @@ export const useGetUser = (profileId: string) =>
     refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
+    enabled: !!profileId, // Query only runs if blogId is truthy
   });
 
 export const useUpdatePassword = () =>

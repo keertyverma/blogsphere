@@ -9,7 +9,7 @@ import UserDraftBlogList from "@/components/user-profile/UserDraftBlogList";
 
 const UserProfile = () => {
   const { username: profileId } = useParams();
-  const { data: user, isLoading, error } = useGetUser(profileId || "");
+  const { data: user, isLoading, error } = useGetUser(profileId);
 
   if (isLoading)
     return (

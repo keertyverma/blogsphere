@@ -38,3 +38,46 @@ export const ChangePasswordValidation = z.object({
       "New Password should be 8 to 20 characters long with atleast 1 numeric, 1 lowercase and 1 uppercase letters.",
   }),
 });
+
+export const EditProfileValidation = z.object({
+  fullname: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters." })
+    .max(50, { message: "Name should not be more than 50 characters." })
+    .optional(),
+  bio: z
+    .string()
+    .max(50, { message: "Bio should not be more than 200." })
+    .optional(),
+  profileImage: z.string(),
+  youtube: z
+    .string()
+    .url({ message: "YouTube URL must be a valid URL." })
+    .or(z.literal(""))
+    .optional(),
+  instagram: z
+    .string()
+    .url({ message: "Instagram URL must be a valid URL." })
+    .or(z.literal(""))
+    .optional(),
+  facebook: z
+    .string()
+    .url({ message: "Facebook URL must be a valid URL." })
+    .or(z.literal(""))
+    .optional(),
+  twitter: z
+    .string()
+    .url({ message: "Twitter URL must be a valid URL." })
+    .or(z.literal(""))
+    .optional(),
+  github: z
+    .string()
+    .url({ message: "GitHub URL must be a valid URL." })
+    .or(z.literal(""))
+    .optional(),
+  website: z
+    .string()
+    .url({ message: "Website URL must be a valid URL." })
+    .or(z.literal(""))
+    .optional(),
+});

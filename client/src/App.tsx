@@ -14,6 +14,7 @@ import UserProfile from "./pages/UserProfile";
 import BlogPage from "./pages/BlogPage";
 import SideNavbar from "./components/settings/SideNavbar";
 import ChangePassword from "./components/settings/ChangePassword";
+import EditProfile from "./components/settings/EditProfile";
 
 const App = () => {
   // to prevent the server from going into sleep mode due to inactivity.
@@ -30,7 +31,7 @@ const App = () => {
           <Route path="user/:username" element={<UserProfile />} />
           <Route path="blogs/:blogId" element={<BlogPage />} />
           <Route path="settings" element={<SideNavbar />}>
-            <Route path="edit-profile" element={<div>Edit profile</div>} />
+            <Route path="edit-profile" element={<EditProfile />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
         </Route>
