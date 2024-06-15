@@ -19,6 +19,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import ProfileUploader from "./ProfileUploader";
 
 const EditProfile = () => {
   const BIO_CHAR_LIMIT = 200;
@@ -107,10 +108,28 @@ const EditProfile = () => {
                 <h4 className="text-lg font-semibold">Basic Info</h4>
                 <FormField
                   control={form.control}
+                  name="profileImage"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col justify-start">
+                      <FormLabel className="text-muted-foreground font-semibold">
+                        Profile Photo
+                      </FormLabel>
+                      <FormControl>
+                        <ProfileUploader
+                          fieldChange={field.onChange}
+                          mediaUrl={user.personalInfo.profileImage || ""}
+                        />
+                      </FormControl>
+                      <FormMessage className="shad-form_message" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="fullname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         Full name
                       </FormLabel>
                       <FormControl>
@@ -131,7 +150,7 @@ const EditProfile = () => {
                   name="bio"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         Bio (about you)
                       </FormLabel>
                       <FormControl>
@@ -162,7 +181,7 @@ const EditProfile = () => {
                   name="twitter"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         X Profile
                       </FormLabel>
                       <FormControl>
@@ -182,7 +201,7 @@ const EditProfile = () => {
                   name="instagram"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         Instagram Profile
                       </FormLabel>
                       <FormControl>
@@ -202,7 +221,7 @@ const EditProfile = () => {
                   name="github"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         Github Profile
                       </FormLabel>
                       <FormControl>
@@ -222,7 +241,7 @@ const EditProfile = () => {
                   name="youtube"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         YouTube Channel
                       </FormLabel>
                       <FormControl>
@@ -242,7 +261,7 @@ const EditProfile = () => {
                   name="facebook"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         Facebook Profile
                       </FormLabel>
                       <FormControl>
@@ -262,7 +281,7 @@ const EditProfile = () => {
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground">
+                      <FormLabel className="text-muted-foreground font-semibold">
                         Website URL
                       </FormLabel>
                       <FormControl>

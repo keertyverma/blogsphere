@@ -28,7 +28,7 @@ const UserInfo = ({ profileId, user }: Props) => {
       <div className="flex gap-3">
         <img
           src={profileImage}
-          className="w-28 h-2w-28 object-cover rounded-full border-2 border-border"
+          className="w-28 h-28 object-cover rounded-full border-2 border-border"
         />
         <div className="flex flex-col gap-1 justify-center">
           <h1 className="text-xl font-semibold capitalize line-clamp-2">
