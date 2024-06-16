@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
 import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
@@ -10,6 +9,10 @@ import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
 import logger from "../utils/logger";
+import {
+  validatePasswordUpdate,
+  validateUserUpdate,
+} from "../utils/validations";
 
 export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);
@@ -115,39 +118,6 @@ export const getUserById = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
-const validatePasswordUpdate = (data: {
-  currentPassword: string;
-  newPassword: string;
-}) => {
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
-
-  const schema = Joi.object({
-    currentPassword: Joi.string()
-      .min(5)
-      .max(1024)
-      .required()
-      .pattern(passwordRegex)
-      .message(
-        "Current Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter."
-      ),
-    newPassword: Joi.string()
-      .min(5)
-      .max(1024)
-      .required()
-      .pattern(passwordRegex)
-      .message(
-        "New Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter."
-      ),
-  });
-
-  const { error } = schema.validate(data);
-  if (error) {
-    let errorMessage = error.details[0].message;
-    logger.error(`Input Validation Error! \n ${errorMessage}`);
-    throw new BadRequestError(errorMessage);
-  }
-};
-
 export const updatePassword = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}/changePassword`);
 
@@ -196,5 +166,52 @@ export const updatePassword = async (req: Request, res: Response) => {
       message: "Password is changed successfully",
     },
   };
+  return res.status(result.statusCode).json(result);
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  logger.debug(`PATCH Request on Route -> ${req.baseUrl}`);
+
+  // validate request body
+  validateUserUpdate(req.body);
+
+  const userId = (req.user as JwtPayload).id;
+  const { fullname, bio, profileImage, socialLinks } = req.body;
+
+  const updateObj: any = {};
+  if (fullname) {
+    updateObj["personalInfo.fullname"] = fullname;
+  }
+  if (bio) {
+    updateObj["personalInfo.bio"] = bio;
+  }
+  if (profileImage) {
+    updateObj["personalInfo.profileImage"] = profileImage;
+  }
+  if (socialLinks) {
+    for (const [key, value] of Object.entries(socialLinks)) {
+      updateObj[`socialLinks.${key}`] = value;
+    }
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(userId, updateObj, {
+    new: true,
+  }).select("-personalInfo.password -googleAuth -blogs -updatedAt -__v");
+
+  if (!updatedUser)
+    throw new CustomAPIError(
+      "Some thing went wrong while updating user data.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: {
+      personalInfo: updatedUser.personalInfo,
+      socialLinks: updatedUser.socialLinks,
+    },
+  };
+
   return res.status(result.statusCode).json(result);
 };

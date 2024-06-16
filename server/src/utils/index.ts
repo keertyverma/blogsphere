@@ -11,3 +11,28 @@ export const generateUsername = async (email: string): Promise<string> => {
 
   return username;
 };
+
+export const isValidUrl = (url: string) => {
+  // List of valid top-level domains (TLDs)
+  const validTLDs = [
+    "com",
+    "org",
+    "net",
+    "edu",
+    "gov",
+    "mil",
+    "co",
+    "io",
+    "ai",
+    "in",
+  ]; // Add more as needed
+
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+    const tld = hostname.substring(hostname.lastIndexOf(".") + 1);
+    return validTLDs.includes(tld);
+  } catch (e) {
+    return false;
+  }
+};

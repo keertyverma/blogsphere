@@ -34,3 +34,17 @@ export interface IBlogFindQuery {
 export interface IBlogResult extends IBlog {
   authorDetails: IUser;
 }
+
+export interface IUserUpdate {
+  fullname: string;
+  bio: string;
+  profileImage: string;
+  socialLinks: {
+    youtube: string;
+    instagram: string;
+    facebook: string;
+    twitter: string;
+    github: string;
+    website: string;
+  };
+}

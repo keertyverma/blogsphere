@@ -391,4 +391,97 @@ describe("/api/v1/users", () => {
       expect(res.body.data.message).toBe("Password is changed successfully");
     });
   });
+
+  describe("PATCH /users", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (payload: any = {}) => {
+      return await request(server)
+        .patch(`${endpoint}`)
+        .set("authorization", token)
+        .send(payload);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return BadRequest-400 if social links are invalid URL", async () => {
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const res = await exec({
+        socialLinks: {
+          youtube: "invalid url",
+        },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"socialLinks.youtube" contains an invalid value',
+      });
+    });
+
+    it("should update user profile if valid data is passed", async () => {
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          password: "Clubhouse12",
+          email: "test@test.com",
+          username: "test",
+        },
+        socialLinks: {
+          youtube: "",
+          twitter: "http://twitter.com/mickey",
+          github: "",
+          instagram: "",
+          facebook: "",
+          website: "",
+        },
+      });
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const toUpdate = {
+        fullname: "Mr. Mickey Mouse",
+        bio: "I'm always ready to spread joy and inspire others to follow their dreams",
+        socialLinks: {
+          youtube: "http://youtube.com/channel/mickey",
+          facebook: "http://facebook.com/mickey",
+        },
+      };
+
+      const res = await exec(toUpdate);
+
+      expect(res.statusCode).toBe(200);
+      const {
+        personalInfo: { fullname, bio },
+        socialLinks: { youtube, facebook, twitter },
+      } = res.body.data;
+
+      expect(fullname).toMatch(new RegExp(toUpdate.fullname, "i"));
+      expect(bio).toBe(toUpdate.bio);
+      expect(youtube).toBe(toUpdate.socialLinks.youtube);
+      expect(facebook).toBe(toUpdate.socialLinks.facebook);
+      expect(twitter).not.toBe(""); // previous social links are not reset
+    });
+  });
 });
