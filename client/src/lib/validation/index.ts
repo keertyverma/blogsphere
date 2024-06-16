@@ -49,7 +49,7 @@ export const EditProfileValidation = z.object({
     .string()
     .max(50, { message: "Bio should not be more than 200." })
     .optional(),
-  profileImage: z.string(),
+  profileImageFile: z.array(z.any()),
   youtube: z
     .string()
     .url({ message: "YouTube URL must be a valid URL." })

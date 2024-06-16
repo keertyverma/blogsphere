@@ -28,13 +28,14 @@ const EditProfile = () => {
   } = useAuthContext();
   const { data: user, isLoading, error } = useGetUser(username);
   const [bioValue, setBioValue] = useState(user?.personalInfo.bio || "");
+  const [profileImgUrl, setProfileImgUrl] = useState("");
 
   const form = useForm<z.infer<typeof EditProfileValidation>>({
     resolver: zodResolver(EditProfileValidation),
     defaultValues: {
       fullname: "",
       bio: "",
-      profileImage: "",
+      profileImageFile: [],
       youtube: "",
       instagram: "",
       facebook: "",
@@ -49,7 +50,7 @@ const EditProfile = () => {
       form.reset({
         fullname: user.personalInfo.fullname || "",
         bio: user.personalInfo.bio || "",
-        profileImage: user.personalInfo.profileImage || "",
+        profileImageFile: [user.personalInfo.profileImage || ""],
         youtube: user.socialLinks.youtube || "",
         instagram: user.socialLinks.instagram || "",
         facebook: user.socialLinks.facebook || "",
@@ -82,6 +83,8 @@ const EditProfile = () => {
     data: z.infer<typeof EditProfileValidation>
   ) => {
     console.log("form data = ", data);
+    console.log("profile image url = ", profileImgUrl);
+
     // TODO: call api to update profile
   };
 
@@ -108,7 +111,7 @@ const EditProfile = () => {
                 <h4 className="text-lg font-semibold">Basic Info</h4>
                 <FormField
                   control={form.control}
-                  name="profileImage"
+                  name="profileImageFile"
                   render={({ field }) => (
                     <FormItem className="flex flex-col justify-start">
                       <FormLabel className="text-muted-foreground font-semibold">
@@ -117,7 +120,8 @@ const EditProfile = () => {
                       <FormControl>
                         <ProfileUploader
                           fieldChange={field.onChange}
-                          mediaUrl={user.personalInfo.profileImage || ""}
+                          mediaUrl={user.personalInfo.profileImage ?? ""}
+                          onUpload={(url) => setProfileImgUrl(url)}
                         />
                       </FormControl>
                       <FormMessage className="shad-form_message" />

@@ -13,35 +13,36 @@ interface Props {
 }
 
 const FileUploader = ({ onUpload }: Props) => {
-  const [file, setFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState("");
 
   const { mutateAsync: upload, isPending: isUploading } = useUpload();
 
-  const uploadImage = async (base64EncodedImg: string) => {
-    try {
-      const res = await upload(base64EncodedImg);
-      const url = res.data.url;
-      onUpload(url);
-      toast.success("Uploaded 👍", {
-        position: "top-right",
-        className: "mt-20",
-        autoClose: 2000,
-      });
-    } catch (error) {
-      setPreviewURL("");
-      toast.error("An error occurred. Please try again later.", {
-        position: "top-right",
-        className: "mt-20",
-      });
-    }
-  };
+  const uploadImage = useCallback(
+    async (base64EncodedImg: string) => {
+      try {
+        const res = await upload(base64EncodedImg);
+        const url = res.data.url;
+        onUpload(url);
+        toast.success("Uploaded 👍", {
+          position: "top-right",
+          className: "mt-20",
+          autoClose: 2000,
+        });
+      } catch (error) {
+        setPreviewURL("");
+        toast.error("An error occurred. Please try again later.", {
+          position: "top-right",
+          className: "mt-20",
+        });
+      }
+    },
+    [onUpload, setPreviewURL, upload]
+  );
 
   const onDrop = useCallback(
     async (acceptedFiles: FileWithPath[]) => {
       const selectedFile = acceptedFiles[0];
       if (selectedFile) {
-        setFile(selectedFile);
         setPreviewURL(convertFileToUrl(selectedFile));
 
         // get base64 image string
@@ -50,7 +51,7 @@ const FileUploader = ({ onUpload }: Props) => {
         await uploadImage(base64EncodedImg);
       }
     },
-    [file]
+    [setPreviewURL, uploadImage]
   );
 
   const { getRootProps, getInputProps } = useDropzone({
