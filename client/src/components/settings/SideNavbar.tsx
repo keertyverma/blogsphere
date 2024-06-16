@@ -42,7 +42,7 @@ const SideNavbar = () => {
   return (
     <section className="relative flex max-md:flex-col gap-10 py-0 pt-20 m-0">
       {/* Side Navigation Bar */}
-      <div className="sticky top-[80px] z-30">
+      <div className="sticky top-[70px] z-30">
         {/* Mobile screens side nav buttons*/}
         <div className="md:hidden bg-white py-1 border-b border-border flex flex-nowrap overflow-x-auto">
           <Button

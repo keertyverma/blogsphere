@@ -75,11 +75,14 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
       )}
 
       {previewUrl && (
-        <div className="cursor-pointer flex items-center gap-4">
+        <div className="w-36 h-36 cursor-pointer flex items-center gap-4 relative">
+          <div className="w-full h-full absolute top-0 left-0 flex-center text-white bg-black/60 opacity-0 hover:opacity-100 cursor-pointer rounded-full">
+            Upload Image
+          </div>
           <img
             src={previewUrl}
             alt="profile image"
-            className="w-36 h-36 object-cover rounded-full border-2 border-border"
+            className="w-full h-full object-cover rounded-full border-2 border-border"
           />
         </div>
       )}

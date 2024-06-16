@@ -28,7 +28,7 @@ const UserNavigationPanel = () => {
     <AnimationWrapper transition={{ duration: 0.2 }}>
       <Menubar className="w-10 h-10 rounded-full flex-center">
         <MenubarMenu>
-          <MenubarTrigger>
+          <MenubarTrigger className="focus:bg-transparent data-[state=open]:bg-transparent">
             <div className="w-10 h-10 rounded-full border-b border-border shadow-md cursor-pointer">
               <img
                 src={profileImage}
