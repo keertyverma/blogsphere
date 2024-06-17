@@ -31,11 +31,14 @@ const SearchedUserList = ({ searchTerm }: Props) => {
         to={`/user/${user.personalInfo.username}`}
         className="flex gap-3 items-center max-lg:border-b border-border p-4 hover:bg-muted/50"
       >
-        <img
-          src={user.personalInfo.profileImage}
-          alt="user profile image"
-          className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
-        />
+        <div className="min-w-9">
+          <img
+            src={user.personalInfo.profileImage}
+            alt="user profile image"
+            className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
+          />
+        </div>
+
         <div className="flex-col tracking-tight">
           <p className="text-base text-secondary-foreground font-semibold capitalize line-clamp-2">
             {user.personalInfo.fullname}
@@ -43,6 +46,11 @@ const SearchedUserList = ({ searchTerm }: Props) => {
           <p className="text-sm text-muted-foreground font-normal">
             {`@${user.personalInfo.username}`}
           </p>
+          {user.personalInfo.bio && (
+            <p className="text-sm text-muted-foreground font-normal line-clamp-1">
+              {user.personalInfo.bio}
+            </p>
+          )}
         </div>
       </Link>
     </AnimationWrapper>

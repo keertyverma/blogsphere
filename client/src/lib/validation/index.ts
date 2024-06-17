@@ -54,7 +54,7 @@ export const EditProfileValidation = z.object({
   bio: z
     .string()
     .trim()
-    .max(50, { message: "Bio should not be more than 200." })
+    .max(200, { message: "Bio should not be more than 200." })
     .optional(),
   profileImageFile: z.array(z.any()),
   youtube: z

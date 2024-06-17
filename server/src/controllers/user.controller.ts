@@ -85,7 +85,7 @@ export const getUsers = async (req: Request, res: Response) => {
   const users = await User.find(findQuery)
     .limit(max_limit)
     .select(
-      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage personalInfo.bio -_id"
     );
 
   const result: APIResponse = {

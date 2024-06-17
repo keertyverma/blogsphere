@@ -24,19 +24,18 @@ const UserInfo = ({ profileId, user }: Props) => {
   } = user;
 
   return (
-    <div className="w-full md:w-[70%] md:px-4 max-sm:border-b border-border">
+    <div className="w-full md:w-[80%] md:px-4 max-sm:border-b border-border">
       <div className="flex gap-3">
-        <img
-          src={profileImage}
-          className="w-28 h-28 object-cover rounded-full border-2 border-border"
-        />
+        <div className="min-w-28">
+          <img
+            src={profileImage}
+            className="w-28 h-28 object-cover rounded-full border-2 border-border"
+          />
+        </div>
+
         <div className="flex flex-col gap-1 justify-center">
-          <h1 className="text-xl font-semibold capitalize line-clamp-2">
-            {fullname}
-          </h1>
-          <p className="text-muted-foreground leading-5 line-clamp-2 md:line-clamp-3">
-            {bio}
-          </p>
+          <h1 className="text-xl font-semibold capitalize">{fullname}</h1>
+          <p className="text-muted-foreground leading-5">{bio}</p>
           <p className="text-sm text-muted-foreground mt-1">
             <span className="font-semibold">{formateNumber(totalPosts)}</span>{" "}
             Posts |{" "}
