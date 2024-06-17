@@ -82,3 +82,10 @@ export interface IBlogQuery {
   tag?: string;
   search?: string;
 }
+
+export interface IUpdateUserProfile {
+  fullname?: string;
+  bio?: string;
+  profileImage?: string;
+  socialLinks?: SocialLink;
+}

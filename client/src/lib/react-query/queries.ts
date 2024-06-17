@@ -1,5 +1,12 @@
-import { IAuthor, IBlog, IBlogQuery, IFetchResponse, INewUser } from "@/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  IAuthor,
+  IBlog,
+  IBlogQuery,
+  IFetchResponse,
+  INewUser,
+  IUpdateUserProfile,
+} from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ms from "ms";
 import apiClient from "../api-client";
 import { QUERY_KEYS } from "./queryKeys";
@@ -91,6 +98,26 @@ export const useUpdatePassword = () =>
         )
         .then((res) => res.data.data),
   });
+
+export const useUpdateUserProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { token: string; toUpdate: IUpdateUserProfile }) =>
+      apiClient
+        .patch("/users", data.toUpdate, {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        })
+        .then((res) => res.data.data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, data.personalInfo.username],
+      });
+    },
+  });
+};
 
 // ----------------- Blog -------------------
 export const useCreateBlog = () =>

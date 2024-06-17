@@ -12,6 +12,7 @@ export const validateUserUpdate = (data: IUserUpdate) => {
     socialLinks: Joi.object({
       youtube: Joi.string()
         .trim()
+        .allow("")
         .custom((value, helpers) => {
           if (!isValidUrl(value)) {
             return helpers.error("any.invalid");
@@ -20,6 +21,7 @@ export const validateUserUpdate = (data: IUserUpdate) => {
         }),
       instagram: Joi.string()
         .trim()
+        .allow("")
         .custom((value, helpers) => {
           if (!isValidUrl(value)) {
             return helpers.error("any.invalid");
@@ -28,6 +30,7 @@ export const validateUserUpdate = (data: IUserUpdate) => {
         }),
       facebook: Joi.string()
         .trim()
+        .allow("")
         .custom((value, helpers) => {
           if (!isValidUrl(value)) {
             return helpers.error("any.invalid");
@@ -36,6 +39,7 @@ export const validateUserUpdate = (data: IUserUpdate) => {
         }),
       twitter: Joi.string()
         .trim()
+        .allow("")
         .custom((value, helpers) => {
           if (!isValidUrl(value)) {
             return helpers.error("any.invalid");
@@ -44,6 +48,7 @@ export const validateUserUpdate = (data: IUserUpdate) => {
         }),
       github: Joi.string()
         .trim()
+        .allow("")
         .custom((value, helpers) => {
           if (!isValidUrl(value)) {
             return helpers.error("any.invalid");
@@ -52,6 +57,7 @@ export const validateUserUpdate = (data: IUserUpdate) => {
         }),
       website: Joi.string()
         .trim()
+        .allow("")
         .custom((value, helpers) => {
           if (!isValidUrl(value)) {
             return helpers.error("any.invalid");

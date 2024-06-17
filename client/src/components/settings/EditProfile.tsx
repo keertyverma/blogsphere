@@ -1,9 +1,15 @@
 import { useAuthContext } from "@/context/authContext";
-import { useGetUser } from "@/lib/react-query/queries";
+import { useGetUser, useUpdateUserProfile } from "@/lib/react-query/queries";
 import { EditProfileValidation } from "@/lib/validation";
+import { IUpdateUserProfile, IUser, SocialLink } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaFacebook, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa";
+import { RiTwitterXFill } from "react-icons/ri";
+import { SlGlobe } from "react-icons/sl";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -29,6 +35,11 @@ const EditProfile = () => {
   const { data: user, isLoading, error } = useGetUser(username);
   const [bioValue, setBioValue] = useState(user?.personalInfo.bio || "");
   const [profileImgUrl, setProfileImgUrl] = useState("");
+  const { token, user: authUser, setUserAndToken } = useAuthContext();
+  const { mutateAsync: updateProfile, isPending: isUpdating } =
+    useUpdateUserProfile();
+
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof EditProfileValidation>>({
     resolver: zodResolver(EditProfileValidation),
@@ -82,10 +93,64 @@ const EditProfile = () => {
   const handleProfileUpdate = async (
     data: z.infer<typeof EditProfileValidation>
   ) => {
-    console.log("form data = ", data);
-    console.log("profile image url = ", profileImgUrl);
+    const loadingToast = toast.loading("Updating...");
+    try {
+      const { fullname, bio, ...socialData } = data;
+      const socialKeys: (keyof SocialLink)[] = [
+        "youtube",
+        "instagram",
+        "github",
+        "website",
+        "facebook",
+        "twitter",
+      ];
+      const socialLinks: Partial<SocialLink> = {};
+      socialKeys.forEach((key) => {
+        if (key in socialData) {
+          socialLinks[key] = socialData[key];
+        }
+      });
 
-    // TODO: call api to update profile
+      const toUpdate: IUpdateUserProfile = {
+        ...(fullname && { fullname }),
+        ...(bio && { bio }),
+        ...(profileImgUrl && { profileImage: profileImgUrl }),
+        ...(Object.keys(socialLinks).length && {
+          socialLinks: socialLinks as SocialLink,
+        }),
+      };
+
+      // Update profile
+      const updatedUser = await updateProfile({
+        token,
+        toUpdate,
+      });
+
+      // update authenticated user data in context if fullname and profileImage are updated
+      const { personalInfo } = updatedUser;
+      const toUpdateAuthUser: IUser = {
+        ...(authUser.fullname !== personalInfo.fullname && {
+          fullname: personalInfo.fullname,
+        }),
+        ...(profileImgUrl && {
+          profileImage: personalInfo.profileImage,
+        }),
+      } as IUser;
+      if (Object.keys(toUpdateAuthUser).length) {
+        setUserAndToken({ ...authUser, ...toUpdateAuthUser }, token);
+      }
+
+      toast.dismiss(loadingToast);
+      toast.success("Profile Updated.👍");
+      form.reset();
+      navigate(`/user/${user.personalInfo.username}`);
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error("An error occurred. Please try again later.", {
+        position: "top-right",
+        className: "mt-20",
+      });
+    }
   };
 
   const handleDescriptionChange = (
@@ -185,8 +250,8 @@ const EditProfile = () => {
                   name="twitter"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
-                        X Profile
+                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                        <RiTwitterXFill /> Profile
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -205,8 +270,8 @@ const EditProfile = () => {
                   name="instagram"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
-                        Instagram Profile
+                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                        <FaInstagram /> Instagram Profile
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -225,8 +290,8 @@ const EditProfile = () => {
                   name="github"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
-                        Github Profile
+                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                        <FaGithub /> Github Profile
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -245,8 +310,8 @@ const EditProfile = () => {
                   name="youtube"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
-                        YouTube Channel
+                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                        <FaYoutube /> YouTube Channel
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -265,8 +330,8 @@ const EditProfile = () => {
                   name="facebook"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
-                        Facebook Profile
+                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                        <FaFacebook /> Facebook Profile
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -285,8 +350,8 @@ const EditProfile = () => {
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
-                        Website URL
+                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                        <SlGlobe /> Website URL
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -303,7 +368,12 @@ const EditProfile = () => {
               </div>
             </div>
             <div className="max-md:flex-center">
-              <Button type="submit" size="lg" className="rounded-full my-4">
+              <Button
+                type="submit"
+                size="lg"
+                className="rounded-full my-4"
+                disabled={isUpdating}
+              >
                 Update
               </Button>
             </div>
