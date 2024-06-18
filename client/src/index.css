@@ -193,7 +193,7 @@
 
   /* File uploader */
   .cover-img {
-    @apply aspect-video rounded-lg object-cover border-[1px] border-border;
+    @apply aspect-video w-full h-full rounded-lg object-cover border-[1px] border-border;
   }
 
   .file_uploader-label {

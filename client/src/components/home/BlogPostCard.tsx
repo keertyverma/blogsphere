@@ -1,14 +1,21 @@
+import { useAuthContext } from "@/context/authContext";
 import { formatDate } from "@/lib/utils";
 import { IAuthor, IBlog } from "@/types";
 import { FaRegHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import ManageBlog from "../blog/ManageBlog";
 
 interface Props {
   content: IBlog;
   author: IAuthor;
+  showManageBlogButtons?: boolean;
 }
 
-const BlogPostCard = ({ content, author }: Props) => {
+const BlogPostCard = ({
+  content,
+  author,
+  showManageBlogButtons = false,
+}: Props) => {
   const {
     blogId: id,
     title,
@@ -22,26 +29,36 @@ const BlogPostCard = ({ content, author }: Props) => {
   const {
     personalInfo: { fullname, username, profileImage },
   } = author;
+  const { user } = useAuthContext();
+
   return (
     <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 md:gap-5 pt-0 md:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
       <section className="p-0">
-        <Link to={`/user/${username}`}>
-          <div className="flex flex-row gap-3 items-center">
-            <img
-              src={profileImage}
-              alt="user profile image"
-              className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
-            />
-            <div className="flex-col text-sm ">
-              <p className="text-secondary-foreground font-semibold capitalize">
-                {fullname}
-              </p>
-              <p className="text-muted-foreground font-normal">
-                {publishedAt && formatDate(publishedAt)}
-              </p>
+        <div className="flex justify-between">
+          <Link to={`/user/${username}`}>
+            <div className="flex flex-row gap-3 items-center">
+              <img
+                src={profileImage}
+                alt="user profile image"
+                className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
+              />
+              <div className="flex-col text-sm ">
+                <p className="text-secondary-foreground font-semibold capitalize">
+                  {fullname}
+                </p>
+                <p className="text-muted-foreground font-normal">
+                  {publishedAt && formatDate(publishedAt)}
+                </p>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+          {showManageBlogButtons && user.username === username && id && (
+            <div className="mb-3">
+              <ManageBlog blogId={id} />
+            </div>
+          )}
+        </div>
+
         <Link to={`/blogs/${id}`}>
           <div className="w-full flex flex-row gap-2 sm:gap-3 md:gap-6 justify-between">
             <div className="flex-1">

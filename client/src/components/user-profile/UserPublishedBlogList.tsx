@@ -25,7 +25,11 @@ const UserPublishedBlogList = ({ authorId }: Props) => {
       key={index}
       transition={{ duration: 1, delay: index * 0.1 }}
     >
-      <BlogPostCard content={blog} author={blog.authorDetails} />
+      <BlogPostCard
+        content={blog}
+        author={blog.authorDetails}
+        showManageBlogButtons={true}
+      />
     </AnimationWrapper>
   ));
 };

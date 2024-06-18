@@ -38,7 +38,7 @@ const UserProfile = () => {
 
           {/* user published blogs */}
           <div className="w-full">
-            <InPageNavigation routes={["Published", "Draft"]}>
+            <InPageNavigation routes={["Published Blogs", "Drafts"]}>
               <UserPublishedBlogList authorId={user._id} />
               <UserDraftBlogList authorId={user._id} />
             </InPageNavigation>

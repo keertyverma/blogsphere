@@ -6,6 +6,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
+import ManageBlog from "./ManageBlog";
 
 interface Props {
   blogId: string;
@@ -76,16 +77,7 @@ const BlogInteraction = ({ blogId, authorUsername, likes }: Props) => {
             </p>
           )}
         </div>
-
-        {user.username === authorUsername && (
-          <Button
-            size="sm"
-            className="rounded-full"
-            onClick={() => navigate(`/editor/${blogId}`)}
-          >
-            Edit
-          </Button>
-        )}
+        {user.username === authorUsername && <ManageBlog blogId={blogId} />}
       </div>
       <hr className="border-border my-1" />
     </>
