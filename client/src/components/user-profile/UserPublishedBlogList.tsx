@@ -29,6 +29,7 @@ const UserPublishedBlogList = ({ authorId }: Props) => {
         content={blog}
         author={blog.authorDetails}
         showManageBlogButtons={true}
+        showReadCount={true}
       />
     </AnimationWrapper>
   ));

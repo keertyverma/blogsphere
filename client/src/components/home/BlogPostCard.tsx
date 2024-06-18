@@ -1,7 +1,8 @@
 import { useAuthContext } from "@/context/authContext";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formateNumber } from "@/lib/utils";
 import { IAuthor, IBlog } from "@/types";
 import { FaRegHeart } from "react-icons/fa";
+import { IoEyeOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import ManageBlog from "../blog/ManageBlog";
 
@@ -9,12 +10,14 @@ interface Props {
   content: IBlog;
   author: IAuthor;
   showManageBlogButtons?: boolean;
+  showReadCount?: boolean;
 }
 
 const BlogPostCard = ({
   content,
   author,
   showManageBlogButtons = false,
+  showReadCount = false,
 }: Props) => {
   const {
     blogId: id,
@@ -24,6 +27,7 @@ const BlogPostCard = ({
     tags,
     createdAt: publishedAt,
     activity,
+    isDraft,
   } = content;
 
   const {
@@ -32,7 +36,7 @@ const BlogPostCard = ({
   const { user } = useAuthContext();
 
   return (
-    <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 md:gap-5 pt-0 md:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
+    <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 pt-0 md:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
       <section className="p-0">
         <div className="flex justify-between">
           <Link to={`/user/${username}`}>
@@ -81,12 +85,29 @@ const BlogPostCard = ({
         </Link>
       </section>
       <section className="flex justify-between p-0 max-lg:mb-6">
-        <div className="flex items-center justify-center gap-1 text-muted-foreground">
-          <FaRegHeart />
-          {activity && activity?.totalLikes > 0 && (
-            <p className="text-sm">{activity?.totalLikes}</p>
-          )}
-        </div>
+        {/* Show blog stats - total likes and read count only for published blogs */}
+        {!isDraft && (
+          <div className="flex items-center justify-center gap-3 text-muted-foreground">
+            <div className="flex-center gap-1">
+              <FaRegHeart />
+              {activity && activity?.totalLikes > 0 && (
+                <p className="text-sm">{formateNumber(activity.totalLikes)}</p>
+              )}
+            </div>
+
+            {showReadCount && user.username === username && (
+              <div className="flex-center gap-1">
+                <IoEyeOutline className="text-lg" />
+                {activity && activity?.totalReads > 0 && (
+                  <p className="text-sm">
+                    {formateNumber(activity.totalReads)}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-2">
           {tags?.slice(0, 2).map((tag, i) => (
             <span

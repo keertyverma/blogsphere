@@ -1,15 +1,17 @@
 import UserListSkeleton from "@/components/search/UserListSkeleton";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
-import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogList";
+import UserDraftBlogList from "@/components/user-profile/UserDraftBlogList";
 import UserInfo from "@/components/user-profile/UserInfo";
+import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogList";
+import { useAuthContext } from "@/context/authContext";
 import { useGetUser } from "@/lib/react-query/queries";
 import { useParams } from "react-router-dom";
-import UserDraftBlogList from "@/components/user-profile/UserDraftBlogList";
 
 const UserProfile = () => {
   const { username: profileId } = useParams();
   const { data: user, isLoading, error } = useGetUser(profileId);
+  const { user: authUser } = useAuthContext();
 
   if (isLoading)
     return (
@@ -29,6 +31,9 @@ const UserProfile = () => {
       </section>
     );
 
+  const routes = ["Published Blogs"];
+  if (authUser.username === user.personalInfo.username) routes.push("Drafts");
+
   return (
     <AnimationWrapper>
       <div className="h-cover px-0 md:px-10">
@@ -38,9 +43,12 @@ const UserProfile = () => {
 
           {/* user published blogs */}
           <div className="w-full">
-            <InPageNavigation routes={["Published Blogs", "Drafts"]}>
+            <InPageNavigation routes={routes}>
               <UserPublishedBlogList authorId={user._id} />
-              <UserDraftBlogList authorId={user._id} />
+
+              {authUser.username === user.personalInfo.username && (
+                <UserDraftBlogList authorId={user._id} />
+              )}
             </InPageNavigation>
           </div>
         </section>

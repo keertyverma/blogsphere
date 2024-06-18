@@ -219,6 +219,7 @@ const getLatestBlogs = async (req: Request, res: Response) => {
         "authorDetails.personalInfo.fullname": 1,
         "authorDetails.personalInfo.username": 1,
         "authorDetails.personalInfo.profileImage": 1,
+        isDraft: 1,
       },
     },
   ]);
