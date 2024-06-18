@@ -251,7 +251,8 @@ const EditProfile = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
-                        <RiTwitterXFill /> Profile
+                        <RiTwitterXFill />
+                        Twitter Profile
                       </FormLabel>
                       <FormControl>
                         <Input

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/authContext";
-import { BsBell, BsPencilSquare, BsSearch } from "react-icons/bs";
+import { BsPencilSquare, BsSearch } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import UserNavigationPanel from "../user-menu/UserNavigationPanel";
 import Logo from "./Logo";
@@ -41,18 +41,7 @@ const NavBar = () => {
         </Button>
 
         {isAuthenticated ? (
-          <>
-            <Button
-              onClick={() => navigate("/dashboard/notification")}
-              variant="link"
-              size="icon"
-              className="rounded-full md:bg-accent flex-center"
-            >
-              <BsBell className="text-xl md:text-lg text-muted-foreground" />
-            </Button>
-
-            <UserNavigationPanel />
-          </>
+          <UserNavigationPanel />
         ) : (
           <>
             <Button
