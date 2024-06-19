@@ -1,6 +1,9 @@
+import { useAuthContext } from "@/context/authContext";
+import { useDeleteBlog } from "@/lib/react-query/queries";
+import { IBlog } from "@/types";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
+import { toast } from "react-toastify";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,13 +15,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import { Button } from "../ui/button";
 
 interface Props {
   blogId: string;
 }
 
 const ManageBlog = ({ blogId }: Props) => {
+  const { mutateAsync: deleteBlog } = useDeleteBlog();
+  const { token } = useAuthContext();
   const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    const loadingToast = toast.loading("Deleting ...");
+    try {
+      const deletedBlog: IBlog = await deleteBlog({ blogId, token });
+      const authorUsername = deletedBlog.authorDetails.personalInfo.username;
+
+      toast.dismiss(loadingToast);
+      toast.success("Blog Deleted.👍");
+      navigate(`/user/${authorUsername}`);
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error("An error occurred. Please try again later.", {
+        position: "top-right",
+        className: "mt-20",
+      });
+    }
+  };
 
   return (
     <div className="flex items-center gap-2">
@@ -48,7 +72,7 @@ const ManageBlog = ({ blogId }: Props) => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => console.log("handle delete")}
+              onClick={handleDelete}
             >
               Delete
             </AlertDialogAction>

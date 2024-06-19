@@ -302,3 +302,34 @@ export const useLikePost = () => {
         .then((res) => res.data),
   });
 };
+
+export const useDeleteBlog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { blogId: string; token: string }) =>
+      apiClient
+        .delete(`blogs/${data.blogId}`, {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        })
+        .then((res) => res.data.data),
+    onSuccess: (data) => {
+      const { _id: authorId, personalInfo } = data.authorDetails;
+
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
+      });
+    },
+  });
+};
