@@ -742,4 +742,132 @@ describe("/api/v1/blogs", () => {
       expect(likes?.hasOwnProperty(user.id)).toBe(false);
     });
   });
+
+  describe("DELETE /:blogId", () => {
+    let blogs: IBlog[];
+    let user: any;
+
+    beforeAll(async () => {
+      user = await createUser();
+      blogs = await createBlogs(user.id);
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (blogId: string, payload: object = {}) => {
+      return await request(server)
+        .delete(`${endpoint}/${blogId}`)
+        .set("authorization", token);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+
+      const res = await exec("invalid-blogId");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return 404-NotFound if blog with given blogId is not found", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const blogId = "invalid-blogId";
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `No blog found with blogId = ${blogId}`,
+      });
+    });
+
+    it("should delete draft blog if blogId is valid", async () => {
+      // setup - get draft blog
+      token = `Bearer ${user.generateAuthToken()}`;
+      const draftBlogId = blogs.filter((blog) => blog.isDraft === true)[0]
+        ?.blogId;
+      const draftBlog = await Blog.findOne({ blogId: draftBlogId });
+      // add blog to user blogs list
+      const blogAuthor = await User.findByIdAndUpdate(
+        draftBlog?.author,
+        {
+          $push: {
+            blogs: draftBlog?.id,
+          },
+        },
+        { new: true }
+      );
+      const totalPost = blogAuthor?.accountInfo.totalPosts;
+
+      // call api
+      const res = await exec(draftBlogId);
+
+      // assertions
+      expect(res.statusCode).toBe(200);
+      const {
+        blogId,
+        isDraft,
+        authorDetails: { _id },
+      } = res.body.data;
+      expect(blogId).toBe(draftBlog?.blogId);
+      expect(isDraft).toBe(draftBlog?.isDraft);
+
+      // blog must be removed from author blog list
+      const author = await User.findById(_id);
+      expect(author?.blogs).not.toContain(draftBlog?.id);
+
+      // when draft blog is deleted then user total post must not change
+      expect(author?.accountInfo.totalPosts).toBe(totalPost);
+    });
+
+    it("should delete published blog and decrement author total post count", async () => {
+      // setup - get published blog
+      token = `Bearer ${user.generateAuthToken()}`;
+      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
+        ?.blogId;
+      const publishedBlog = await Blog.findOne({ blogId: publishedBlogId });
+      // add blog and update totalPost count for blog author
+      const blogAuthor = await User.findByIdAndUpdate(
+        publishedBlog?.author,
+        {
+          $inc: { "accountInfo.totalPosts": 1 },
+          $push: {
+            blogs: publishedBlog?.id,
+          },
+        },
+        { new: true }
+      );
+      const totalPost = blogAuthor?.accountInfo.totalPosts;
+
+      // call api
+      const res = await exec(publishedBlogId);
+
+      // assertion
+      expect(res.statusCode).toBe(200);
+      const {
+        blogId,
+        isDraft,
+        authorDetails: { _id },
+      } = res.body.data;
+      expect(blogId).toBe(publishedBlogId);
+      expect(isDraft).toBe(publishedBlog?.isDraft);
+
+      // blog must be removed from author blog list
+      const author = await User.findById(_id);
+      expect(author?.blogs).not.toContain(publishedBlog?.id);
+
+      // when published blog is deleted then user total post must be decrement by 1
+      if (totalPost) {
+        expect(author?.accountInfo.totalPosts).toBe(totalPost - 1);
+      }
+    });
+  });
 });

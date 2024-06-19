@@ -59,7 +59,7 @@ const validateCreateBlog = (blog: any, isDraft: boolean) => {
 };
 
 const createBlog = async (req: Request, res: Response) => {
-  logger.debug(`POST Request on Route -> ${req.baseUrl}`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}`);
 
   const isDraft = Boolean(req.body.isDraft);
 
@@ -140,7 +140,7 @@ const validateBlogQueryParams = (query: any) => {
 };
 
 const getLatestBlogs = async (req: Request, res: Response) => {
-  logger.debug(`GET Request on Route -> ${req.baseUrl}`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}`);
 
   // validate request query params
   validateBlogQueryParams(req.query);
@@ -234,7 +234,7 @@ const getLatestBlogs = async (req: Request, res: Response) => {
 };
 
 const getBlogById = async (req: Request, res: Response) => {
-  logger.debug(`GET Request on Route -> ${req.baseUrl}/:blogId`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:blogId`);
 
   const { blogId } = req.params;
   const blog = await Blog.findOne({ blogId })
@@ -258,7 +258,9 @@ const getBlogById = async (req: Request, res: Response) => {
 };
 
 const updateReadCount = async (req: Request, res: Response) => {
-  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId/readCount`);
+  logger.debug(
+    `${req.method} Request on Route -> ${req.baseUrl}/:blogId/readCount`
+  );
 
   const { blogId } = req.params;
 
@@ -299,7 +301,7 @@ const updateReadCount = async (req: Request, res: Response) => {
 };
 
 const updateBlogById = async (req: Request, res: Response) => {
-  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:blogId`);
 
   // get blog by blogId
   const { blogId } = req.params;
@@ -355,7 +357,7 @@ const updateBlogById = async (req: Request, res: Response) => {
 };
 
 const updateLike = async (req: Request, res: Response) => {
-  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId/like`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:blogId/like`);
 
   const userId = (req.user as JwtPayload).id;
   const { blogId } = req.params;
@@ -391,8 +393,47 @@ const updateLike = async (req: Request, res: Response) => {
   return res.status(result.statusCode).json(result);
 };
 
+const deleteBlogByBlogId = async (req: Request, res: Response) => {
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:blogId`);
+
+  const { blogId } = req.params;
+
+  // delete blog
+  const deletedBlog = await Blog.findOneAndDelete({ blogId })
+    .populate("author", "personalInfo.fullname personalInfo.username _id")
+    .select("blogId title isDraft");
+
+  if (!deletedBlog)
+    throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  const { id, author, isDraft } = deletedBlog;
+  // update author
+  // - remove blog from author blogs list
+  // - decrement total post count if published blog is deleted
+  const user = await User.findByIdAndUpdate(author.id, {
+    $inc: { "accountInfo.totalPosts": isDraft ? 0 : -1 },
+    $pull: {
+      blogs: id,
+    },
+  });
+  if (!user)
+    throw new CustomAPIError(
+      "Failed to update user blogs and total posts count",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+
+  const result: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: deletedBlog,
+  };
+
+  return res.status(result.statusCode).json(result);
+};
+
 export {
   createBlog,
+  deleteBlogByBlogId,
   getBlogById,
   getLatestBlogs,
   updateBlogById,
