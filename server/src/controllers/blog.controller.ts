@@ -85,7 +85,7 @@ const createBlog = async (req: Request, res: Response) => {
     coverImgURL,
     tags,
     author: authorId,
-    isDraft: Boolean(isDraft),
+    isDraft,
   });
 
   // save blog
@@ -301,26 +301,49 @@ const updateReadCount = async (req: Request, res: Response) => {
 const updateBlogById = async (req: Request, res: Response) => {
   logger.debug(`PATCH Request on Route -> ${req.baseUrl}/:blogId`);
 
+  // get blog by blogId
+  const { blogId } = req.params;
+  const blog = await Blog.findOne({ blogId });
+  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
   const isDraft = Boolean(req.body.isDraft);
   // validate request body
   validateCreateBlog(req.body, isDraft);
 
-  const { blogId } = req.params;
   let { tags } = req.body;
-
   tags = tags?.map((tag: string) => tag.toLowerCase());
+
+  // update Blog
   const updatedBlog = await Blog.findOneAndUpdate(
     { blogId },
     { ...req.body, tags },
     {
       new: true,
     }
-  ).select(
-    "blogId title description content coverImgURL tags author activity createdAt isDraft -_id"
-  );
+  )
+    .populate(
+      "author",
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage _id"
+    )
+    .select(
+      "blogId title description content coverImgURL tags activity createdAt isDraft -_id"
+    );
 
-  if (!updatedBlog)
-    throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+  // increment user total post count if draft blog is getting published
+  if (blog.isDraft && !isDraft) {
+    const user = await User.findOneAndUpdate(
+      { _id: blog.author },
+      {
+        $inc: { "accountInfo.totalPosts": 1 },
+      }
+    );
+
+    if (!user)
+      throw new CustomAPIError(
+        "Failed to update total posts count",
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+  }
 
   const result: APIResponse = {
     status: APIStatus.SUCCESS,

@@ -73,7 +73,7 @@ export const useGetUser = (profileId?: string) =>
     refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
-    enabled: !!profileId, // Query only runs if blogId is truthy
+    enabled: !!profileId, // Query only runs if profileId is truthy
   });
 
 export const useUpdatePassword = () =>
@@ -231,7 +231,7 @@ export const useGetBlog = (blogId?: string) =>
       apiClient
         .get<IBlog>(`/blogs/${blogId}`)
         .then((res) => (res.data as IFetchResponse).data),
-    // staleTime: ms("10m"),
+    staleTime: ms("10m"),
     gcTime: ms("30m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to get updated blog after edit
@@ -255,8 +255,10 @@ export const useUpdateReads = () =>
         .then((res) => res.data),
   });
 
-export const useUpdateBlog = () =>
-  useMutation({
+export const useUpdateBlog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: (data: { blogId: string; token: string; blog: object }) =>
       apiClient
         .patch(`/blogs/${data.blogId}`, data.blog, {
@@ -265,7 +267,24 @@ export const useUpdateBlog = () =>
           },
         })
         .then((res) => res.data.data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
+      });
+
+      const { _id: authorId, personalInfo } = data.authorDetails;
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
+      });
+    },
   });
+};
 
 export const useLikePost = () => {
   return useMutation({

@@ -561,11 +561,14 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return BadRequest-400 if description exceeds 200 characters limit is not passed", async () => {
+    it("should return BadRequest-400 if published blog description exceeds 200 characters limit is not passed", async () => {
       token = `Bearer ${user.generateAuthToken()}`;
+      const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
 
-      const blogId = "some-blogId";
-      const res = await exec(blogId, { description: "a".repeat(201) });
+      const res = await exec(publishedBlog.blogId, {
+        ...publishedBlog,
+        description: "a".repeat(201),
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -576,11 +579,58 @@ describe("/api/v1/blogs", () => {
       });
     });
 
+    it("should update draft blog", async () => {
+      token = `Bearer ${user.generateAuthToken()}`;
+      const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
+      const toUpdate = {
+        title: `updated ${draftBlog.title}`,
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "My blog heading",
+                level: 2,
+              },
+            },
+          ],
+        },
+        isDraft: true,
+      };
+
+      const res = await exec(draftBlog.blogId, toUpdate);
+
+      expect(res.statusCode).toBe(200);
+      const { blogId, title, isDraft, content } = res.body.data;
+      expect(blogId).toBe(draftBlog.blogId);
+      expect(title).toBe(toUpdate.title);
+      expect(content.blocks).toHaveLength(1);
+      expect(isDraft).toBe(toUpdate.isDraft);
+
+      // when draft blog is updated then it should not update user total post
+      const author = await User.findById(draftBlog.author);
+      expect(author?.accountInfo.totalPosts).toBe(0);
+    });
+
     it("should update draft blog and publish it", async () => {
       token = `Bearer ${user.generateAuthToken()}`;
       const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
       const toUpdate = {
+        title: draftBlog.title,
         description: "some meaningful short description",
+        content: {
+          blocks: [
+            {
+              id: "O8uS0t2SUk",
+              type: "header",
+              data: {
+                text: "My blog heading",
+                level: 2,
+              },
+            },
+          ],
+        },
         tags: ["tag1", "tag2"],
         isDraft: false,
       };
@@ -588,26 +638,16 @@ describe("/api/v1/blogs", () => {
       const res = await exec(draftBlog.blogId, toUpdate);
 
       expect(res.statusCode).toBe(200);
-      const { blogId, description, tags, isDraft } = res.body.data;
+      const { blogId, content, description, tags, isDraft } = res.body.data;
       expect(blogId).toBe(draftBlog.blogId);
+      expect(content.blocks).toHaveLength(1);
       expect(description).toBe(toUpdate.description);
       expect(tags).toEqual(toUpdate.tags);
       expect(isDraft).toBe(toUpdate.isDraft);
-    });
 
-    it("should update blog state from publish to draft", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
-      const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
-      const toUpdate = {
-        isDraft: true,
-      };
-
-      const res = await exec(publishedBlog.blogId, toUpdate);
-
-      expect(res.statusCode).toBe(200);
-      const { blogId, isDraft } = res.body.data;
-      expect(blogId).toBe(publishedBlog.blogId);
-      expect(isDraft).toBe(toUpdate.isDraft);
+      // when draft blog is updated then it should not update user total post
+      const author = await User.findById(draftBlog.author);
+      expect(author?.accountInfo.totalPosts).toBe(1);
     });
   });
 
