@@ -1,3 +1,4 @@
+import { useAuthContext } from "@/context/authContext";
 import {
   IAuthor,
   IBlog,
@@ -120,8 +121,13 @@ export const useUpdateUserProfile = () => {
 };
 
 // ----------------- Blog -------------------
-export const useCreateBlog = () =>
-  useMutation({
+export const useCreateBlog = () => {
+  const queryClient = useQueryClient();
+  const {
+    user: { id: authorId, username },
+  } = useAuthContext();
+
+  return useMutation({
     mutationFn: (data: { token: string; blog: object }) =>
       apiClient
         .post("/blogs", data.blog, {
@@ -130,7 +136,20 @@ export const useCreateBlog = () =>
           },
         })
         .then((res) => res.data.data),
+    onSuccess: () => {
+      // refresh authenticated user published and draft blog lists
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
+      });
+    },
   });
+};
 
 export const useGetLatestBlog = (tag: string) =>
   useQuery<IBlog[]>({
@@ -143,7 +162,6 @@ export const useGetLatestBlog = (tag: string) =>
         .get<IBlog[]>("/blogs", { params })
         .then((res) => (res.data as IFetchResponse).data);
     },
-    // staleTime: ms("1m"),
     gcTime: ms("5m"),
     refetchOnWindowFocus: true, // Refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders

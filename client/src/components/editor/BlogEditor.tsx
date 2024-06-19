@@ -163,7 +163,6 @@ const BlogEditor = () => {
         });
         toast.success("Saved 👍");
       }
-      // TODO: navigate to user profile -> draft blog section
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
     }
