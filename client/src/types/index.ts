@@ -81,6 +81,9 @@ export interface ICreateBlog {
 export interface IBlogQuery {
   tag?: string;
   search?: string;
+  authorId?: string;
+  draft?: boolean;
+  limit?: number;
 }
 
 export interface IUpdateUserProfile {

@@ -142,10 +142,10 @@ export const useCreateBlog = () => {
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
+        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
+        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
       });
     },
   });
@@ -204,37 +204,30 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-export const useGetUserPublishedBlogs = (authorId: string) =>
+export const useGetUserBlogs = (
+  authorId: string,
+  isDraft: boolean,
+  searchTerm?: string
+) =>
   useQuery<IBlog[]>({
-    queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
-    queryFn: () =>
-      apiClient
-        .get<IBlog[]>("/blogs", {
-          params: {
-            authorId,
-            limit: 10,
-          },
-        })
-        .then((res) => (res.data as IFetchResponse).data),
-    staleTime: ms("5m"),
-    gcTime: ms("10m"),
-    refetchOnWindowFocus: false, // No need to refetch on window focus
-    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
-    refetchOnReconnect: true, // Refetch on network reconnect
-  });
+    queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft, searchTerm }],
+    queryFn: async () => {
+      const params: IBlogQuery = {
+        authorId,
+        draft: isDraft,
+        limit: 10,
+      };
 
-export const useGetUserDraftBlogs = (authorId: string) =>
-  useQuery<IBlog[]>({
-    queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
-    queryFn: () =>
-      apiClient
+      if (searchTerm) {
+        params["search"] = searchTerm;
+      }
+
+      return await apiClient
         .get<IBlog[]>("/blogs", {
-          params: {
-            authorId,
-            draft: true,
-          },
+          params,
         })
-        .then((res) => (res.data as IFetchResponse).data),
+        .then((res) => (res.data as IFetchResponse).data);
+    },
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
@@ -295,10 +288,10 @@ export const useUpdateBlog = () => {
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
+        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
+        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
       });
     },
   });
@@ -340,10 +333,10 @@ export const useDeleteBlog = () => {
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, authorId],
+        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, authorId],
+        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],

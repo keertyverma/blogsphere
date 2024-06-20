@@ -1,13 +1,18 @@
-import { useGetUserPublishedBlogs } from "@/lib/react-query/queries";
+import { useGetUserBlogs } from "@/lib/react-query/queries";
 import BlogPostCard from "../home/BlogPostCard";
 import BlogPostCardSkeleton from "../home/BlogPostCardSkeleton";
 import AnimationWrapper from "../shared/AnimationWrapper";
 
 interface Props {
   authorId: string;
+  searchTerm?: string;
 }
-const UserPublishedBlogList = ({ authorId }: Props) => {
-  const { data: blogs, isLoading, error } = useGetUserPublishedBlogs(authorId);
+const UserPublishedBlogList = ({ authorId, searchTerm }: Props) => {
+  const {
+    data: blogs,
+    isLoading,
+    error,
+  } = useGetUserBlogs(authorId, false, searchTerm);
 
   if (isLoading) return <BlogPostCardSkeleton />;
 
