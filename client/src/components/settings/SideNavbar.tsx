@@ -1,8 +1,7 @@
 import { useAuthContext } from "@/context/authContext";
 import { useEffect, useRef, useState } from "react";
-import { BsLayoutTextSidebarReverse, BsPencilSquare } from "react-icons/bs";
+import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 import { FaRegUserCircle } from "react-icons/fa";
-import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdOutlineLock } from "react-icons/md";
 import { NavLink, Navigate, Outlet } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -79,34 +78,8 @@ const SideNavbar = () => {
               : "max-md:opacity-0 max-md:pointer-events-none")
           }
         >
-          {/* Dashboard */}
-          <h1 className="text-base md:text-lg text-slate-900 mb-3">
-            Dashboard
-          </h1>
-          <hr className="border-border mb-5 -ml-6 mr-6" />
-          <NavLink
-            to="/editor"
-            onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
-              setPageUrl((e.target as HTMLAnchorElement).innerText)
-            }
-            className="sidebar-link"
-          >
-            <BsPencilSquare className="text-lg" /> Write
-          </NavLink>
-          <NavLink
-            to="/dashboard/blogs"
-            onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
-              setPageUrl((e.target as HTMLAnchorElement).innerText)
-            }
-            className="sidebar-link"
-          >
-            <IoDocumentTextOutline className="text-xl" /> Manage Blogs
-          </NavLink>
-
           {/* Setting */}
-          <h1 className="text-base md:text-lg text-slate-900 mb-3 mt-10">
-            Setting
-          </h1>
+          <h1 className="text-base md:text-lg text-slate-900 mb-3">Setting</h1>
           <hr className="border-border mb-5 -ml-6 mr-6" />
           <NavLink
             to="/settings/edit-profile"

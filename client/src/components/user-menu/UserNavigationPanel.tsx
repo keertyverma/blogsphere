@@ -1,5 +1,8 @@
 import { useAuthContext } from "@/context/authContext";
 import { IUser } from "@/types";
+import { IoSettingsOutline } from "react-icons/io5";
+import { LuUserCircle } from "react-icons/lu";
+import { MdLogout } from "react-icons/md";
 import { Link } from "react-router-dom";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import { Button } from "../ui/button";
@@ -57,15 +60,15 @@ const UserNavigationPanel = () => {
             </MenubarItem>
             <MenubarSeparator />
             <Link to={`/user/${username}`} className="text-muted-foreground">
-              <MenubarItem>Profile</MenubarItem>
-            </Link>
-            <MenubarSeparator />
-            <Link to="/dashboard/blogs" className="text-muted-foreground">
-              <MenubarItem>Dashboard</MenubarItem>
+              <MenubarItem>
+                <LuUserCircle className="text-lg mr-2" /> Profile
+              </MenubarItem>
             </Link>
             <MenubarSeparator />
             <Link to="/settings/edit-profile" className="text-muted-foreground">
-              <MenubarItem>Settings</MenubarItem>
+              <MenubarItem>
+                <IoSettingsOutline className="text-lg mr-2" /> Account settings
+              </MenubarItem>
             </Link>
             <MenubarSeparator />
             <MenubarItem className="py-0" onClick={() => logoutUser()}>
@@ -74,7 +77,7 @@ const UserNavigationPanel = () => {
                 size="sm"
                 className="text-orange-800 p-0 bg-transparent font-medium"
               >
-                Log out
+                <MdLogout className="text-lg mr-2 text-orange-800/90" /> Log out
               </Button>
             </MenubarItem>
           </MenubarContent>
