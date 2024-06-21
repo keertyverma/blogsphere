@@ -1,7 +1,7 @@
 import { useAuthContext } from "@/context/authContext";
 import { useGetUser, useUpdateUserProfile } from "@/lib/react-query/queries";
 import { EditProfileValidation } from "@/lib/validation";
-import { IUpdateUserProfile, IUser, SocialLink } from "@/types";
+import { IUpdateUserProfile, SocialLink } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -35,7 +35,7 @@ const EditProfile = () => {
   const { data: user, isLoading, error } = useGetUser(username);
   const [bioValue, setBioValue] = useState(user?.personalInfo.bio || "");
   const [profileImgUrl, setProfileImgUrl] = useState("");
-  const { token, user: authUser, setUserAndToken } = useAuthContext();
+  const { token } = useAuthContext();
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateUserProfile();
 
@@ -121,24 +121,10 @@ const EditProfile = () => {
       };
 
       // Update profile
-      const updatedUser = await updateProfile({
+      await updateProfile({
         token,
         toUpdate,
       });
-
-      // update authenticated user data in context if fullname and profileImage are updated
-      const { personalInfo } = updatedUser;
-      const toUpdateAuthUser: IUser = {
-        ...(authUser.fullname !== personalInfo.fullname && {
-          fullname: personalInfo.fullname,
-        }),
-        ...(profileImgUrl && {
-          profileImage: personalInfo.profileImage,
-        }),
-      } as IUser;
-      if (Object.keys(toUpdateAuthUser).length) {
-        setUserAndToken({ ...authUser, ...toUpdateAuthUser }, token);
-      }
 
       toast.dismiss(loadingToast);
       toast.success("Profile Updated.👍");

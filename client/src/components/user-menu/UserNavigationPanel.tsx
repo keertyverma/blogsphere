@@ -1,10 +1,12 @@
 import { useAuthContext } from "@/context/authContext";
+import { useGetUser } from "@/lib/react-query/queries";
 import { IUser } from "@/types";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LuUserCircle } from "react-icons/lu";
 import { MdLogout } from "react-icons/md";
 import { Link } from "react-router-dom";
 import AnimationWrapper from "../shared/AnimationWrapper";
+import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 import {
   Menubar,
@@ -17,15 +19,19 @@ import {
 
 const UserNavigationPanel = () => {
   const {
-    user: { fullname, username, profileImage },
+    user: { username },
     setUserAndToken,
     setIsAuthenticated,
   } = useAuthContext();
+  const { data: user, isLoading, error } = useGetUser(username);
 
   const logoutUser = () => {
     setUserAndToken({} as IUser, "");
     setIsAuthenticated(false);
   };
+
+  if (error) console.error(error);
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <AnimationWrapper transition={{ duration: 0.2 }}>
@@ -34,7 +40,7 @@ const UserNavigationPanel = () => {
           <MenubarTrigger className="focus:bg-transparent data-[state=open]:bg-transparent">
             <div className="w-10 h-10 rounded-full border-b border-border shadow-md cursor-pointer">
               <img
-                src={profileImage}
+                src={user?.personalInfo.profileImage}
                 alt={"profile image"}
                 className="object-cover w-full h-full rounded-full"
               />
@@ -45,13 +51,15 @@ const UserNavigationPanel = () => {
               <div className="flex gap-3 p-1">
                 <div className="w-10 h-10 rounded-full shadow-lg">
                   <img
-                    src={profileImage}
+                    src={user?.personalInfo.profileImage}
                     alt={"profile image"}
                     className="object-cover w-full h-full rounded-full"
                   />
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="font-bold capitalize">{fullname}</h2>
+                  <h2 className="font-bold capitalize">
+                    {user?.personalInfo.fullname}
+                  </h2>
                   <p className="font-medium text-muted-foreground">
                     @{username}
                   </p>
