@@ -3,6 +3,7 @@ import { useLikePost } from "@/lib/react-query/queries";
 import { checkIsLiked, formateNumber } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { IoEyeOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
@@ -12,9 +13,15 @@ interface Props {
   blogId: string;
   authorUsername: string;
   likes?: { [key: string]: boolean };
+  readCount?: number;
 }
 
-const BlogInteraction = ({ blogId, authorUsername, likes }: Props) => {
+const BlogInteraction = ({
+  blogId,
+  authorUsername,
+  likes,
+  readCount,
+}: Props) => {
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
   const { user, isAuthenticated, token } = useAuthContext();
   const { mutateAsync: likePost } = useLikePost();
@@ -57,24 +64,35 @@ const BlogInteraction = ({ blogId, authorUsername, likes }: Props) => {
     <>
       <hr className="border-border my-1" />
       <div className="flex flex-row justify-between items-center">
-        <div className="flex-center gap-2 px-2 text-muted-foreground hover:text-slate-600">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="text-lg px-0 bg-transparent hover:bg-transparent text-inherit"
-            onClick={handlePostLikeUnlike}
-            aria-label="like this blog"
-          >
-            {checkIsLiked(blogLikes, user.id) ? (
-              <FaHeart className="text-red-600 hover:text-red-500 like-animation" />
-            ) : (
-              <FaRegHeart />
+        <div className="flex-center gap-3 text-muted-foreground hover:text-slate-600">
+          <div className="flex-center gap-1">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="text-lg px-0 bg-transparent hover:bg-transparent text-inherit"
+              onClick={handlePostLikeUnlike}
+              aria-label="like this blog"
+            >
+              {checkIsLiked(blogLikes, user.id) ? (
+                <FaHeart className="text-red-600 hover:text-red-500 like-animation" />
+              ) : (
+                <FaRegHeart />
+              )}
+            </Button>
+            {Object.keys(blogLikes).length > 0 && (
+              <p className="text-sm">
+                {formateNumber(Object.keys(blogLikes).length)}
+              </p>
             )}
-          </Button>
-          {Object.keys(blogLikes).length > 0 && (
-            <p className="text-sm">
-              {formateNumber(Object.keys(blogLikes).length)}
-            </p>
+          </div>
+
+          {user.username === authorUsername && (
+            <div className="flex-center gap-1">
+              <IoEyeOutline className="text-lg" />
+              {readCount && readCount > 0 && (
+                <p className="text-sm">{formateNumber(readCount)}</p>
+              )}
+            </div>
           )}
         </div>
         {user.username === authorUsername && <ManageBlog blogId={blogId} />}

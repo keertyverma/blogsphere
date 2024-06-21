@@ -49,6 +49,7 @@ const BlogPage = () => {
     content,
     createdAt: publishedAt,
     likes,
+    activity,
   } = blog;
 
   return (
@@ -92,6 +93,7 @@ const BlogPage = () => {
           blogId={blogId}
           authorUsername={username}
           likes={likes}
+          readCount={activity && activity.totalReads}
         />
 
         {/* blog content */}
