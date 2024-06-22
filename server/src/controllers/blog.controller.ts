@@ -382,7 +382,7 @@ const updateLike = async (req: Request, res: Response) => {
       $inc: { "activity.totalLikes": isLiked ? -1 : 1 },
     },
     { new: true }
-  ).select("blogId title activity -_id");
+  ).select("blogId title activity author -_id");
 
   const result: APIResponse = {
     status: APIStatus.SUCCESS,

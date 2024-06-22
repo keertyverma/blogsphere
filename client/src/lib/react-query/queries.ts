@@ -298,6 +298,8 @@ export const useUpdateBlog = () => {
 };
 
 export const useLikePost = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (data: { token: string; blogId: string }) =>
       apiClient
@@ -310,7 +312,17 @@ export const useLikePost = () => {
             },
           }
         )
-        .then((res) => res.data),
+        .then((res) => res.data.data),
+    onSuccess: (data) => {
+      const authorId = data.authorDetails;
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
+      });
+    },
   });
 };
 
