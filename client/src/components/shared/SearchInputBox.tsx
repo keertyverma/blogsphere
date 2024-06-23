@@ -44,7 +44,7 @@ const SearchInputBox = () => {
           className="absolute right-[5%] md:right-5 top-1/2 -translate-y-1/2 text-muted-foreground"
           onClick={handleClear}
         >
-          <IoClose />
+          <IoClose className="text-lg" />
         </Button>
       )}
     </div>

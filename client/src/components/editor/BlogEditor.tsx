@@ -33,7 +33,7 @@ const BlogEditor = () => {
     useUpdateBlog();
   const { token } = useAuthContext();
   const { blogId } = useParams();
-  const { data } = useGetBlog(blogId);
+  const { data, isLoading } = useGetBlog(blogId);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const initializeEditor = (content = {} as OutputData) => {
@@ -56,23 +56,26 @@ const BlogEditor = () => {
     setIsPublishClose(false);
   }, []);
 
+  // set text editor content
   const isReady = useRef(false);
-  // Handle editor initialization
   useEffect(() => {
-    if (!isReady.current) {
-      let blogContent = {} as OutputData;
-      if (blogId && data) {
-        // edit mode
-        blogContent = isPublishClose ? blog.content : data.content;
-      } else if (isPublishClose && blog.content) {
-        // write mode
-        blogContent = blog.content;
+    if (blogId) {
+      // edit mode
+      if (!isReady.current && !isLoading && data) {
+        const blogContent = isPublishClose ? blog.content : data.content;
+        initializeEditor(blogContent);
+        isReady.current = true;
       }
-
-      initializeEditor(blogContent);
-      isReady.current = true;
+    } else {
+      // write mode
+      if (!isReady.current) {
+        const blogContent =
+          isPublishClose && blog.content ? blog.content : ({} as OutputData);
+        initializeEditor(blogContent);
+        isReady.current = true;
+      }
     }
-  }, [blogId, data]);
+  }, [blogId, data, isLoading]);
 
   // Handle textarea auto-resize
   useEffect(() => {
