@@ -1,10 +1,10 @@
 import { useAuthContext } from "@/context/authContext";
-import { useEditorContext } from "@/context/editorContext";
 import {
   useCreateBlog,
   useGetBlog,
   useUpdateBlog,
 } from "@/lib/react-query/queries";
+import { useEditorStore } from "@/store";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
@@ -19,15 +19,18 @@ import { Button } from "../ui/button";
 const BlogEditor = () => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
   const {
-    setIsPublish,
     blog,
-    blog: { title, coverImgURL, tags, description, isDraft },
+    blog: { title, coverImgURL, description, tags, isDraft },
+  } = useEditorStore((s) => ({ blog: s.blog }));
+  const {
+    setIsPublish,
     setBlog,
     textEditor,
     setTextEditor,
     isPublishClose,
     setIsPublishClose,
-  } = useEditorContext();
+  } = useEditorStore();
+
   const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
     useUpdateBlog();
@@ -37,10 +40,6 @@ const BlogEditor = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const initializeEditor = (content = {} as OutputData) => {
-    if (textEditor) {
-      textEditor.clear();
-    }
-
     setTextEditor(
       new EditorJS({
         holder: "text-editor",

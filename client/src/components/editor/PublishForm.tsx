@@ -1,7 +1,7 @@
 import { useAuthContext } from "@/context/authContext";
-import { useEditorContext } from "@/context/editorContext";
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
+import { useEditorStore } from "@/store";
 import { ICreateBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
@@ -30,12 +30,13 @@ const PublishForm = () => {
   const TAG_LIMIT = 10;
   const DESCRIPTION_CHAR_LIMIT = 200;
   const {
-    blog: { title, coverImgURL, description, tags, content, isDraft },
     blog,
-    setIsPublish,
-    setBlog,
-    setIsPublishClose,
-  } = useEditorContext();
+    blog: { title, coverImgURL, description, tags, content, isDraft },
+  } = useEditorStore((s) => ({ blog: s.blog }));
+  const setBlog = useEditorStore((s) => s.setBlog);
+  const setIsPublish = useEditorStore((s) => s.setIsPublish);
+  const setIsPublishClose = useEditorStore((s) => s.setIsPublishClose);
+
   const [titleValue, setTitleValue] = useState(title);
   const [descriptionValue, setDescriptionValue] = useState(description);
   const { token } = useAuthContext();
@@ -76,11 +77,7 @@ const PublishForm = () => {
       updatedBlog.coverImgURL = coverImgURL;
     }
 
-    setBlog((prevBlog) => ({
-      ...prevBlog,
-      ...updatedBlog,
-    }));
-
+    setBlog({ ...blog, ...updatedBlog });
     const publishedBlog = {
       ...updatedBlog,
       isDraft: false,

@@ -1,17 +1,15 @@
+import { useEditorStore } from "@/store";
 import { IoClose } from "react-icons/io5";
 import { Button } from "../ui/button";
-import { useEditorContext } from "@/context/editorContext";
 
 const Tag = ({ name }: { name: string }) => {
-  const {
-    blog: { tags },
-    blog,
-    setBlog,
-  } = useEditorContext();
+  const blog = useEditorStore((s) => s.blog);
+  const setBlog = useEditorStore((s) => s.setBlog);
 
   const handleTagDelete = () => {
-    setBlog({ ...blog, tags: tags.filter((t) => t !== name) });
+    setBlog({ ...blog, tags: blog.tags.filter((t) => t !== name) });
   };
+
   return (
     <div className="relative p-1 md:p-2 mt-2 mr-2 px-4 md:px-4 pr-8 md:pr-10 bg-white rounded-full inline-block hover:bg-opacity-50">
       <p className="outline-none text-[14px]">{name}</p>

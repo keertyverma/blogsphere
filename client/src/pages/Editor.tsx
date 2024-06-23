@@ -1,14 +1,17 @@
 import BlogEditor from "@/components/editor/BlogEditor";
 import PublishForm from "@/components/editor/PublishForm";
 import { useAuthContext } from "@/context/authContext";
-import { INITIAL_BLOG, useEditorContext } from "@/context/editorContext";
+import { INITIAL_BLOG } from "@/context/editorContext";
 import { useGetBlog } from "@/lib/react-query/queries";
+import { useEditorStore } from "@/store";
 import { useEffect } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 const Editor = () => {
   const { isAuthenticated } = useAuthContext();
-  const { isPublish, setIsPublish, setBlog } = useEditorContext();
+  const isPublish = useEditorStore((s) => s.isPublish);
+  const setIsPublish = useEditorStore((s) => s.setIsPublish);
+  const setBlog = useEditorStore((s) => s.setBlog);
 
   const { blogId } = useParams();
   const { data } = useGetBlog(blogId);
