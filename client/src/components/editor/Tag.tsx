@@ -6,7 +6,10 @@ const Tag = ({ name }: { name: string }) => {
   const blog = useEditorStore((s) => s.blog);
   const setBlog = useEditorStore((s) => s.setBlog);
 
-  const handleTagDelete = () => {
+  const handleTagDelete = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
     setBlog({ ...blog, tags: blog.tags.filter((t) => t !== name) });
   };
 
