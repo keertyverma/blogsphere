@@ -1,7 +1,7 @@
 import BlogEditor from "@/components/editor/BlogEditor";
 import PublishForm from "@/components/editor/PublishForm";
 import { useAuthContext } from "@/context/authContext";
-import { INITIAL_BLOG } from "@/context/editorContext";
+import { INITIAL_BLOG } from "@/store";
 import { useGetBlog } from "@/lib/react-query/queries";
 import { useEditorStore } from "@/store";
 import { useEffect } from "react";

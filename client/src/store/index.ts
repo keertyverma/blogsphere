@@ -1,1 +1,1 @@
-export { useEditorStore } from "./editorStore";
+export { useEditorStore, INITIAL_BLOG } from "./editorStore";
