@@ -1,4 +1,4 @@
-import { useAuthContext } from "@/context/authContext";
+import { useAuthStore } from "@/store";
 import { useEffect, useRef, useState } from "react";
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 import { FaRegUserCircle } from "react-icons/fa";
@@ -7,7 +7,7 @@ import { NavLink, Navigate, Outlet } from "react-router-dom";
 import { Button } from "../ui/button";
 
 const SideNavbar = () => {
-  const { isAuthenticated } = useAuthContext();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const page = location.pathname.split("/")[2];
   const [pageUrl, setPageUrl] = useState(page.replace("-", " "));

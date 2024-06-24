@@ -1,5 +1,5 @@
-import { useAuthContext } from "@/context/authContext";
 import { formatDate, formateNumber } from "@/lib/utils";
+import { useAuthStore } from "@/store";
 import { IAuthor, IBlog } from "@/types";
 import { FaRegHeart } from "react-icons/fa";
 import { IoEyeOutline } from "react-icons/io5";
@@ -33,7 +33,7 @@ const BlogPostCard = ({
   const {
     personalInfo: { fullname, username, profileImage },
   } = author;
-  const { user } = useAuthContext();
+  const user = useAuthStore((s) => s.user);
 
   return (
     <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 pt-0 md:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">

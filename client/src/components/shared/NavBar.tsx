@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/context/authContext";
+import { useAuthStore } from "@/store";
 import { BsPencilSquare, BsSearch } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import UserNavigationPanel from "../user-menu/UserNavigationPanel";
@@ -7,7 +7,7 @@ import Logo from "./Logo";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthContext();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
     <nav className="navbar">

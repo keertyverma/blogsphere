@@ -1,16 +1,16 @@
 import BlogContent from "@/components/blog/BlogContent";
 import BlogInteraction from "@/components/blog/BlogInteraction";
 import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
-import { useAuthContext } from "@/context/authContext";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
 import { formatDate } from "@/lib/utils";
+import { useAuthStore } from "@/store";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
 const BlogPage = () => {
   const { blogId } = useParams();
 
-  const { token } = useAuthContext();
+  const token = useAuthStore((s) => s.token);
   const { data: blog, isLoading, error } = useGetBlog(blogId);
   const updateReads = useUpdateReads();
 

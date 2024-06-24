@@ -3,15 +3,15 @@ import GetTrendingBlog from "@/components/home/GetTrendingBlog";
 import TagList from "@/components/home/TagList";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
-import { useAuthContext } from "@/context/authContext";
+import { useAuthStore } from "@/store";
 import { useState } from "react";
 import { IoTrendingUpSharp } from "react-icons/io5";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
-  const { isAuthenticated } = useAuthContext();
   const [selectedTag, setSelectedTag] = useState("all");
 
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   return (

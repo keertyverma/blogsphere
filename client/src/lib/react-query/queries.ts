@@ -1,4 +1,4 @@
-import { useAuthContext } from "@/context/authContext";
+import { useAuthStore } from "@/store";
 import {
   IAuthor,
   IBlog,
@@ -123,9 +123,7 @@ export const useUpdateUserProfile = () => {
 // ----------------- Blog -------------------
 export const useCreateBlog = () => {
   const queryClient = useQueryClient();
-  const {
-    user: { id: authorId, username },
-  } = useAuthContext();
+  const { id: authorId, username } = useAuthStore((s) => s.user);
 
   return useMutation({
     mutationFn: (data: { token: string; blog: object }) =>

@@ -1,7 +1,6 @@
-import { useAuthContext } from "@/context/authContext";
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
-import { useEditorStore } from "@/store";
+import { useAuthStore, useEditorStore } from "@/store";
 import { ICreateBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
@@ -39,7 +38,7 @@ const PublishForm = () => {
 
   const [titleValue, setTitleValue] = useState(title);
   const [descriptionValue, setDescriptionValue] = useState(description);
-  const { token } = useAuthContext();
+  const token = useAuthStore((s) => s.token);
 
   const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
   const { mutateAsync: updatePublishedBlog, isPending: isUpdating } =

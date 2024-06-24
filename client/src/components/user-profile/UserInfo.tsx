@@ -1,5 +1,5 @@
-import { useAuthContext } from "@/context/authContext";
 import { formatDate, formateNumber } from "@/lib/utils";
+import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
 import { LuCalendarDays } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
@@ -12,9 +12,7 @@ interface Props {
 }
 const UserInfo = ({ profileId, user }: Props) => {
   const navigate = useNavigate();
-  const {
-    user: { username },
-  } = useAuthContext();
+  const authUser = useAuthStore((s) => s.user);
 
   const {
     personalInfo: { fullname, profileImage, bio },
@@ -52,7 +50,7 @@ const UserInfo = ({ profileId, user }: Props) => {
           </p>
           <SocialLinks links={socialLinks} />
         </div>
-        {profileId === username && (
+        {profileId === authUser.username && (
           <Button
             size="sm"
             className="rounded-full"

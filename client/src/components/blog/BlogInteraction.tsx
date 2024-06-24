@@ -1,6 +1,6 @@
-import { useAuthContext } from "@/context/authContext";
 import { useLikePost } from "@/lib/react-query/queries";
 import { checkIsLiked, formateNumber } from "@/lib/utils";
+import { useAuthStore } from "@/store";
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoEyeOutline } from "react-icons/io5";
@@ -23,7 +23,10 @@ const BlogInteraction = ({
   readCount,
 }: Props) => {
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
-  const { user, isAuthenticated, token } = useAuthContext();
+  const user = useAuthStore((s) => s.user);
+  const token = useAuthStore((s) => s.token);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
   const { mutateAsync: likePost } = useLikePost();
   const navigate = useNavigate();
 

@@ -1,10 +1,9 @@
-import { useAuthContext } from "@/context/authContext";
 import {
   useCreateBlog,
   useGetBlog,
   useUpdateBlog,
 } from "@/lib/react-query/queries";
-import { useEditorStore } from "@/store";
+import { useAuthStore, useEditorStore } from "@/store";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
@@ -34,7 +33,7 @@ const BlogEditor = () => {
   const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
     useUpdateBlog();
-  const { token } = useAuthContext();
+  const token = useAuthStore((s) => s.token);
   const { blogId } = useParams();
   const { data, isLoading } = useGetBlog(blogId);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

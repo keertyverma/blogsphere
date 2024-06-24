@@ -1,5 +1,6 @@
 import { IAuthor, IBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
+import { mountStoreDevtool } from "simple-zustand-devtools";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -39,3 +40,7 @@ export const useEditorStore = create<EditorStore>()(
     { name: "BlogsphereEditorStore" }
   )
 );
+
+if (process.env.NODE_ENV === "development") {
+  mountStoreDevtool("Editor Store", useEditorStore);
+}

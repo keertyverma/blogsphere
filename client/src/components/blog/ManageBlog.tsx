@@ -1,5 +1,5 @@
-import { useAuthContext } from "@/context/authContext";
 import { useDeleteBlog } from "@/lib/react-query/queries";
+import { useAuthStore } from "@/store";
 import { IBlog } from "@/types";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ interface Props {
 
 const ManageBlog = ({ blogId }: Props) => {
   const { mutateAsync: deleteBlog } = useDeleteBlog();
-  const { token } = useAuthContext();
+  const token = useAuthStore((s) => s.token);
   const navigate = useNavigate();
 
   const handleDelete = async () => {

@@ -1,6 +1,6 @@
-import { useAuthContext } from "@/context/authContext";
 import { useGetUser, useUpdateUserProfile } from "@/lib/react-query/queries";
 import { EditProfileValidation } from "@/lib/validation";
+import { useAuthStore } from "@/store";
 import { IUpdateUserProfile, SocialLink } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -29,13 +29,11 @@ import ProfileUploader from "./ProfileUploader";
 
 const EditProfile = () => {
   const BIO_CHAR_LIMIT = 200;
-  const {
-    user: { username },
-  } = useAuthContext();
+  const { username } = useAuthStore((s) => s.user);
   const { data: user, isLoading, error } = useGetUser(username);
   const [bioValue, setBioValue] = useState(user?.personalInfo.bio || "");
   const [profileImgUrl, setProfileImgUrl] = useState("");
-  const { token } = useAuthContext();
+  const token = useAuthStore((s) => s.token);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateUserProfile();
 

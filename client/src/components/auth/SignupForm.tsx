@@ -25,8 +25,8 @@ import {
 import AnimationWrapper from "../shared/AnimationWrapper";
 import { Input } from "../ui/input";
 
-import { useAuthContext } from "@/context/authContext";
 import { googleAuth } from "@/lib/firebase/Firebase";
+import { useAuthStore } from "@/store";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
@@ -39,7 +39,7 @@ const SignupForm = () => {
     useLoginWithGoogle();
   const isLoading = isCreatingUser || isGoogleLoginUser;
 
-  const { setUserAndToken, setIsAuthenticated } = useAuthContext();
+  const setUserAuth = useAuthStore((s) => s.setUserAuth);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof SignupValidation>>({
@@ -58,8 +58,7 @@ const SignupForm = () => {
       const authToken = userResponse.headers["x-auth-token"];
 
       if (userData && authToken) {
-        setUserAndToken({ ...userData }, authToken);
-        setIsAuthenticated(true);
+        setUserAuth({ ...userData }, authToken);
       }
 
       form.reset();
@@ -94,8 +93,7 @@ const SignupForm = () => {
       const authToken = headers["x-auth-token"];
 
       if (userData && authToken) {
-        setUserAndToken({ ...userData }, authToken);
-        setIsAuthenticated(true);
+        setUserAuth({ ...userData }, authToken);
         navigate("/");
       }
     } catch (error) {

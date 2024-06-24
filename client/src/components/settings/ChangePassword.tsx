@@ -11,8 +11,8 @@ import {
   FormMessage,
 } from "../ui/form";
 
-import { useAuthContext } from "@/context/authContext";
 import { useUpdatePassword } from "@/lib/react-query/queries";
+import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
@@ -23,7 +23,7 @@ import { Input } from "../ui/input";
 
 const ChangePassword = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const { token } = useAuthContext();
+  const token = useAuthStore((s) => s.token);
   const { mutateAsync: updatePassword, isPending: isUpdatingPassword } =
     useUpdatePassword();
   const navigate = useNavigate();

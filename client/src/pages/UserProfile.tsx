@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import UserDraftBlogList from "@/components/user-profile/UserDraftBlogList";
 import UserInfo from "@/components/user-profile/UserInfo";
 import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogList";
-import { useAuthContext } from "@/context/authContext";
 import { useGetUser } from "@/lib/react-query/queries";
+import { useAuthStore } from "@/store";
 import { KeyboardEvent, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
@@ -16,7 +16,7 @@ import { useParams } from "react-router-dom";
 const UserProfile = () => {
   const { username: profileId } = useParams();
   const { data: user, isLoading, error } = useGetUser(profileId);
-  const { user: authUser } = useAuthContext();
+  const authUser = useAuthStore((s) => s.user);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 

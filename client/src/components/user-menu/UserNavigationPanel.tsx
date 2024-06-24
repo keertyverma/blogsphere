@@ -1,6 +1,5 @@
-import { useAuthContext } from "@/context/authContext";
 import { useGetUser } from "@/lib/react-query/queries";
-import { IUser } from "@/types";
+import { useAuthStore } from "@/store";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LuUserCircle } from "react-icons/lu";
 import { MdLogout } from "react-icons/md";
@@ -18,16 +17,12 @@ import {
 } from "../ui/menubar";
 
 const UserNavigationPanel = () => {
-  const {
-    user: { username },
-    setUserAndToken,
-    setIsAuthenticated,
-  } = useAuthContext();
-  const { data: user, isLoading, error } = useGetUser(username);
+  const authUser = useAuthStore((s) => s.user);
+  const clearUserAuth = useAuthStore((s) => s.clearUserAuth);
+  const { data: user, isLoading, error } = useGetUser(authUser.username);
 
   const logoutUser = () => {
-    setUserAndToken({} as IUser, "");
-    setIsAuthenticated(false);
+    clearUserAuth();
   };
 
   if (error) console.error(error);
@@ -61,13 +56,16 @@ const UserNavigationPanel = () => {
                     {user?.personalInfo.fullname}
                   </h2>
                   <p className="font-medium text-muted-foreground">
-                    @{username}
+                    @{authUser.username}
                   </p>
                 </div>
               </div>
             </MenubarItem>
             <MenubarSeparator />
-            <Link to={`/user/${username}`} className="text-muted-foreground">
+            <Link
+              to={`/user/${authUser.username}`}
+              className="text-muted-foreground"
+            >
               <MenubarItem>
                 <LuUserCircle className="text-lg mr-2" /> Profile
               </MenubarItem>

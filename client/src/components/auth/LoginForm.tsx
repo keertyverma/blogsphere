@@ -11,9 +11,9 @@ import {
 } from "../ui/form";
 
 import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/context/authContext";
 import { googleAuth } from "@/lib/firebase/Firebase";
 import { useLogin, useLoginWithGoogle } from "@/lib/react-query/queries";
+import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { FormEvent, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
@@ -21,8 +21,8 @@ import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AnimationWrapper from "../shared/AnimationWrapper";
-import { Input } from "../ui/input";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import { Input } from "../ui/input";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -32,7 +32,7 @@ const LoginForm = () => {
     useLoginWithGoogle();
   const isLoading = isLoginUser || isGoogleLoginUser;
 
-  const { setUserAndToken, setIsAuthenticated } = useAuthContext();
+  const setUserAuth = useAuthStore((s) => s.setUserAuth);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof LoginValidation>>({
@@ -50,8 +50,7 @@ const LoginForm = () => {
       const authToken = userResponse.headers["x-auth-token"];
 
       if (userData && authToken) {
-        setUserAndToken({ ...userData }, authToken);
-        setIsAuthenticated(true);
+        setUserAuth({ ...userData }, authToken);
       }
 
       form.reset();
@@ -103,8 +102,7 @@ const LoginForm = () => {
       const authToken = headers["x-auth-token"];
 
       if (userData && authToken) {
-        setUserAndToken({ ...userData }, authToken);
-        setIsAuthenticated(true);
+        setUserAuth({ ...userData }, authToken);
         navigate("/");
       }
     } catch (error) {
