@@ -3,6 +3,7 @@ import {
   IAuthor,
   IBlog,
   IBlogQuery,
+  IFetchAllResponse,
   IFetchResponse,
   INewUser,
   IUpdateUserProfile,
@@ -40,7 +41,7 @@ export const useLoginWithGoogle = () =>
 export const useUpload = () =>
   useMutation({
     mutationFn: (data: string) =>
-      apiClient.post("/upload", { data }).then((res) => res.data),
+      apiClient.post("/upload", { data }).then((res) => res.data.result),
   });
 
 export const useGetSearchedUsers = (searchTerm: string) =>
@@ -54,7 +55,9 @@ export const useGetSearchedUsers = (searchTerm: string) =>
             limit: 20,
           },
         })
-        .then((res) => (res.data as IFetchResponse).data),
+        .then(
+          (res) => (res.data as unknown as IFetchAllResponse<IAuthor>).results
+        ),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
@@ -68,7 +71,7 @@ export const useGetUser = (profileId?: string) =>
     queryFn: () =>
       apiClient
         .get<IAuthor>(`/users/${profileId}`)
-        .then((res) => (res.data as IFetchResponse).data),
+        .then((res) => (res.data as unknown as IFetchResponse<IAuthor>).result),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
@@ -97,7 +100,7 @@ export const useUpdatePassword = () =>
             },
           }
         )
-        .then((res) => res.data.data),
+        .then((res) => res.data.result),
   });
 
 export const useUpdateUserProfile = () => {
@@ -111,7 +114,7 @@ export const useUpdateUserProfile = () => {
             Authorization: `Bearer ${data.token}`,
           },
         })
-        .then((res) => res.data.data),
+        .then((res) => res.data.result),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, data.personalInfo.username],
@@ -133,7 +136,7 @@ export const useCreateBlog = () => {
             Authorization: `Bearer ${data.token}`,
           },
         })
-        .then((res) => res.data.data),
+        .then((res) => res.data.result),
     onSuccess: () => {
       // refresh authenticated user published and draft blog lists
       queryClient.invalidateQueries({
@@ -149,7 +152,7 @@ export const useCreateBlog = () => {
   });
 };
 
-export const useGetLatestBlog = (tag: string) =>
+export const useGetLatestBlogs = (tag: string) =>
   useQuery<IBlog[]>({
     queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, tag],
     queryFn: async () => {
@@ -158,7 +161,7 @@ export const useGetLatestBlog = (tag: string) =>
 
       return await apiClient
         .get<IBlog[]>("/blogs", { params })
-        .then((res) => (res.data as IFetchResponse).data);
+        .then((res) => (res.data as unknown as IFetchAllResponse).results);
     },
     gcTime: ms("5m"),
     refetchOnWindowFocus: true, // Refetch on window focus
@@ -166,8 +169,8 @@ export const useGetLatestBlog = (tag: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-// Get top 10 trending blog
-export const useGetTrendingBlog = () =>
+// Get top 10 trending blogs
+export const useGetTrendingBlogs = () =>
   useQuery<IBlog[]>({
     queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
     queryFn: () =>
@@ -175,7 +178,7 @@ export const useGetTrendingBlog = () =>
         .get<IBlog[]>("/blogs", {
           params: { ordering: "trending", limit: 10 },
         })
-        .then((res) => (res.data as IFetchResponse).data),
+        .then((res) => (res.data as unknown as IFetchAllResponse).results),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
@@ -194,7 +197,7 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
             limit: 10,
           },
         })
-        .then((res) => (res.data as IFetchResponse).data),
+        .then((res) => (res.data as unknown as IFetchAllResponse).results),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
@@ -224,7 +227,7 @@ export const useGetUserBlogs = (
         .get<IBlog[]>("/blogs", {
           params,
         })
-        .then((res) => (res.data as IFetchResponse).data);
+        .then((res) => (res.data as unknown as IFetchAllResponse).results);
     },
     staleTime: ms("5m"),
     gcTime: ms("10m"),
@@ -239,7 +242,7 @@ export const useGetBlog = (blogId?: string) =>
     queryFn: () =>
       apiClient
         .get<IBlog>(`/blogs/${blogId}`)
-        .then((res) => (res.data as IFetchResponse).data),
+        .then((res) => (res.data as unknown as IFetchResponse).result),
     staleTime: ms("10m"),
     gcTime: ms("30m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
@@ -275,7 +278,7 @@ export const useUpdateBlog = () => {
             Authorization: `Bearer ${data.token}`,
           },
         })
-        .then((res) => res.data.data),
+        .then((res) => res.data.result),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
@@ -310,7 +313,7 @@ export const useLikePost = () => {
             },
           }
         )
-        .then((res) => res.data.data),
+        .then((res) => res.data.result),
     onSuccess: (data) => {
       const authorId = data.authorDetails;
       queryClient.invalidateQueries({
@@ -335,7 +338,7 @@ export const useDeleteBlog = () => {
             Authorization: `Bearer ${data.token}`,
           },
         })
-        .then((res) => res.data.data),
+        .then((res) => res.data.result),
     onSuccess: (data) => {
       const { _id: authorId, personalInfo } = data.authorDetails;
 

@@ -9,7 +9,8 @@ export enum APIStatus {
 export type APIResponse<T = any> = {
   status: APIStatus;
   statusCode: number;
-  data?: T[] | T;
+  results?: T[];
+  result?: T;
   error?: APIError;
 };
 

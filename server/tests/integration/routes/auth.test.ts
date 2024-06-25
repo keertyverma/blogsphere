@@ -143,7 +143,7 @@ describe("/api/v1/auth", () => {
         });
       expect(registerRes.statusCode).toBe(201);
       const { id, fullname, email, username, profileImage } =
-        registerRes.body.data;
+        registerRes.body.result;
       expect(id).not.toBeNull;
 
       const userData = {
@@ -155,7 +155,7 @@ describe("/api/v1/auth", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.status).toBe("success");
 
-      const responseData = res.body.data;
+      const responseData = res.body.result;
       expect(responseData.fullname).toBe(fullname.toLowerCase());
       expect(responseData.email).toBe(email);
       expect(responseData.username).toBe(username);
@@ -288,7 +288,7 @@ describe("/api/v1/auth", () => {
       expect(res.header["x-auth-token"]).not.toBeNull();
 
       // User data in response body
-      const { fullname, email, username } = res.body.data;
+      const { fullname, email, username } = res.body.result;
       expect(fullname).toBe(user.personalInfo.fullname);
       expect(email).toBe(user.personalInfo.email);
       expect(username).toBe(user.personalInfo.username);
@@ -312,7 +312,7 @@ describe("/api/v1/auth", () => {
       expect(res.header["x-auth-token"]).not.toBeNull();
 
       // User data in response body
-      const { fullname, email, username } = res.body.data;
+      const { fullname, email, username } = res.body.result;
       expect(fullname).toBe(user?.personalInfo.fullname);
       expect(email).toBe(user?.personalInfo.email);
       expect(username).toBe(user?.personalInfo.username);

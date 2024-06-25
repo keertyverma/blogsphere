@@ -46,7 +46,7 @@ const LoginForm = () => {
   const handleLogin = async (user: z.infer<typeof LoginValidation>) => {
     try {
       const userResponse = await login(user);
-      const userData = userResponse.data.data;
+      const userData = userResponse.data.result;
       const authToken = userResponse.headers["x-auth-token"];
 
       if (userData && authToken) {
@@ -98,7 +98,7 @@ const LoginForm = () => {
       const accessToken = await googleUser.getIdToken();
       const userResponse = await loginWithGoogle(accessToken);
       const { data, headers } = userResponse;
-      const { data: userData } = data;
+      const { result: userData } = data;
       const authToken = headers["x-auth-token"];
 
       if (userData && authToken) {

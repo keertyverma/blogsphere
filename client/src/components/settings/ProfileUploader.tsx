@@ -18,8 +18,8 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
   const uploadImage = useCallback(
     async (base64EncodedImg: string) => {
       try {
-        const res = await upload(base64EncodedImg);
-        const url = res.data.url;
+        const result = await upload(base64EncodedImg);
+        const url = result.url;
         onUpload(url);
         toast.success("Profile Image Uploaded👍", {
           position: "top-right",

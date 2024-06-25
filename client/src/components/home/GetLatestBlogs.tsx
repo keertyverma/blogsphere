@@ -1,4 +1,4 @@
-import { useGetLatestBlog } from "@/lib/react-query/queries";
+import { useGetLatestBlogs } from "@/lib/react-query/queries";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import BlogPostCard from "./BlogPostCard";
 import BlogPostCardSkeleton from "./BlogPostCardSkeleton";
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const GetLatestBlogs = ({ selectedTag }: Props) => {
-  const { data: blogs, isLoading, error } = useGetLatestBlog(selectedTag);
+  const { data: blogs, isLoading, error } = useGetLatestBlogs(selectedTag);
 
   if (isLoading) return <BlogPostCardSkeleton />;
 

@@ -49,10 +49,10 @@ export const createUser = async (req: Request, res: Response) => {
   await user.save();
   const accessToken = user.generateAuthToken();
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
-    data: {
+    result: {
       id: user.id,
       fullname: user.personalInfo?.fullname,
       email: user.personalInfo?.email,
@@ -62,8 +62,8 @@ export const createUser = async (req: Request, res: Response) => {
   };
   return res
     .header("x-auth-token", accessToken)
-    .status(result.statusCode)
-    .json(result);
+    .status(data.statusCode)
+    .json(data);
 };
 
 export const getUsers = async (req: Request, res: Response) => {
@@ -88,13 +88,13 @@ export const getUsers = async (req: Request, res: Response) => {
       "personalInfo.fullname personalInfo.username personalInfo.profileImage personalInfo.bio -_id"
     );
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: users,
+    results: users,
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 export const getUserById = async (req: Request, res: Response) => {
@@ -110,12 +110,12 @@ export const getUserById = async (req: Request, res: Response) => {
       `User with username = ${username} does not exists!`
     );
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: user,
+    result: user,
   };
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 export const updatePassword = async (req: Request, res: Response) => {
@@ -159,14 +159,14 @@ export const updatePassword = async (req: Request, res: Response) => {
     { new: true }
   );
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: {
+    result: {
       message: "Password is changed successfully",
     },
   };
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 export const updateUser = async (req: Request, res: Response) => {
@@ -204,14 +204,14 @@ export const updateUser = async (req: Request, res: Response) => {
       StatusCodes.INTERNAL_SERVER_ERROR
     );
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: {
+    result: {
       personalInfo: updatedUser.personalInfo,
       socialLinks: updatedUser.socialLinks,
     },
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };

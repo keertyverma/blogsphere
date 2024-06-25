@@ -244,7 +244,7 @@ describe("/api/v1/blogs", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
 
-      const { id } = res.body.data;
+      const { id } = res.body.result;
       expect(id).toBeDefined();
 
       // check user
@@ -300,7 +300,7 @@ describe("/api/v1/blogs", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
 
-      const { id } = res.body.data;
+      const { id } = res.body.result;
       expect(id).toBeDefined();
 
       // check user
@@ -333,10 +333,10 @@ describe("/api/v1/blogs", () => {
       const publishedBlogIds = blogs
         .filter((blog) => blog.isDraft === false)
         .map((blog) => blog.blogId);
-      expect(res.body.data).toHaveLength(publishedBlogIds.length);
+      expect(res.body.results).toHaveLength(publishedBlogIds.length);
 
       // only published blog must be returned
-      res.body.data.forEach((blog: IBlog) => {
+      res.body.results.forEach((blog: IBlog) => {
         expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
       });
     });
@@ -347,10 +347,10 @@ describe("/api/v1/blogs", () => {
       const res = await request(server).get(`${endpoint}?tag=${tag}`);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body.results.length).toBeGreaterThan(0);
 
       // blog with tag must be returned
-      res.body.data.forEach((blog: IBlog) => {
+      res.body.results.forEach((blog: IBlog) => {
         expect(blog.tags).toContain(tag);
       });
     });
@@ -363,9 +363,9 @@ describe("/api/v1/blogs", () => {
       expect(res.statusCode).toBe(200);
 
       // check limit = 2
-      expect(res.body.data).toHaveLength(2);
+      expect(res.body.results).toHaveLength(2);
 
-      const [blog1, blog2] = res.body.data;
+      const [blog1, blog2] = res.body.results;
       expect(blog1.activity.totalLikes).toBeGreaterThan(
         blog2.activity.totalLikes
       );
@@ -380,10 +380,10 @@ describe("/api/v1/blogs", () => {
       const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body.results.length).toBeGreaterThan(0);
 
       // blog with tag must be returned
-      res.body.data.forEach((blog: IBlog) => {
+      res.body.results.forEach((blog: IBlog) => {
         expect(blog.title).toContain(searchTerm);
       });
     });
@@ -396,10 +396,10 @@ describe("/api/v1/blogs", () => {
         .filter((blog) => blog.isDraft === true)
         .map((blog) => blog.blogId);
 
-      expect(res.body.data).toHaveLength(draftBlogIds.length);
+      expect(res.body.results).toHaveLength(draftBlogIds.length);
 
       // only draft blog must be returned
-      res.body.data.forEach((blog: IBlog) => {
+      res.body.results.forEach((blog: IBlog) => {
         expect(draftBlogIds.includes(blog.blogId)).toBe(true);
       });
     });
@@ -437,7 +437,7 @@ describe("/api/v1/blogs", () => {
       const res = await request(server).get(`${endpoint}/${blogId}`);
 
       expect(res.statusCode).toBe(200);
-      const { title, blogId: id } = res.body.data;
+      const { title, blogId: id } = res.body.result;
       expect(id).toBe(blogId);
       expect(title).toBe(existingBlog.title);
     });
@@ -500,7 +500,7 @@ describe("/api/v1/blogs", () => {
       const res = await exec(blogId);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.activity.totalReads).toBe(BlogTotalReads + 1);
+      expect(res.body.result.activity.totalReads).toBe(BlogTotalReads + 1);
 
       // check blog total read increment by 1
       const blog = await Blog.findOne({ blogId });
@@ -602,7 +602,7 @@ describe("/api/v1/blogs", () => {
       const res = await exec(draftBlog.blogId, toUpdate);
 
       expect(res.statusCode).toBe(200);
-      const { blogId, title, isDraft, content } = res.body.data;
+      const { blogId, title, isDraft, content } = res.body.result;
       expect(blogId).toBe(draftBlog.blogId);
       expect(title).toBe(toUpdate.title);
       expect(content.blocks).toHaveLength(1);
@@ -638,7 +638,7 @@ describe("/api/v1/blogs", () => {
       const res = await exec(draftBlog.blogId, toUpdate);
 
       expect(res.statusCode).toBe(200);
-      const { blogId, content, description, tags, isDraft } = res.body.data;
+      const { blogId, content, description, tags, isDraft } = res.body.result;
       expect(blogId).toBe(draftBlog.blogId);
       expect(content.blocks).toHaveLength(1);
       expect(description).toBe(toUpdate.description);
@@ -707,7 +707,7 @@ describe("/api/v1/blogs", () => {
       const {
         blogId,
         activity: { totalLikes },
-      } = res.body.data;
+      } = res.body.result;
       expect(blogId).toBe(publishedBlog.blogId);
       expect(totalLikes).toBe(publishedBlog.activity.totalLikes + 1);
 
@@ -732,7 +732,7 @@ describe("/api/v1/blogs", () => {
       const {
         blogId,
         activity: { totalLikes },
-      } = res.body.data;
+      } = res.body.result;
       expect(blogId).toBe(publishedBlog.blogId);
       expect(totalLikes).toBe(expectedTotalLikes);
 
@@ -816,7 +816,7 @@ describe("/api/v1/blogs", () => {
         blogId,
         isDraft,
         authorDetails: { _id },
-      } = res.body.data;
+      } = res.body.result;
       expect(blogId).toBe(draftBlog?.blogId);
       expect(isDraft).toBe(draftBlog?.isDraft);
 
@@ -856,7 +856,7 @@ describe("/api/v1/blogs", () => {
         blogId,
         isDraft,
         authorDetails: { _id },
-      } = res.body.data;
+      } = res.body.result;
       expect(blogId).toBe(publishedBlogId);
       expect(isDraft).toBe(publishedBlog?.isDraft);
 

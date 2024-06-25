@@ -56,10 +56,10 @@ const authenticateUser = async (req: Request, res: Response) => {
   }
 
   const accessToken = user.generateAuthToken();
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: {
+    result: {
       id: user.id,
       fullname: user.personalInfo?.fullname,
       email: user.personalInfo?.email,
@@ -70,8 +70,8 @@ const authenticateUser = async (req: Request, res: Response) => {
 
   return res
     .header("x-auth-token", accessToken)
-    .status(result.statusCode)
-    .json(result);
+    .status(data.statusCode)
+    .json(data);
 };
 
 const validateGoogleAuth = (req: { accessToken: string }) => {
@@ -127,10 +127,10 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
     }
 
     const userAccessToken = user.generateAuthToken();
-    const result: APIResponse = {
+    const data: APIResponse = {
       status: APIStatus.SUCCESS,
       statusCode: StatusCodes.OK,
-      data: {
+      result: {
         id: user.id,
         fullname: user.personalInfo?.fullname,
         email: user.personalInfo?.email,
@@ -141,8 +141,8 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
 
     return res
       .header("x-auth-token", userAccessToken)
-      .status(result.statusCode)
-      .json(result);
+      .status(data.statusCode)
+      .json(data);
   } catch (error) {
     const err = error as FirebaseAuthError;
     if (err.code === "auth/argument-error") {

@@ -1,10 +1,10 @@
-import { useGetTrendingBlog } from "@/lib/react-query/queries";
+import { useGetTrendingBlogs } from "@/lib/react-query/queries";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import TrendingBlogPost from "./TrendingBlogPost";
 import TrendingBlogPostSkeleton from "./TrendingBlogPostSkeleton";
 
 const GetTrendingBlog = () => {
-  const { data: trendingBlogs, isLoading, error } = useGetTrendingBlog();
+  const { data: trendingBlogs, isLoading, error } = useGetTrendingBlogs();
 
   if (isLoading) return <TrendingBlogPostSkeleton />;
 

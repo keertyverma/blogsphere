@@ -9,7 +9,7 @@
     "dev": "nodemon src/index.ts",
     "test": "jest --verbose --coverage",
     "test:unit": "jest --testPathPattern=tests/unit --verbose --detectOpenHandles",
-    "test:integration": "jest --testPathPattern=tests/integration/routes/blogs.test.ts --verbose --detectOpenHandles",
+    "test:integration": "jest --testPathPattern=tests/integration/routes --verbose --detectOpenHandles",
     "migrate-data": "ts-node src/db/migration.ts"
   },
   "keywords": [],

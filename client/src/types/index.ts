@@ -14,7 +14,13 @@ export type IFetchError = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IFetchResponse<T = any> = {
-  data?: T[] | T;
+  result: T;
+  error?: IFetchError;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IFetchAllResponse<T = any> = {
+  results: T[];
   error?: IFetchError;
 };
 

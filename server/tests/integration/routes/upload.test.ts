@@ -76,7 +76,7 @@ describe("/api/v1/upload", () => {
       const {
         status,
         statusCode,
-        data: { url },
+        result: { url },
       } = res.body;
 
       expect(status).toBe("success");

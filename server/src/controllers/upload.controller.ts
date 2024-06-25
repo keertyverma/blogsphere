@@ -30,13 +30,13 @@ export const uploadSingleImage = async (req: Request, res: Response) => {
 
   const { data } = req.body;
   const uploadedImgURL = await uploadSecurely(data);
-  const result: APIResponse = {
+  const dataRes: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
-    data: {
+    result: {
       url: uploadedImgURL,
     },
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(dataRes.statusCode).json(dataRes);
 };

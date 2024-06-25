@@ -110,15 +110,15 @@ const createBlog = async (req: Request, res: Response) => {
       StatusCodes.INTERNAL_SERVER_ERROR
     );
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
-    data: {
+    result: {
       id: blog.blogId,
     },
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 const validateBlogQueryParams = (query: any) => {
@@ -224,13 +224,13 @@ const getLatestBlogs = async (req: Request, res: Response) => {
     },
   ]);
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: blogs,
+    results: blogs,
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 const getBlogById = async (req: Request, res: Response) => {
@@ -248,13 +248,13 @@ const getBlogById = async (req: Request, res: Response) => {
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: blog.toJSON(),
+    result: blog.toJSON(),
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 const updateReadCount = async (req: Request, res: Response) => {
@@ -286,10 +286,10 @@ const updateReadCount = async (req: Request, res: Response) => {
 
   if (!user) throw new Error("User not found. Unable to update read counts");
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: {
+    result: {
       blogId: blog.blogId,
       title: blog.title,
       author: blog.author,
@@ -297,7 +297,7 @@ const updateReadCount = async (req: Request, res: Response) => {
     },
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 const updateBlogById = async (req: Request, res: Response) => {
@@ -347,13 +347,13 @@ const updateBlogById = async (req: Request, res: Response) => {
       );
   }
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: updatedBlog,
+    result: updatedBlog,
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 const updateLike = async (req: Request, res: Response) => {
@@ -384,13 +384,13 @@ const updateLike = async (req: Request, res: Response) => {
     { new: true }
   ).select("blogId title activity author -_id");
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: updatedBlog,
+    result: updatedBlog,
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 const deleteBlogByBlogId = async (req: Request, res: Response) => {
@@ -422,13 +422,13 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
       StatusCodes.INTERNAL_SERVER_ERROR
     );
 
-  const result: APIResponse = {
+  const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    data: deletedBlog,
+    result: deletedBlog,
   };
 
-  return res.status(result.statusCode).json(result);
+  return res.status(data.statusCode).json(data);
 };
 
 export {

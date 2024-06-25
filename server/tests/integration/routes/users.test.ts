@@ -126,7 +126,7 @@ describe("/api/v1/users", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
       expect(res.header["x-auth-token"]).not.toBeNull();
-      const responseData = res.body.data;
+      const responseData = res.body.result;
 
       const { id, fullname, email, username, profileImage } = responseData;
 
@@ -161,7 +161,7 @@ describe("/api/v1/users", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
       const {
-        data: { id, username },
+        result: { id, username },
       } = res.body;
 
       expect(id).toBeDefined();
@@ -182,15 +182,15 @@ describe("/api/v1/users", () => {
       await User.deleteMany({});
     });
 
-    it("should return all userst", async () => {
+    it("should return all users", async () => {
       const res = await request(server).get(`${endpoint}`);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.length).toBe(2);
+      expect(res.body.results.length).toBe(2);
 
       const usernames = users.map((user) => user.personalInfo.username);
 
-      res.body.data.forEach((user: IUser) => {
+      res.body.results.forEach((user: IUser) => {
         expect(usernames.includes(user.personalInfo.username)).toBe(true);
       });
     });
@@ -201,8 +201,8 @@ describe("/api/v1/users", () => {
       const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.length).toBe(1);
-      const [user] = res.body.data;
+      expect(res.body.results.length).toBe(1);
+      const [user] = res.body.results;
       const [existingUser] = users.filter(
         (user) => user.personalInfo.username === "mickey"
       );
@@ -249,7 +249,7 @@ describe("/api/v1/users", () => {
         personalInfo: { email, password },
         googleAuth,
         blogs,
-      } = res.body.data;
+      } = res.body.result;
 
       const [existingUser] = users.filter(
         (u) => u.personalInfo.username === username
@@ -388,7 +388,7 @@ describe("/api/v1/users", () => {
       });
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.message).toBe("Password is changed successfully");
+      expect(res.body.result.message).toBe("Password is changed successfully");
     });
   });
 
@@ -475,7 +475,7 @@ describe("/api/v1/users", () => {
       const {
         personalInfo: { fullname, bio },
         socialLinks: { youtube, facebook, twitter },
-      } = res.body.data;
+      } = res.body.result;
 
       expect(fullname).toMatch(new RegExp(toUpdate.fullname, "i"));
       expect(bio).toBe(toUpdate.bio);
