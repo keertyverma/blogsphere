@@ -34,11 +34,15 @@ const UserNavigationPanel = () => {
         <MenubarMenu>
           <MenubarTrigger className="focus:bg-transparent data-[state=open]:bg-transparent">
             <div className="w-10 h-10 rounded-full border-b border-border shadow-md cursor-pointer">
-              <img
-                src={user?.personalInfo.profileImage}
-                alt={"profile image"}
-                className="object-cover w-full h-full rounded-full"
-              />
+              {user?.personalInfo.profileImage ? (
+                <img
+                  src={user?.personalInfo.profileImage}
+                  alt="profile image"
+                  className="object-cover w-full h-full rounded-full"
+                />
+              ) : (
+                <LuUserCircle className="text-gray-400 w-full h-full" />
+              )}
             </div>
           </MenubarTrigger>
           <MenubarContent>
