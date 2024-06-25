@@ -326,17 +326,47 @@ describe("/api/v1/blogs", () => {
       await Blog.deleteMany({});
     });
 
-    it("should return all latest published blogs", async () => {
-      const res = await request(server).get(`${endpoint}`);
-
-      expect(res.statusCode).toBe(200);
+    it("should return all latest published blogs from first page", async () => {
       const publishedBlogIds = blogs
         .filter((blog) => blog.isDraft === false)
         .map((blog) => blog.blogId);
-      expect(res.body.results).toHaveLength(publishedBlogIds.length);
+      const res = await request(server).get(`${endpoint}`);
+
+      expect(res.statusCode).toBe(200);
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(publishedBlogIds.length);
+      expect(previous).toBeNull();
+      expect(next).toBeNull();
+      expect(results).toHaveLength(publishedBlogIds.length);
 
       // only published blog must be returned
-      res.body.results.forEach((blog: IBlog) => {
+      results.forEach((blog: IBlog) => {
+        expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
+      });
+    });
+
+    it("should return published blogs from page 2", async () => {
+      const publishedBlogIds = blogs
+        .filter((blog) => blog.isDraft === false)
+        .map((blog) => blog.blogId);
+      const pageSize = 1;
+      const res = await request(server).get(
+        `${endpoint}?draft=false&page=2&pageSize=${pageSize}`
+      );
+
+      expect(res.statusCode).toBe(200);
+
+      // total published blog is 2 and if 'pageSize' is 1 then there will be 2 pages.
+      // page-2 will have 1 blog and there will be no more page so 'next = null'
+      // 'previous' must point to page-1
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(publishedBlogIds.length);
+      expect(previous).toMatch(/draft=false&page=1/i);
+      expect(next).toBeNull();
+      expect(results).toHaveLength(pageSize);
+
+      // only published blog must be returned
+      results.forEach((blog: IBlog) => {
         expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
       });
     });

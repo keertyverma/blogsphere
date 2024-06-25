@@ -127,7 +127,8 @@ const validateBlogQueryParams = (query: any) => {
     search: Joi.string(),
     ordering: Joi.string(),
     authorId: mongoIdValidator.objectId(),
-    limit: Joi.number(),
+    page: Joi.number(),
+    pageSize: Joi.number(),
     draft: Joi.boolean(),
   });
 
@@ -145,9 +146,18 @@ const getLatestBlogs = async (req: Request, res: Response) => {
   // validate request query params
   validateBlogQueryParams(req.query);
 
-  const { tag, authorId, search, ordering, limit, draft } = req.query;
+  const {
+    tag,
+    authorId,
+    search,
+    ordering,
+    page = 1,
+    pageSize = 10,
+    draft,
+  } = req.query;
 
-  const max_limit = limit ? parseInt(limit as string) : 10;
+  const max_limit = parseInt(pageSize as string);
+  const skip = (parseInt(page as string) - 1) * max_limit;
 
   const matchQuery: any = {
     isDraft: draft
@@ -182,6 +192,12 @@ const getLatestBlogs = async (req: Request, res: Response) => {
         }
       : { createdAt: -1 };
 
+  // Get total count of documents for pagination
+  const totalCount = await Blog.countDocuments({
+    ...matchQuery,
+    ...searchQuery,
+  });
+
   const blogs = await Blog.aggregate([
     {
       $match: matchQuery,
@@ -199,6 +215,9 @@ const getLatestBlogs = async (req: Request, res: Response) => {
     },
     {
       $match: searchQuery,
+    },
+    {
+      $skip: skip,
     },
     {
       $sort: sortQuery,
@@ -224,9 +243,33 @@ const getLatestBlogs = async (req: Request, res: Response) => {
     },
   ]);
 
+  const queryParams = new URLSearchParams(req.query as any);
+  queryParams.delete("page");
+  queryParams.delete("pageSize");
+
+  const baseUrlWithQuery = `${req.protocol}://${req.get("host")}${
+    req.baseUrl
+  }?${queryParams.toString()}`;
+
+  const nextPage =
+    skip + max_limit < totalCount
+      ? `${baseUrlWithQuery}&page=${
+          parseInt(page as string) + 1
+        }&pageSize=${max_limit}`
+      : null;
+  const previousPage =
+    skip > 0
+      ? `${baseUrlWithQuery}&page=${
+          parseInt(page as string) - 1
+        }&pageSize=${max_limit}`
+      : null;
+
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
+    count: totalCount,
+    next: nextPage,
+    previous: previousPage,
     results: blogs,
   };
 
