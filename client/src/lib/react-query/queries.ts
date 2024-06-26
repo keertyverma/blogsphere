@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/store";
+import { useAuthStore, useEditorStore } from "@/store";
 import {
   IAuthor,
   IBlog,
@@ -132,6 +132,7 @@ export const useUpdateUserProfile = () => {
 export const useCreateBlog = () => {
   const queryClient = useQueryClient();
   const { id: authorId, username } = useAuthStore((s) => s.user);
+  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
     mutationFn: (data: { token: string; blog: object }) =>
@@ -146,6 +147,11 @@ export const useCreateBlog = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
       });
+      if (selectedTag !== "all") {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+        });
+      }
 
       // refresh authenticated user published and draft blog lists
       queryClient.invalidateQueries({
@@ -289,6 +295,7 @@ export const useUpdateReads = () =>
 
 export const useUpdateBlog = () => {
   const queryClient = useQueryClient();
+  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
     mutationFn: (data: { blogId: string; token: string; blog: object }) =>
@@ -300,13 +307,22 @@ export const useUpdateBlog = () => {
         })
         .then((res) => res.data.result),
     onSuccess: (data) => {
+      // refetch given blog
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
       });
 
+      // refetch latest blog with or without tag filter
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
       });
+      if (selectedTag !== "all") {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+        });
+      }
+
+      // refetch user profile and all blogs
       const { _id: authorId, personalInfo } = data.authorDetails;
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
@@ -352,6 +368,7 @@ export const useLikePost = () => {
 
 export const useDeleteBlog = () => {
   const queryClient = useQueryClient();
+  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
     mutationFn: (data: { blogId: string; token: string }) =>
@@ -364,7 +381,7 @@ export const useDeleteBlog = () => {
         .then((res) => res.data.result),
     onSuccess: (data) => {
       const { _id: authorId, personalInfo } = data.authorDetails;
-
+      // refetch user profile and all blogs
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
       });
@@ -374,9 +391,16 @@ export const useDeleteBlog = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
       });
+
+      // refetch latest blog with or without tag filter
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
       });
+      if (selectedTag !== "all") {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
       });

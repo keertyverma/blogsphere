@@ -1,16 +1,14 @@
+import { useEditorStore } from "@/store";
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 import { Button } from "../ui/button";
 
-interface Props {
-  selectedTag: string;
-  onSelect: (tag: string) => void;
-}
-
-const TagList = ({ selectedTag, onSelect }: Props) => {
+const TagList = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const selectedTag = useEditorStore((s) => s.selectedTag);
+  const setSelectedTag = useEditorStore((s) => s.setSelectedTag);
 
   // TODO: Fetch popular tags from server
   const categories = [
@@ -93,9 +91,9 @@ const TagList = ({ selectedTag, onSelect }: Props) => {
             onClick={() => {
               if (selectedTag === category) {
                 // deselect
-                onSelect("all");
+                setSelectedTag("all");
               } else {
-                onSelect(category);
+                setSelectedTag(category);
               }
             }}
           >

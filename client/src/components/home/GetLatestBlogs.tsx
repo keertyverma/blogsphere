@@ -1,4 +1,5 @@
 import { useGetLatestBlogs } from "@/lib/react-query/queries";
+import { useEditorStore } from "@/store";
 import { IBlog } from "@/types";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -7,11 +8,8 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import BlogPostCard from "./BlogPostCard";
 import BlogPostCardSkeleton from "./BlogPostCardSkeleton";
 
-interface Props {
-  selectedTag: string;
-}
-
-const GetLatestBlogs = ({ selectedTag }: Props) => {
+const GetLatestBlogs = () => {
+  const selectedTag = useEditorStore((s) => s.selectedTag);
   const { data, isLoading, error, fetchNextPage, hasNextPage } =
     useGetLatestBlogs(selectedTag);
 
@@ -27,6 +25,13 @@ const GetLatestBlogs = ({ selectedTag }: Props) => {
     );
   }
 
+  if (fetchedBlogsCount === 0) {
+    return (
+      <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
+        <p>No Blogs found</p>
+      </div>
+    );
+  }
   if (isLoading) {
     return <BlogPostCardSkeleton />;
   }

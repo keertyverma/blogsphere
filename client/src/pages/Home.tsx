@@ -5,12 +5,10 @@ import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
 import { useAuthStore } from "@/store";
 import { useMediaQuery } from "@react-hook/media-query";
-import { useState } from "react";
 import { IoTrendingUpSharp } from "react-icons/io5";
 import { Navigate } from "react-router-dom";
 
 const Home = () => {
-  const [selectedTag, setSelectedTag] = useState("all");
   const isTabletOrLargerScreen = useMediaQuery("(min-width: 768px)");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   if (!isAuthenticated) return <Navigate to="/login" />;
@@ -23,13 +21,10 @@ const Home = () => {
           <>
             <div>
               {/* filter */}
-              <TagList
-                selectedTag={selectedTag}
-                onSelect={(tag: string) => setSelectedTag(tag)}
-              />
+              <TagList />
 
               {/* latest blogs */}
-              <GetLatestBlogs selectedTag={selectedTag} />
+              <GetLatestBlogs />
             </div>
 
             <aside className="min-w-[40%] lg:min-w-[400px] max-w-min max-md:hidden border-l border-border pl-8 pt-3 mt-4">
@@ -49,13 +44,10 @@ const Home = () => {
             {/* In page navigation */}
             <InPageNavigation routes={["home", "trending"]}>
               <>
-                <TagList
-                  selectedTag={selectedTag}
-                  onSelect={(tag: string) => setSelectedTag(tag)}
-                />
+                <TagList />
 
                 {/* latest blogs */}
-                <GetLatestBlogs selectedTag={selectedTag} />
+                <GetLatestBlogs />
               </>
 
               {/* Trending blogs on mobile screen */}

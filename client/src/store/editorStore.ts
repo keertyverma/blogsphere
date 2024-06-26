@@ -22,6 +22,8 @@ interface EditorStore {
   setTextEditor: (textEditor: EditorJS | null) => void;
   isPublishClose: boolean;
   setIsPublishClose: (isPublishClose: boolean) => void;
+  selectedTag: string;
+  setSelectedTag: (selectedTag: string) => void;
 }
 
 // persist state in localStorage by default
@@ -32,10 +34,12 @@ export const useEditorStore = create<EditorStore>()(
       isPublish: false,
       textEditor: null,
       isPublishClose: false,
+      selectedTag: "all",
       setBlog: (blog) => set({ blog }),
       setIsPublish: (isPublish) => set({ isPublish }),
       setTextEditor: (textEditor) => set({ textEditor }),
       setIsPublishClose: (isPublishClose) => set({ isPublishClose }),
+      setSelectedTag: (selectedTag) => set({ selectedTag }),
     }),
     { name: "BlogsphereEditorStore" }
   )
