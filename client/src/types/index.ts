@@ -89,7 +89,8 @@ export interface IBlogQuery {
   search?: string;
   authorId?: string;
   draft?: boolean;
-  limit?: number;
+  pageSize?: number;
+  page?: number;
 }
 
 export interface IUpdateUserProfile {

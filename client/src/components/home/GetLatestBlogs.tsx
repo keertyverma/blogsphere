@@ -1,5 +1,9 @@
 import { useGetLatestBlogs } from "@/lib/react-query/queries";
+import { IBlog } from "@/types";
+import React from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import AnimationWrapper from "../shared/AnimationWrapper";
+import LoadingSpinner from "../ui/LoadingSpinner";
 import BlogPostCard from "./BlogPostCard";
 import BlogPostCardSkeleton from "./BlogPostCardSkeleton";
 
@@ -8,30 +12,45 @@ interface Props {
 }
 
 const GetLatestBlogs = ({ selectedTag }: Props) => {
-  const { data: blogs, isLoading, error } = useGetLatestBlogs(selectedTag);
+  const { data, isLoading, error, fetchNextPage, hasNextPage } =
+    useGetLatestBlogs(selectedTag);
 
-  if (isLoading) return <BlogPostCardSkeleton />;
+  const fetchedBlogsCount =
+    data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
 
-  if (error) console.error(error);
-
-  if (!blogs?.length)
+  if (error) {
+    console.error(error);
     return (
       <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
-        <p>No blogs available</p>
+        <p>Error loading blogs</p>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <BlogPostCardSkeleton />;
+  }
 
   return (
-    <>
-      {blogs.map((blog, index) => (
-        <AnimationWrapper
-          key={index}
-          transition={{ duration: 1, delay: index * 0.1 }}
-        >
-          <BlogPostCard content={blog} author={blog.authorDetails} />
-        </AnimationWrapper>
+    <InfiniteScroll
+      dataLength={fetchedBlogsCount}
+      hasMore={!!hasNextPage}
+      next={() => fetchNextPage()}
+      loader={<LoadingSpinner className="m-auto" />}
+    >
+      {data?.pages.map((page, pageIndex) => (
+        <React.Fragment key={pageIndex}>
+          {page.results.map((blog: IBlog, index: number) => (
+            <AnimationWrapper
+              key={index}
+              transition={{ duration: 1, delay: index * 0.1 }}
+            >
+              <BlogPostCard content={blog} author={blog.authorDetails} />
+            </AnimationWrapper>
+          ))}
+        </React.Fragment>
       ))}
-    </>
+    </InfiniteScroll>
   );
 };
 

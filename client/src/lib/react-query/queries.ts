@@ -8,7 +8,12 @@ import {
   INewUser,
   IUpdateUserProfile,
 } from "@/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import ms from "ms";
 import apiClient from "../api-client";
 import { QUERY_KEYS } from "./queryKeys";
@@ -52,7 +57,7 @@ export const useGetSearchedUsers = (searchTerm: string) =>
         .get<IAuthor[]>("/users", {
           params: {
             search: searchTerm,
-            limit: 20,
+            pageSize: 20,
           },
         })
         .then(
@@ -138,6 +143,10 @@ export const useCreateBlog = () => {
         })
         .then((res) => res.data.result),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
+      });
+
       // refresh authenticated user published and draft blog lists
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
@@ -153,16 +162,27 @@ export const useCreateBlog = () => {
 };
 
 export const useGetLatestBlogs = (tag: string) =>
-  useQuery<IBlog[]>({
+  useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, tag],
-    queryFn: async () => {
-      const params: IBlogQuery = {};
+    queryFn: async ({ pageParam = 1 }) => {
+      const params: IBlogQuery = {
+        draft: false,
+        page: pageParam,
+        pageSize: 10,
+      };
       if (tag !== "all") params.tag = tag;
-
       return await apiClient
-        .get<IBlog[]>("/blogs", { params })
-        .then((res) => (res.data as unknown as IFetchAllResponse).results);
+        .get("/blogs", {
+          params,
+        })
+        .then((res) => res.data);
     },
+    getNextPageParam: (lastPage, allPages) => {
+      // to get next page number
+      return lastPage.next ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
+    staleTime: ms("2m"),
     gcTime: ms("5m"),
     refetchOnWindowFocus: true, // Refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
@@ -176,7 +196,7 @@ export const useGetTrendingBlogs = () =>
     queryFn: () =>
       apiClient
         .get<IBlog[]>("/blogs", {
-          params: { ordering: "trending", limit: 10 },
+          params: { ordering: "trending", pageSize: 10 },
         })
         .then((res) => (res.data as unknown as IFetchAllResponse).results),
     staleTime: ms("5m"),
@@ -194,7 +214,7 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
         .get<IBlog[]>("/blogs", {
           params: {
             search: searchTerm,
-            limit: 10,
+            pageSize: 10,
           },
         })
         .then((res) => (res.data as unknown as IFetchAllResponse).results),
@@ -216,7 +236,7 @@ export const useGetUserBlogs = (
       const params: IBlogQuery = {
         authorId,
         draft: isDraft,
-        limit: 10,
+        pageSize: 10,
       };
 
       if (searchTerm) {
@@ -284,6 +304,9 @@ export const useUpdateBlog = () => {
         queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
+      });
       const { _id: authorId, personalInfo } = data.authorDetails;
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
@@ -350,6 +373,9 @@ export const useDeleteBlog = () => {
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],

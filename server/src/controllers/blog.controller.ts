@@ -216,11 +216,12 @@ const getLatestBlogs = async (req: Request, res: Response) => {
     {
       $match: searchQuery,
     },
-    {
-      $skip: skip,
-    },
+
     {
       $sort: sortQuery,
+    },
+    {
+      $skip: skip,
     },
     {
       $limit: max_limit,
