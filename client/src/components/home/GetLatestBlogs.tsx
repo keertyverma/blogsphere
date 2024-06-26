@@ -13,8 +13,9 @@ const GetLatestBlogs = () => {
   const { data, isLoading, error, fetchNextPage, hasNextPage } =
     useGetLatestBlogs(selectedTag);
 
-  const fetchedBlogsCount =
-    data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
+  if (isLoading) {
+    return <BlogPostCardSkeleton />;
+  }
 
   if (error) {
     console.error(error);
@@ -24,16 +25,14 @@ const GetLatestBlogs = () => {
       </div>
     );
   }
-
+  const fetchedBlogsCount =
+    data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
   if (fetchedBlogsCount === 0) {
     return (
       <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
         <p>No Blogs found</p>
       </div>
     );
-  }
-  if (isLoading) {
-    return <BlogPostCardSkeleton />;
   }
 
   return (

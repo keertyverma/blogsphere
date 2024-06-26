@@ -20,6 +20,9 @@ export type IFetchResponse<T = any> = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IFetchAllResponse<T = any> = {
+  count: number;
+  next: string | null;
+  previous: string | null;
   results: T[];
   error?: IFetchError;
 };

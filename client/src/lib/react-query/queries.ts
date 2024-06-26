@@ -213,17 +213,24 @@ export const useGetTrendingBlogs = () =>
   });
 
 export const useGetSearchedBlogs = (searchTerm: string) =>
-  useQuery<IBlog[]>({
+  useInfiniteQuery<IFetchAllResponse<IBlog>>({
     queryKey: [QUERY_KEYS.GET_SEARCHED_BLOGS, searchTerm],
-    queryFn: () =>
-      apiClient
-        .get<IBlog[]>("/blogs", {
+    queryFn: async ({ pageParam = 1 }) =>
+      await apiClient
+        .get("/blogs", {
           params: {
+            draft: false,
             search: searchTerm,
             pageSize: 10,
+            page: pageParam,
           },
         })
-        .then((res) => (res.data as unknown as IFetchAllResponse).results),
+        .then((res) => res.data),
+    getNextPageParam: (lastPage, allPages) => {
+      // to get next page number
+      return lastPage.next ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus
