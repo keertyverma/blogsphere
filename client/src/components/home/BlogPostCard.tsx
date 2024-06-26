@@ -1,4 +1,4 @@
-import { formatDate, formateNumber } from "@/lib/utils";
+import { formatDate, formateNumber, handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor, IBlog } from "@/types";
 import { FaRegHeart } from "react-icons/fa";
@@ -45,6 +45,7 @@ const BlogPostCard = ({
                 src={profileImage}
                 alt="user profile image"
                 className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
+                onError={handleProfileImgErr}
               />
               <div className="flex-col text-sm ">
                 <p className="text-secondary-foreground font-semibold capitalize">

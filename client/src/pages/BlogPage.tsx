@@ -2,7 +2,7 @@ import BlogContent from "@/components/blog/BlogContent";
 import BlogInteraction from "@/components/blog/BlogInteraction";
 import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
-import { formatDate } from "@/lib/utils";
+import { formatDate, handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -78,6 +78,7 @@ const BlogPage = () => {
               src={profileImage}
               alt="user profile image"
               className="w-10 h-10 object-cover rounded-full border-[1px] border-border"
+              onError={handleProfileImgErr}
             />
             <div className="flex flex-col gap-1">
               <p className="text-base text-secondary-foreground font-medium capitalize">

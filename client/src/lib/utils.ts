@@ -93,3 +93,11 @@ export const isValidUrl = (url: string) => {
     return false;
   }
 };
+
+export const handleProfileImgErr = (
+  e: React.SyntheticEvent<HTMLImageElement, Event>
+) => {
+  // set fallback user profile image
+  const target = e.target as HTMLImageElement;
+  target.src = "/assets/images/default_profile.png";
+};

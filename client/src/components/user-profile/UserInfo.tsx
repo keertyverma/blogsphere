@@ -1,4 +1,4 @@
-import { formatDate, formateNumber } from "@/lib/utils";
+import { formatDate, formateNumber, handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
 import { LuCalendarDays } from "react-icons/lu";
@@ -28,6 +28,7 @@ const UserInfo = ({ profileId, user }: Props) => {
           <img
             src={profileImage}
             className="w-28 h-28 object-cover rounded-full border-2 border-border"
+            onError={handleProfileImgErr}
           />
         </div>
 

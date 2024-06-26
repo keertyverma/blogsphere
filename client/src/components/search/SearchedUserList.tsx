@@ -2,6 +2,7 @@ import { useGetSearchedUsers } from "@/lib/react-query/queries";
 import { Link } from "react-router-dom";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import UserListSkeleton from "./UserListSkeleton";
+import { handleProfileImgErr } from "@/lib/utils";
 
 interface Props {
   searchTerm: string;
@@ -36,6 +37,7 @@ const SearchedUserList = ({ searchTerm }: Props) => {
             src={user.personalInfo.profileImage}
             alt="user profile image"
             className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
+            onError={handleProfileImgErr}
           />
         </div>
 

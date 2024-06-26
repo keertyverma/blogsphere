@@ -1,4 +1,4 @@
-import { formatDate } from "@/lib/utils";
+import { formatDate, handleProfileImgErr } from "@/lib/utils";
 import { IBlog } from "@/types";
 import { Link } from "react-router-dom";
 
@@ -33,6 +33,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
               src={profileImage}
               alt="user profile image"
               className="w-7 h-7 object-cover rounded-full border-[1px] border-border"
+              onError={handleProfileImgErr}
             />
             <div className="flex-col text-sm ">
               <p className="text-secondary-foreground font-semibold capitalize">

@@ -15,6 +15,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "../ui/menubar";
+import { handleProfileImgErr } from "@/lib/utils";
 
 const UserNavigationPanel = () => {
   const authUser = useAuthStore((s) => s.user);
@@ -39,6 +40,7 @@ const UserNavigationPanel = () => {
                   src={user?.personalInfo.profileImage}
                   alt="profile image"
                   className="object-cover w-full h-full rounded-full"
+                  onError={handleProfileImgErr}
                 />
               ) : (
                 <LuUserCircle className="text-gray-400 w-full h-full" />
@@ -53,6 +55,7 @@ const UserNavigationPanel = () => {
                     src={user?.personalInfo.profileImage}
                     alt={"profile image"}
                     className="object-cover w-full h-full rounded-full"
+                    onError={handleProfileImgErr}
                   />
                 </div>
                 <div className="flex flex-col">
