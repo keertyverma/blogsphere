@@ -243,13 +243,14 @@ export const useGetUserBlogs = (
   isDraft: boolean,
   searchTerm?: string
 ) =>
-  useQuery<IBlog[]>({
+  useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft, searchTerm }],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       const params: IBlogQuery = {
         authorId,
         draft: isDraft,
         pageSize: 10,
+        page: pageParam,
       };
 
       if (searchTerm) {
@@ -257,11 +258,16 @@ export const useGetUserBlogs = (
       }
 
       return await apiClient
-        .get<IBlog[]>("/blogs", {
+        .get("/blogs", {
           params,
         })
-        .then((res) => (res.data as unknown as IFetchAllResponse).results);
+        .then((res) => res.data);
     },
+    getNextPageParam: (lastPage, allPages) => {
+      // to get next page number
+      return lastPage.next ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnWindowFocus: false, // No need to refetch on window focus

@@ -41,7 +41,14 @@ export const useEditorStore = create<EditorStore>()(
       setIsPublishClose: (isPublishClose) => set({ isPublishClose }),
       setSelectedTag: (selectedTag) => set({ selectedTag }),
     }),
-    { name: "BlogsphereEditorStore" }
+    {
+      name: "BlogsphereEditorStore",
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.selectedTag = "all";
+        }
+      },
+    }
   )
 );
 
