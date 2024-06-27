@@ -57,7 +57,7 @@ export const useGetSearchedUsers = (searchTerm: string) =>
         .get<IAuthor[]>("/users", {
           params: {
             search: searchTerm,
-            pageSize: 20,
+            pageSize: 50,
           },
         })
         .then(

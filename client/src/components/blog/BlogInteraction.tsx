@@ -3,10 +3,11 @@ import { checkIsLiked, formateNumber } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { IoEyeOutline } from "react-icons/io5";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
+import BlogComment from "./BlogComment";
 import ManageBlog from "./ManageBlog";
 
 interface Props {
@@ -88,10 +89,14 @@ const BlogInteraction = ({
               </p>
             )}
           </div>
+          <div className="flex-center gap-1">
+            <BlogComment />
+            {/* TODO: show total comment count */}
+          </div>
 
           {user.username === authorUsername && (
             <div className="flex-center gap-1">
-              <IoEyeOutline className="text-lg" />
+              <MdOutlineRemoveRedEye className="text-lg" />
               {readCount && readCount > 0 && (
                 <p className="text-sm">{formateNumber(readCount)}</p>
               )}
