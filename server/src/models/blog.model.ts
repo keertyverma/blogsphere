@@ -15,8 +15,11 @@ interface IBlog extends Document {
   activity: {
     totalLikes: number;
     totalReads: number;
+    totalComments: number;
+    totalParentComments: number;
   };
   likes: Map<string, boolean>;
+  comments: string[];
 }
 
 const blogSchema = new Schema(
@@ -55,12 +58,20 @@ const blogSchema = new Schema(
     activity: {
       totalLikes: { type: Number, default: 0 },
       totalReads: { type: Number, default: 0 },
+      totalComments: { type: Number, default: 0 },
+      totalParentComments: { type: Number, default: 0 },
     },
     likes: {
       type: Map,
       of: Boolean,
       default: {},
     },
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   { timestamps: true }
 );
