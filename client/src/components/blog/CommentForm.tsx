@@ -1,24 +1,54 @@
-import { useGetUser } from "@/lib/react-query/queries";
+import { useCreateComment, useGetUser } from "@/lib/react-query/queries";
 import { handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useRef, useState } from "react";
+import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 
-const CommentForm = () => {
+interface Props {
+  blogId?: string;
+  authorId: string;
+}
+
+const CommentForm = ({ blogId, authorId }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [comment, setComment] = useState("");
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
+  const token = useAuthStore((s) => s.token);
+
   const { data: user, isLoading, error } = useGetUser(authUser.username);
+  const {
+    mutateAsync: createComment,
+    isPending: isCreatingComment,
+    error: creatingCommentError,
+  } = useCreateComment();
 
-  if (error) console.error(error);
+  if (!blogId) return null;
   if (isLoading) return <LoadingSpinner />;
+  if (error || creatingCommentError)
+    console.error(error || creatingCommentError);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("comment = ", comment);
+    if (!isAuthenticated) {
+      return toast.error("Please log in to add a comment.");
+    }
 
-    // TODO: reset textarea input
+    try {
+      const commentData = {
+        blogId,
+        blogAuthor: authorId,
+        content: comment,
+      };
+
+      // create comment
+      await createComment({ token, comment: commentData });
+      setComment("");
+    } catch (error) {
+      toast.error("An error occurred. Please try again later.");
+    }
   };
 
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
@@ -34,17 +64,20 @@ const CommentForm = () => {
 
   return (
     <div className="mt-4">
-      <div className="flex gap-3 items-center mb-2">
-        <img
-          src={user?.personalInfo.profileImage}
-          alt="user profile image"
-          className="w-10 h-10 object-cover rounded-full border-[1px] border-border shadow-lg"
-          onError={handleProfileImgErr}
-        />
-        <p className="font-semibold capitalize">
-          {user?.personalInfo.fullname}
-        </p>
-      </div>
+      {isAuthenticated && (
+        <div className="flex gap-3 items-center mb-2">
+          <img
+            src={user?.personalInfo.profileImage}
+            alt="user profile image"
+            className="w-10 h-10 object-cover rounded-full border-[1px] border-border shadow-lg"
+            onError={handleProfileImgErr}
+          />
+          <p className="font-semibold capitalize">
+            {user?.personalInfo.fullname}
+          </p>
+        </div>
+      )}
+
       <form className="flex flex-col gap-1" onSubmit={handleSubmit}>
         <textarea
           ref={textareaRef}
@@ -58,7 +91,7 @@ const CommentForm = () => {
             type="submit"
             size="sm"
             className="rounded-full text-sm capitalize"
-            disabled={!comment}
+            disabled={!comment || isCreatingComment}
           >
             comment
           </Button>

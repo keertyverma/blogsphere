@@ -352,6 +352,7 @@ export const useUpdateBlog = () => {
 
 export const useLikePost = () => {
   const queryClient = useQueryClient();
+  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
     mutationFn: (data: { token: string; blogId: string }) =>
@@ -371,6 +372,16 @@ export const useLikePost = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
       });
+
+      // refetch latest blog with or without tag filter
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
+      });
+      if (selectedTag !== "all") {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+        });
+      }
 
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
@@ -417,6 +428,34 @@ export const useDeleteBlog = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
       });
+    },
+  });
+};
+
+export const useCreateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      token: string;
+      comment: { blogId: string; blogAuthor: string; content: string };
+    }) =>
+      apiClient
+        .post("/blogs/comments", data.comment, {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        })
+        .then((res) => res.data.result),
+    onSuccess: (data) => {
+      const {
+        blog: { blogId },
+      } = data;
+      if (blogId) {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+        });
+      }
     },
   });
 };

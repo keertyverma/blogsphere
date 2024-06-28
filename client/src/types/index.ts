@@ -63,6 +63,7 @@ export interface IAuthor {
 }
 
 export interface IBlog {
+  _id?: string;
   blogId?: string;
   title: string;
   coverImgURL: string;
@@ -74,6 +75,8 @@ export interface IBlog {
   activity?: {
     totalLikes: number;
     totalReads: number;
+    totalComments: number;
+    totalParentComments: number;
   };
   likes?: { [key: string]: boolean };
   isDraft?: boolean;

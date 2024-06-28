@@ -28,7 +28,12 @@ const addActivityFieldToBlog = async () => {
   for (const blog of blogsToUpdate) {
     // Check if the activity field exists, if not, add it
     if (!blog.activity) {
-      blog.activity = { totalLikes: 0, totalReads: 0 };
+      blog.activity = {
+        totalLikes: 0,
+        totalReads: 0,
+        totalComments: 0,
+        totalParentComments: 0,
+      };
       await blog.save();
     }
   }

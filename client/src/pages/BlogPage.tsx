@@ -41,15 +41,17 @@ const BlogPage = () => {
     );
 
   const {
+    _id,
     title,
     coverImgURL,
+    authorDetails,
     authorDetails: {
       personalInfo: { fullname, username, profileImage },
     },
-    content,
-    createdAt: publishedAt,
     likes,
     activity,
+    content,
+    createdAt: publishedAt,
   } = blog;
 
   return (
@@ -91,10 +93,11 @@ const BlogPage = () => {
           </Link>
         </div>
         <BlogInteraction
+          id={_id}
           blogId={blogId}
-          authorUsername={username}
+          author={authorDetails}
           likes={likes}
-          readCount={activity && activity.totalReads}
+          activity={activity}
         />
 
         {/* blog content */}

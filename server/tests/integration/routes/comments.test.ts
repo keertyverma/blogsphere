@@ -197,9 +197,8 @@ describe("/api/v1/blogs", () => {
 
     it("should create comment and update blog's comment", async () => {
       token = `Bearer ${commentedByUser.generateAuthToken()}`;
-      const blogId = blogs[0].id;
       const commentData = {
-        blogId: blogId,
+        blogId: blogs[0].id,
         content: "some thoughtful comment",
         blogAuthor: blogAuthor,
       };
@@ -208,16 +207,11 @@ describe("/api/v1/blogs", () => {
 
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
-      const {
-        id,
-        blogId: blogID,
-        blogAuthor: authorId,
-        commentedBy,
-        content,
-      } = res.body.result;
+
+      const { id, blog, commentedBy, content } = res.body.result;
       expect(id).toBeDefined();
-      expect(blogID).toBe(commentData.blogId);
-      expect(authorId).toBe(commentData.blogAuthor);
+      expect(blog.id).toBe(commentData.blogId);
+      expect(blog.author).toBe(commentData.blogAuthor);
       expect(content).toBe(commentData.content);
       expect(commentedBy).toBe(commentedByUser.id);
 

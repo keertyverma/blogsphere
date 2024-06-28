@@ -284,10 +284,10 @@ const getBlogById = async (req: Request, res: Response) => {
   const blog = await Blog.findOne({ blogId })
     .populate(
       "author",
-      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage _id"
     )
     .select(
-      "blogId title description content coverImgURL tags activity createdAt likes isDraft -_id"
+      "blogId title description content coverImgURL tags activity createdAt likes isDraft _id"
     );
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);

@@ -58,22 +58,25 @@ export const createComment = async (req: Request, res: Response) => {
   // update blog
   // - add comment in 'comments' array
   // - increment 'totalComments' and 'totalParentComments' count by 1
-  await Blog.findByIdAndUpdate(
+  const updatedBlog = await Blog.findByIdAndUpdate(
     blogId,
     {
       $push: { comments: comment._id },
       $inc: { "activity.totalComments": 1, "activity.totalParentComments": 1 },
     },
     { new: true }
-  );
+  ).select("_id blogId author");
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
     result: {
       id: comment.id,
-      blogId: comment.blogId,
-      blogAuthor: comment.blogAuthor,
+      blog: {
+        id: updatedBlog?._id,
+        blogId: updatedBlog?.blogId,
+        author: updatedBlog?.author,
+      },
       commentedBy: comment.commentedBy,
       content: comment.content,
     },
