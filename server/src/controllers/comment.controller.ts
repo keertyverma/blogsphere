@@ -31,7 +31,7 @@ const validateCreateComment = (data: {
 };
 
 export const createComment = async (req: Request, res: Response) => {
-  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:id/comments`);
 
   // check blog id value format
   const { id: blogId } = req.params;
@@ -87,6 +87,89 @@ export const createComment = async (req: Request, res: Response) => {
       commentedBy: comment.commentedBy,
       content: comment.content,
     },
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
+const validateCommentQueryParams = (query: {
+  page?: number;
+  pageSize?: number;
+}) => {
+  const schema = Joi.object({
+    page: Joi.number(),
+    pageSize: Joi.number(),
+  });
+
+  const { error } = schema.validate(query);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+};
+
+export const getAllComments = async (req: Request, res: Response) => {
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:id/comments`);
+
+  // check format of blog id
+  const { id: blogId } = req.params;
+  if (!isValidObjectId(blogId)) {
+    throw new BadRequestError(
+      `Blog id = ${blogId} is not a valid MongoDB ObjectId.`
+    );
+  }
+
+  // validate request query params
+  validateCommentQueryParams(req.query);
+
+  const { page = 1, pageSize = 10 } = req.query;
+  const max_limit = parseInt(pageSize as string);
+  const skip = (parseInt(page as string) - 1) * max_limit;
+  const matchQuery = { blogId, isReply: false };
+
+  // get total comments
+  const totalCount = await Comment.countDocuments(matchQuery);
+
+  const comments = await Comment.find(matchQuery)
+    .populate(
+      "commentedBy",
+      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+    )
+    .sort({ commentedAt: -1 })
+    .skip(skip)
+    .limit(max_limit)
+    .select("-__v");
+
+  // set previous and next url for pagination
+  const queryParams = new URLSearchParams(req.query as any);
+  queryParams.delete("page");
+  queryParams.delete("pageSize");
+
+  const baseUrlWithQuery = `${req.protocol}://${req.get("host")}${
+    req.baseUrl
+  }/${blogId}/comments?${queryParams.toString()}`;
+
+  const nextPage =
+    skip + max_limit < totalCount
+      ? `${baseUrlWithQuery}&page=${
+          parseInt(page as string) + 1
+        }&pageSize=${max_limit}`
+      : null;
+  const previousPage =
+    skip > 0
+      ? `${baseUrlWithQuery}&page=${
+          parseInt(page as string) - 1
+        }&pageSize=${max_limit}`
+      : null;
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    count: totalCount,
+    next: nextPage,
+    previous: previousPage,
+    results: comments,
   };
 
   return res.status(data.statusCode).json(data);

@@ -6,6 +6,7 @@ import request from "supertest";
 import appServer from "../../../src";
 import { Blog, IBlog } from "../../../src/models/blog.model";
 import { IUser, User } from "../../../src/models/user.model";
+import { IComment, Comment } from "../../../src/models/comment.model";
 
 let server: http.Server;
 let endpoint: string = `/api/v1/blogs/:id/comments`;
@@ -96,6 +97,41 @@ const createBlogs = async (userId: string) => {
 
   const blogs = await Blog.create([publishedBlog1, publishedBlog2]);
   return blogs;
+};
+
+const createComments = async (
+  blogId: string,
+  blogAuthor: string,
+  userId: string
+) => {
+  const comments = await Comment.create([
+    {
+      blogId,
+      blogAuthor,
+      commentedBy: userId,
+      content: "Comment 1",
+    },
+    {
+      blogId,
+      blogAuthor,
+      commentedBy: userId,
+      content: "Comment 2",
+    },
+    {
+      blogId,
+      blogAuthor,
+      commentedBy: userId,
+      content: "Comment 3",
+    },
+    {
+      blogId,
+      blogAuthor,
+      commentedBy: userId,
+      content: "Comment 4",
+    },
+  ]);
+
+  return comments;
 };
 
 describe("/api/v1/blogs", () => {
@@ -225,6 +261,97 @@ describe("/api/v1/blogs", () => {
       // 'totalComments' and 'totalParentComments' is increment by 1
       expect(updatedBlog?.activity.totalComments).toBe(1);
       expect(updatedBlog?.activity.totalParentComments).toBe(1);
+    });
+  });
+
+  describe(`GET /:id/comments`, () => {
+    let blogs: IBlog[];
+    let comments: IComment[];
+
+    beforeAll(async () => {
+      const users = await createUsers();
+      const blogAuthor = users[0].id;
+      blogs = await createBlogs(blogAuthor);
+
+      const commentedByUser = users[1];
+      comments = await createComments(
+        blogs[0].id,
+        blogAuthor,
+        commentedByUser.id
+      );
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      await Comment.deleteMany({});
+    });
+
+    it("should return BadRequest-400 if blogId parameter is invalid", async () => {
+      // 'blogId' must be a valid mongodb Object id
+      const blogId = "invalid-blogid";
+
+      const res = await request(server).get(endpoint.replace(":id", blogId));
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: `Blog id = ${blogId} is not a valid MongoDB ObjectId.`,
+      });
+    });
+
+    it("should return BadRequest-400 if query parameter is invalid", async () => {
+      // page parameter must be a number
+      const page = "two";
+      const blogId = new mongoose.Types.ObjectId().toString();
+
+      const res = await request(server).get(
+        `${endpoint}?page=${page}`.replace(":id", blogId)
+      );
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"page" must be a number',
+      });
+    });
+
+    it("should get all comments from first page", async () => {
+      const blogId = blogs[0].id;
+      const pageSize = comments.length;
+
+      const res = await request(server).get(
+        `${endpoint}?pageSize=${pageSize}`.replace(":id", blogId)
+      );
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(comments.length);
+      expect(previous).toBeNull();
+      expect(next).toBeNull();
+      expect(results).toHaveLength(pageSize);
+    });
+
+    it("should get all comments from second page", async () => {
+      const blogId = blogs[0].id;
+      const page = 2;
+      const pageSize = comments.length / 2;
+
+      const res = await request(server).get(
+        `${endpoint}?page=${page}&pageSize=${pageSize}`.replace(":id", blogId)
+      );
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(comments.length);
+      expect(previous).toMatch(/&page=1/i);
+      expect(next).toBeNull();
+      expect(results).toHaveLength(pageSize);
     });
   });
 });
