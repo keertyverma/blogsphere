@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
+import { isValidObjectId } from "mongoose";
 import { Blog } from "../models/blog.model";
 import { Comment } from "../models/comment.model";
 import { APIResponse, APIStatus } from "../types/api-response";
@@ -11,12 +12,10 @@ import { mongoIdValidator } from "../utils/joi-custom-types";
 import logger from "../utils/logger";
 
 const validateCreateComment = (data: {
-  blogId: string;
   blogAuthor: string;
   content: string;
 }) => {
   const schema = Joi.object({
-    blogId: mongoIdValidator.objectId().trim().required(),
     blogAuthor: mongoIdValidator.objectId().trim().required(),
     content: Joi.string().trim().required(),
   });
@@ -34,8 +33,16 @@ const validateCreateComment = (data: {
 export const createComment = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}`);
 
+  // check blog id value format
+  const { id: blogId } = req.params;
+  if (!isValidObjectId(blogId)) {
+    throw new BadRequestError(
+      `Blog id = ${blogId} is not a valid MongoDB ObjectId.`
+    );
+  }
+
   // validate request body
-  const { blogId, blogAuthor, content } = validateCreateComment(req.body);
+  const { blogAuthor, content } = validateCreateComment(req.body);
   const userId = (req.user as JwtPayload).id;
 
   //   check if blog exists

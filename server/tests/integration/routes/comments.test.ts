@@ -8,7 +8,7 @@ import { Blog, IBlog } from "../../../src/models/blog.model";
 import { IUser, User } from "../../../src/models/user.model";
 
 let server: http.Server;
-let endpoint: string = `/api/v1/blogs/comments`;
+let endpoint: string = `/api/v1/blogs/:id/comments`;
 
 const createUsers = async () => {
   const user1 = {
@@ -132,9 +132,9 @@ describe("/api/v1/blogs", () => {
     });
 
     let token: string;
-    const exec = async (payload: any) => {
+    const exec = async (id: string, payload: any) => {
       return await request(server)
-        .post(endpoint)
+        .post(endpoint.replace(":id", id))
         .set("authorization", token)
         .send(payload);
     };
@@ -142,8 +142,9 @@ describe("/api/v1/blogs", () => {
     it("should return UnAuthorized-401 if user is not authorized", async () => {
       // token is not passed in request header
       token = "";
+      const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await exec({ content: "some thoughtful comment" });
+      const res = await exec(blogId, { content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(401);
       expect(res.text).toBe("Access Denied.Token is not provided.");
@@ -151,8 +152,9 @@ describe("/api/v1/blogs", () => {
 
     it("should return BadRequest-400 if token is invalid", async () => {
       token = "invalid token";
+      const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await exec({ content: "some thoughtful comment" });
+      const res = await exec(blogId, { content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(400);
       expect(res.text).toBe("Invalid token.");
@@ -160,10 +162,10 @@ describe("/api/v1/blogs", () => {
 
     it("should return BadRequest-400 if blogId parameter is not of the correct type", async () => {
       token = `Bearer ${commentedByUser.generateAuthToken()}`;
-
       // 'blogId' must be a valid mongodb Object id
-      const res = await exec({
-        blogId: "invalid-blogid",
+      const blogId = "invalid-blogid";
+
+      const res = await exec(blogId, {
         content: "some thoughtful comment",
         blogAuthor: blogAuthor,
       });
@@ -172,7 +174,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"blogId" must be a valid MongoDB ObjectId',
+        details: `Blog id = ${blogId} is not a valid MongoDB ObjectId.`,
       });
     });
 
@@ -181,8 +183,7 @@ describe("/api/v1/blogs", () => {
       // blog with this id does not exists
       const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await exec({
-        blogId,
+      const res = await exec(blogId, {
         content: "some thoughtful comment",
         blogAuthor: blogAuthor,
       });
@@ -197,26 +198,26 @@ describe("/api/v1/blogs", () => {
 
     it("should create comment and update blog's comment", async () => {
       token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      const blogId = blogs[0].id;
       const commentData = {
-        blogId: blogs[0].id,
         content: "some thoughtful comment",
         blogAuthor: blogAuthor,
       };
 
-      const res = await exec(commentData);
+      const res = await exec(blogId, commentData);
 
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
 
       const { id, blog, commentedBy, content } = res.body.result;
       expect(id).toBeDefined();
-      expect(blog.id).toBe(commentData.blogId);
+      expect(blog.id).toBe(blogId);
       expect(blog.author).toBe(commentData.blogAuthor);
       expect(content).toBe(commentData.content);
       expect(commentedBy).toBe(commentedByUser.id);
 
       // check blog
-      const updatedBlog = await Blog.findById(commentData.blogId);
+      const updatedBlog = await Blog.findById(blogId);
       //  comment is added in blog 'comments' array
       expect(updatedBlog).not.toBeNull();
       expect(updatedBlog?.comments.includes(id)).toBeTruthy();

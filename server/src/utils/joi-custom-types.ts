@@ -1,10 +1,5 @@
 import Joi from "joi";
-import { Types } from "mongoose";
-
-// Define a function to validate if a string is in the correct format for MongoDB ObjectId
-const isValidMongoObjectId = (value: string): boolean => {
-  return Types.ObjectId.isValid(value);
-};
+import { isValidObjectId } from "mongoose";
 
 // Create a custom Joi extension to validate MongoDB ObjectIds.
 const mongoIdValidator = Joi.extend((joi) => ({
@@ -14,7 +9,7 @@ const mongoIdValidator = Joi.extend((joi) => ({
     "objectId.invalid": "{{#label}} must be a valid MongoDB ObjectId",
   },
   validate(value, helper) {
-    if (!isValidMongoObjectId(value)) {
+    if (!isValidObjectId(value)) {
       return { value, errors: helper.error("objectId.invalid") };
     }
     return { value };

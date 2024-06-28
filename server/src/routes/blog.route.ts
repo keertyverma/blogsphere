@@ -24,4 +24,4 @@ blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount);
 blogRouter.patch("/:blogId/like", verifyToken, updateLike);
 blogRouter.delete("/:blogId", verifyToken, deleteBlogByBlogId);
 
-blogRouter.route("/comments").post(verifyToken, createComment);
+blogRouter.route("/:id/comments").post(verifyToken, createComment);

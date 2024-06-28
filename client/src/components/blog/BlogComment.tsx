@@ -18,7 +18,7 @@ interface Props {
 const BlogComment = ({ blogId, authorId, totalParentComments = 0 }: Props) => {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger className="outline-none">
         <div className="w-8 h-8 flex-center hover:bg-transparent">
           <FaRegCommentDots className="text-lg" />
         </div>
