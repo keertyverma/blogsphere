@@ -8,6 +8,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import CommentForm from "./CommentForm";
+import CommentList from "./CommentList";
 
 interface Props {
   blogId?: string; // blog _id
@@ -32,7 +33,7 @@ const BlogComment = ({ blogId, authorId, totalParentComments = 0 }: Props) => {
         </DialogHeader>
         <CommentForm blogId={blogId} authorId={authorId} />
         <hr className="my-2" />
-        <div>{/* TODO: show list of comments */}</div>
+        <CommentList blogId={blogId} />
       </DialogContent>
     </Dialog>
   );

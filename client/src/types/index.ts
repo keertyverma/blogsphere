@@ -105,3 +105,17 @@ export interface IUpdateUserProfile {
   profileImage?: string;
   socialLinks?: SocialLink;
 }
+
+export interface IComment {
+  _id: string;
+  blogId: string;
+  blogAuthor: string;
+  content: string;
+  commentedBy: IAuthor;
+  commentedAt: string;
+}
+
+export interface ICommentQuery {
+  pageSize?: number;
+  page?: number;
+}

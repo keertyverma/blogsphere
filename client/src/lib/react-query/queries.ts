@@ -3,6 +3,7 @@ import {
   IAuthor,
   IBlog,
   IBlogQuery,
+  ICommentQuery,
   IFetchAllResponse,
   IFetchResponse,
   INewUser,
@@ -450,13 +451,42 @@ export const useCreateComment = () => {
         .then((res) => res.data.result),
     onSuccess: (data) => {
       const {
-        blog: { blogId },
+        blog: { id, blogId },
       } = data;
       if (blogId) {
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
         });
       }
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id],
+      });
     },
   });
 };
+
+export const useGetComments = (blogId?: string) =>
+  useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, blogId],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params: ICommentQuery = {
+        pageSize: 5,
+        page: pageParam,
+      };
+
+      return await apiClient
+        .get(`/blogs/${blogId}/comments`, { params })
+        .then((res) => res.data);
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      // to get next page number
+      return lastPage.next ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
+    enabled: !!blogId,
+    staleTime: ms("2m"),
+    gcTime: ms("5m"),
+    refetchOnWindowFocus: true, // Refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });
