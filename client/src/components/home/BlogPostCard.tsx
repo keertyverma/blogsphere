@@ -1,4 +1,9 @@
-import { formatDate, formateNumber, handleProfileImgErr } from "@/lib/utils";
+import {
+  formatDate,
+  formateNumber,
+  handleProfileImgErr,
+  getTimeAgo,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor, IBlog } from "@/types";
 import { FaRegHeart } from "react-icons/fa";
@@ -11,6 +16,7 @@ interface Props {
   author: IAuthor;
   showManageBlogButtons?: boolean;
   showReadCount?: boolean;
+  showTimeAgo?: boolean;
 }
 
 const BlogPostCard = ({
@@ -18,6 +24,7 @@ const BlogPostCard = ({
   author,
   showManageBlogButtons = false,
   showReadCount = false,
+  showTimeAgo = false,
 }: Props) => {
   const {
     blogId: id,
@@ -52,7 +59,9 @@ const BlogPostCard = ({
                   {fullname}
                 </p>
                 <p className="text-muted-foreground font-normal">
-                  {publishedAt && formatDate(publishedAt)}
+                  {publishedAt && showTimeAgo
+                    ? getTimeAgo(publishedAt)
+                    : formatDate(publishedAt)}
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { formatDate, handleProfileImgErr } from "@/lib/utils";
+import { handleProfileImgErr, getTimeAgo } from "@/lib/utils";
 import { IComment } from "@/types";
 import DOMPurify from "dompurify";
 import { Link } from "react-router-dom";
@@ -37,7 +37,7 @@ const CommentCard = ({ comment }: Props) => {
               {fullname}
             </p>
             <p className="text-muted-foreground font-normal">
-              {commentedAt && formatDate(commentedAt)}
+              {commentedAt && getTimeAgo(commentedAt)}
             </p>
           </div>
         </div>

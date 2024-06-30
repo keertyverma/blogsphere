@@ -1,4 +1,4 @@
-import { formatDate, handleProfileImgErr } from "@/lib/utils";
+import { handleProfileImgErr, getTimeAgo } from "@/lib/utils";
 import { IBlog } from "@/types";
 import { Link } from "react-router-dom";
 
@@ -40,7 +40,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
                 {fullname}
               </p>
               <p className="text-muted-foreground font-normal">
-                {publishedAt && formatDate(publishedAt)}
+                {publishedAt && getTimeAgo(publishedAt)}
               </p>
             </div>
           </div>

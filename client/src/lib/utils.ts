@@ -1,4 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -23,7 +25,7 @@ export const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const formatDate = (timestamp: string) => {
+export const formatDate = (timestamp?: string) => {
   if (!timestamp) return null;
   // returns data in format -> Month Day, Year  [example -> May 14, 2024]
   const months = [
@@ -44,6 +46,14 @@ export const formatDate = (timestamp: string) => {
   const date = new Date(timestamp);
 
   return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+};
+
+export const getTimeAgo = (timestamp: string) => {
+  if (!timestamp) return null;
+
+  dayjs.extend(relativeTime);
+  const timeAgo = dayjs(timestamp).fromNow();
+  return timeAgo;
 };
 
 export const formateNumber = (num: number): string => {
