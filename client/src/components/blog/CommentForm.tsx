@@ -1,7 +1,7 @@
 import { useCreateComment, useGetUser } from "@/lib/react-query/queries";
 import { handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
@@ -13,6 +13,7 @@ interface Props {
 
 const CommentForm = ({ blogId, authorId }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isTextareaDisabled, setIsTextareaDisabled] = useState(true);
   const [comment, setComment] = useState("");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
@@ -24,6 +25,12 @@ const CommentForm = ({ blogId, authorId }: Props) => {
     isPending: isCreatingComment,
     error: creatingCommentError,
   } = useCreateComment();
+
+  useEffect(() => {
+    // This is done to prevent textrea from auto-focusing and opening keyboard on mobile
+    // Enable the textarea after the component mounts
+    setIsTextareaDisabled(false);
+  }, []);
 
   if (!blogId) return null;
   if (isLoading) return <LoadingSpinner />;
@@ -58,7 +65,7 @@ const CommentForm = ({ blogId, authorId }: Props) => {
   const handleCommentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const input = e.target;
     autoResizeTextarea(input);
-    setComment(e.target.value);
+    setComment(input.value);
   };
 
   return (
@@ -82,8 +89,9 @@ const CommentForm = ({ blogId, authorId }: Props) => {
           ref={textareaRef}
           value={comment}
           placeholder="Share your thoughts..."
-          className="w-full min-h-[70px] resize-none focus:outline-none py-2 !leading-6"
+          className="w-full min-h-[70px] resize-none outline-none py-2 !leading-6"
           onChange={handleCommentChange}
+          disabled={isTextareaDisabled}
         />
         <div className="flex justify-end">
           <Button
