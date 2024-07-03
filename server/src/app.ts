@@ -1,12 +1,17 @@
-import config from "config";
-import express, { Request, Response } from "express";
+import compression from "compression";
 import cors from "cors";
 import "dotenv/config";
+import express, { Request, Response } from "express";
 import helmet from "helmet";
-import compression from "compression";
 
-import { userRouter, authRouter, uploadRouter, blogRouter } from "./routes";
-import { errorHandler, routeNotFoundHandler, rateLimiter } from "./middlewares";
+import { errorHandler, rateLimiter, routeNotFoundHandler } from "./middlewares";
+import {
+  authRouter,
+  blogRouter,
+  commentRouter,
+  uploadRouter,
+  userRouter,
+} from "./routes";
 
 const app = express();
 
@@ -33,6 +38,7 @@ app.use(`${BASE_URL}/users`, userRouter);
 app.use(`${BASE_URL}/auth`, authRouter);
 app.use(`${BASE_URL}/upload`, uploadRouter);
 app.use(`${BASE_URL}/blogs`, blogRouter);
+app.use(`${BASE_URL}/comments`, commentRouter);
 
 // error handler middleware
 app.use(routeNotFoundHandler);

@@ -4,7 +4,7 @@ import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
 import { isValidObjectId } from "mongoose";
 import { Blog } from "../models/blog.model";
-import { Comment } from "../models/comment.model";
+import { Comment, IComment } from "../models/comment.model";
 import { APIResponse, APIStatus } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
 import NotFoundError from "../utils/errors/not-found";
@@ -93,10 +93,12 @@ export const createComment = async (req: Request, res: Response) => {
 };
 
 const validateCommentQueryParams = (query: {
+  blogId?: string;
   page?: number;
   pageSize?: number;
 }) => {
   const schema = Joi.object({
+    blogId: mongoIdValidator.objectId(),
     page: Joi.number(),
     pageSize: Joi.number(),
   });
@@ -112,56 +114,57 @@ const validateCommentQueryParams = (query: {
 export const getAllComments = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:id/comments`);
 
-  // check format of blog id
-  const { id: blogId } = req.params;
-  if (!isValidObjectId(blogId)) {
-    throw new BadRequestError(
-      `Blog id = ${blogId} is not a valid MongoDB ObjectId.`
-    );
-  }
-
   // validate request query params
   validateCommentQueryParams(req.query);
 
-  const { page = 1, pageSize = 10 } = req.query;
+  const { blogId, page = 1, pageSize = 10 } = req.query;
   const max_limit = parseInt(pageSize as string);
   const skip = (parseInt(page as string) - 1) * max_limit;
   const matchQuery = { blogId, isReply: false };
 
-  // get total comments
+  let nextPage: string | null;
+  let previousPage: string | null;
+  let comments: IComment[];
+
+  // get total comments count
   const totalCount = await Comment.countDocuments(matchQuery);
+  if (totalCount === 0) {
+    nextPage = null;
+    previousPage = null;
+    comments = [];
+  } else {
+    comments = await Comment.find(matchQuery)
+      .populate(
+        "commentedBy",
+        "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+      )
+      .sort({ commentedAt: -1 })
+      .skip(skip)
+      .limit(max_limit)
+      .select("-__v");
 
-  const comments = await Comment.find(matchQuery)
-    .populate(
-      "commentedBy",
-      "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
-    )
-    .sort({ commentedAt: -1 })
-    .skip(skip)
-    .limit(max_limit)
-    .select("-__v");
+    // set previous and next url for pagination
+    const queryParams = new URLSearchParams(req.query as any);
+    queryParams.delete("page");
+    queryParams.delete("pageSize");
 
-  // set previous and next url for pagination
-  const queryParams = new URLSearchParams(req.query as any);
-  queryParams.delete("page");
-  queryParams.delete("pageSize");
+    const baseUrlWithQuery = `${req.protocol}://${req.get("host")}${
+      req.baseUrl
+    }/${blogId}/comments?${queryParams.toString()}`;
 
-  const baseUrlWithQuery = `${req.protocol}://${req.get("host")}${
-    req.baseUrl
-  }/${blogId}/comments?${queryParams.toString()}`;
-
-  const nextPage =
-    skip + max_limit < totalCount
-      ? `${baseUrlWithQuery}&page=${
-          parseInt(page as string) + 1
-        }&pageSize=${max_limit}`
-      : null;
-  const previousPage =
-    skip > 0
-      ? `${baseUrlWithQuery}&page=${
-          parseInt(page as string) - 1
-        }&pageSize=${max_limit}`
-      : null;
+    nextPage =
+      skip + max_limit < totalCount
+        ? `${baseUrlWithQuery}&page=${
+            parseInt(page as string) + 1
+          }&pageSize=${max_limit}`
+        : null;
+    previousPage =
+      skip > 0
+        ? `${baseUrlWithQuery}&page=${
+            parseInt(page as string) - 1
+          }&pageSize=${max_limit}`
+        : null;
+  }
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,

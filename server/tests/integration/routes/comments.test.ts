@@ -9,7 +9,7 @@ import { IUser, User } from "../../../src/models/user.model";
 import { IComment, Comment } from "../../../src/models/comment.model";
 
 let server: http.Server;
-let endpoint: string = `/api/v1/blogs/:id/comments`;
+let endpoint: string = `/api/v1/comments`;
 
 const createUsers = async () => {
   const user1 = {
@@ -264,7 +264,7 @@ describe("/api/v1/blogs", () => {
     });
   });
 
-  describe(`GET /:id/comments`, () => {
+  describe(`GET /`, () => {
     let blogs: IBlog[];
     let comments: IComment[];
 
@@ -292,23 +292,23 @@ describe("/api/v1/blogs", () => {
       // 'blogId' must be a valid mongodb Object id
       const blogId = "invalid-blogid";
 
-      const res = await request(server).get(endpoint.replace(":id", blogId));
+      const res = await request(server).get(`${endpoint}?blogId=${blogId}`);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: `Blog id = ${blogId} is not a valid MongoDB ObjectId.`,
+        details: '"blogId" must be a valid MongoDB ObjectId',
       });
     });
 
-    it("should return BadRequest-400 if query parameter is invalid", async () => {
+    it("should return BadRequest-400 if other query parameter is invalid", async () => {
       // page parameter must be a number
       const page = "two";
       const blogId = new mongoose.Types.ObjectId().toString();
 
       const res = await request(server).get(
-        `${endpoint}?page=${page}`.replace(":id", blogId)
+        `${endpoint}?blogId=${blogId}&page=${page}`
       );
 
       expect(res.statusCode).toBe(400);
@@ -324,7 +324,7 @@ describe("/api/v1/blogs", () => {
       const pageSize = comments.length;
 
       const res = await request(server).get(
-        `${endpoint}?pageSize=${pageSize}`.replace(":id", blogId)
+        `${endpoint}?blogId=${blogId}&pageSize=${pageSize}`
       );
 
       expect(res.statusCode).toBe(200);
@@ -342,7 +342,7 @@ describe("/api/v1/blogs", () => {
       const pageSize = comments.length / 2;
 
       const res = await request(server).get(
-        `${endpoint}?page=${page}&pageSize=${pageSize}`.replace(":id", blogId)
+        `${endpoint}?blogId=${blogId}&page=${page}&pageSize=${pageSize}`
       );
 
       expect(res.statusCode).toBe(200);

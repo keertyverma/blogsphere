@@ -1,18 +1,14 @@
 import { Router } from "express";
 import {
   createBlog,
-  getLatestBlogs,
+  deleteBlogByBlogId,
   getBlogById,
-  updateReadCount,
+  getLatestBlogs,
   updateBlogById,
   updateLike,
-  deleteBlogByBlogId,
+  updateReadCount,
 } from "../controllers/blog.controller";
 import { verifyToken } from "../middlewares";
-import {
-  createComment,
-  getAllComments,
-} from "../controllers/comment.controller";
 
 export const blogRouter = Router();
 
@@ -26,8 +22,3 @@ blogRouter.patch("/:blogId", verifyToken, updateBlogById);
 blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount);
 blogRouter.patch("/:blogId/like", verifyToken, updateLike);
 blogRouter.delete("/:blogId", verifyToken, deleteBlogByBlogId);
-
-blogRouter
-  .route("/:id/comments")
-  .get(getAllComments)
-  .post(verifyToken, createComment);

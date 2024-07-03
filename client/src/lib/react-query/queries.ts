@@ -473,9 +473,10 @@ export const useGetComments = (blogId?: string) =>
         pageSize: 5,
         page: pageParam,
       };
+      if (blogId) params.blogId = blogId;
 
       return await apiClient
-        .get(`/blogs/${blogId}/comments`, { params })
+        .get(`/comments`, { params })
         .then((res) => res.data);
     },
     getNextPageParam: (lastPage, allPages) => {

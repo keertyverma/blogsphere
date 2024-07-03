@@ -116,6 +116,7 @@ export interface IComment {
 }
 
 export interface ICommentQuery {
+  blogId?: string; // blog id
   pageSize?: number;
   page?: number;
 }
