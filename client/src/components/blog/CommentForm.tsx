@@ -45,12 +45,13 @@ const CommentForm = ({ blogId, authorId }: Props) => {
 
     try {
       const commentData = {
+        blogId,
         blogAuthor: authorId,
         content: comment,
       };
 
       // create comment
-      await createComment({ blogId, token, comment: commentData });
+      await createComment({ token, comment: commentData });
       setComment("");
     } catch (error) {
       toast.error("An error occurred. Please try again later.");

@@ -438,12 +438,11 @@ export const useCreateComment = () => {
 
   return useMutation({
     mutationFn: (data: {
-      blogId: string;
       token: string;
-      comment: { blogAuthor: string; content: string };
+      comment: { blogId: string; blogAuthor: string; content: string };
     }) =>
       apiClient
-        .post(`/blogs/${data.blogId}/comments`, data.comment, {
+        .post(`/comments`, data.comment, {
           headers: {
             Authorization: `Bearer ${data.token}`,
           },

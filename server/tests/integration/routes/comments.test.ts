@@ -168,9 +168,9 @@ describe("/api/v1/blogs", () => {
     });
 
     let token: string;
-    const exec = async (id: string, payload: any) => {
+    const exec = async (payload: any) => {
       return await request(server)
-        .post(endpoint.replace(":id", id))
+        .post(endpoint)
         .set("authorization", token)
         .send(payload);
     };
@@ -180,7 +180,7 @@ describe("/api/v1/blogs", () => {
       token = "";
       const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await exec(blogId, { content: "some thoughtful comment" });
+      const res = await exec({ blogId, content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(401);
       expect(res.text).toBe("Access Denied.Token is not provided.");
@@ -190,7 +190,7 @@ describe("/api/v1/blogs", () => {
       token = "invalid token";
       const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await exec(blogId, { content: "some thoughtful comment" });
+      const res = await exec({ blogId, content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(400);
       expect(res.text).toBe("Invalid token.");
@@ -201,7 +201,8 @@ describe("/api/v1/blogs", () => {
       // 'blogId' must be a valid mongodb Object id
       const blogId = "invalid-blogid";
 
-      const res = await exec(blogId, {
+      const res = await exec({
+        blogId,
         content: "some thoughtful comment",
         blogAuthor: blogAuthor,
       });
@@ -210,7 +211,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: `Blog id = ${blogId} is not a valid MongoDB ObjectId.`,
+        details: '"blogId" must be a valid MongoDB ObjectId',
       });
     });
 
@@ -219,7 +220,8 @@ describe("/api/v1/blogs", () => {
       // blog with this id does not exists
       const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await exec(blogId, {
+      const res = await exec({
+        blogId,
         content: "some thoughtful comment",
         blogAuthor: blogAuthor,
       });
@@ -236,11 +238,12 @@ describe("/api/v1/blogs", () => {
       token = `Bearer ${commentedByUser.generateAuthToken()}`;
       const blogId = blogs[0].id;
       const commentData = {
+        blogId,
         content: "some thoughtful comment",
         blogAuthor: blogAuthor,
       };
 
-      const res = await exec(blogId, commentData);
+      const res = await exec(commentData);
 
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
