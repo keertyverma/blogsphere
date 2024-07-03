@@ -490,3 +490,34 @@ export const useGetComments = (blogId?: string) =>
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
+
+export const useCreateReply = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      token: string;
+      reply: { commentId: string; content: string };
+    }) =>
+      apiClient
+        .post(`/comments/replies`, data.reply, {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        })
+        .then((res) => res.data.result),
+    onSuccess: (data) => {
+      const {
+        blog: { id, blogId },
+      } = data;
+      if (blogId) {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+        });
+      }
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id],
+      });
+    },
+  });
+};

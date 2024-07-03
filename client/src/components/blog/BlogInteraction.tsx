@@ -18,7 +18,7 @@ interface Props {
   likes?: { [key: string]: boolean };
   activity?: {
     totalReads: number;
-    totalParentComments: number;
+    totalComments: number;
   };
 }
 
@@ -98,11 +98,11 @@ const BlogInteraction = ({ id, blogId, author, likes, activity }: Props) => {
             <BlogComment
               blogId={id}
               authorId={authorId}
-              totalParentComments={activity?.totalParentComments}
+              totalComments={activity?.totalComments}
             />
-            {activity && activity.totalParentComments !== 0 ? (
+            {activity && activity.totalComments !== 0 ? (
               <p className="text-sm mr-1">
-                {formateNumber(activity.totalParentComments)}
+                {formateNumber(activity.totalComments)}
               </p>
             ) : null}
           </div>

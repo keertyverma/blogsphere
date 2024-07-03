@@ -13,10 +13,10 @@ import CommentList from "./CommentList";
 interface Props {
   blogId?: string; // blog _id
   authorId: string;
-  totalParentComments?: number;
+  totalComments?: number;
 }
 
-const BlogComment = ({ blogId, authorId, totalParentComments = 0 }: Props) => {
+const BlogComment = ({ blogId, authorId, totalComments = 0 }: Props) => {
   return (
     <Dialog>
       <DialogTrigger className="outline-none">
@@ -27,7 +27,7 @@ const BlogComment = ({ blogId, authorId, totalParentComments = 0 }: Props) => {
       <DialogContent className="flex flex-col gap-1">
         <DialogHeader className="text-left">
           <DialogTitle className="font-semibold">
-            Comments {`(${totalParentComments})`}
+            Comments {`(${totalComments})`}
           </DialogTitle>
           <DialogDescription />
         </DialogHeader>
