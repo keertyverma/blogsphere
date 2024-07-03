@@ -33,7 +33,7 @@ const validateCreateComment = (data: {
 };
 
 export const createComment = async (req: Request, res: Response) => {
-  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:id/comments`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/`);
 
   // validate request body
   const { blogId, blogAuthor, content } = validateCreateComment(req.body);
@@ -106,7 +106,7 @@ const validateCommentQueryParams = (query: {
 };
 
 export const getAllComments = async (req: Request, res: Response) => {
-  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:id/comments`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/`);
 
   // validate request query params
   validateCommentQueryParams(req.query);
@@ -167,6 +167,83 @@ export const getAllComments = async (req: Request, res: Response) => {
     next: nextPage,
     previous: previousPage,
     results: comments,
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
+const validateCreateReply = (data: { commentId: string; content: string }) => {
+  const schema = Joi.object({
+    commentId: mongoIdValidator.objectId().trim().required(),
+    content: Joi.string().trim().required(),
+  });
+
+  const { error, value: validatedData } = schema.validate(data);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  return validatedData;
+};
+export const createReply = async (req: Request, res: Response) => {
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/`);
+
+  // validate request body
+  const { commentId, content } = validateCreateReply(req.body);
+  const userId = (req.user as JwtPayload).id;
+
+  // find parent comment by id
+  const comment = await Comment.findById(commentId).select(
+    "blogId blogAuthor "
+  );
+  if (!comment)
+    throw new NotFoundError(`comment with id = ${commentId} does not exists.`);
+
+  // create reply
+  const { blogId, blogAuthor } = comment;
+  let reply = new Comment({
+    blogId,
+    blogAuthor,
+    content,
+    commentedBy: userId,
+    isReply: true,
+    parent: commentId,
+  });
+
+  // save reply
+  reply = await reply.save();
+
+  // update parent comment and add reply as it's children
+  await Comment.findByIdAndUpdate(commentId, { $push: { children: reply.id } });
+
+  // update blog
+  // - add comment in 'comments' array
+  // - increment 'totalComments' count by 1
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    blogId,
+    {
+      $push: { comments: reply._id },
+      $inc: { "activity.totalComments": 1 },
+    },
+    { new: true }
+  ).select("_id blogId author");
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.CREATED,
+    result: {
+      id: reply.id,
+      parent: reply.parent,
+      commentedBy: reply.commentedBy,
+      content: reply.content,
+      blog: {
+        id: updatedBlog?._id,
+        blogId: updatedBlog?.blogId,
+        author: updatedBlog?.author,
+      },
+    },
   };
 
   return res.status(data.statusCode).json(data);

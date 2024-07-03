@@ -165,6 +165,7 @@ describe("/api/v1/blogs", () => {
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
+      await Comment.deleteMany({});
     });
 
     let token: string;
@@ -355,6 +356,143 @@ describe("/api/v1/blogs", () => {
       expect(previous).toMatch(/&page=1/i);
       expect(next).toBeNull();
       expect(results).toHaveLength(pageSize);
+    });
+  });
+
+  describe("POST /replies", () => {
+    let blogs: IBlog[];
+    let comments: IComment[];
+    let repliedByUser: any;
+
+    beforeAll(async () => {
+      const users = await createUsers();
+      const blogAuthor = users[0].id;
+      repliedByUser = users[0];
+      blogs = await createBlogs(blogAuthor);
+
+      const commentedByUser = users[1];
+      comments = await createComments(
+        blogs[0].id,
+        blogAuthor,
+        commentedByUser.id
+      );
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      await Comment.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (payload: any) => {
+      return await request(server)
+        .post(`${endpoint}/replies`)
+        .set("authorization", token)
+        .send(payload);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+      const payload = { content: "some thoughtful reply to existing comment" };
+
+      const res = await exec(payload);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return BadRequest-400 if token is invalid", async () => {
+      token = "invalid token";
+      const payload = { content: "some thoughtful reply to existing comment" };
+
+      const res = await exec({ payload });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.text).toBe("Invalid token.");
+    });
+
+    it("should return BadRequest-400 if commentId parameter is not a valid value", async () => {
+      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      // 'commentId' must be a valid mongodb Object id
+      const commentId = "invalid-commentId";
+
+      const res = await exec({
+        commentId,
+        content: "some thoughtful comment",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"commentId" must be a valid MongoDB ObjectId',
+      });
+    });
+
+    it("should return NotFound-404 if parent comment does not exists", async () => {
+      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      // comment with this id does not exists
+      const commentId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec({
+        commentId,
+        content: "some thoughtful reply to existing comment",
+      });
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `comment with id = ${commentId} does not exists.`,
+      });
+    });
+
+    it("should create reply and update comment and blog accordingly", async () => {
+      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      const comment = comments.filter((c) => c.isReply === false)[0];
+      const blog = await Blog.findById(comment.blogId);
+      const totalComment = blog?.activity.totalComments;
+      const totalParentComments = blog?.activity.totalParentComments;
+      const replyData = {
+        commentId: comment.id,
+        content: "some thoughtful reply to existing comment",
+      };
+
+      const res = await exec(replyData);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body.status).toBe("success");
+      const {
+        id,
+        parent,
+        commentedBy,
+        content,
+        blog: { id: blogId },
+      } = res.body.result;
+      expect(id).toBeDefined();
+      expect(parent).toBe(replyData.commentId);
+      expect(content).toBe(replyData.content);
+      expect(commentedBy).toBe(repliedByUser.id);
+
+      // check if reply is added as children of its parent comment
+      const parentComment = await Comment.findById(comment.id);
+      expect(parentComment?.children.includes(id)).toBeTruthy();
+
+      // check blog - reply is added in blog 'comments' array
+      const updatedBlog = await Blog.findById(blogId);
+      expect(updatedBlog).not.toBeUndefined();
+      expect(updatedBlog?.comments.includes(id)).toBeTruthy();
+
+      // 'totalComments' is increment by 1 and `totalParentComments` must be the same count as before.
+      expect(updatedBlog?.activity.totalComments).toBe(
+        (totalComment as number) + 1
+      );
+      expect(updatedBlog?.activity.totalParentComments).toBe(
+        totalParentComments
+      );
     });
   });
 });
