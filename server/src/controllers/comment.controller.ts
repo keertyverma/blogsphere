@@ -90,11 +90,13 @@ const validateCommentQueryParams = (query: {
   blogId?: string;
   page?: number;
   pageSize?: number;
+  commentId?: string;
 }) => {
   const schema = Joi.object({
     blogId: mongoIdValidator.objectId(),
     page: Joi.number(),
     pageSize: Joi.number(),
+    commentId: mongoIdValidator.objectId(),
   });
 
   const { error } = schema.validate(query);
@@ -111,10 +113,14 @@ export const getAllComments = async (req: Request, res: Response) => {
   // validate request query params
   validateCommentQueryParams(req.query);
 
-  const { blogId, page = 1, pageSize = 10 } = req.query;
+  const { blogId, commentId, page = 1, pageSize = 10 } = req.query;
   const max_limit = parseInt(pageSize as string);
   const skip = (parseInt(page as string) - 1) * max_limit;
-  const matchQuery = { blogId, isReply: false };
+  const matchQuery: any = {
+    ...(blogId && { blogId }),
+    isReply: commentId ? true : false,
+    ...(commentId && { parent: commentId }),
+  };
 
   let nextPage: string | null;
   let previousPage: string | null;

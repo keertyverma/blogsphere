@@ -113,10 +113,12 @@ export interface IComment {
   content: string;
   commentedBy: IAuthor;
   commentedAt: string;
+  children: string[];
 }
 
 export interface ICommentQuery {
   blogId?: string; // blog id
   pageSize?: number;
   page?: number;
+  commentId?: string;
 }

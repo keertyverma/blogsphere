@@ -1,22 +1,22 @@
 import { getTimeAgo, handleProfileImgErr } from "@/lib/utils";
 import { IComment } from "@/types";
 import DOMPurify from "dompurify";
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../ui/button";
-import ReplyForm from "./ReplyForm";
+import CommentInteraction from "./CommentInteraction";
 
 interface Props {
   comment: IComment;
+  classname?: string;
 }
-const CommentCard = ({ comment }: Props) => {
-  const [isReplying, setIsReplying] = useState(false);
+const CommentCard = ({ comment, classname }: Props) => {
   const {
     commentedBy: {
       personalInfo: { fullname, username, profileImage },
     },
     commentedAt,
     content,
+    _id,
+    children,
   } = comment;
 
   const formatContent = (content: string) => {
@@ -26,7 +26,7 @@ const CommentCard = ({ comment }: Props) => {
   };
 
   return (
-    <article className="w-full flex flex-col border-b border-border my-2">
+    <article className={`w-full flex flex-col my-2 ${classname}`}>
       {/* user info */}
       <Link to={`/user/${username}`}>
         <div className="flex flex-row gap-3 items-center">
@@ -50,29 +50,7 @@ const CommentCard = ({ comment }: Props) => {
         className="my-2 text-base leading-6 text-accent-foreground"
         dangerouslySetInnerHTML={{ __html: formatContent(content) }}
       ></p>
-
-      {/* reply on comment */}
-      <div className="flex justify-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground text-sm capitalize hover:bg-transparent hover:underline"
-          onClick={() => {
-            setIsReplying(true);
-          }}
-        >
-          reply
-        </Button>
-      </div>
-      {isReplying && (
-        <div className="mb-2 ml-3">
-          <div className="my-1.5 ml-3.5 h-6 w-px border dark:border-slate-600"></div>
-          <ReplyForm
-            commentId={comment._id}
-            onClose={() => setIsReplying(false)}
-          />
-        </div>
-      )}
+      <CommentInteraction commentId={_id} totalReplies={children.length} />
     </article>
   );
 };

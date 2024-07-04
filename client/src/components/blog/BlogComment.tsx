@@ -27,7 +27,7 @@ const BlogComment = ({ blogId, authorId, totalComments = 0 }: Props) => {
       <DialogContent className="flex flex-col gap-1">
         <DialogHeader className="text-left">
           <DialogTitle className="font-semibold">
-            Comments {`(${totalComments})`}
+            Comments {`${totalComments > 0 ? `(${totalComments})` : ""}`}
           </DialogTitle>
           <DialogDescription />
         </DialogHeader>

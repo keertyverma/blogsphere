@@ -8,8 +8,9 @@ import CommentCard from "./CommentCard";
 
 interface Props {
   blogId?: string; // blog _id
+  commentId?: string;
 }
-const CommentList = ({ blogId }: Props) => {
+const CommentList = ({ blogId, commentId }: Props) => {
   const {
     data,
     isLoading,
@@ -17,14 +18,14 @@ const CommentList = ({ blogId }: Props) => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useGetComments(blogId);
+  } = useGetComments(blogId, commentId);
 
   if (isLoading) return <LoadingSpinner className="mt-20 mx-auto" />;
   if (error) console.error(error);
 
   const fetchedCommentsCount =
     data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
-  if (fetchedCommentsCount === 0) {
+  if (fetchedCommentsCount === 0 && !commentId) {
     return (
       <div className="text-base text-muted-foreground font-medium text-center py-10 flex-center flex-col gap-2">
         <p>No comments yet.</p>
@@ -42,7 +43,14 @@ const CommentList = ({ blogId }: Props) => {
               key={index}
               transition={{ duration: 1, delay: index * 0.1 }}
             >
-              <CommentCard comment={comment} />
+              <CommentCard
+                comment={comment}
+                classname={`${
+                  index !== page.results.length - 1
+                    ? "border-b border-border"
+                    : ""
+                }`}
+              />
             </AnimationWrapper>
           ))}
         </React.Fragment>
@@ -51,13 +59,20 @@ const CommentList = ({ blogId }: Props) => {
       {hasNextPage && (
         <div className="flex-center">
           <Button
-            variant="secondary"
+            variant={`${commentId ? "ghost" : "secondary"}`}
             size="sm"
-            className="capitalize rounded-full"
+            className={`rounded-full ${
+              commentId &&
+              "bg-transparent underline text-muted-foreground hover:bg-transparent"
+            }`}
             disabled={isFetchingNextPage}
             onClick={() => fetchNextPage()}
           >
-            {isFetchingNextPage ? "loading..." : "load more"}
+            {isFetchingNextPage
+              ? "loading..."
+              : commentId
+              ? "Load more replies"
+              : "Load more"}
           </Button>
         </div>
       )}

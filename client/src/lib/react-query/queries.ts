@@ -458,21 +458,22 @@ export const useCreateComment = () => {
         });
       }
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id],
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
       });
     },
   });
 };
 
-export const useGetComments = (blogId?: string) =>
+export const useGetComments = (blogId: string = "", commentId: string = "") =>
   useInfiniteQuery({
-    queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, blogId],
+    queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, blogId, commentId],
     queryFn: async ({ pageParam = 1 }) => {
       const params: ICommentQuery = {
-        pageSize: 5,
+        pageSize: 10,
         page: pageParam,
       };
       if (blogId) params.blogId = blogId;
+      if (commentId) params.commentId = commentId;
 
       return await apiClient
         .get(`/comments`, { params })
@@ -483,9 +484,9 @@ export const useGetComments = (blogId?: string) =>
       return lastPage.next ? allPages.length + 1 : undefined;
     },
     initialPageParam: 1,
-    enabled: !!blogId,
     staleTime: ms("2m"),
     gcTime: ms("5m"),
+    enabled: !!blogId || !!commentId,
     refetchOnWindowFocus: true, // Refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
@@ -508,7 +509,8 @@ export const useCreateReply = () => {
         .then((res) => res.data.result),
     onSuccess: (data) => {
       const {
-        blog: { id, blogId },
+        blog: { blogId },
+        parent,
       } = data;
       if (blogId) {
         queryClient.invalidateQueries({
@@ -516,7 +518,7 @@ export const useCreateReply = () => {
         });
       }
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id],
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
       });
     },
   });

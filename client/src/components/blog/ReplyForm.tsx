@@ -9,9 +9,10 @@ import { Button } from "../ui/button";
 interface Props {
   commentId: string;
   onClose: () => void;
+  onSubmit: () => void;
 }
 
-const ReplyForm = ({ commentId, onClose }: Props) => {
+const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const [reply, setReply] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -36,6 +37,7 @@ const ReplyForm = ({ commentId, onClose }: Props) => {
     try {
       // create reply
       await createReply({ token, reply: { commentId, content: reply } });
+      onSubmit();
       setReply("");
       onClose();
     } catch (error) {
