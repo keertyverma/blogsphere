@@ -3,18 +3,20 @@ import mongoose from "mongoose";
 import { Blog } from "../models/blog.model";
 import connectDB from ".";
 import { User } from "../models/user.model";
+import { Comment } from "../models/comment.model";
 
 connectDB();
 
 const db = mongoose.connection;
 db.once("open", async () => {
   try {
-    await addActivityFieldToBlog();
-    await addSocialLinksFieldToUser();
-    //  await updateContentFieldType();
-    await addLikesFieldToBlog();
-    // await deleteCommentsFieldOnBlog();
+    // await addActivityFieldToBlog();
+    // await addSocialLinksFieldToUser();
+    // //  await updateContentFieldType();
+    // await addLikesFieldToBlog();
+    // // await deleteCommentsFieldOnBlog();
 
+    // await updateCommentsSchema();
     console.log("Migration completed successfully!");
   } catch (error) {
     console.error("Migration failed:", error);
@@ -91,4 +93,30 @@ const addLikesFieldToBlog = async () => {
 const deleteCommentsFieldOnBlog = async () => {
   // fing blog where 'comments' field is set and remove it.
   await Blog.updateMany({}, { $unset: { comments: 1 } });
+};
+
+const _incrementalTotalReplies = async (commentId: string) => {
+  const parentComment = await Comment.findByIdAndUpdate(
+    commentId,
+    { $inc: { totalReplies: 1 } },
+    { new: true }
+  );
+
+  if (parentComment?.parent) {
+    await _incrementalTotalReplies(parentComment.parent);
+  }
+};
+
+const updateCommentsSchema = async () => {
+  // Set default value for totalReplies in all documents
+  await Comment.updateMany(
+    { totalReplies: { $exists: false } },
+    { $set: { totalReplies: 0 } }
+  );
+
+  // remove 'children' field
+  await Comment.updateMany(
+    { children: { $exists: true } },
+    { $unset: { children: 1 } }
+  );
 };

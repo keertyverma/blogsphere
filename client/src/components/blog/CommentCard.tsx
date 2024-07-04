@@ -16,7 +16,7 @@ const CommentCard = ({ comment, classname }: Props) => {
     commentedAt,
     content,
     _id,
-    children,
+    totalReplies,
   } = comment;
 
   const formatContent = (content: string) => {
@@ -50,7 +50,7 @@ const CommentCard = ({ comment, classname }: Props) => {
         className="my-2 text-base leading-6 text-accent-foreground"
         dangerouslySetInnerHTML={{ __html: formatContent(content) }}
       ></p>
-      <CommentInteraction commentId={_id} totalReplies={children.length} />
+      <CommentInteraction commentId={_id} totalReplies={totalReplies} />
     </article>
   );
 };

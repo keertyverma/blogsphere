@@ -256,13 +256,8 @@ describe("/api/v1/blogs", () => {
       expect(content).toBe(commentData.content);
       expect(commentedBy).toBe(commentedByUser.id);
 
-      // check blog
+      // check blog - 'totalComments' and 'totalParentComments' is increment by 1
       const updatedBlog = await Blog.findById(blogId);
-      //  comment is added in blog 'comments' array
-      expect(updatedBlog).not.toBeNull();
-      expect(updatedBlog?.comments.includes(id)).toBeTruthy();
-
-      // 'totalComments' and 'totalParentComments' is increment by 1
       expect(updatedBlog?.activity.totalComments).toBe(1);
       expect(updatedBlog?.activity.totalParentComments).toBe(1);
     });
@@ -477,22 +472,60 @@ describe("/api/v1/blogs", () => {
       expect(content).toBe(replyData.content);
       expect(commentedBy).toBe(repliedByUser.id);
 
-      // check if reply is added as children of its parent comment
       const parentComment = await Comment.findById(comment.id);
-      expect(parentComment?.children.includes(id)).toBeTruthy();
+      expect(parentComment?.totalReplies).toBe(1);
 
-      // check blog - reply is added in blog 'comments' array
+      // check blog - 'totalComments' is increment by 1 and `totalParentComments` must be the same count as before.
       const updatedBlog = await Blog.findById(blogId);
-      expect(updatedBlog).not.toBeUndefined();
-      expect(updatedBlog?.comments.includes(id)).toBeTruthy();
-
-      // 'totalComments' is increment by 1 and `totalParentComments` must be the same count as before.
       expect(updatedBlog?.activity.totalComments).toBe(
         (totalComment as number) + 1
       );
       expect(updatedBlog?.activity.totalParentComments).toBe(
         totalParentComments
       );
+    });
+
+    it("should update totalReplies count for all ancestor comment for a given reply", async () => {
+      // create comment
+      const comment: IComment = comments.filter((c) => c.isReply === false)[0];
+      const user1 = comment.commentedBy;
+
+      // create reply to above comment
+      const reply = await Comment.create({
+        blogId: comment.blogId,
+        blogAuthor: comment.blogAuthor,
+        commentedBy: repliedByUser,
+        content: `Reply to ${comment.content}`,
+        isReply: true,
+        parent: comment.id,
+      });
+      comment.totalReplies = 1;
+      await comment.save();
+
+      // create reply by calling api
+      const repliedBy = await User.findById(user1);
+      token = `Bearer ${repliedBy?.generateAuthToken()}`;
+      const replyData = {
+        commentId: reply.id,
+        content: `Reply to ${reply.content}`,
+      };
+
+      const res = await exec(replyData);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body.status).toBe("success");
+
+      const { id, parent, commentedBy, content } = res.body.result;
+      expect(id).toBeDefined();
+      expect(parent).toBe(replyData.commentId);
+      expect(content).toBe(replyData.content);
+      expect(commentedBy).toBe(repliedBy?.id);
+
+      const parentComment = await Comment.findById(reply.id);
+      expect(parentComment?.totalReplies).toBe(1);
+
+      const greatParentComment = await Comment.findById(comment.id);
+      expect(greatParentComment?.totalReplies).toBe(2);
     });
   });
 });

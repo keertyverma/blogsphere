@@ -113,7 +113,7 @@ export interface IComment {
   content: string;
   commentedBy: IAuthor;
   commentedAt: string;
-  children: string[];
+  totalReplies: number;
 }
 
 export interface ICommentQuery {

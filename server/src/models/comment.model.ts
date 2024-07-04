@@ -6,8 +6,8 @@ interface IComment extends Document {
   content: string; // Text of the comment
   commentedBy: string; // ID of the user who made the comment
   isReply: boolean; // Indicates if the comment is a reply to another comment
+  totalReplies: number; // total nested replies count
   parent?: string; // ID of the parent comment, if applicable
-  children: string[]; // Array of child comment IDs
   commentedAt: Date; // Timestamp when the comment was created
   updatedAt: Date; // Timestamp when the comment was last updated
 }
@@ -18,6 +18,7 @@ const commentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Blog",
       required: true,
+      index: true, // Index on blogId field
     },
     blogAuthor: {
       type: Schema.Types.ObjectId,
@@ -40,13 +41,12 @@ const commentSchema = new Schema(
     parent: {
       type: Schema.Types.ObjectId,
       ref: "Comment",
+      index: true, // Index on parent field
     },
-    children: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
-      },
-    ],
+    totalReplies: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: {

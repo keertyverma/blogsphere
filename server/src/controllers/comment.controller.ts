@@ -57,7 +57,6 @@ export const createComment = async (req: Request, res: Response) => {
   comment = await comment.save();
 
   // update blog
-  // - add comment in 'comments' array
   // - increment 'totalComments' and 'totalParentComments' count by 1
   const updatedBlog = await Blog.findByIdAndUpdate(
     blogId,
@@ -192,6 +191,19 @@ const validateCreateReply = (data: { commentId: string; content: string }) => {
 
   return validatedData;
 };
+
+const _incrementalTotalReplies = async (commentId: string) => {
+  const parentComment = await Comment.findByIdAndUpdate(
+    commentId,
+    { $inc: { totalReplies: 1 } },
+    { new: true }
+  );
+
+  if (parentComment?.parent) {
+    await _incrementalTotalReplies(parentComment.parent);
+  }
+};
+
 export const createReply = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/`);
 
@@ -220,11 +232,10 @@ export const createReply = async (req: Request, res: Response) => {
   // save reply
   reply = await reply.save();
 
-  // update parent comment and add reply as it's children
-  await Comment.findByIdAndUpdate(commentId, { $push: { children: reply.id } });
+  // update `totalReplies` of all ancestor comments recursively
+  await _incrementalTotalReplies(commentId);
 
   // update blog
-  // - add comment in 'comments' array
   // - increment 'totalComments' count by 1
   const updatedBlog = await Blog.findByIdAndUpdate(
     blogId,

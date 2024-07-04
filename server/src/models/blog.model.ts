@@ -19,7 +19,6 @@ interface IBlog extends Document {
     totalParentComments: number;
   };
   likes: Map<string, boolean>;
-  comments: string[];
 }
 
 const blogSchema = new Schema(
@@ -28,6 +27,7 @@ const blogSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      index: true,
     },
     title: {
       type: String,
@@ -50,10 +50,12 @@ const blogSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     isDraft: {
       type: Boolean,
       required: true,
+      index: true,
     },
     activity: {
       totalLikes: { type: Number, default: 0 },
