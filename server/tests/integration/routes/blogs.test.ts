@@ -385,15 +385,16 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return latest trending blogs when ordering and limit query parameters are set", async () => {
+    it("should return latest trending blogs when ordering and pageSize query parameters are set", async () => {
+      const pageSize = 2;
       const res = await request(server).get(
-        `${endpoint}?ordering=trending&limit=2`
+        `${endpoint}?ordering=trending&pageSize=${pageSize}`
       );
 
       expect(res.statusCode).toBe(200);
 
-      // check limit = 2
-      expect(res.body.results).toHaveLength(2);
+      // check pageSize = 2
+      expect(res.body.results).toHaveLength(pageSize);
 
       const [blog1, blog2] = res.body.results;
       expect(blog1.activity.totalLikes).toBeGreaterThan(

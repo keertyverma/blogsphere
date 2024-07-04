@@ -13,6 +13,7 @@ db.once("open", async () => {
     await addSocialLinksFieldToUser();
     //  await updateContentFieldType();
     await addLikesFieldToBlog();
+    // await deleteCommentsFieldOnBlog();
 
     console.log("Migration completed successfully!");
   } catch (error) {
@@ -85,4 +86,9 @@ const addLikesFieldToBlog = async () => {
       await blog.save();
     }
   }
+};
+
+const deleteCommentsFieldOnBlog = async () => {
+  // fing blog where 'comments' field is set and remove it.
+  await Blog.updateMany({}, { $unset: { comments: 1 } });
 };

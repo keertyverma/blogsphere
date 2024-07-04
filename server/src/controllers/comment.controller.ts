@@ -62,7 +62,6 @@ export const createComment = async (req: Request, res: Response) => {
   const updatedBlog = await Blog.findByIdAndUpdate(
     blogId,
     {
-      $push: { comments: comment._id },
       $inc: { "activity.totalComments": 1, "activity.totalParentComments": 1 },
     },
     { new: true }
@@ -230,7 +229,6 @@ export const createReply = async (req: Request, res: Response) => {
   const updatedBlog = await Blog.findByIdAndUpdate(
     blogId,
     {
-      $push: { comments: reply._id },
       $inc: { "activity.totalComments": 1 },
     },
     { new: true }

@@ -66,12 +66,6 @@ const blogSchema = new Schema(
       of: Boolean,
       default: {},
     },
-    comments: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
-      },
-    ],
   },
   { timestamps: true }
 );
