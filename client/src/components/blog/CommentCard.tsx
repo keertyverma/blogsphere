@@ -11,12 +11,14 @@ interface Props {
 const CommentCard = ({ comment, classname }: Props) => {
   const {
     commentedBy: {
+      _id: commentedByUserId,
       personalInfo: { fullname, username, profileImage },
     },
     commentedAt,
     content,
     _id,
     totalReplies,
+    blogAuthor,
   } = comment;
 
   const formatContent = (content: string) => {
@@ -37,9 +39,17 @@ const CommentCard = ({ comment, classname }: Props) => {
             onError={handleProfileImgErr}
           />
           <div className="flex-col text-sm ">
-            <p className="text-secondary-foreground font-semibold capitalize">
-              {fullname}
-            </p>
+            <div className="flex gap-2">
+              <p className="text-secondary-foreground font-semibold capitalize">
+                {fullname}
+              </p>
+              {commentedByUserId === blogAuthor && (
+                <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                  Author
+                </span>
+              )}
+            </div>
+
             <p className="text-muted-foreground font-normal">
               {commentedAt && getTimeAgo(commentedAt)}
             </p>

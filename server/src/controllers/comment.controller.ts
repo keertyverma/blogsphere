@@ -135,7 +135,7 @@ export const getAllComments = async (req: Request, res: Response) => {
     comments = await Comment.find(matchQuery)
       .populate(
         "commentedBy",
-        "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id"
+        "personalInfo.fullname personalInfo.username personalInfo.profileImage _id"
       )
       .sort({ commentedAt: -1 })
       .skip(skip)
