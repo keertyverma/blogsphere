@@ -30,8 +30,17 @@ const createUsers = async () => {
       profileImage: "http://example-img.png",
     },
   };
+  const user3 = {
+    personalInfo: {
+      fullname: "Minnie Mouse",
+      password: "Clubhouse123",
+      email: "minnie@test.com",
+      username: "minnie",
+      profileImage: "http://example-img.png",
+    },
+  };
 
-  const users = await User.create([user1, user2]);
+  const users = await User.create([user1, user2, user3]);
   return users;
 };
 
@@ -526,6 +535,333 @@ describe("/api/v1/blogs", () => {
 
       const greatParentComment = await Comment.findById(comment.id);
       expect(greatParentComment?.totalReplies).toBe(2);
+    });
+  });
+
+  describe("DELETE /:id", () => {
+    let blogs: IBlog[];
+    let users: IUser[];
+    let blogAuthor: string;
+    let comments: IComment[];
+    let repliedByUser: any;
+    let commentedByUser: any;
+
+    beforeAll(async () => {
+      users = await createUsers();
+      blogAuthor = users[0].id;
+      blogs = await createBlogs(blogAuthor);
+      repliedByUser = users[0];
+      commentedByUser = users[1];
+    });
+
+    beforeEach(async () => {
+      comments = await createComments(
+        blogs[0].id,
+        blogAuthor,
+        commentedByUser.id
+      );
+    });
+
+    afterEach(async () => {
+      await Comment.deleteMany({});
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (id: any) => {
+      return await request(server)
+        .delete(`${endpoint}/${id}`)
+        .set("authorization", token);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+      const commentId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec(commentId);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return BadRequest-400 if commentId is invalid", async () => {
+      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      // 'commentId' must be a valid mongodb Object id
+      const commentId = "invalid-blogid";
+
+      const res = await exec(commentId);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"Id" must be a valid MongoDB ObjectId',
+      });
+    });
+
+    it("should return NotFound-404 if comment does not exists", async () => {
+      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      // comment with this id does not exists
+      const commentId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec(commentId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `Comment with id = ${commentId} not found.`,
+      });
+    });
+
+    it("should return Forbidden-403 if user is not allowed to perform delete operation", async () => {
+      const comment = comments.filter((c) => c.isReply === false)[0];
+      // this user is not neither comment creator nor blog author
+      const user: any = users.filter(
+        (u) =>
+          String(u._id) !== String(comment.commentedBy) &&
+          String(u._id) !== String(comment.blogAuthor)
+      )[0];
+      token = `Bearer ${user.generateAuthToken()}`;
+
+      const res = await exec(comment.id);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details: "You can not delete this comment",
+      });
+    });
+
+    it("should delete a top level comment that has no replies", async () => {
+      // if we delete a top level comment that has no replies
+      // 1. comment must be deleted
+      // 2. blog `totalParentComments` must be decrement by 1
+      //    blog `totalComments` must be decrement by 1
+
+      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      // get top level comment
+      const comment = comments.filter((c) => !c.parent)[0];
+      // add totalComments and totalParentComments on blog
+      const blog = await Blog.findByIdAndUpdate(
+        { _id: comment.blogId },
+        {
+          $inc: {
+            "activity.totalComments": 1,
+            "activity.totalParentComments": 1,
+          },
+        },
+        { new: true }
+      );
+
+      const res = await exec(comment.id);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+      const {
+        id,
+        blog: { id: blogId },
+      } = res.body.result;
+      expect(id).toBe(comment.id);
+
+      // check blog - 'totalParentComments' and 'totalComments' is decrement by 1
+      const updatedBlog = await Blog.findById(blogId);
+      expect(updatedBlog?.activity.totalParentComments).toBe(
+        (blog?.activity.totalParentComments as number) - 1
+      );
+      expect(updatedBlog?.activity.totalComments).toBe(
+        (blog?.activity.totalComments as number) - 1
+      );
+    });
+
+    it("should delete a top level comment that has replies", async () => {
+      // if we delete top level comment which has replies then
+      // 1. comment must be deleted
+      // 2. blog `totalParentComments` must be decrement by 1
+      //    blog `totalComments` must be decrement by 1 + (totalReplies count of deleted comment)
+
+      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      // get top level comment
+      const comment = comments.filter((c) => !c.parent)[0];
+
+      // create reply to above comment
+      const reply = await Comment.create({
+        blogId: comment.blogId,
+        blogAuthor: comment.blogAuthor,
+        commentedBy: repliedByUser,
+        content: `Reply to ${comment.content}`,
+        isReply: true,
+        parent: comment.id,
+      });
+      comment.totalReplies = 1;
+      await comment.save();
+
+      // add totalComments and totalParentComments on blog
+      const blog = await Blog.findByIdAndUpdate(
+        { _id: comment.blogId },
+        {
+          $inc: {
+            "activity.totalComments": 2,
+            "activity.totalParentComments": 1,
+          },
+        },
+        { new: true }
+      );
+
+      const res = await exec(comment.id);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+      const {
+        id,
+        blog: { id: blogId },
+      } = res.body.result;
+      expect(id).toBe(comment.id);
+
+      // check blog - 'totalParentComments' is decrement by 1 and 'totalComments' is decremented by 2
+      const updatedBlog = await Blog.findById(blogId);
+      expect(updatedBlog?.activity.totalParentComments).toBe(
+        (blog?.activity.totalParentComments as number) - 1
+      );
+      expect(updatedBlog?.activity.totalComments).toBe(
+        (blog?.activity.totalComments as number) - (1 + comment.totalReplies)
+      );
+    });
+
+    it("should delete a reply that has no replies", async () => {
+      // if we delete a reply which has not nested replies then
+      // 1. reply must be deleted
+      // 2. Its all ancestor comments `totalReplies` must be decrement by 1 recursively
+      // 3. blog `totalParentComments` must not be changed
+      //    blog `totalComments` must be decrement by 1
+
+      // create comment
+      const comment: IComment = comments.filter((c) => c.isReply === false)[0];
+      // create reply to above comment
+      const reply = await Comment.create({
+        blogId: comment.blogId,
+        blogAuthor: comment.blogAuthor,
+        commentedBy: repliedByUser,
+        content: `Reply to ${comment.content}`,
+        isReply: true,
+        parent: comment.id,
+      });
+      comment.totalReplies = 1;
+      await comment.save();
+      // add totalComments and totalParentComments on blog
+      const blog = await Blog.findByIdAndUpdate(
+        { _id: comment.blogId },
+        {
+          $inc: {
+            "activity.totalComments": 2,
+            "activity.totalParentComments": 1,
+          },
+        },
+        { new: true }
+      );
+      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+
+      const res = await exec(reply.id);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+      const {
+        id,
+        blog: { id: blogId },
+      } = res.body.result;
+      expect(id).toBe(reply.id);
+
+      // parent comment's 'totalReplies' is decrement by 1
+      const parentComment = await Comment.findById(reply.parent);
+      expect(parentComment?.totalReplies).toBe(comment.totalReplies - 1);
+
+      // check blog - 'totalComments' is decrement by 1 and 'totalParentComments' is not updated
+      const updatedBlog = await Blog.findById(blogId);
+      expect(updatedBlog?.activity.totalParentComments).toBe(
+        blog?.activity.totalParentComments
+      );
+      expect(updatedBlog?.activity.totalComments).toBe(
+        (blog?.activity.totalComments as number) - 1
+      );
+    });
+
+    it("should delete a reply that has nested replies", async () => {
+      // if we delete a reply which has nested replies then
+      // 1. reply must be deleted
+      // 2. Its all ancestor comment `totalReplies` must be decrement by (1 + 'totalReplies' count of deleted reply) recursively
+      // 3. blog `totalParentComments` must not be changed
+      //    blog `totalComments` must be decrement decrement by (1 + 'totalReplies' count of deleted reply)
+
+      // create comment
+      const comment: IComment = comments.filter((c) => c.isReply === false)[0];
+      // create reply to above comment
+      const reply = await Comment.create({
+        blogId: comment.blogId,
+        blogAuthor: comment.blogAuthor,
+        commentedBy: repliedByUser,
+        content: `Reply to ${comment.content}`,
+        isReply: true,
+        parent: comment.id,
+      });
+      // create reply to above reply
+      await Comment.create({
+        blogId: reply.blogId,
+        blogAuthor: reply.blogAuthor,
+        commentedBy: repliedByUser,
+        content: `Reply to ${reply.content}`,
+        isReply: true,
+        parent: reply.id,
+      });
+      reply.totalReplies = 1;
+      await reply.save();
+
+      // top level comment has 2 totalReplies
+      comment.totalReplies = 2;
+      await comment.save();
+      // add totalComments and totalParentComments on blog
+      const blog = await Blog.findByIdAndUpdate(
+        { _id: comment.blogId },
+        {
+          $inc: {
+            "activity.totalComments": 3,
+            "activity.totalParentComments": 1,
+          },
+        },
+        { new: true }
+      );
+      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+
+      const res = await exec(reply.id);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+      const {
+        id,
+        blog: { id: blogId },
+      } = res.body.result;
+      expect(id).toBe(reply.id);
+
+      // parent comment's 'totalReplies' is decrement by 1 + totalReplies count on deleted reply
+      const parentComment = await Comment.findById(reply.parent);
+      expect(parentComment?.totalReplies).toBe(
+        comment.totalReplies - (1 + reply.totalReplies)
+      );
+
+      // check blog - 'totalComments' is decrement by 1 + totalReplies count on deleted reply and 'totalParentComments' is not updated
+      const updatedBlog = await Blog.findById(blogId);
+      expect(updatedBlog?.activity.totalParentComments).toBe(
+        blog?.activity.totalParentComments
+      );
+      expect(updatedBlog?.activity.totalComments).toBe(
+        (blog?.activity.totalComments as number) - (1 + reply.totalReplies)
+      );
     });
   });
 });

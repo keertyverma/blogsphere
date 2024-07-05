@@ -7,6 +7,7 @@ import { Blog } from "../models/blog.model";
 import { Comment, IComment } from "../models/comment.model";
 import { APIResponse, APIStatus } from "../types/api-response";
 import BadRequestError from "../utils/errors/bad-request";
+import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
 import { mongoIdValidator } from "../utils/joi-custom-types";
 import logger from "../utils/logger";
@@ -253,6 +254,90 @@ export const createReply = async (req: Request, res: Response) => {
       parent: reply.parent,
       commentedBy: reply.commentedBy,
       content: reply.content,
+      blog: {
+        id: updatedBlog?._id,
+        blogId: updatedBlog?.blogId,
+        author: updatedBlog?.author,
+      },
+    },
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
+const _decrementTotalReplies = async (
+  commentId: string,
+  decrementCount: number
+) => {
+  // recursively update 'totalReplies' count of given comment and it's all parent comments
+  const parentComment = await Comment.findByIdAndUpdate(commentId, {
+    $inc: { totalReplies: decrementCount },
+  });
+
+  if (parentComment?.parent) {
+    await _decrementTotalReplies(parentComment.parent, decrementCount);
+  }
+};
+
+export const deleteCommentById = async (req: Request, res: Response) => {
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:id`);
+
+  const { id } = req.params;
+  // check id format
+  if (!isValidObjectId(id))
+    throw new BadRequestError(`"Id" must be a valid MongoDB ObjectId`);
+
+  // find comment
+  const comment = await Comment.findById(id);
+  if (!comment) throw new NotFoundError(`Comment with id = ${id} not found.`);
+
+  // check user permission - comment can only be deleted by comment creator or blog author
+  const userId = (req.user as JwtPayload).id;
+  if (
+    String(userId) !== String(comment.commentedBy) &&
+    String(userId) !== String(comment.blogAuthor)
+  )
+    throw new CustomAPIError(
+      "You can not delete this comment",
+      StatusCodes.FORBIDDEN
+    );
+
+  // delete comment
+  const deletedComment = await Comment.findOneAndDelete({ _id: id });
+  if (!deletedComment) {
+    throw new CustomAPIError(
+      `There is some issue with deleting comment = ${id}`,
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  const isReply = comment?.isReply && comment.parent;
+  const decrementBy = -(1 + comment.totalReplies);
+  if (isReply) {
+    // if comment is a reply then update 'totalReplies` count on all ancestor comments recursively
+    await _decrementTotalReplies(comment?.parent as string, decrementBy);
+  }
+
+  // update blog - decrement 'totalComments' and 'totalParentComments'
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    comment?.blogId,
+    {
+      $inc: {
+        "activity.totalComments": decrementBy,
+        "activity.totalParentComments": isReply ? 0 : -1,
+      },
+    },
+    { new: true }
+  ).select("_id blogId author");
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    result: {
+      id: comment.id,
+      parent: comment.parent,
+      commentedBy: comment.commentedBy,
+      content: comment.content,
       blog: {
         id: updatedBlog?._id,
         blogId: updatedBlog?.blogId,
