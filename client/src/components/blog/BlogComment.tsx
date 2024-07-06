@@ -7,8 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import CommentForm from "./CommentForm";
-import CommentList from "./CommentList";
+import CommentForm from "../comments/CommentForm";
+import CommentList from "../comments/CommentList";
 
 interface Props {
   blogId?: string; // blog _id

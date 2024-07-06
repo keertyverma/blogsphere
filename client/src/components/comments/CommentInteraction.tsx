@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
 import { Button } from "../ui/button";
 import CommentList from "./CommentList";
-import ReplyForm from "./ReplyForm";
+import ReplyForm from "../blog/ReplyForm";
 
 interface Props {
   commentId: string;

@@ -523,3 +523,40 @@ export const useCreateReply = () => {
     },
   });
 };
+
+export const useDeleteComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { commentId: string; token: string }) =>
+      apiClient
+        .delete(`comments/${data.commentId}`, {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        })
+        .then((res) => res.data.result),
+    onSuccess: (data) => {
+      const {
+        blog: { id, blogId },
+        parent,
+      } = data;
+      // refresh blog page
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+      });
+
+      if (parent) {
+        // refresh reply list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
+        });
+      } else {
+        // refresh top level comment list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
+        });
+      }
+    },
+  });
+};
