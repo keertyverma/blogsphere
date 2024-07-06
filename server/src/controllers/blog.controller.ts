@@ -5,6 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
+import { Comment } from "../models/comment.model";
 import { User } from "../models/user.model";
 import { SortQuery } from "../types";
 import { APIResponse, APIStatus } from "../types/api-response";
@@ -465,6 +466,9 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
       "Failed to update user blogs and total posts count",
       StatusCodes.INTERNAL_SERVER_ERROR
     );
+
+  // delete all comments and replies associated with this blog
+  const retur = await Comment.deleteMany({ blogId: id });
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
