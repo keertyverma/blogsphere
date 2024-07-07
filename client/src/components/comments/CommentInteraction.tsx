@@ -59,14 +59,12 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
       </div>
 
       {showReplies && (
-        <div className="mb-2 ml-3">
-          <div className="my-1.5 ml-3.5 h-6 w-px border dark:border-slate-600"></div>
+        <div className="mb-2 ml-3 border-l-[3px] pl-2">
           <CommentList commentId={commentId} />
         </div>
       )}
       {isReplying && (
-        <div className="mb-2 ml-3">
-          <div className="my-1.5 ml-3.5 h-6 w-px border dark:border-slate-600"></div>
+        <div className="mb-2 ml-3 border-l-[3px] pl-2">
           <ReplyForm
             commentId={commentId}
             onClose={() => setIsReplying(false)}

@@ -20,9 +20,17 @@ interface Props {
     totalReads: number;
     totalComments: number;
   };
+  isDraft?: boolean;
 }
 
-const BlogInteraction = ({ id, blogId, author, likes, activity }: Props) => {
+const BlogInteraction = ({
+  id,
+  blogId,
+  author,
+  likes,
+  activity,
+  isDraft = false,
+}: Props) => {
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
   const user = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
@@ -74,40 +82,45 @@ const BlogInteraction = ({ id, blogId, author, likes, activity }: Props) => {
       <hr className="border-border my-1" />
       <div className="flex flex-row justify-between items-center">
         <div className="flex-center gap-2 text-muted-foreground hover:text-slate-600">
-          <div className="flex-center gap-1">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent text-inherit"
-              onClick={handlePostLikeUnlike}
-              aria-label="like this blog"
-            >
-              {checkIsLiked(blogLikes, user.id) ? (
-                <FaHeart className="text-red-600 hover:text-red-500 like-animation" />
-              ) : (
-                <FaRegHeart />
+          {!isDraft && (
+            <div className="flex-center gap-1">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent text-inherit"
+                onClick={handlePostLikeUnlike}
+                aria-label="like this blog"
+              >
+                {checkIsLiked(blogLikes, user.id) ? (
+                  <FaHeart className="text-red-600 hover:text-red-500 like-animation" />
+                ) : (
+                  <FaRegHeart />
+                )}
+              </Button>
+              {Object.keys(blogLikes).length > 0 && (
+                <p className="text-sm">
+                  {formateNumber(Object.keys(blogLikes).length)}
+                </p>
               )}
-            </Button>
-            {Object.keys(blogLikes).length > 0 && (
-              <p className="text-sm">
-                {formateNumber(Object.keys(blogLikes).length)}
-              </p>
-            )}
-          </div>
-          <div className="flex-center">
-            <BlogComment
-              blogId={id}
-              authorId={authorId}
-              totalComments={activity?.totalComments}
-            />
-            {activity && activity.totalComments !== 0 ? (
-              <p className="text-sm mr-1">
-                {formateNumber(activity.totalComments)}
-              </p>
-            ) : null}
-          </div>
+            </div>
+          )}
 
-          {user.username === authorUsername && (
+          {!isDraft && (
+            <div className="flex-center">
+              <BlogComment
+                blogId={id}
+                authorId={authorId}
+                totalComments={activity?.totalComments}
+              />
+              {activity && activity.totalComments !== 0 ? (
+                <p className="text-sm mr-1">
+                  {formateNumber(activity.totalComments)}
+                </p>
+              ) : null}
+            </div>
+          )}
+
+          {!isDraft && user.username === authorUsername && (
             <div className="flex-center gap-1">
               <MdOutlineRemoveRedEye className="text-lg" />
               {activity && activity.totalReads !== 0 ? (
@@ -116,6 +129,7 @@ const BlogInteraction = ({ id, blogId, author, likes, activity }: Props) => {
             </div>
           )}
         </div>
+
         {user.username === authorUsername && <ManageBlog blogId={blogId} />}
       </div>
       <hr className="border-border my-1" />

@@ -52,6 +52,7 @@ const BlogPage = () => {
     activity,
     content,
     createdAt: publishedAt,
+    isDraft,
   } = blog;
 
   return (
@@ -98,6 +99,7 @@ const BlogPage = () => {
           author={authorDetails}
           likes={likes}
           activity={activity}
+          isDraft={isDraft}
         />
 
         {/* blog content */}
