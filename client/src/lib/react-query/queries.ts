@@ -560,3 +560,42 @@ export const useDeleteComment = () => {
     },
   });
 };
+
+export const useUpdateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      token: string;
+      comment: { id: string; content: string };
+    }) =>
+      apiClient
+        .patch(
+          `/comments/${data.comment.id}`,
+          { content: data.comment.content },
+          {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }
+        )
+        .then((res) => res.data.result),
+    onSuccess: (data) => {
+      const {
+        blog: { id },
+        parent,
+      } = data;
+      if (parent) {
+        // refresh reply list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
+        });
+      } else {
+        // refresh top level comment list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
+        });
+      }
+    },
+  });
+};

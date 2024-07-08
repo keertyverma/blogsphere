@@ -16,10 +16,12 @@ import {
 interface Props {
   commentId: string;
   commentedByUserId: string;
+  onEdit: () => void;
 }
 const ManageComment = ({
   commentId,
   commentedByUserId: commetedByUserId,
+  onEdit,
 }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutateAsync: deleteBlog, isPending: isDeleting } = useDeleteComment();
@@ -63,6 +65,7 @@ const ManageComment = ({
                 <Button
                   variant="secondary"
                   className="bg-transparent text-muted-foreground w-full justify-start"
+                  onClick={() => onEdit()}
                 >
                   Edit
                 </Button>

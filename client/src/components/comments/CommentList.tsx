@@ -1,10 +1,9 @@
 import { useGetComments } from "@/lib/react-query/queries";
 import { IComment } from "@/types";
 import React from "react";
-import AnimationWrapper from "../shared/AnimationWrapper";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
-import CommentCard from "./CommentCard";
+import CommentContainer from "./CommentContainer";
 
 interface Props {
   blogId?: string; // blog _id
@@ -39,19 +38,12 @@ const CommentList = ({ blogId, commentId }: Props) => {
       {data?.pages.map((page, pageIndex) => (
         <React.Fragment key={pageIndex}>
           {page.results.map((comment: IComment, index: number) => (
-            <AnimationWrapper
+            <CommentContainer
               key={index}
-              transition={{ duration: 1, delay: index * 0.1 }}
-            >
-              <CommentCard
-                comment={comment}
-                classname={`${
-                  index !== page.results.length - 1
-                    ? "border-b border-border"
-                    : ""
-                }`}
-              />
-            </AnimationWrapper>
+              comment={comment}
+              index={index}
+              isLast={index === page.results.length - 1}
+            />
           ))}
         </React.Fragment>
       ))}

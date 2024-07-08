@@ -9,8 +9,9 @@ import { useAuthStore } from "@/store";
 interface Props {
   comment: IComment;
   classname?: string;
+  onEdit: () => void;
 }
-const CommentCard = ({ comment, classname }: Props) => {
+const CommentCard = ({ comment, classname, onEdit }: Props) => {
   const {
     commentedBy: {
       _id: commentedByUserId,
@@ -21,6 +22,7 @@ const CommentCard = ({ comment, classname }: Props) => {
     _id,
     totalReplies,
     blogAuthor,
+    isEdited,
   } = comment;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
@@ -55,9 +57,10 @@ const CommentCard = ({ comment, classname }: Props) => {
                 )}
               </div>
 
-              <p className="text-muted-foreground font-normal">
-                {commentedAt && getTimeAgo(commentedAt)}
-              </p>
+              <div className="flex gap-1 text-muted-foreground font-normal">
+                <p>{commentedAt && getTimeAgo(commentedAt)}</p>
+                {isEdited && <p>(Edited)</p>}
+              </div>
             </div>
           </div>
         </Link>
@@ -66,6 +69,7 @@ const CommentCard = ({ comment, classname }: Props) => {
             <ManageComment
               commentId={_id}
               commentedByUserId={commentedByUserId}
+              onEdit={onEdit}
             />
           )}
       </div>

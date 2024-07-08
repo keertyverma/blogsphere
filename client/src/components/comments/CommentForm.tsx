@@ -1,4 +1,8 @@
-import { useCreateComment, useGetUser } from "@/lib/react-query/queries";
+import {
+  useCreateComment,
+  useGetUser,
+  useUpdateComment,
+} from "@/lib/react-query/queries";
 import { handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -8,23 +12,45 @@ import { Button } from "../ui/button";
 
 interface Props {
   blogId?: string;
-  authorId: string;
+  authorId?: string;
+  existingComment?: {
+    id: string;
+    content: string;
+  };
+  closeEditForm?: () => void; // Callback to handle successful edit
 }
 
-const CommentForm = ({ blogId, authorId }: Props) => {
+const CommentForm = ({
+  blogId,
+  authorId,
+  existingComment,
+  closeEditForm,
+}: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isTextareaDisabled, setIsTextareaDisabled] = useState(true);
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState(
+    existingComment ? existingComment.content : ""
+  );
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
 
-  const { data: user, isLoading, error } = useGetUser(authUser.username);
+  const {
+    data: user,
+    isLoading,
+    error: getUserError,
+  } = useGetUser(authUser.username);
   const {
     mutateAsync: createComment,
     isPending: isCreatingComment,
     error: creatingCommentError,
   } = useCreateComment();
+
+  const {
+    mutateAsync: updateComment,
+    isPending: isUpdatingComment,
+    error: updatingCommentError,
+  } = useUpdateComment();
 
   useEffect(() => {
     // This is done to prevent textrea from auto-focusing and opening keyboard on mobile
@@ -32,10 +58,9 @@ const CommentForm = ({ blogId, authorId }: Props) => {
     setIsTextareaDisabled(false);
   }, []);
 
-  if (!blogId) return null;
   if (isLoading) return <LoadingSpinner />;
-  if (error || creatingCommentError)
-    console.error(error || creatingCommentError);
+  const error = getUserError || creatingCommentError || updatingCommentError;
+  if (error) console.error(error);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,14 +69,24 @@ const CommentForm = ({ blogId, authorId }: Props) => {
     }
 
     try {
-      const commentData = {
-        blogId,
-        blogAuthor: authorId,
-        content: comment,
-      };
+      if (existingComment) {
+        // update comment
+        await updateComment({
+          token,
+          comment: { id: existingComment.id, content: comment },
+        });
 
-      // create comment
-      await createComment({ token, comment: commentData });
+        toast.success("Comment updated 👍");
+        if (closeEditForm) closeEditForm();
+      } else {
+        // create comment
+        const commentData = {
+          blogId: blogId as string,
+          blogAuthor: authorId as string,
+          content: comment,
+        };
+        await createComment({ token, comment: commentData });
+      }
       setComment("");
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
@@ -95,13 +130,24 @@ const CommentForm = ({ blogId, authorId }: Props) => {
           disabled={isTextareaDisabled}
         />
         <div className="flex justify-end">
+          {existingComment && (
+            <Button
+              type="reset"
+              variant="secondary"
+              size="sm"
+              className="rounded-full text-sm capitalize mr-3"
+              onClick={closeEditForm}
+            >
+              cancel
+            </Button>
+          )}
           <Button
             type="submit"
             size="sm"
             className="rounded-full text-sm capitalize"
-            disabled={!comment || isCreatingComment}
+            disabled={!comment || isCreatingComment || isUpdatingComment}
           >
-            comment
+            {existingComment ? "save" : "comment"}
           </Button>
         </div>
       </form>

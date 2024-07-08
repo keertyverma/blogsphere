@@ -394,7 +394,7 @@ export const updateCommentById = async (req: Request, res: Response) => {
       $set: { content: updatedContent, isEdited: true },
     },
     { new: true }
-  ).populate("blogId", "_id blogId");
+  );
 
   if (!updatedComment) {
     throw new CustomAPIError(
@@ -403,7 +403,6 @@ export const updateCommentById = async (req: Request, res: Response) => {
     );
   }
 
-  const { _id, blogId } = updatedComment.blogId;
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
@@ -413,9 +412,7 @@ export const updateCommentById = async (req: Request, res: Response) => {
       commentedBy: updatedComment.commentedBy,
       content: updatedComment.content,
       blog: {
-        id: _id,
-        blogId: blogId,
-        author: updatedComment.blogAuthor,
+        id: updatedComment.blogId,
       },
       isEdited: updatedComment.isEdited,
     },
