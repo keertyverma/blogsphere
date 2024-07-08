@@ -864,4 +864,127 @@ describe("/api/v1/blogs", () => {
       );
     });
   });
+
+  describe("PATCH /:id", () => {
+    let blogs: IBlog[];
+    let users: IUser[];
+    let blogAuthor: string;
+    let comments: IComment[];
+    let commentedByUser: any;
+
+    beforeAll(async () => {
+      users = await createUsers();
+      blogAuthor = users[0].id;
+      blogs = await createBlogs(blogAuthor);
+      commentedByUser = users[1];
+    });
+
+    beforeEach(async () => {
+      comments = await createComments(
+        blogs[0].id,
+        blogAuthor,
+        commentedByUser.id
+      );
+    });
+
+    afterEach(async () => {
+      await Comment.deleteMany({});
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (id: any, payload: { content: string }) => {
+      return await request(server)
+        .patch(`${endpoint}/${id}`)
+        .set("authorization", token)
+        .send(payload);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token is not passed in request header
+      token = "";
+      const commentId = new mongoose.Types.ObjectId().toString();
+      const payload = { content: "updated comment" };
+
+      const res = await exec(commentId, payload);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should return BadRequest-400 if commentId is invalid", async () => {
+      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      // 'commentId' must be a valid mongodb Object id
+      const commentId = "invalid-blogid";
+      const payload = { content: "updated comment" };
+
+      const res = await exec(commentId, payload);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"Id" must be a valid MongoDB ObjectId',
+      });
+    });
+
+    it("should return NotFound-404 if comment does not exists", async () => {
+      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      // comment with this id does not exists
+      const commentId = new mongoose.Types.ObjectId().toString();
+      const payload = { content: "updated comment" };
+
+      const res = await exec(commentId, payload);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `Comment with id = ${commentId} not found.`,
+      });
+    });
+
+    it("should return Forbidden-403 if user is not allowed to perform update operation", async () => {
+      const comment = comments.filter((c) => c.isReply === false)[0];
+      // this user is not the comment creator
+      const user: any = users.filter(
+        (u) => String(u._id) !== String(comment.commentedBy)
+      )[0];
+      token = `Bearer ${user.generateAuthToken()}`;
+      const payload = { content: "updated comment" };
+
+      const res = await exec(comment.id, payload);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details: "You can not update this comment",
+      });
+    });
+
+    it("should update a comment", async () => {
+      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      // get a comment created by authenticated user
+      const comment = comments.filter(
+        (c) =>
+          !c.parent && String(c.commentedBy) === String(commentedByUser._id)
+      )[0];
+      const payload = { content: "updated comment" };
+
+      const res = await exec(comment.id, payload);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.status).toBe("success");
+      const { id, content, isEdited } = res.body.result;
+      expect(id).toBe(comment.id);
+      expect(content).toBe(payload.content);
+      expect(isEdited).toBeTruthy();
+    });
+  });
 });

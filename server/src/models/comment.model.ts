@@ -1,7 +1,8 @@
 import { Document, Schema, model } from "mongoose";
+import { IBlog } from "./blog.model";
 
 interface IComment extends Document {
-  blogId: string; // ID of the blog post the comment belongs to
+  blogId: string | IBlog["_id"]; // ID of the blog post the comment belongs to
   blogAuthor: string; // ID of the blog author
   content: string; // Text of the comment
   commentedBy: string; // ID of the user who made the comment
@@ -10,6 +11,7 @@ interface IComment extends Document {
   parent?: string; // ID of the parent comment, if applicable
   commentedAt: Date; // Timestamp when the comment was created
   updatedAt: Date; // Timestamp when the comment was last updated
+  isEdited: boolean; //to track edited status
 }
 
 const commentSchema = new Schema(
@@ -46,6 +48,10 @@ const commentSchema = new Schema(
     totalReplies: {
       type: Number,
       default: 0,
+    },
+    isEdited: {
+      type: Boolean,
+      default: false,
     },
   },
   {

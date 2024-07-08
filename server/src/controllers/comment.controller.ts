@@ -348,3 +348,78 @@ export const deleteCommentById = async (req: Request, res: Response) => {
 
   return res.status(data.statusCode).json(data);
 };
+
+const validateUpdateComment = (data: { content: string }) => {
+  const schema = Joi.object({
+    content: Joi.string().trim().required(),
+  });
+
+  const { error, value: validatedData } = schema.validate(data);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  return validatedData;
+};
+
+export const updateCommentById = async (req: Request, res: Response) => {
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:id`);
+
+  // check id format
+  const { id } = req.params;
+  if (!isValidObjectId(id))
+    throw new BadRequestError(`"Id" must be a valid MongoDB ObjectId`);
+
+  // find comment
+  const comment = await Comment.findById(id);
+  if (!comment) throw new NotFoundError(`Comment with id = ${id} not found.`);
+
+  // check user permission - comment can only be updated by it's creator
+  const userId = (req.user as JwtPayload).id;
+  if (String(userId) !== String(comment.commentedBy))
+    throw new CustomAPIError(
+      "You can not update this comment",
+      StatusCodes.FORBIDDEN
+    );
+
+  // validate request body data
+  const { content: updatedContent } = validateUpdateComment(req.body);
+
+  // update comment and set 'isEdited' flag
+  const updatedComment = await Comment.findByIdAndUpdate(
+    id,
+    {
+      $set: { content: updatedContent, isEdited: true },
+    },
+    { new: true }
+  ).populate("blogId", "_id blogId");
+
+  if (!updatedComment) {
+    throw new CustomAPIError(
+      `There is some issue with updating comment = ${id}`,
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  const { _id, blogId } = updatedComment.blogId;
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    result: {
+      id: updatedComment.id,
+      parent: updatedComment.parent,
+      commentedBy: updatedComment.commentedBy,
+      content: updatedComment.content,
+      blog: {
+        id: _id,
+        blogId: blogId,
+        author: updatedComment.blogAuthor,
+      },
+      isEdited: updatedComment.isEdited,
+    },
+  };
+
+  return res.status(data.statusCode).json(data);
+};

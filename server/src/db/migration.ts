@@ -119,4 +119,10 @@ const updateCommentsSchema = async () => {
     { children: { $exists: true } },
     { $unset: { children: 1 } }
   );
+
+  // add 'isEdited' field and set it to 'false' by default
+  await Comment.updateMany(
+    { isEdited: { $exists: false } },
+    { $set: { isEdited: false } }
+  );
 };
