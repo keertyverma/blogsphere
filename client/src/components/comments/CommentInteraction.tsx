@@ -1,9 +1,11 @@
+import { QUERY_KEYS } from "@/lib/react-query/queryKeys";
 import { formateNumber } from "@/lib/utils";
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
+import ReplyForm from "../blog/ReplyForm";
 import { Button } from "../ui/button";
 import CommentList from "./CommentList";
-import ReplyForm from "../blog/ReplyForm";
 
 interface Props {
   commentId: string;
@@ -14,19 +16,35 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
   const [replyCount, setReplyCount] = useState(totalReplies);
   const [isReplying, setIsReplying] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Update the reply count when totalReplies props changes
+    setReplyCount(totalReplies);
+  }, [totalReplies]);
+
+  const handleToggleReplies = () => {
+    setShowReplies((prev) => !prev);
+
+    // If replies are being shown, trigger a refetch of the replies
+    if (!showReplies) {
+      // This will ensure CommentList fetches the latest replies
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", commentId],
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col mb-2">
       <div className="flex flex-row justify-between items-center flex-nowrap gap-2 text-muted-foreground hover:text-slate-600">
-        <div className="flex-center gap-1">
+        <div className="flex-center">
           <Button
             variant="secondary"
             size="sm"
             className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent text-inherit"
-            onClick={() => {
-              setShowReplies((prev) => !prev);
-            }}
-            aria-label="add reply"
+            onClick={handleToggleReplies}
+            aria-label="show reply list"
             disabled={!replyCount}
           >
             <FaRegCommentDots className="text-lg" />
@@ -34,9 +52,7 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
           {showReplies ? (
             <p
               className="hover:underline text-muted-foreground text-sm"
-              onClick={() => {
-                setShowReplies((prev) => !prev);
-              }}
+              onClick={handleToggleReplies}
             >
               Hide replies
             </p>
@@ -50,6 +66,7 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
           variant="ghost"
           size="sm"
           className="text-muted-foreground text-sm capitalize hover:bg-transparent hover:underline h-5"
+          aria-label="reply to comment"
           onClick={() => {
             setIsReplying(true);
           }}

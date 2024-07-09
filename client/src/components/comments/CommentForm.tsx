@@ -146,6 +146,7 @@ const CommentForm = ({
             size="sm"
             className="rounded-full text-sm capitalize"
             disabled={!comment || isCreatingComment || isUpdatingComment}
+            aria-label={existingComment ? "update comment" : "create comment"}
           >
             {existingComment ? "save" : "comment"}
           </Button>

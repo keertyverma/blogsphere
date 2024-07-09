@@ -554,17 +554,15 @@ export const useDeleteComment = () => {
         queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
       });
 
-      if (parent) {
-        // refresh reply list
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
-        });
-      } else {
-        // refresh top level comment list
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
-        });
-      }
+      // refresh reply list for given comment
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
+      });
+
+      // refresh top-level comment list for given blog
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
+      });
     },
   });
 };
