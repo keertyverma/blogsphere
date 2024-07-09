@@ -1,6 +1,5 @@
 import { useGetComments } from "@/lib/react-query/queries";
 import { IComment } from "@/types";
-import React from "react";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 import CommentContainer from "./CommentContainer";
@@ -22,9 +21,9 @@ const CommentList = ({ blogId, commentId }: Props) => {
   if (isLoading) return <LoadingSpinner className="mt-20 mx-auto" />;
   if (error) console.error(error);
 
-  const fetchedCommentsCount =
-    data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
-  if (fetchedCommentsCount === 0 && !commentId) {
+  const comments = data?.pages.flatMap((page) => page.results) || [];
+
+  if (comments.length === 0 && !commentId) {
     return (
       <div className="text-base text-muted-foreground font-medium text-center py-10 flex-center flex-col gap-2">
         <p>No comments yet.</p>
@@ -33,19 +32,27 @@ const CommentList = ({ blogId, commentId }: Props) => {
     );
   }
 
+  // For comments -> show most recent comments first
+  // For replies  -> show replies oldest to newest to maintain conversation history
+  const renderComments = commentId
+    ? comments
+        .slice()
+        .sort(
+          (a: IComment, b: IComment) =>
+            new Date(a.commentedAt).getTime() -
+            new Date(b.commentedAt).getTime()
+        )
+    : comments;
+
   return (
     <>
-      {data?.pages.map((page, pageIndex) => (
-        <React.Fragment key={pageIndex}>
-          {page.results.map((comment: IComment, index: number) => (
-            <CommentContainer
-              key={index}
-              comment={comment}
-              index={index}
-              isLast={index === page.results.length - 1}
-            />
-          ))}
-        </React.Fragment>
+      {renderComments.map((comment: IComment, index: number) => (
+        <CommentContainer
+          key={index}
+          index={index}
+          comment={comment}
+          isLast={index === renderComments.length - 1}
+        />
       ))}
 
       {hasNextPage && (
@@ -53,10 +60,7 @@ const CommentList = ({ blogId, commentId }: Props) => {
           <Button
             variant={`${commentId ? "ghost" : "secondary"}`}
             size="sm"
-            className={`rounded-full ${
-              commentId &&
-              "bg-transparent underline text-muted-foreground hover:bg-transparent"
-            }`}
+            className={`rounded-full bg-transparent hover:bg-secondary underline hover:no-underline`}
             disabled={isFetchingNextPage}
             onClick={() => fetchNextPage()}
           >
@@ -64,7 +68,7 @@ const CommentList = ({ blogId, commentId }: Props) => {
               ? "loading..."
               : commentId
               ? "Load more replies"
-              : "Load more"}
+              : "Load more comments"}
           </Button>
         </div>
       )}
