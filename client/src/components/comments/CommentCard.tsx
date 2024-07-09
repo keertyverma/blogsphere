@@ -77,7 +77,11 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
         className="my-2 text-base leading-6 text-accent-foreground"
         dangerouslySetInnerHTML={{ __html: formatContent(content) }}
       ></p>
-      <CommentInteraction commentId={_id} totalReplies={totalReplies} />
+      <CommentInteraction
+        key={_id}
+        commentId={_id}
+        totalReplies={totalReplies}
+      />
     </article>
   );
 };

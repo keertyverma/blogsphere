@@ -509,16 +509,24 @@ export const useCreateReply = () => {
         .then((res) => res.data.result),
     onSuccess: (data) => {
       const {
-        blog: { blogId },
+        blog: { id, blogId },
         parent,
       } = data;
       if (blogId) {
+        // refresh blog page to show correct 'totalComments' count
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
         });
       }
+
+      // refresh reply list for given comment
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
+      });
+
+      // refresh top-level comment list for given blog
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
       });
     },
   });
