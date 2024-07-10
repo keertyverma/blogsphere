@@ -1,10 +1,12 @@
 import { getTimeAgo, handleProfileImgErr } from "@/lib/utils";
+import { useAuthStore } from "@/store";
 import { IComment } from "@/types";
 import DOMPurify from "dompurify";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "../ui/button";
 import CommentInteraction from "./CommentInteraction";
 import ManageComment from "./ManageComment";
-import { useAuthStore } from "@/store";
 
 interface Props {
   comment: IComment;
@@ -27,10 +29,21 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
 
+  const [isExpanded, setIsExpanded] = useState(false);
+  const CONTENT_CHAR_LIMIT = 200;
+  const truncatedContent =
+    content.length > CONTENT_CHAR_LIMIT && !isExpanded
+      ? content.slice(0, CONTENT_CHAR_LIMIT - 1)
+      : content;
+
+  const toggleContentExpansion = () => {
+    setIsExpanded((prev) => !prev);
+  };
+
   const formatContent = (content: string) => {
     // sanitize the HTML content to prevent XSS attacks.
-    const safeHTML = DOMPurify.sanitize(content);
-    return safeHTML.replace(/\n/g, "<br>");
+    const safeContent = DOMPurify.sanitize(content).replace(/\n/g, "<br>");
+    return safeContent;
   };
 
   return (
@@ -73,10 +86,23 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
             />
           )}
       </div>
-      <p
-        className="my-2 text-base leading-6 text-accent-foreground"
-        dangerouslySetInnerHTML={{ __html: formatContent(content) }}
-      ></p>
+      <div className="my-2">
+        <span
+          className="text-base leading-6 text-accent-foreground"
+          dangerouslySetInnerHTML={{ __html: formatContent(truncatedContent) }}
+        ></span>
+        {content.length > CONTENT_CHAR_LIMIT && (
+          <Button
+            variant="link"
+            size="sm"
+            onClick={toggleContentExpansion}
+            className="p-0 ml-2 h-1"
+          >
+            {isExpanded ? "show less" : "...show more"}
+          </Button>
+        )}
+      </div>
+
       <CommentInteraction
         key={_id}
         commentId={_id}
