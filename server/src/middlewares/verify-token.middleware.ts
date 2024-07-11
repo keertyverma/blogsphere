@@ -1,5 +1,5 @@
 import config from "config";
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
@@ -18,9 +18,8 @@ export const verifyToken = (
   res: Response,
   next: NextFunction
 ) => {
-  // check auth token in request header.Valid auth header - Bearer <token>
-  const authHeader = req.header("authorization");
-  const token = authHeader && authHeader.split(" ")[1];
+  // get token from request cookies
+  const token = req.cookies?.authToken;
   if (!token) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
@@ -33,6 +32,12 @@ export const verifyToken = (
     req.user = jwt.verify(token, config.get("secretAccessKey"));
     next();
   } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .send("Token has expired. Please log in again.");
+    }
+
     return res.status(StatusCodes.BAD_REQUEST).send("Invalid token.");
   }
 };

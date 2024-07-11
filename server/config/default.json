@@ -12,5 +12,6 @@
     "clientEmail": "",
     "clientId": "",
     "clientX509CertUrl": ""
-  }
+  },
+  "tokenExpiresIn": "7d"
 }

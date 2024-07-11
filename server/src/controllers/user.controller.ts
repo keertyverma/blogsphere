@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
+
 import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
 import { generateUsername } from "../utils";
@@ -60,8 +61,13 @@ export const createUser = async (req: Request, res: Response) => {
       profileImage: user.personalInfo.profileImage,
     },
   };
+
+  // send token inside cookies (`HTTP-only` secure)
   return res
-    .header("x-auth-token", accessToken)
+    .cookie("authToken", accessToken, {
+      httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
+      secure: process.env.NODE_ENV === "production", // Ensures cookie is sent only over HTTPS in production
+    })
     .status(data.statusCode)
     .json(data);
 };

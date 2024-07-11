@@ -1,7 +1,7 @@
-import { Schema, model, Document, Types } from "mongoose";
+import config from "config";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
-import config from "config";
+import { Document, Schema, Types, model } from "mongoose";
 
 interface IUser extends Document {
   personalInfo: {
@@ -129,7 +129,10 @@ userSchema.methods.generateAuthToken = function (): string {
     {
       id: this.id,
     },
-    config.get("secretAccessKey")
+    config.get("secretAccessKey") as string,
+    {
+      expiresIn: config.get("tokenExpiresIn"),
+    }
   );
 };
 

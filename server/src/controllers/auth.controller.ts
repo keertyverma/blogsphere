@@ -68,8 +68,12 @@ const authenticateUser = async (req: Request, res: Response) => {
     },
   };
 
+  // send token inside cookies (`HTTP-only` secure)
   return res
-    .header("x-auth-token", accessToken)
+    .cookie("authToken", accessToken, {
+      httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
+      secure: process.env.NODE_ENV === "production", // Ensures cookie is sent only over HTTPS in production
+    })
     .status(data.statusCode)
     .json(data);
 };
@@ -139,8 +143,12 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
       },
     };
 
+    // send token inside cookies (`HTTP-only` secure)
     return res
-      .header("x-auth-token", userAccessToken)
+      .cookie("authToken", userAccessToken, {
+        httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
+        secure: process.env.NODE_ENV === "production", // Ensures cookie is sent only over HTTPS in production
+      })
       .status(data.statusCode)
       .json(data);
   } catch (error) {

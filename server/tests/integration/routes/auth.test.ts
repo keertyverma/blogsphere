@@ -1,13 +1,13 @@
-import request from "supertest";
-import { disconnect } from "mongoose";
+import cookie from "cookie";
 import "dotenv/config";
-import config from "config";
 import http from "http";
+import { disconnect } from "mongoose";
+import request from "supertest";
 
 import appServer from "../../../src";
 import { User } from "../../../src/models/user.model";
-import * as firebaseAuth from "../../../src/utils/firebase-auth";
 import FirebaseAuthError from "../../../src/utils/errors/firebase-error";
+import * as firebaseAuth from "../../../src/utils/firebase-auth";
 
 let server: http.Server;
 let endpoint: string = `/api/v1/auth`;
@@ -161,8 +161,11 @@ describe("/api/v1/auth", () => {
       expect(responseData.username).toBe(username);
       expect(responseData.profileImage).toBe(profileImage);
 
-      expect(res.headers).toHaveProperty("x-auth-token");
-      expect(res.headers["x-auth-token"]).not.toBe("");
+      // Ensure the authToken is set in the cookie
+      expect(res.headers["set-cookie"]).toBeDefined();
+      // Parse the set-cookie header to get authToken
+      const cookies = cookie.parse(res.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBeDefined();
     });
   });
 
@@ -284,8 +287,11 @@ describe("/api/v1/auth", () => {
 
       expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
 
-      // Access token
-      expect(res.header["x-auth-token"]).not.toBeNull();
+      // Ensure the lauthToken' is set in the cookie
+      expect(res.headers["set-cookie"]).toBeDefined();
+      // Parse the set-cookie header to get authToken
+      const cookies = cookie.parse(res.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBeDefined();
 
       // User data in response body
       const { fullname, email, username } = res.body.result;
@@ -308,8 +314,11 @@ describe("/api/v1/auth", () => {
       const user = await User.findOne({ "personalInfo.email": mockUser.email });
       expect(user?.googleAuth).toBeTruthy();
 
-      // Access token
-      expect(res.header["x-auth-token"]).not.toBeNull();
+      // Ensure the lauthToken' is set in the cookie
+      expect(res.headers["set-cookie"]).toBeDefined();
+      // Parse the set-cookie header to get authToken
+      const cookies = cookie.parse(res.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBeDefined();
 
       // User data in response body
       const { fullname, email, username } = res.body.result;

@@ -1,7 +1,8 @@
-import request from "supertest";
-import { disconnect } from "mongoose";
+import cookie from "cookie";
 import "dotenv/config";
 import http from "http";
+import { disconnect } from "mongoose";
+import request from "supertest";
 
 import appServer from "../../../src";
 import { IUser, User } from "../../../src/models/user.model";
@@ -271,7 +272,7 @@ describe("/api/v1/users", () => {
     const exec = async (payload: any = {}) => {
       return await request(server)
         .post(`${endpoint}/changePassword`)
-        .set("authorization", token)
+        .set("Cookie", `authToken=${token}`)
         .send(payload);
     };
 
@@ -304,7 +305,7 @@ describe("/api/v1/users", () => {
           username: "test",
         },
       });
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
 
       const res = await exec({ currentPassword: "Clubhouse12" });
 
@@ -326,7 +327,7 @@ describe("/api/v1/users", () => {
         },
         googleAuth: true,
       });
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
 
       const res = await exec({
         currentPassword: "Clubhouse12",
@@ -352,8 +353,12 @@ describe("/api/v1/users", () => {
           email: "test@test.com",
         });
       expect(createUserRes.statusCode).toBe(201);
-      expect(createUserRes.header["x-auth-token"]).not.toBeNull();
-      token = `Bearer ${createUserRes.header["x-auth-token"]}`;
+
+      expect(createUserRes.headers["set-cookie"]).toBeDefined();
+      // Parse the set-cookie header to get authToken
+      const cookies = cookie.parse(createUserRes.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBeDefined();
+      token = cookies.authToken;
 
       //  update password request
       const res = await exec({
@@ -379,8 +384,10 @@ describe("/api/v1/users", () => {
           email: "test@test.com",
         });
       expect(createUserRes.statusCode).toBe(201);
-      expect(createUserRes.header["x-auth-token"]).not.toBeNull();
-      token = `Bearer ${createUserRes.header["x-auth-token"]}`;
+      // Parse the set-cookie header to get authToken
+      const cookies = cookie.parse(createUserRes.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBeDefined();
+      token = cookies.authToken;
 
       const res = await exec({
         currentPassword: "Clubhouse12",
@@ -402,7 +409,7 @@ describe("/api/v1/users", () => {
     const exec = async (payload: any = {}) => {
       return await request(server)
         .patch(`${endpoint}`)
-        .set("authorization", token)
+        .set("Cookie", `authToken=${token}`)
         .send(payload);
     };
 
@@ -425,7 +432,7 @@ describe("/api/v1/users", () => {
           username: "test",
         },
       });
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
 
       const res = await exec({
         socialLinks: {
@@ -458,7 +465,7 @@ describe("/api/v1/users", () => {
           website: "",
         },
       });
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
 
       const toUpdate = {
         fullname: "Mr. Mickey Mouse",

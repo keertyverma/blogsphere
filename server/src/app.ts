@@ -1,5 +1,5 @@
 import compression from "compression";
-import cors from "cors";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import helmet from "helmet";
@@ -16,7 +16,7 @@ import {
 const app = express();
 
 app.use(express.json({ limit: "10mb" }));
-app.use(cors({ exposedHeaders: ["x-auth-token"] }));
+app.use(cookieParser());
 
 // if (process.env.NODE_ENV === "production") {
 //   app.use(helmet());
