@@ -121,13 +121,13 @@ describe("/api/v1/blogs", () => {
     const exec = async (payload: any) => {
       return await request(server)
         .post(endpoint)
-        .set("authorization", token)
+        .set("Cookie", `authToken=${token}`)
         .send(payload);
     };
 
     beforeEach(async () => {
       const user = new User();
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
     });
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
@@ -210,7 +210,7 @@ describe("/api/v1/blogs", () => {
           username: "test",
         },
       });
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const totalPosts = user.accountInfo.totalPosts;
 
       const blog = {
@@ -265,7 +265,7 @@ describe("/api/v1/blogs", () => {
           username: "test",
         },
       });
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const totalPosts = user.accountInfo.totalPosts;
 
       const blog = {
@@ -493,7 +493,7 @@ describe("/api/v1/blogs", () => {
     const exec = async (blogId: string) => {
       return await request(server)
         .patch(`${endpoint}/${blogId}/readCount`)
-        .set("authorization", token);
+        .set("Cookie", `authToken=${token}`);
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
@@ -507,8 +507,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
-
+      token = user.generateAuthToken();
       const blogId = "invalid-blogId";
       const res = await exec(blogId);
 
@@ -521,7 +520,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should update read count of blog and user", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const {
         blogId,
         activity: { totalReads: BlogTotalReads },
@@ -565,7 +564,7 @@ describe("/api/v1/blogs", () => {
       return await request(server)
         .patch(`${endpoint}/${blogId}`)
         .send(payload)
-        .set("authorization", token);
+        .set("Cookie", `authToken=${token}`);
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
@@ -579,8 +578,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
-
+      token = user.generateAuthToken();
       const blogId = "invalid-blogId";
       const res = await exec(blogId);
 
@@ -593,7 +591,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return BadRequest-400 if published blog description exceeds 200 characters limit is not passed", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
 
       const res = await exec(publishedBlog.blogId, {
@@ -611,7 +609,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should update draft blog", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
       const toUpdate = {
         title: `updated ${draftBlog.title}`,
@@ -645,7 +643,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should update draft blog and publish it", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
       const toUpdate = {
         title: draftBlog.title,
@@ -701,7 +699,7 @@ describe("/api/v1/blogs", () => {
     const exec = async (blogId: string) => {
       return await request(server)
         .patch(`${endpoint}/${blogId}/like`)
-        .set("authorization", token);
+        .set("Cookie", `authToken=${token}`);
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
@@ -715,8 +713,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
-
+      token = user.generateAuthToken();
       const blogId = "invalid-blogId";
       const res = await exec(blogId);
 
@@ -729,7 +726,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should like blog if user has not already liked", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
 
       const res = await exec(publishedBlog.blogId);
@@ -749,7 +746,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should unlike blog if user has already liked", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
       // add user in blog likes map
       let existingBlog = await Blog.findOne({ blogId: publishedBlog.blogId });
@@ -793,7 +790,7 @@ describe("/api/v1/blogs", () => {
     const exec = async (blogId: string, payload: object = {}) => {
       return await request(server)
         .delete(`${endpoint}/${blogId}`)
-        .set("authorization", token);
+        .set("Cookie", `authToken=${token}`);
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
@@ -807,8 +804,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
-      token = `Bearer ${user.generateAuthToken()}`;
-
+      token = user.generateAuthToken();
       const blogId = "invalid-blogId";
       const res = await exec(blogId);
 
@@ -822,7 +818,7 @@ describe("/api/v1/blogs", () => {
 
     it("should delete draft blog if blogId is valid", async () => {
       // setup - get draft blog
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const draftBlogId = blogs.filter((blog) => blog.isDraft === true)[0]
         ?.blogId;
       const draftBlog = await Blog.findOne({ blogId: draftBlogId });
@@ -861,7 +857,7 @@ describe("/api/v1/blogs", () => {
 
     it("should delete published blog and decrement author total post count", async () => {
       // setup - get published blog
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
         ?.blogId;
       const publishedBlog = await Blog.findOne({ blogId: publishedBlogId });

@@ -181,7 +181,7 @@ describe("/api/v1/blogs", () => {
     const exec = async (payload: any) => {
       return await request(server)
         .post(endpoint)
-        .set("authorization", token)
+        .set("Cookie", `authToken=${token}`)
         .send(payload);
     };
 
@@ -207,7 +207,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return BadRequest-400 if blogId parameter is not of the correct type", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // 'blogId' must be a valid mongodb Object id
       const blogId = "invalid-blogid";
 
@@ -226,7 +226,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return NotFound-404 if blog with given blogId does not exists", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // blog with this id does not exists
       const blogId = new mongoose.Types.ObjectId().toString();
 
@@ -245,7 +245,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should create comment and update blog's comment", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       const blogId = blogs[0].id;
       const commentData = {
         blogId,
@@ -393,7 +393,7 @@ describe("/api/v1/blogs", () => {
     const exec = async (payload: any) => {
       return await request(server)
         .post(`${endpoint}/replies`)
-        .set("authorization", token)
+        .set("Cookie", `authToken=${token}`)
         .send(payload);
     };
 
@@ -419,7 +419,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return BadRequest-400 if commentId parameter is not a valid value", async () => {
-      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      token = repliedByUser.generateAuthToken();
       // 'commentId' must be a valid mongodb Object id
       const commentId = "invalid-commentId";
 
@@ -437,7 +437,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return NotFound-404 if parent comment does not exists", async () => {
-      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      token = repliedByUser.generateAuthToken();
       // comment with this id does not exists
       const commentId = new mongoose.Types.ObjectId().toString();
 
@@ -455,7 +455,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should create reply and update comment and blog accordingly", async () => {
-      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      token = repliedByUser.generateAuthToken();
       const comment = comments.filter((c) => c.isReply === false)[0];
       const blog = await Blog.findById(comment.blogId);
       const totalComment = blog?.activity.totalComments;
@@ -513,7 +513,7 @@ describe("/api/v1/blogs", () => {
 
       // create reply by calling api
       const repliedBy = await User.findById(user1);
-      token = `Bearer ${repliedBy?.generateAuthToken()}`;
+      token = repliedBy?.generateAuthToken() as string;
       const replyData = {
         commentId: reply.id,
         content: `Reply to ${reply.content}`,
@@ -576,7 +576,7 @@ describe("/api/v1/blogs", () => {
     const exec = async (id: any) => {
       return await request(server)
         .delete(`${endpoint}/${id}`)
-        .set("authorization", token);
+        .set("Cookie", `authToken=${token}`);
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
@@ -591,7 +591,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return BadRequest-400 if commentId is invalid", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // 'commentId' must be a valid mongodb Object id
       const commentId = "invalid-blogid";
 
@@ -606,7 +606,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return NotFound-404 if comment does not exists", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // comment with this id does not exists
       const commentId = new mongoose.Types.ObjectId().toString();
 
@@ -628,7 +628,7 @@ describe("/api/v1/blogs", () => {
           String(u._id) !== String(comment.commentedBy) &&
           String(u._id) !== String(comment.blogAuthor)
       )[0];
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
 
       const res = await exec(comment.id);
 
@@ -646,7 +646,7 @@ describe("/api/v1/blogs", () => {
       // 2. blog `totalParentComments` must be decrement by 1
       //    blog `totalComments` must be decrement by 1
 
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // get top level comment
       const comment = comments.filter((c) => !c.parent)[0];
       // add totalComments and totalParentComments on blog
@@ -687,7 +687,7 @@ describe("/api/v1/blogs", () => {
       // 2. blog `totalParentComments` must be decrement by 1
       //    blog `totalComments` must be decrement by 1 + (totalReplies count of deleted comment)
 
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // get top level comment
       const comment = comments.filter((c) => !c.parent)[0];
 
@@ -766,7 +766,7 @@ describe("/api/v1/blogs", () => {
         },
         { new: true }
       );
-      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      token = repliedByUser.generateAuthToken();
 
       const res = await exec(reply.id);
 
@@ -836,7 +836,7 @@ describe("/api/v1/blogs", () => {
         },
         { new: true }
       );
-      token = `Bearer ${repliedByUser.generateAuthToken()}`;
+      token = repliedByUser.generateAuthToken();
 
       const res = await exec(reply.id);
 
@@ -901,7 +901,7 @@ describe("/api/v1/blogs", () => {
     const exec = async (id: any, payload: { content: string }) => {
       return await request(server)
         .patch(`${endpoint}/${id}`)
-        .set("authorization", token)
+        .set("Cookie", `authToken=${token}`)
         .send(payload);
     };
 
@@ -918,7 +918,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return BadRequest-400 if commentId is invalid", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // 'commentId' must be a valid mongodb Object id
       const commentId = "invalid-blogid";
       const payload = { content: "updated comment" };
@@ -934,7 +934,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return NotFound-404 if comment does not exists", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // comment with this id does not exists
       const commentId = new mongoose.Types.ObjectId().toString();
       const payload = { content: "updated comment" };
@@ -955,7 +955,7 @@ describe("/api/v1/blogs", () => {
       const user: any = users.filter(
         (u) => String(u._id) !== String(comment.commentedBy)
       )[0];
-      token = `Bearer ${user.generateAuthToken()}`;
+      token = user.generateAuthToken();
       const payload = { content: "updated comment" };
 
       const res = await exec(comment.id, payload);
@@ -969,7 +969,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should update a comment", async () => {
-      token = `Bearer ${commentedByUser.generateAuthToken()}`;
+      token = commentedByUser.generateAuthToken();
       // get a comment created by authenticated user
       const comment = comments.filter(
         (c) =>

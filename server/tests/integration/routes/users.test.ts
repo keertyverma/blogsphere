@@ -126,7 +126,11 @@ describe("/api/v1/users", () => {
         .send(userData);
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
-      expect(res.header["x-auth-token"]).not.toBeNull();
+      expect(res.headers["set-cookie"]).toBeDefined();
+      // Parse the set-cookie header to get authToken
+      const cookies = cookie.parse(res.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBeDefined();
+
       const responseData = res.body.result;
 
       const { id, fullname, email, username, profileImage } = responseData;
