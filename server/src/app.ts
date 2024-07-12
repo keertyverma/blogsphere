@@ -4,7 +4,12 @@ import "dotenv/config";
 import express, { Request, Response } from "express";
 import helmet from "helmet";
 
-import { errorHandler, rateLimiter, routeNotFoundHandler } from "./middlewares";
+import {
+  corsMiddleware,
+  errorHandler,
+  rateLimiter,
+  routeNotFoundHandler,
+} from "./middlewares";
 import {
   authRouter,
   blogRouter,
@@ -16,6 +21,7 @@ import {
 const app = express();
 
 app.use(express.json({ limit: "10mb" }));
+app.use(corsMiddleware);
 app.use(cookieParser());
 
 // if (process.env.NODE_ENV === "production") {
