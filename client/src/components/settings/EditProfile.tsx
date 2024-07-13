@@ -33,7 +33,6 @@ const EditProfile = () => {
   const { data: user, isLoading, error } = useGetUser(username);
   const [bioValue, setBioValue] = useState(user?.personalInfo.bio || "");
   const [profileImgUrl, setProfileImgUrl] = useState("");
-  const token = useAuthStore((s) => s.token);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateUserProfile();
 
@@ -119,10 +118,7 @@ const EditProfile = () => {
       };
 
       // Update profile
-      await updateProfile({
-        token,
-        toUpdate,
-      });
+      await updateProfile(toUpdate);
 
       toast.dismiss(loadingToast);
       toast.success("Profile Updated.👍");

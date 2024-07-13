@@ -5,9 +5,8 @@ import { persist } from "zustand/middleware";
 
 interface AuthStore {
   user: IUser;
-  token: string;
   isAuthenticated: boolean;
-  setUserAuth: (user: IUser, token: string) => void;
+  setUserAuth: (user: IUser) => void;
   clearUserAuth: () => void;
 }
 
@@ -24,19 +23,16 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       user: initialUser,
-      token: "",
       isAuthenticated: false,
-      setUserAuth: (user, token) =>
-        set({ user, token, isAuthenticated: !!user.id && !!token }),
-      clearUserAuth: () =>
-        set({ user: initialUser, token: "", isAuthenticated: false }),
+      setUserAuth: (user) => set({ user, isAuthenticated: !!user.id }),
+      clearUserAuth: () => set({ user: initialUser, isAuthenticated: false }),
     }),
     {
       name: "BlogsphereAuthStore",
       onRehydrateStorage: () => (state) => {
         if (state) {
-          const { user, token } = state;
-          state.isAuthenticated = !!user.id && !!token;
+          const { user } = state;
+          state.isAuthenticated = !!user.id;
         }
       },
     }

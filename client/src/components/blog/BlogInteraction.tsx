@@ -33,7 +33,6 @@ const BlogInteraction = ({
 }: Props) => {
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
   const user = useAuthStore((s) => s.user);
-  const token = useAuthStore((s) => s.token);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const { mutateAsync: likePost } = useLikePost();
@@ -73,8 +72,8 @@ const BlogInteraction = ({
       return likeObj;
     });
 
-    // update like count in backend server
-    await likePost({ token, blogId });
+    // update like count
+    await likePost(blogId);
   };
 
   return (

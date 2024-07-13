@@ -22,7 +22,12 @@ import { QUERY_KEYS } from "./queryKeys";
 export const usePingServer = () => {
   useQuery({
     queryKey: ["ping-server"],
-    queryFn: () => apiClient.get("/").then((res) => res.data),
+    queryFn: () =>
+      apiClient
+        .get("/", {
+          withCredentials: false,
+        })
+        .then((res) => res.data),
   });
 };
 
@@ -60,6 +65,7 @@ export const useGetSearchedUsers = (searchTerm: string) =>
             search: searchTerm,
             pageSize: 50,
           },
+          withCredentials: false,
         })
         .then(
           (res) => (res.data as unknown as IFetchAllResponse<IAuthor>).results
@@ -76,7 +82,7 @@ export const useGetUser = (profileId?: string) =>
     queryKey: [QUERY_KEYS.GET_USER_BY_ID, profileId],
     queryFn: () =>
       apiClient
-        .get<IAuthor>(`/users/${profileId}`)
+        .get<IAuthor>(`/users/${profileId}`, { withCredentials: false })
         .then((res) => (res.data as unknown as IFetchResponse<IAuthor>).result),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
@@ -88,24 +94,12 @@ export const useGetUser = (profileId?: string) =>
 
 export const useUpdatePassword = () =>
   useMutation({
-    mutationFn: (data: {
-      token: string;
-      currentPassword: string;
-      newPassword: string;
-    }) =>
+    mutationFn: (data: { currentPassword: string; newPassword: string }) =>
       apiClient
-        .post(
-          "/users/changePassword",
-          {
-            currentPassword: data.currentPassword,
-            newPassword: data.newPassword,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
-          }
-        )
+        .post("/users/changePassword", {
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        })
         .then((res) => res.data.result),
   });
 
@@ -113,14 +107,8 @@ export const useUpdateUserProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { token: string; toUpdate: IUpdateUserProfile }) =>
-      apiClient
-        .patch("/users", data.toUpdate, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        })
-        .then((res) => res.data.result),
+    mutationFn: (data: IUpdateUserProfile) =>
+      apiClient.patch("/users", data).then((res) => res.data.result),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, data.personalInfo.username],
@@ -136,14 +124,8 @@ export const useCreateBlog = () => {
   const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
-    mutationFn: (data: { token: string; blog: object }) =>
-      apiClient
-        .post("/blogs", data.blog, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        })
-        .then((res) => res.data.result),
+    mutationFn: (data: object) =>
+      apiClient.post("/blogs", data).then((res) => res.data.result),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
@@ -181,6 +163,7 @@ export const useGetLatestBlogs = (tag: string) =>
       return await apiClient
         .get("/blogs", {
           params,
+          withCredentials: false,
         })
         .then((res) => res.data);
     },
@@ -204,6 +187,7 @@ export const useGetTrendingBlogs = () =>
       apiClient
         .get<IBlog[]>("/blogs", {
           params: { ordering: "trending", pageSize: 10 },
+          withCredentials: false,
         })
         .then((res) => (res.data as unknown as IFetchAllResponse).results),
     staleTime: ms("5m"),
@@ -225,6 +209,7 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
             pageSize: 10,
             page: pageParam,
           },
+          withCredentials: false,
         })
         .then((res) => res.data),
     getNextPageParam: (lastPage, allPages) => {
@@ -261,6 +246,7 @@ export const useGetUserBlogs = (
       return await apiClient
         .get("/blogs", {
           params,
+          withCredentials: false,
         })
         .then((res) => res.data);
     },
@@ -281,7 +267,7 @@ export const useGetBlog = (blogId?: string) =>
     queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
     queryFn: () =>
       apiClient
-        .get<IBlog>(`/blogs/${blogId}`)
+        .get<IBlog>(`/blogs/${blogId}`, { withCredentials: false })
         .then((res) => (res.data as unknown as IFetchResponse).result),
     staleTime: ms("10m"),
     gcTime: ms("30m"),
@@ -293,18 +279,8 @@ export const useGetBlog = (blogId?: string) =>
 
 export const useUpdateReads = () =>
   useMutation({
-    mutationFn: (data: { token: string; blogId: string }) =>
-      apiClient
-        .patch(
-          `/blogs/${data.blogId}/readCount`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
-          }
-        )
-        .then((res) => res.data),
+    mutationFn: (blogId: string) =>
+      apiClient.patch(`/blogs/${blogId}/readCount`).then((res) => res.data),
   });
 
 export const useUpdateBlog = () => {
@@ -312,13 +288,9 @@ export const useUpdateBlog = () => {
   const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
-    mutationFn: (data: { blogId: string; token: string; blog: object }) =>
+    mutationFn: (data: { blogId: string; blog: object }) =>
       apiClient
-        .patch(`/blogs/${data.blogId}`, data.blog, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        })
+        .patch(`/blogs/${data.blogId}`, data.blog)
         .then((res) => res.data.result),
     onSuccess: (data) => {
       // refetch given blog
@@ -356,18 +328,8 @@ export const useLikePost = () => {
   const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
-    mutationFn: (data: { token: string; blogId: string }) =>
-      apiClient
-        .patch(
-          `/blogs/${data.blogId}/like`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
-          }
-        )
-        .then((res) => res.data.result),
+    mutationFn: (blogId: string) =>
+      apiClient.patch(`/blogs/${blogId}/like`).then((res) => res.data.result),
     onSuccess: (data) => {
       const authorId = data.authorDetails;
       queryClient.invalidateQueries({
@@ -396,14 +358,8 @@ export const useDeleteBlog = () => {
   const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
-    mutationFn: (data: { blogId: string; token: string }) =>
-      apiClient
-        .delete(`blogs/${data.blogId}`, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        })
-        .then((res) => res.data.result),
+    mutationFn: (blogId: string) =>
+      apiClient.delete(`blogs/${blogId}`).then((res) => res.data.result),
     onSuccess: (data) => {
       const { _id: authorId, personalInfo } = data.authorDetails;
       // refetch user profile and all blogs
@@ -437,17 +393,11 @@ export const useCreateComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: {
-      token: string;
-      comment: { blogId: string; blogAuthor: string; content: string };
-    }) =>
-      apiClient
-        .post(`/comments`, data.comment, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        })
-        .then((res) => res.data.result),
+    mutationFn: (comment: {
+      blogId: string;
+      blogAuthor: string;
+      content: string;
+    }) => apiClient.post(`/comments`, comment).then((res) => res.data.result),
     onSuccess: (data) => {
       const {
         blog: { id, blogId },
@@ -476,7 +426,7 @@ export const useGetComments = (blogId: string = "", commentId: string = "") =>
       if (commentId) params.commentId = commentId;
 
       return await apiClient
-        .get(`/comments`, { params })
+        .get(`/comments`, { params, withCredentials: false })
         .then((res) => res.data);
     },
     getNextPageParam: (lastPage, allPages) => {
@@ -496,17 +446,8 @@ export const useCreateReply = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: {
-      token: string;
-      reply: { commentId: string; content: string };
-    }) =>
-      apiClient
-        .post(`/comments/replies`, data.reply, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        })
-        .then((res) => res.data.result),
+    mutationFn: (reply: { commentId: string; content: string }) =>
+      apiClient.post(`/comments/replies`, reply).then((res) => res.data.result),
     onSuccess: (data) => {
       const {
         blog: { id, blogId },
@@ -536,14 +477,8 @@ export const useDeleteComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { commentId: string; token: string }) =>
-      apiClient
-        .delete(`comments/${data.commentId}`, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        })
-        .then((res) => res.data.result),
+    mutationFn: (commentId: string) =>
+      apiClient.delete(`comments/${commentId}`).then((res) => res.data.result),
     onSuccess: (data) => {
       const {
         blog: { id, blogId },
@@ -571,20 +506,9 @@ export const useUpdateComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: {
-      token: string;
-      comment: { id: string; content: string };
-    }) =>
+    mutationFn: (comment: { id: string; content: string }) =>
       apiClient
-        .patch(
-          `/comments/${data.comment.id}`,
-          { content: data.comment.content },
-          {
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
-          }
-        )
+        .patch(`/comments/${comment.id}`, { content: comment.content })
         .then((res) => res.data.result),
     onSuccess: (data) => {
       const {

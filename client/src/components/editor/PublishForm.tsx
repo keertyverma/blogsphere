@@ -1,6 +1,6 @@
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
-import { useAuthStore, useEditorStore } from "@/store";
+import { useEditorStore } from "@/store";
 import { ICreateBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
@@ -38,7 +38,6 @@ const PublishForm = () => {
 
   const [titleValue, setTitleValue] = useState(title);
   const [descriptionValue, setDescriptionValue] = useState(description);
-  const token = useAuthStore((s) => s.token);
 
   const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
   const { mutateAsync: updatePublishedBlog, isPending: isUpdating } =
@@ -90,16 +89,12 @@ const PublishForm = () => {
         const updatedBlog = await updatePublishedBlog({
           blogId,
           blog: publishedBlog,
-          token,
         });
         message = "Blog Updated";
         blogUrl = `/blogs/${updatedBlog.blogId}`;
       } else {
         // create mode - publish new blog
-        const newBlog = await createBlog({
-          blog: publishedBlog,
-          token,
-        });
+        const newBlog = await createBlog(publishedBlog);
         message = "Blog Published 🥳";
         blogUrl = `/blogs/${newBlog.id}`;
       }

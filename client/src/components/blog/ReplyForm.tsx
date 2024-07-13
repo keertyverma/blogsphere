@@ -17,7 +17,6 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
-  const token = useAuthStore((s) => s.token);
 
   const { data: user, isLoading, error } = useGetUser(authUser.username);
   const {
@@ -36,7 +35,7 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
     }
     try {
       // create reply
-      await createReply({ token, reply: { commentId, content: reply } });
+      await createReply({ commentId, content: reply });
       onSubmit();
       setReply("");
       onClose();

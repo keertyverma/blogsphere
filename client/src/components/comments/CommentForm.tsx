@@ -33,7 +33,6 @@ const CommentForm = ({
   );
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
-  const token = useAuthStore((s) => s.token);
 
   const {
     data: user,
@@ -71,10 +70,7 @@ const CommentForm = ({
     try {
       if (existingComment) {
         // update comment
-        await updateComment({
-          token,
-          comment: { id: existingComment.id, content: comment },
-        });
+        await updateComment({ id: existingComment.id, content: comment });
 
         toast.success("Comment updated 👍");
         if (closeEditForm) closeEditForm();
@@ -85,7 +81,7 @@ const CommentForm = ({
           blogAuthor: authorId as string,
           content: comment,
         };
-        await createComment({ token, comment: commentData });
+        await createComment(commentData);
       }
       setComment("");
     } catch (error) {

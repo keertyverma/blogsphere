@@ -12,7 +12,6 @@ import {
 } from "../ui/form";
 
 import { useUpdatePassword } from "@/lib/react-query/queries";
-import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
@@ -22,8 +21,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
 const ChangePassword = () => {
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const token = useAuthStore((s) => s.token);
+  const [passwordVisible, setPasswordVisible] = useState(true);
   const { mutateAsync: updatePassword, isPending: isUpdatingPassword } =
     useUpdatePassword();
   const navigate = useNavigate();
@@ -43,7 +41,6 @@ const ChangePassword = () => {
     try {
       const { currentPassword, newPassword } = data;
       await updatePassword({
-        token,
         currentPassword,
         newPassword,
       });

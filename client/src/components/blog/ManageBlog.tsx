@@ -1,5 +1,4 @@
 import { useDeleteBlog } from "@/lib/react-query/queries";
-import { useAuthStore } from "@/store";
 import { IBlog } from "@/types";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -23,13 +22,12 @@ interface Props {
 
 const ManageBlog = ({ blogId }: Props) => {
   const { mutateAsync: deleteBlog } = useDeleteBlog();
-  const token = useAuthStore((s) => s.token);
   const navigate = useNavigate();
 
   const handleDelete = async () => {
     const loadingToast = toast.loading("Deleting ...");
     try {
-      const deletedBlog: IBlog = await deleteBlog({ blogId, token });
+      const deletedBlog: IBlog = await deleteBlog(blogId);
       const authorUsername = deletedBlog.authorDetails.personalInfo.username;
 
       toast.dismiss(loadingToast);

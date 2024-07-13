@@ -26,7 +26,6 @@ const ManageComment = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutateAsync: deleteBlog, isPending: isDeleting } = useDeleteComment();
   const user = useAuthStore((s) => s.user);
-  const token = useAuthStore((s) => s.token);
 
   const handleDelete = () => {
     setIsModalOpen(true);
@@ -36,7 +35,7 @@ const ManageComment = ({
     setIsModalOpen(false);
     const loadingToast = toast.loading("Deleting ...");
     try {
-      await deleteBlog({ commentId, token });
+      await deleteBlog(commentId);
       toast.dismiss(loadingToast);
       toast.success("Comment Deleted.");
     } catch (error) {

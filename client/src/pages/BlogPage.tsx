@@ -10,7 +10,7 @@ import { Link, useParams } from "react-router-dom";
 const BlogPage = () => {
   const { blogId } = useParams();
 
-  const token = useAuthStore((s) => s.token);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data: blog, isLoading, error } = useGetBlog(blogId);
   const updateReads = useUpdateReads();
 
@@ -19,11 +19,11 @@ const BlogPage = () => {
     const readCountKey = `hasUpdatedReadCount_${blogId}`;
     const hasUpdatedReadCount = sessionStorage.getItem(readCountKey);
     // update read count for authenticated users
-    if (token && blogId && !hasUpdatedReadCount) {
-      updateReads.mutate({ token, blogId });
+    if (isAuthenticated && blogId && !hasUpdatedReadCount) {
+      updateReads.mutate(blogId);
       sessionStorage.setItem(readCountKey, "true"); // Set the flag after updating read count
     }
-  }, [token, blogId]);
+  }, [isAuthenticated, blogId]);
 
   if (!blogId) return null;
 

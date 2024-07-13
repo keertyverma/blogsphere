@@ -47,10 +47,8 @@ const LoginForm = () => {
     try {
       const userResponse = await login(user);
       const userData = userResponse.data.result;
-      const authToken = userResponse.headers["x-auth-token"];
-
-      if (userData && authToken) {
-        setUserAuth({ ...userData }, authToken);
+      if (userData) {
+        setUserAuth({ ...userData });
       }
 
       form.reset();
@@ -97,12 +95,11 @@ const LoginForm = () => {
 
       const accessToken = await googleUser.getIdToken();
       const userResponse = await loginWithGoogle(accessToken);
-      const { data, headers } = userResponse;
+      const { data } = userResponse;
       const { result: userData } = data;
-      const authToken = headers["x-auth-token"];
 
-      if (userData && authToken) {
-        setUserAuth({ ...userData }, authToken);
+      if (userData) {
+        setUserAuth({ ...userData });
         navigate("/");
       }
     } catch (error) {

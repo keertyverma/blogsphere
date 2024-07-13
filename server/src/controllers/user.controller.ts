@@ -5,7 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 
 import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
-import { generateUsername } from "../utils";
+import { generateUsername, getCookieOptions } from "../utils";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
@@ -64,10 +64,7 @@ export const createUser = async (req: Request, res: Response) => {
 
   // send token inside cookies (`HTTP-only` secure)
   return res
-    .cookie("authToken", accessToken, {
-      httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
-      secure: process.env.NODE_ENV === "production", // Ensures cookie is sent only over HTTPS in production
-    })
+    .cookie("authToken", accessToken, getCookieOptions())
     .status(data.statusCode)
     .json(data);
 };
