@@ -157,4 +157,12 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
   }
 };
 
-export { authenticateUser, authenticateWithGoogle };
+const logout = async (req: Request, res: Response) => {
+  logger.debug(`POST Request on Route -> ${req.baseUrl}/logout`);
+
+  // clear token cookie
+  res.clearCookie("authToken", getCookieOptions());
+  res.status(200).json({ message: "Logout successful" });
+};
+
+export { authenticateUser, authenticateWithGoogle, logout };

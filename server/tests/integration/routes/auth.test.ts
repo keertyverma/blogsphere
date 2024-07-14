@@ -287,7 +287,7 @@ describe("/api/v1/auth", () => {
 
       expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
 
-      // Ensure the lauthToken' is set in the cookie
+      // Ensure the authToken' is set in the cookie
       expect(res.headers["set-cookie"]).toBeDefined();
       // Parse the set-cookie header to get authToken
       const cookies = cookie.parse(res.headers["set-cookie"][0]);
@@ -325,6 +325,43 @@ describe("/api/v1/auth", () => {
       expect(fullname).toBe(user?.personalInfo.fullname);
       expect(email).toBe(user?.personalInfo.email);
       expect(username).toBe(user?.personalInfo.username);
+    });
+  });
+
+  describe("POST /logout", () => {
+    let token: string;
+
+    const exec = async () => {
+      return await request(server)
+        .post(`${endpoint}/logout`)
+        .set("Cookie", `authToken=${token}`);
+    };
+
+    it("should return 401 if user is not authenticated", async () => {
+      token = "";
+      const res = await exec();
+
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toBe("Access Denied.Token is not provided.");
+    });
+
+    it("should clear the authToken cookie on logout", async () => {
+      // create a valid user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+      });
+      token = user.generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(200);
+      // authToken must be empty within cookie token
+      const cookies = cookie.parse(res.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBe("");
     });
   });
 });
