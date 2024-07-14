@@ -49,6 +49,11 @@ export const useLoginWithGoogle = () =>
       apiClient.post("/auth/google-auth", { accessToken }),
   });
 
+export const useLogout = () =>
+  useMutation({
+    mutationFn: () => apiClient.post("/auth/logout"),
+  });
+
 export const useUpload = () =>
   useMutation({
     mutationFn: (data: string) =>

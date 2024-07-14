@@ -1,9 +1,11 @@
-import { useGetUser } from "@/lib/react-query/queries";
+import { useGetUser, useLogout } from "@/lib/react-query/queries";
+import { handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LuUserCircle } from "react-icons/lu";
 import { MdLogout } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
@@ -15,15 +17,24 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "../ui/menubar";
-import { handleProfileImgErr } from "@/lib/utils";
 
 const UserNavigationPanel = () => {
   const authUser = useAuthStore((s) => s.user);
   const clearUserAuth = useAuthStore((s) => s.clearUserAuth);
   const { data: user, isLoading, error } = useGetUser(authUser.username);
+  const { mutateAsync: logout } = useLogout();
 
-  const logoutUser = () => {
-    clearUserAuth();
+  const logoutUser = async () => {
+    try {
+      await logout();
+      clearUserAuth();
+    } catch (error) {
+      const errorMessage = "An error occurred. Please try again later.";
+      toast.error(errorMessage, {
+        position: "top-right",
+        className: "mt-20",
+      });
+    }
   };
 
   if (error) console.error(error);
