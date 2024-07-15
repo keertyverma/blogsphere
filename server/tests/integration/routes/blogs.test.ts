@@ -137,7 +137,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec({ title: "blog-1" });
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return BadRequest-400 if token is invalid", async () => {
@@ -146,7 +150,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec({ title: "blog-1" });
 
       expect(res.statusCode).toBe(400);
-      expect(res.text).toBe("Invalid token.");
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid auth token.",
+      });
     });
 
     it("should return BadRequest-400 if required parameter is not passed", async () => {
@@ -503,7 +511,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec("invalid-blogId");
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
@@ -574,7 +586,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec("invalid-blogId");
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
@@ -709,7 +725,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec("invalid-blogId");
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
@@ -800,7 +820,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec("invalid-blogId");
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {

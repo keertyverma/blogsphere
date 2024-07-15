@@ -342,7 +342,11 @@ describe("/api/v1/auth", () => {
       const res = await exec();
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should clear the authToken cookie on logout", async () => {

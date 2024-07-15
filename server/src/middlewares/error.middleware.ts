@@ -20,6 +20,7 @@ export const errorHandler = (
 
   const errorCodeMessageMap: IErrorCodeMessageMap = {
     400: { code: "BAD_REQUEST", message: "Invalid input data" },
+    401: { code: "UNAUTHORIZED", message: "Unauthorized access." },
     403: {
       code: "FORBIDDEN",
       message: "You do not have permission to access this resource.",

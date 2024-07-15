@@ -193,7 +193,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec({ blogId, content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return BadRequest-400 if token is invalid", async () => {
@@ -203,7 +207,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec({ blogId, content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(400);
-      expect(res.text).toBe("Invalid token.");
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid auth token.",
+      });
     });
 
     it("should return BadRequest-400 if blogId parameter is not of the correct type", async () => {
@@ -405,7 +413,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec(payload);
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return BadRequest-400 if token is invalid", async () => {
@@ -415,7 +427,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec({ payload });
 
       expect(res.statusCode).toBe(400);
-      expect(res.text).toBe("Invalid token.");
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid auth token.",
+      });
     });
 
     it("should return BadRequest-400 if commentId parameter is not a valid value", async () => {
@@ -587,7 +603,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec(commentId);
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return BadRequest-400 if commentId is invalid", async () => {
@@ -914,7 +934,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec(commentId, payload);
 
       expect(res.statusCode).toBe(401);
-      expect(res.text).toBe("Access Denied.Token is not provided.");
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
     });
 
     it("should return BadRequest-400 if commentId is invalid", async () => {

@@ -29,13 +29,8 @@ describe("verify token middleware", () => {
     } as unknown as Response;
     const next: jest.Mock<NextFunction> = jest.fn();
 
-    verifyToken(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.send).toHaveBeenCalledWith(
-      "Access Denied.Token is not provided."
-    );
-    expect(next).not.toHaveBeenCalled();
+    const callWithoutToken = () => verifyToken(req, res, next);
+    expect(callWithoutToken).toThrow("Access Denied.Token is not provided.");
   });
 
   it("should return 401-UnAuthorized if token has expired", async () => {
@@ -58,13 +53,10 @@ describe("verify token middleware", () => {
     } as unknown as Response;
     const next: jest.Mock<NextFunction> = jest.fn();
 
-    verifyToken(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.send).toHaveBeenCalledWith(
+    const callWithExpiredToken = () => verifyToken(req, res, next);
+    expect(callWithExpiredToken).toThrow(
       "Token has expired. Please log in again."
     );
-    expect(next).not.toHaveBeenCalled();
   });
 
   it("should return 400-BadRequest if token is invalid", async () => {
@@ -79,10 +71,7 @@ describe("verify token middleware", () => {
     } as unknown as Response;
     const next: jest.Mock<NextFunction> = jest.fn();
 
-    verifyToken(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send).toHaveBeenCalledWith("Invalid token.");
-    expect(next).not.toHaveBeenCalled();
+    const callWithInvalidToken = () => verifyToken(req, res, next);
+    expect(callWithInvalidToken).toThrow("Invalid auth token.");
   });
 });
