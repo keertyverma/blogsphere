@@ -22,6 +22,7 @@ Welcome to Blogsphere, the ultimate fullstack web application for bloggers and r
   - Signup and login with email/password.
   - Login via Google.
   - Logout functionality.
+  - Token expiration
 - **User Profile**: View and edit user profile, update social links, bio, and username.
 - **Change Password**: Users can change their login password from settings.
 

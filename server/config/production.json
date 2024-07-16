@@ -3,5 +3,5 @@
   "database": {
     "name": "blogsphere_prod"
   },
-  "tokenExpiresIn": "20s"
+  "tokenExpiresIn": "7d"
 }
