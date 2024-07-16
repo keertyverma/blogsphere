@@ -40,6 +40,7 @@ const SignupForm = () => {
   const isLoading = isCreatingUser || isGoogleLoginUser;
 
   const setUserAuth = useAuthStore((s) => s.setUserAuth);
+  const clearRedirectedUrl = useAuthStore((s) => s.clearRedirectedUrl);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof SignupValidation>>({
@@ -60,7 +61,13 @@ const SignupForm = () => {
       }
 
       form.reset();
-      navigate("/");
+      const redirectedUrl = useAuthStore.getState().redirectedUrl;
+      if (redirectedUrl) {
+        navigate(redirectedUrl);
+        clearRedirectedUrl();
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {
@@ -91,7 +98,13 @@ const SignupForm = () => {
 
       if (userData) {
         setUserAuth({ ...userData });
-        navigate("/");
+        const redirectedUrl = useAuthStore.getState().redirectedUrl;
+        if (redirectedUrl) {
+          navigate(redirectedUrl);
+          clearRedirectedUrl();
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";

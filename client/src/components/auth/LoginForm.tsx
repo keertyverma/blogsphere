@@ -33,6 +33,7 @@ const LoginForm = () => {
   const isLoading = isLoginUser || isGoogleLoginUser;
 
   const setUserAuth = useAuthStore((s) => s.setUserAuth);
+  const clearRedirectedUrl = useAuthStore((s) => s.clearRedirectedUrl);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof LoginValidation>>({
@@ -52,7 +53,13 @@ const LoginForm = () => {
       }
 
       form.reset();
-      navigate("/");
+      const redirectedUrl = useAuthStore.getState().redirectedUrl;
+      if (redirectedUrl) {
+        navigate(redirectedUrl);
+        clearRedirectedUrl();
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
       if (
@@ -100,7 +107,13 @@ const LoginForm = () => {
 
       if (userData) {
         setUserAuth({ ...userData });
-        navigate("/");
+        const redirectedUrl = useAuthStore.getState().redirectedUrl;
+        if (redirectedUrl) {
+          navigate(redirectedUrl);
+          clearRedirectedUrl();
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";

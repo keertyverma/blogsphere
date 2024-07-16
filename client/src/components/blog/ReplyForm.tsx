@@ -2,6 +2,7 @@ import { useCreateReply, useGetUser } from "@/lib/react-query/queries";
 import { handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
@@ -15,8 +16,11 @@ interface Props {
 const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const [reply, setReply] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
+  const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
+  const navigate = useNavigate();
 
   const { data: user, isLoading, error } = useGetUser(authUser.username);
   const {
@@ -31,7 +35,9 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      return toast.error("Please log in to add a reply.");
+      toast.error("Please log in to add a reply.");
+      setRedirectedUrl(location.pathname);
+      return navigate("/login");
     }
     try {
       // create reply

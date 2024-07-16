@@ -6,6 +6,7 @@ import {
 import { handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
@@ -33,6 +34,8 @@ const CommentForm = ({
   );
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
+  const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
+  const navigate = useNavigate();
 
   const {
     data: user,
@@ -64,7 +67,9 @@ const CommentForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      return toast.error("Please log in to add a comment.");
+      toast.error("Please log in to add a comment.");
+      setRedirectedUrl(location.pathname);
+      return navigate("/login");
     }
 
     try {

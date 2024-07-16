@@ -12,6 +12,7 @@ const apiClient = axios.create({
 const useAxiosInterceptors = () => {
   const setTokenExpired = useAuthStore((state) => state.setTokenExpired);
   const clearUserAuth = useAuthStore((state) => state.clearUserAuth);
+  const setRedirectedUrl = useAuthStore((state) => state.setRedirectedUrl);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +32,8 @@ const useAxiosInterceptors = () => {
           // this will reset user auth and re-direct user to login page
           setTokenExpired(true);
           clearUserAuth();
+
+          setRedirectedUrl(location.pathname);
           navigate("/login");
           toast.error("Your session has expired. Please log in again.", {
             position: "top-right",

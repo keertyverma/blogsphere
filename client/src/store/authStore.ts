@@ -7,9 +7,12 @@ interface AuthStore {
   user: IUser;
   isAuthenticated: boolean;
   isTokenExpired: boolean;
+  redirectedUrl: string | null;
   setUserAuth: (user: IUser) => void;
   clearUserAuth: () => void;
   setTokenExpired: (expired: boolean) => void;
+  setRedirectedUrl: (url: string) => void;
+  clearRedirectedUrl: () => void;
 }
 
 const initialUser = {
@@ -27,10 +30,13 @@ export const useAuthStore = create<AuthStore>()(
       user: initialUser,
       isAuthenticated: false,
       isTokenExpired: false,
+      redirectedUrl: null,
       setUserAuth: (user) =>
         set({ user, isAuthenticated: !!user.id, isTokenExpired: false }),
       clearUserAuth: () => set({ user: initialUser, isAuthenticated: false }),
       setTokenExpired: (expired) => set({ isTokenExpired: expired }),
+      setRedirectedUrl: (url) => set({ redirectedUrl: url }),
+      clearRedirectedUrl: () => set({ redirectedUrl: null }),
     }),
     {
       name: "BlogsphereAuthStore",

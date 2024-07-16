@@ -34,6 +34,7 @@ const BlogInteraction = ({
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
 
   const { mutateAsync: likePost } = useLikePost();
   const navigate = useNavigate();
@@ -56,6 +57,7 @@ const BlogInteraction = ({
 
     if (!isAuthenticated) {
       toast.error("Please login to like this blog");
+      setRedirectedUrl(location.pathname);
       return navigate("/login");
     }
 
