@@ -1,4 +1,5 @@
 import { useDeleteBlog } from "@/lib/react-query/queries";
+import { useAuthStore } from "@/store";
 import { IBlog } from "@/types";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -35,10 +36,12 @@ const ManageBlog = ({ blogId }: Props) => {
       navigate(`/user/${authorUsername}`);
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error("An error occurred. Please try again later.", {
-        position: "top-right",
-        className: "mt-20",
-      });
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.", {
+          position: "top-right",
+          className: "mt-20",
+        });
+      }
     }
   };
 

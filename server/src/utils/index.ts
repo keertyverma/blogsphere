@@ -42,7 +42,7 @@ export const getCookieOptions = (): CookieOptions => {
   // cookies option to create secure cookies
   return {
     httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
-    sameSite: "none", // Allows cookie to be sent in cross-origin requests
+    sameSite: process.env.NODE_ENV === "production" ? "none" : undefined, // Allows cookie to be sent in cross-origin requests
     secure: process.env.NODE_ENV === "production", // Ensures cookie is sent only over HTTPS in production
     path: "/api/v1/", // Ensures cookie is accessible only within a specific subset of URLs within the domain that begin with /api/v1/
   };

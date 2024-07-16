@@ -2,5 +2,6 @@
   "appName": "blogsphere",
   "database": {
     "name": "blogsphere_prod"
-  }
+  },
+  "tokenExpiresIn": "20s"
 }

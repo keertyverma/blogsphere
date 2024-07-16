@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 import { useUpload } from "@/lib/react-query/queries";
 import { convertFileToUrl, fileToBase64 } from "@/lib/utils";
+import { useAuthStore } from "@/store";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 
@@ -30,10 +31,12 @@ const FileUploader = ({ onUpload }: Props) => {
         });
       } catch (error) {
         setPreviewURL("");
-        toast.error("An error occurred. Please try again later.", {
-          position: "top-right",
-          className: "mt-20",
-        });
+        if (!useAuthStore.getState().isTokenExpired) {
+          toast.error("An error occurred. Please try again later.", {
+            position: "top-right",
+            className: "mt-20",
+          });
+        }
       }
     },
     [onUpload, setPreviewURL, upload]

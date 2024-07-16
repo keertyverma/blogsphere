@@ -40,7 +40,9 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
       setReply("");
       onClose();
     } catch (error) {
-      toast.error("An error occurred. Please try again later.");
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.");
+      }
     }
   };
 

@@ -1,5 +1,6 @@
 import { useUpload } from "@/lib/react-query/queries";
 import { convertFileToUrl, fileToBase64 } from "@/lib/utils";
+import { useAuthStore } from "@/store";
 import { useCallback, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { toast } from "react-toastify";
@@ -28,10 +29,12 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
         });
       } catch (error) {
         setPreviewUrl(mediaUrl);
-        toast.error("An error occurred. Please try again later.", {
-          position: "top-right",
-          className: "mt-20",
-        });
+        if (!useAuthStore.getState().isTokenExpired) {
+          toast.error("An error occurred. Please try again later.", {
+            position: "top-right",
+            className: "mt-20",
+          });
+        }
       }
     },
     [onUpload, setPreviewUrl, upload]

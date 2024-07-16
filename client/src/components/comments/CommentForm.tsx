@@ -85,7 +85,9 @@ const CommentForm = ({
       }
       setComment("");
     } catch (error) {
-      toast.error("An error occurred. Please try again later.");
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.");
+      }
     }
   };
 

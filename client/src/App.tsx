@@ -15,10 +15,13 @@ import BlogPage from "./pages/BlogPage";
 import SideNavbar from "./components/settings/SideNavbar";
 import ChangePassword from "./components/settings/ChangePassword";
 import EditProfile from "./components/settings/EditProfile";
+import { useAxiosInterceptors } from "./lib/api-client";
 
 const App = () => {
   // to prevent the server from going into sleep mode due to inactivity.
   usePingServer();
+  // to intercept response and handle token expiration
+  useAxiosInterceptors();
 
   return (
     <main className="w-full h-screen">

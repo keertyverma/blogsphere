@@ -1,6 +1,6 @@
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
-import { useEditorStore } from "@/store";
+import { useAuthStore, useEditorStore } from "@/store";
 import { ICreateBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
@@ -103,7 +103,9 @@ const PublishForm = () => {
       form.reset();
       setIsPublish(false);
     } catch (error) {
-      toast.error("An error occurred. Please try again later.");
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.");
+      }
     }
   };
 

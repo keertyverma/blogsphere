@@ -10,7 +10,7 @@ const SideNavbar = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const page = location.pathname.split("/")[2];
-  const [pageUrl, setPageUrl] = useState(page.replace("-", " "));
+  const [pageUrl, setPageUrl] = useState(page?.replace("-", " ") || "");
 
   const [showSideNav, setShowSideNav] = useState(false);
   const activeTabLineRef = useRef<HTMLHRElement>(null);

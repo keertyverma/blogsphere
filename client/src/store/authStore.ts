@@ -6,8 +6,10 @@ import { persist } from "zustand/middleware";
 interface AuthStore {
   user: IUser;
   isAuthenticated: boolean;
+  isTokenExpired: boolean;
   setUserAuth: (user: IUser) => void;
   clearUserAuth: () => void;
+  setTokenExpired: (expired: boolean) => void;
 }
 
 const initialUser = {
@@ -24,8 +26,11 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       user: initialUser,
       isAuthenticated: false,
-      setUserAuth: (user) => set({ user, isAuthenticated: !!user.id }),
+      isTokenExpired: false,
+      setUserAuth: (user) =>
+        set({ user, isAuthenticated: !!user.id, isTokenExpired: false }),
       clearUserAuth: () => set({ user: initialUser, isAuthenticated: false }),
+      setTokenExpired: (expired) => set({ isTokenExpired: expired }),
     }),
     {
       name: "BlogsphereAuthStore",

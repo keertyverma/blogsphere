@@ -40,10 +40,12 @@ const ManageComment = ({
       toast.success("Comment Deleted.");
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error("An error occurred. Please try again later.", {
-        position: "top-right",
-        className: "mt-20",
-      });
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.", {
+          position: "top-right",
+          className: "mt-20",
+        });
+      }
     }
   };
 

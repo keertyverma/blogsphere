@@ -3,7 +3,7 @@ import {
   useGetBlog,
   useUpdateBlog,
 } from "@/lib/react-query/queries";
-import { useEditorStore } from "@/store";
+import { useAuthStore, useEditorStore } from "@/store";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
@@ -160,7 +160,9 @@ const BlogEditor = () => {
         toast.success("Saved 👍");
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again later.");
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.");
+      }
     }
   };
 

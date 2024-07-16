@@ -29,11 +29,13 @@ const UserNavigationPanel = () => {
       await logout();
       clearUserAuth();
     } catch (error) {
-      const errorMessage = "An error occurred. Please try again later.";
-      toast.error(errorMessage, {
-        position: "top-right",
-        className: "mt-20",
-      });
+      if (!useAuthStore.getState().isTokenExpired) {
+        const errorMessage = "An error occurred. Please try again later.";
+        toast.error(errorMessage, {
+          position: "top-right",
+          className: "mt-20",
+        });
+      }
     }
   };
 

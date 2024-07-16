@@ -12,6 +12,7 @@ import {
 } from "../ui/form";
 
 import { useUpdatePassword } from "@/lib/react-query/queries";
+import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
@@ -67,10 +68,12 @@ const ChangePassword = () => {
       }
 
       toast.dismiss(loadingToast);
-      toast.error(errorMessage, {
-        position: "top-right",
-        className: "mt-20",
-      });
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error(errorMessage, {
+          position: "top-right",
+          className: "mt-20",
+        });
+      }
     }
   };
 
