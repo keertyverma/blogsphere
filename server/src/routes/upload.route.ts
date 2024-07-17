@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { uploadSingleImage } from "../controllers/upload.controller";
+import { verifyToken } from "../middlewares";
 
 export const uploadRouter = Router();
 
-uploadRouter.post("/", uploadSingleImage);
+uploadRouter.post("/", verifyToken, uploadSingleImage);
