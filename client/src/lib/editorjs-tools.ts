@@ -34,11 +34,10 @@ const uploadImage = async (img: File) => {
   // get base64 image string
   const base64EncodedImg = await fileToBase64(img);
   try {
-    const res = await apiClient
+    const result = await apiClient
       .post("/upload", { data: base64EncodedImg })
-      .then((res) => res.data);
-
-    imgURL = res.data.url;
+      .then((res) => res.data.result);
+    imgURL = result.url;
   } catch (error) {
     console.error("Error in uploading file from editor. ", error);
   }
