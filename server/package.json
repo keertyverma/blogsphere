@@ -10,7 +10,8 @@
     "test": "jest --verbose --coverage",
     "test:unit": "jest --testPathPattern=tests/unit --verbose --detectOpenHandles",
     "test:integration": "jest --testPathPattern=tests/integration --verbose --detectOpenHandles",
-    "migrate-data": "ts-node src/db/migration.ts"
+    "migrate-data": "ts-node src/db/migration.ts",
+    "cleanup-unused-images": "ts-node src/utils/cleanupImages.ts"
   },
   "keywords": [],
   "author": "Keerty Verma",
@@ -34,6 +35,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.30.2",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.2.0",
     "compression": "^1.7.4",

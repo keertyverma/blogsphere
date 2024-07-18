@@ -1,7 +1,7 @@
 import {
   v2 as cloudinary,
-  UploadApiOptions,
   UploadApiErrorResponse,
+  UploadApiOptions,
 } from "cloudinary";
 import config from "config";
 import "dotenv/config";
@@ -29,4 +29,38 @@ export const uploadSecurely = async (data: string) => {
     if (err.http_code === 400) throw new BadRequestError("Invalid image file");
     throw err;
   }
+};
+
+export const getAllUploadedImages = async (count?: number) => {
+  try {
+    const { resources } = await cloudinary.api.resources({
+      type: "upload",
+      resource_type: "image",
+      prefix: config.get("appName") + "/", // Ensure the folder name ends with a slash to target only that folder
+      max_results: count || 100,
+    });
+
+    return resources;
+  } catch (error) {
+    console.error("Error fetching images from Cloudinary:", error);
+    throw error;
+  }
+};
+
+export const deleteUploadedImages = async (publicIds: string[]) => {
+  const results = await cloudinary.api.delete_resources(publicIds, {
+    type: "upload",
+    resource_type: "image",
+  });
+
+  return results;
+};
+
+export const getPublicIdFromUrl = (url: string): string | undefined => {
+  if (!url.includes("res.cloudinary.com")) {
+    return undefined;
+  }
+
+  const Id = url.split("/")?.pop()?.split(".").shift();
+  return Id ? `${config.get("appName")}/${Id}` : undefined;
 };
