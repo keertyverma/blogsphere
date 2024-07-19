@@ -96,6 +96,7 @@ const BlogPage = () => {
         <BlogInteraction
           id={_id}
           blogId={blogId}
+          title={title}
           author={authorDetails}
           likes={likes}
           activity={activity}
