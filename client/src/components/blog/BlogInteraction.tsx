@@ -90,6 +90,23 @@ const BlogInteraction = ({
     await likePost(blogId);
   };
 
+  const copyToClipboard = () => {
+    const currentURL = location.href;
+    navigator.clipboard
+      .writeText(currentURL)
+      .then(() => {
+        toast.dark("Link copied.", {
+          position: "bottom-right",
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to copy link.", {
+          position: "bottom-right",
+        });
+      });
+  };
+
   return (
     <>
       <hr className="border-border my-1" />
@@ -153,6 +170,7 @@ const BlogInteraction = ({
                 <DropdownMenuItem className="p-1">
                   <Button
                     variant="secondary"
+                    onClick={copyToClipboard}
                     className="bg-transparent text-muted-foreground w-full justify-start p-2 hover:text-black"
                   >
                     <IoIosLink className="text-lg mr-2" />
