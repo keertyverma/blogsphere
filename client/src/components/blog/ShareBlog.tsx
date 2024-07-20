@@ -39,7 +39,7 @@ const ShareBlog = ({ title, description }: Props) => {
     const text = encodeURIComponent(
       `${title}\n${description}\n\nCheck it out at BlogSphere!\n${location.href}`
     );
-    const linkedInShareUrl = `https://www.linkedin.com/shareArticle?mini=true&text=${text}}`;
+    const linkedInShareUrl = `https://www.linkedin.com/shareArticle?mini=true&text=${text}`;
     window.open(linkedInShareUrl, "_blank");
   };
 
@@ -55,7 +55,7 @@ const ShareBlog = ({ title, description }: Props) => {
       <DropdownMenuTrigger className="outline-none">
         <IoShareOutline className="text-xl text-muted-foreground " />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mt-3 mr-8 text-muted-foreground p-0">
+      <DropdownMenuContent className="mt-2 mr-8 text-muted-foreground p-0">
         <DropdownMenuItem className="p-1">
           <Button
             variant="secondary"
