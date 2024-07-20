@@ -4,22 +4,13 @@ import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { IoIosLink } from "react-icons/io";
-import { IoShareOutline } from "react-icons/io5";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
-import { RiTwitterXFill } from "react-icons/ri";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import BlogComment from "./BlogComment";
 import ManageBlog from "./ManageBlog";
+import ShareBlog from "./ShareBlog";
 
 interface Props {
   id?: string;
@@ -32,6 +23,7 @@ interface Props {
     totalComments: number;
   };
   isDraft?: boolean;
+  description: string;
 }
 
 const BlogInteraction = ({
@@ -42,6 +34,7 @@ const BlogInteraction = ({
   likes,
   activity,
   isDraft = false,
+  description,
 }: Props) => {
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
   const user = useAuthStore((s) => s.user);
@@ -88,23 +81,6 @@ const BlogInteraction = ({
 
     // update like count
     await likePost(blogId);
-  };
-
-  const copyToClipboard = () => {
-    const currentURL = location.href;
-    navigator.clipboard
-      .writeText(currentURL)
-      .then(() => {
-        toast.dark("Link copied.", {
-          position: "bottom-right",
-        });
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to copy link.", {
-          position: "bottom-right",
-        });
-      });
   };
 
   return (
@@ -161,38 +137,7 @@ const BlogInteraction = ({
         </div>
 
         <div className="flex gap-4 items-center">
-          <div>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="outline-none">
-                <IoShareOutline className="text-xl text-muted-foreground " />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="mt-3 mr-8 text-muted-foreground p-0">
-                <DropdownMenuItem className="p-1">
-                  <Button
-                    variant="secondary"
-                    onClick={copyToClipboard}
-                    className="bg-transparent text-muted-foreground w-full justify-start p-2 hover:text-black"
-                  >
-                    <IoIosLink className="text-lg mr-2" />
-                    Copy link
-                  </Button>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="my-0" />
-                <DropdownMenuItem className="p-1">
-                  <Link
-                    to={`https://x.com/intent/tweet?text=${encodeURIComponent(
-                      `Read -> ${title}.\n\nCheck it out at BlogSphere!`
-                    )}&url=${encodeURIComponent(location.href)}`}
-                    target="_blank"
-                    className="w-full flex justify-start p-2 font-medium"
-                  >
-                    <RiTwitterXFill className="text-lg mr-2" />
-                    Share to X
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <ShareBlog title={title} description={description} />
           {user.username === authorUsername && <ManageBlog blogId={blogId} />}
         </div>
       </div>
