@@ -5,6 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 import { nanoid } from "nanoid";
 import { Blog } from "../models/blog.model";
+import { Bookmark } from "../models/bookmark.model";
 import { Comment } from "../models/comment.model";
 import { User } from "../models/user.model";
 import { SortQuery } from "../types";
@@ -468,7 +469,10 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
     );
 
   // delete all comments and replies associated with this blog
-  const retur = await Comment.deleteMany({ blogId: id });
+  await Comment.deleteMany({ blogId: id });
+
+  // delete all bookmarks associated with this blog
+  await Bookmark.deleteMany({ blogId: id });
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,

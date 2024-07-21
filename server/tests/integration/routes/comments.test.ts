@@ -186,7 +186,7 @@ describe("/api/v1/blogs", () => {
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
-      // token is not passed in request header
+      // token cookie is not set
       token = "";
       const blogId = new mongoose.Types.ObjectId().toString();
 
@@ -406,7 +406,7 @@ describe("/api/v1/blogs", () => {
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
-      // token is not passed in request header
+      // token cookie is not set
       token = "";
       const payload = { content: "some thoughtful reply to existing comment" };
 
@@ -596,7 +596,7 @@ describe("/api/v1/blogs", () => {
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
-      // token is not passed in request header
+      // token cookie is not set
       token = "";
       const commentId = new mongoose.Types.ObjectId().toString();
 
@@ -926,7 +926,7 @@ describe("/api/v1/blogs", () => {
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
-      // token is not passed in request header
+      // token cookie is not set
       token = "";
       const commentId = new mongoose.Types.ObjectId().toString();
       const payload = { content: "updated comment" };

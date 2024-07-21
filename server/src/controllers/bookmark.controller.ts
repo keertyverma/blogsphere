@@ -10,7 +10,7 @@ import NotFoundError from "../utils/errors/not-found";
 import logger from "../utils/logger";
 
 export const addBookmark = async (req: Request, res: Response) => {
-  logger.debug(`POST Request on Route -> ${req.baseUrl}`);
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}`);
 
   // validate 'blogId' request params
   const { blogId } = req.params;
@@ -34,11 +34,41 @@ export const addBookmark = async (req: Request, res: Response) => {
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
-    statusCode: StatusCodes.OK,
+    statusCode: StatusCodes.CREATED,
     result: {
       _id: bookmark._id,
       blogId: bookmark.blogId,
       userId: bookmark.userId,
+    },
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
+export const removeBookmark = async (req: Request, res: Response) => {
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}`);
+
+  // validate 'blogId' request params
+  const { blogId } = req.params;
+  if (!isValidObjectId(blogId))
+    throw new BadRequestError(`"blogId" must be a valid MongoDB ObjectId`);
+
+  const userId = (req.user as JwtPayload).id;
+
+  const deletedBookmark = await Bookmark.findOneAndDelete({ userId, blogId });
+  if (!deletedBookmark) {
+    throw new NotFoundError(
+      "No bookmark found for the specified user and blog"
+    );
+  }
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    result: {
+      _id: deletedBookmark._id,
+      blogId: deletedBookmark.blogId,
+      userId: deletedBookmark.userId,
     },
   };
 

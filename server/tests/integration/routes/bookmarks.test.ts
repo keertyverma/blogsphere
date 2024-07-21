@@ -113,7 +113,8 @@ describe("/api/v1/bookmarks", () => {
     server.close();
   });
 
-  describe("POST /", () => {
+  describe("POST /:blogId", () => {
+    // Add a bookmark for specified user and blog
     let blogs: IBlog[];
     let users: IUser[];
     let authenticatedUser: any;
@@ -148,7 +149,7 @@ describe("/api/v1/bookmarks", () => {
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
-      // token is not passed in request header
+      // token cookie is not set
       token = "";
       const blogId = new mongoose.Types.ObjectId().toString();
       const res = await exec(blogId);
@@ -218,10 +219,119 @@ describe("/api/v1/bookmarks", () => {
       });
     });
 
-    it("should add a blog as bookmark for given user", async () => {
+    it("should add a bookmark for specified user and blog", async () => {
       const blog_Id = blogs[0].id;
 
       const res = await exec(blog_Id);
+
+      expect(res.statusCode).toBe(201);
+      const { _id, blogId, userId } = res.body.result;
+      expect(_id).toBeDefined();
+      expect(blogId).toBe(blog_Id);
+      expect(userId).toBe(authenticatedUser.id);
+    });
+  });
+
+  describe("DELETE /:blogId", () => {
+    // Delete a bookmark for specified user and blog
+    let blogs: IBlog[];
+    let users: IUser[];
+    let authenticatedUser: any;
+    let token: string;
+
+    beforeAll(async () => {
+      users = await createUsers();
+      const blogAuthor = users[0].id;
+      authenticatedUser = users[1];
+      blogs = await createBlogs(blogAuthor);
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      server.close();
+    });
+
+    beforeEach(async () => {
+      token = authenticatedUser.generateAuthToken();
+    });
+
+    afterEach(async () => {
+      await Bookmark.deleteMany({});
+    });
+
+    const exec = async (blogId: string = "") => {
+      return await request(server)
+        .delete(`${endpoint}/${blogId}`)
+        .set("Cookie", `authToken=${token}`);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token cookie is not set
+      token = "";
+      const blogId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
+    });
+
+    it("should return BadRequest-400 if token is invalid", async () => {
+      token = "invalid token";
+      const blogId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid auth token.",
+      });
+    });
+
+    it("should return BadRequest-400 if blogId is invalid", async () => {
+      // blogId must be a valid mongoDB object Id format
+      const blogId = "invalid-blogId";
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"blogId" must be a valid MongoDB ObjectId',
+      });
+    });
+
+    it("should return NotFoundError-404 if bookmark does not exists", async () => {
+      const blogId = blogs[0].id;
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: "No bookmark found for the specified user and blog",
+      });
+    });
+
+    it("should remove bookmark for specified user and blog", async () => {
+      // create bookmark
+      const blog_Id = blogs[0].id;
+      const bookmark = await Bookmark.create({
+        userId: authenticatedUser.id,
+        blogId: blog_Id,
+      });
+
+      const res = await exec(bookmark.blogId);
 
       expect(res.statusCode).toBe(200);
       const { _id, blogId, userId } = res.body.result;

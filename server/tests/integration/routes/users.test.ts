@@ -281,7 +281,7 @@ describe("/api/v1/users", () => {
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
-      // token is not passed in request header
+      // token cookie is not set
       token = "";
 
       const res = await exec();
@@ -426,7 +426,7 @@ describe("/api/v1/users", () => {
     };
 
     it("should return UnAuthorized-401 if user is not authorized", async () => {
-      // token is not passed in request header
+      // token cookie is not set
       token = "";
 
       const res = await exec();

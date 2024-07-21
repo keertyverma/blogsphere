@@ -13,6 +13,7 @@ const bookmarkSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Blog",
       required: true,
+      index: true, // Index on blogId field
     },
     userId: {
       type: Schema.Types.ObjectId,
