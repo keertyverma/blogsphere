@@ -3,7 +3,7 @@ import { checkIsLiked, formateNumber } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
 import { useEffect, useState } from "react";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -83,6 +83,11 @@ const BlogInteraction = ({
     await likePost(blogId);
   };
 
+  const handleBlogSave = () => {
+    // TODO:
+    console.log("pending...");
+  };
+
   return (
     <>
       <hr className="border-border my-1" />
@@ -136,7 +141,14 @@ const BlogInteraction = ({
           )}
         </div>
 
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-3 items-center">
+          <Button
+            variant="secondary"
+            className="bg-transparent text-muted-foreground p-1 hover:bg-transparent"
+            onClick={handleBlogSave}
+          >
+            <FaRegBookmark className="text-muted-foreground text-lg hover:text-slate-600" />
+          </Button>
           <ShareBlog title={title} description={description} />
           {user.username === authorUsername && <ManageBlog blogId={blogId} />}
         </div>

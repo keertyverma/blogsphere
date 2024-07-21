@@ -1,6 +1,6 @@
 import { BsLinkedin } from "react-icons/bs";
 import { IoIosLink } from "react-icons/io";
-import { IoShareOutline } from "react-icons/io5";
+import { MdIosShare } from "react-icons/md";
 import { RiTwitterXFill } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
@@ -53,7 +53,7 @@ const ShareBlog = ({ title, description }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="outline-none">
-        <IoShareOutline className="text-xl text-muted-foreground " />
+        <MdIosShare className="text-xl text-muted-foreground hover:text-slate-600" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mt-2 mr-8 text-muted-foreground p-0">
         <DropdownMenuItem className="p-1">
