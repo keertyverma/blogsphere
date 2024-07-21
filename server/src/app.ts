@@ -16,6 +16,7 @@ import {
   commentRouter,
   uploadRouter,
   userRouter,
+  bookmarkRouter,
 } from "./routes";
 
 const app = express();
@@ -45,6 +46,7 @@ app.use(`${BASE_URL}/auth`, authRouter);
 app.use(`${BASE_URL}/upload`, uploadRouter);
 app.use(`${BASE_URL}/blogs`, blogRouter);
 app.use(`${BASE_URL}/comments`, commentRouter);
+app.use(`${BASE_URL}/bookmarks`, bookmarkRouter);
 
 // error handler middleware
 app.use(routeNotFoundHandler);
