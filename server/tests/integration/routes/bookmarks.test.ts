@@ -5,7 +5,7 @@ import request from "supertest";
 
 import appServer from "../../../src";
 import { Blog, IBlog } from "../../../src/models/blog.model";
-import { Bookmark } from "../../../src/models/bookmark.model";
+import { Bookmark, IBookmark } from "../../../src/models/bookmark.model";
 import { IUser, User } from "../../../src/models/user.model";
 
 let server: http.Server;
@@ -97,6 +97,25 @@ const createBlogs = async (userId: string) => {
 
   const blogs = await Blog.create([publishedBlog1, publishedBlog2]);
   return blogs;
+};
+
+const createBookmarks = async (
+  userId: string,
+  blogId1: string,
+  blogId2: string
+) => {
+  const bookmark1 = {
+    userId,
+    blogId: blogId1,
+  };
+
+  const bookmark2 = {
+    userId,
+    blogId: blogId2,
+  };
+
+  const bookmarks = await Bookmark.create([bookmark1, bookmark2]);
+  return bookmarks;
 };
 
 describe("/api/v1/bookmarks", () => {
@@ -338,6 +357,121 @@ describe("/api/v1/bookmarks", () => {
       expect(_id).toBeDefined();
       expect(blogId).toBe(blog_Id);
       expect(userId).toBe(authenticatedUser.id);
+    });
+  });
+
+  describe("GET /users/:userId", () => {
+    // Get all bookmarked blogs for given user
+    let blogs: IBlog[];
+    let users: IUser[];
+    let bookmarks: IBookmark[];
+    let authenticatedUser: any;
+
+    beforeAll(async () => {
+      users = await createUsers();
+
+      const blogAuthor = users[0].id;
+      blogs = await createBlogs(blogAuthor);
+
+      authenticatedUser = users[1];
+      bookmarks = await createBookmarks(
+        authenticatedUser.id,
+        blogs[0].id,
+        blogs[1].id
+      );
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      await Bookmark.deleteMany({});
+      server.close();
+    });
+
+    it("should return BadRequest-400 if userId is invalid", async () => {
+      // userId must be a valid mongoDB object Id format
+      const userId = "invalid-userId";
+
+      const res = await request(server).get(`${endpoint}/users/${userId}`);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"userId" must be a valid MongoDB ObjectId',
+      });
+    });
+
+    it("should return BadRequest-400 if blogId is invalid", async () => {
+      // blogId must be a valid mongoDB object Id format
+      const userId = authenticatedUser.id;
+      const blogId = "invalid-blogId";
+
+      const res = await request(server).get(
+        `${endpoint}/users/${userId}?blogId=${blogId}`
+      );
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"blogId" must be a valid MongoDB ObjectId',
+      });
+    });
+
+    it("should return bookmark for specified user and blog", async () => {
+      const user_Id = authenticatedUser.id;
+      const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
+      const blogId = userBookmarks[0].blogId;
+
+      const res = await request(server).get(
+        `${endpoint}/users/${user_Id}?blogId=${blogId}`
+      );
+
+      expect(res.statusCode).toBe(200);
+
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(1);
+      expect(previous).toBeNull();
+      expect(next).toBeNull();
+      expect(results).toHaveLength(1);
+
+      const { userId } = results[0];
+      expect(userId).toBe(user_Id);
+    });
+
+    it("should return all bookmarks for given user", async () => {
+      const user_Id = authenticatedUser.id;
+      const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
+
+      const res = await request(server).get(`${endpoint}/users/${user_Id}`);
+
+      expect(res.statusCode).toBe(200);
+
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(userBookmarks.length);
+      expect(previous).toBeNull();
+      expect(next).toBeNull();
+      expect(results).toHaveLength(userBookmarks.length);
+    });
+
+    it("should return bookmarks for user from page 2", async () => {
+      const user_Id = authenticatedUser.id;
+      const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
+      const pageSize = 1;
+
+      const res = await request(server).get(
+        `${endpoint}/users/${user_Id}?page=2&pageSize=${pageSize}`
+      );
+
+      expect(res.statusCode).toBe(200);
+
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(userBookmarks.length);
+      expect(previous).toMatch(/page=1/i);
+      expect(next).toBeNull();
+      expect(results).toHaveLength(pageSize);
     });
   });
 });

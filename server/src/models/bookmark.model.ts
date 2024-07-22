@@ -25,6 +25,17 @@ const bookmarkSchema = new Schema(
   { timestamps: true }
 );
 
+// Customize 'toJSON' method to convert Map to plain object
+bookmarkSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    if (ret.blogId) {
+      ret.blog = ret.blogId;
+      delete ret.blogId;
+    }
+    return ret;
+  },
+});
+
 const Bookmark = model<IBookmark>("Bookmark", bookmarkSchema);
 
 export { Bookmark, IBookmark };
