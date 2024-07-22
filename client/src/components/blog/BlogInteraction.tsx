@@ -1,9 +1,13 @@
-import { useLikePost } from "@/lib/react-query/queries";
+import {
+  useCreateBookmark,
+  useGetUserBookmarks,
+  useLikePost,
+} from "@/lib/react-query/queries";
 import { checkIsLiked, formateNumber } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
 import { useEffect, useState } from "react";
-import { FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
+import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -40,20 +44,23 @@ const BlogInteraction = ({
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
+  const navigate = useNavigate();
 
   const { mutateAsync: likePost } = useLikePost();
-  const navigate = useNavigate();
+  const { mutateAsync: createBookmark } = useCreateBookmark();
+  const { data: userBookmarks } = useGetUserBookmarks(user.id, id);
+
+  const isBookmarked =
+    (userBookmarks?.pages.reduce(
+      (total, page) => total + page.results.length,
+      0
+    ) || 0) === 1;
 
   useEffect(() => {
     if (likes) {
       setBlogLikes(likes);
     }
   }, [likes]);
-
-  const {
-    _id: authorId,
-    personalInfo: { username: authorUsername },
-  } = author;
 
   const handlePostLikeUnlike = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -83,10 +90,33 @@ const BlogInteraction = ({
     await likePost(blogId);
   };
 
-  const handleBlogSave = () => {
-    // TODO:
-    console.log("pending...");
+  const handleBookmark = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to bookmark this blog");
+      setRedirectedUrl(location.pathname);
+      return navigate("/login");
+    }
+
+    try {
+      if (isBookmarked) {
+        // TODO: remove bookmark
+        toast.success("Blog unsaved");
+      } else {
+        // add bookmark
+        await createBookmark(id as string);
+        toast.success("Blog saved");
+      }
+    } catch (error) {
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.");
+      }
+    }
   };
+
+  const {
+    _id: authorId,
+    personalInfo: { username: authorUsername },
+  } = author;
 
   return (
     <>
@@ -145,9 +175,13 @@ const BlogInteraction = ({
           <Button
             variant="secondary"
             className="bg-transparent text-muted-foreground p-1 hover:bg-transparent"
-            onClick={handleBlogSave}
+            onClick={handleBookmark}
           >
-            <FaRegBookmark className="text-muted-foreground text-lg hover:text-slate-600" />
+            {isBookmarked ? (
+              <FaBookmark className="text-primary/90 text-lg hover:text-primary" />
+            ) : (
+              <FaRegBookmark className="text-muted-foreground text-lg hover:text-slate-600" />
+            )}
           </Button>
           <ShareBlog title={title} description={description} />
           {user.username === authorUsername && <ManageBlog blogId={blogId} />}

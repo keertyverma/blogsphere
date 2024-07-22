@@ -123,3 +123,15 @@ export interface ICommentQuery {
   page?: number;
   commentId?: string;
 }
+
+export interface IBookmark {
+  userId: string;
+  blogId?: string;
+  blog?: IBlog;
+}
+
+export interface IBookmarkGetQuery {
+  blogId?: string;
+  pageSize?: number;
+  page?: number;
+}

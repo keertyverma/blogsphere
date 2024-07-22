@@ -3,6 +3,8 @@ import {
   IAuthor,
   IBlog,
   IBlogQuery,
+  IBookmark,
+  IBookmarkGetQuery,
   ICommentQuery,
   IFetchAllResponse,
   IFetchResponse,
@@ -394,6 +396,7 @@ export const useDeleteBlog = () => {
   });
 };
 
+// ----------------- Comment -------------------
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
 
@@ -534,3 +537,51 @@ export const useUpdateComment = () => {
     },
   });
 };
+
+// ----------------- Bookmark -------------------
+export const useCreateBookmark = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (blogId: string) =>
+      apiClient.post(`/bookmarks/${blogId}`).then((res) => res.data.result),
+    onSuccess: (data: IBookmark) => {
+      const { userId, blogId } = data;
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
+      });
+    },
+  });
+};
+
+export const useGetUserBookmarks = (userId: string, blogId?: string) =>
+  useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params: IBookmarkGetQuery = {
+        // pageSize: 10,
+        page: pageParam,
+      };
+      if (blogId) {
+        params["blogId"] = blogId;
+      }
+
+      return await apiClient
+        .get(`bookmarks/users/${userId}`, {
+          params,
+          withCredentials: false,
+        })
+        .then((res) => res.data);
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      // to get next page number
+      return lastPage.next ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
+    staleTime: ms("30m"),
+    gcTime: ms("40m"),
+    enabled: !!userId, // Query only runs if userId is truthy
+    refetchOnWindowFocus: false, // No need to refetch on window focus
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });
