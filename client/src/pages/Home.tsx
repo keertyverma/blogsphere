@@ -15,7 +15,7 @@ const Home = () => {
 
   return (
     <AnimationWrapper>
-      <section className="h-cover md:flex md:justify-center gap-10 py-16 ">
+      <section className="h-cover md:flex md:justify-center gap-10 py-16">
         {isTabletOrLargerScreen ? (
           // larger screen view
           <>

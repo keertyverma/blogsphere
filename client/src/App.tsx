@@ -6,16 +6,17 @@ import Search from "./pages/Search";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
-import Editor from "./pages/Editor";
-import Home from "./pages/Home";
-import { usePingServer } from "./lib/react-query/queries";
-import ErrorPage from "./pages/ErrorPage";
-import UserProfile from "./pages/UserProfile";
-import BlogPage from "./pages/BlogPage";
-import SideNavbar from "./components/settings/SideNavbar";
 import ChangePassword from "./components/settings/ChangePassword";
 import EditProfile from "./components/settings/EditProfile";
+import SideNavbar from "./components/settings/SideNavbar";
 import { useAxiosInterceptors } from "./lib/api-client";
+import { usePingServer } from "./lib/react-query/queries";
+import BlogPage from "./pages/BlogPage";
+import Bookmarks from "./pages/Bookmarks";
+import Editor from "./pages/Editor";
+import ErrorPage from "./pages/ErrorPage";
+import Home from "./pages/Home";
+import UserProfile from "./pages/UserProfile";
 
 const App = () => {
   // to prevent the server from going into sleep mode due to inactivity.
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="edit-profile" element={<EditProfile />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
+          <Route path="bookmarks" element={<Bookmarks />} />
         </Route>
 
         <Route path="/editor" element={<Editor />} />

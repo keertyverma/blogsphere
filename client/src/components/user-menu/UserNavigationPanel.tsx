@@ -1,14 +1,14 @@
 import { useGetUser, useLogout } from "@/lib/react-query/queries";
 import { handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
-import { IoSettingsOutline } from "react-icons/io5";
+import { IoBookmarksOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuUserCircle } from "react-icons/lu";
 import { MdLogout } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import AnimationWrapper from "../shared/AnimationWrapper";
-import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
+import LoadingSpinner from "../ui/LoadingSpinner";
 import {
   Menubar,
   MenubarContent,
@@ -88,6 +88,12 @@ const UserNavigationPanel = () => {
             >
               <MenubarItem>
                 <LuUserCircle className="text-lg mr-2" /> Profile
+              </MenubarItem>
+            </Link>
+            <MenubarSeparator />
+            <Link to="/bookmarks" className="text-muted-foreground">
+              <MenubarItem>
+                <IoBookmarksOutline className="text-lg mr-2" /> Bookmarks
               </MenubarItem>
             </Link>
             <MenubarSeparator />

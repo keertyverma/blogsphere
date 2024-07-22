@@ -134,6 +134,7 @@ export const getBookmarksForUser = async (req: Request, res: Response) => {
       },
       select: "-_id -content -likes -updatedAt -__v",
     })
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(maxLimit)
     .select("-__v -_id -createdAt -updatedAt");

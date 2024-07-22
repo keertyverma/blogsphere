@@ -92,7 +92,11 @@ const BlogInteraction = ({
     await likePost(blogId);
   };
 
-  const handleBookmark = async () => {
+  const handleBookmark = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+
     if (!isAuthenticated) {
       toast.error("Please login to bookmark this blog");
       setRedirectedUrl(location.pathname);

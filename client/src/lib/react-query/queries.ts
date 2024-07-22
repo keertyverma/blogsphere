@@ -550,6 +550,9 @@ export const useCreateBookmark = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId }],
+      });
     },
   });
 };
@@ -565,6 +568,9 @@ export const useDeleteBookmark = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId }],
+      });
     },
   });
 };
@@ -574,7 +580,7 @@ export const useGetUserBookmarks = (userId: string, blogId?: string) =>
     queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
     queryFn: async ({ pageParam = 1 }) => {
       const params: IBookmarkGetQuery = {
-        // pageSize: 10,
+        // pageSize: 2,
         page: pageParam,
       };
       if (blogId) {
