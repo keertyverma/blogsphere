@@ -1,5 +1,6 @@
 import {
   useCreateBookmark,
+  useDeleteBookmark,
   useGetUserBookmarks,
   useLikePost,
 } from "@/lib/react-query/queries";
@@ -48,6 +49,7 @@ const BlogInteraction = ({
 
   const { mutateAsync: likePost } = useLikePost();
   const { mutateAsync: createBookmark } = useCreateBookmark();
+  const { mutateAsync: deleteBookmark } = useDeleteBookmark();
   const { data: userBookmarks } = useGetUserBookmarks(user.id, id);
 
   const isBookmarked =
@@ -99,7 +101,8 @@ const BlogInteraction = ({
 
     try {
       if (isBookmarked) {
-        // TODO: remove bookmark
+        // remove bookmark
+        await deleteBookmark(id as string);
         toast.success("Blog unsaved");
       } else {
         // add bookmark

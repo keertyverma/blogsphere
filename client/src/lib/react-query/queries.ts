@@ -554,6 +554,21 @@ export const useCreateBookmark = () => {
   });
 };
 
+export const useDeleteBookmark = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (blogId: string) =>
+      apiClient.delete(`/bookmarks/${blogId}`).then((res) => res.data.result),
+    onSuccess: (data: IBookmark) => {
+      const { userId, blogId } = data;
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
+      });
+    },
+  });
+};
+
 export const useGetUserBookmarks = (userId: string, blogId?: string) =>
   useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
