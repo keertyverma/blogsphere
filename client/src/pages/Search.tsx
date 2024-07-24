@@ -10,7 +10,7 @@ const Search = () => {
 
   return (
     <div className="h-cover px-0 md:px-10 lg:px-40 xl:px-40 2xl:px-52">
-      <section className="mx-auto md:max-w-[728px] px-4 py-20 ">
+      <section className="mx-auto md:max-w-[728px] px-6 py-20 ">
         <div className="my-4">
           <SearchInputBox />
         </div>

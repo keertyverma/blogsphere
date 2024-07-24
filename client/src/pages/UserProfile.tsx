@@ -58,7 +58,7 @@ const UserProfile = () => {
   return (
     <AnimationWrapper>
       <div className="h-cover px-0 md:px-10">
-        <section className="px-4 mx-auto md:max-w-[728px] flex flex-col gap-5 py-24">
+        <section className="px-6 mx-auto md:max-w-[728px] flex flex-col gap-5 py-24">
           {/* user info */}
           {profileId && <UserInfo profileId={profileId} user={user} />}
           <hr />
