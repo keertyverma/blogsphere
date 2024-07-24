@@ -40,10 +40,13 @@ export const isValidUrl = (url: string) => {
 
 export const getCookieOptions = (): CookieOptions => {
   // cookies option to create secure cookies
+  const isProduction = process.env.NODE_ENV === "production";
+
   return {
     httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
-    sameSite: process.env.NODE_ENV === "production" ? "none" : undefined, // Allows cookie to be sent in cross-origin requests
-    secure: process.env.NODE_ENV === "production", // Ensures cookie is sent only over HTTPS in production
+    sameSite: "strict", // Mitigate Cross-Site Request Forgery (CSRF) attack
+    secure: isProduction, // Ensures cookie is sent only over HTTPS in production
+    domain: isProduction ? ".360verse.co" : "localhost",
     path: "/api/v1/", // Ensures cookie is accessible only within a specific subset of URLs within the domain that begin with /api/v1/
   };
 };
