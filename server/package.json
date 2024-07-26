@@ -11,7 +11,8 @@
     "test:unit": "jest --testPathPattern=tests/unit --verbose --detectOpenHandles",
     "test:integration": "jest --testPathPattern=tests/integration --verbose --detectOpenHandles",
     "migrate-data": "ts-node src/db/migration.ts",
-    "cleanup-unused-images": "ts-node src/utils/cleanupImages.ts"
+    "cleanup-unused-images": "ts-node src/utils/cleanupImages.ts",
+    "send-email": "ts-node src/utils/mailer/run.ts"
   },
   "keywords": [],
   "author": "Keerty Verma",
@@ -23,6 +24,7 @@
     "@types/cookie": "^0.6.0",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
+    "@types/ejs": "^3.1.5",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
@@ -44,6 +46,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-rate-limit": "^7.2.0",
