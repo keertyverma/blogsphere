@@ -15,6 +15,7 @@ export type APIResponse<T = any> = {
   results?: T[];
   result?: T;
   error?: APIError;
+  message?: string;
 };
 
 export type APIError = {

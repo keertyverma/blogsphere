@@ -50,3 +50,22 @@ export const getCookieOptions = (): CookieOptions => {
     path: "/api/v1/", // Ensures cookie is accessible only within a specific subset of URLs within the domain that begin with /api/v1/
   };
 };
+
+export const getFormattedExpiryDate = (date: Date): string => {
+  // Format the provided date as a local string in the format: Month DD, YYYY at H:M
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric", // "2024"
+    month: "long", // "July"
+    day: "numeric", // "30"
+    hour: "2-digit", // "10"
+    minute: "2-digit", // "52"
+    hour12: true, // "PM"
+  };
+
+  const formattedExpiresAt = date
+    .toLocaleString("en-US", options)
+    .replace(",", ""); // Remove the comma after the date
+
+  return formattedExpiresAt;
+};

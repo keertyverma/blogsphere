@@ -10,6 +10,7 @@ import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
 import logger from "../utils/logger";
+import { sendVerificationEmail } from "../utils/mailer";
 import {
   validatePasswordUpdate,
   validateUserUpdate,
@@ -49,7 +50,7 @@ export const createUser = async (req: Request, res: Response) => {
   });
 
   // get verification token
-  const { hashedToken, expiresAt } = user.generateVerificationToken();
+  const { token, hashedToken, expiresAt } = user.generateVerificationToken();
 
   // set verification token and expiration date
   user.verificationToken = {
@@ -59,16 +60,26 @@ export const createUser = async (req: Request, res: Response) => {
 
   await user.save();
 
+  // generate verification link and send verification email
+  try {
+    await sendVerificationEmail(email, token, expiresAt);
+    logger.info("Verification email sent successfully.");
+  } catch (error) {
+    logger.error(`Failed to send verification email to ${email}`);
+    if (error instanceof Error) {
+      logger.error(`Error: ${error.message}`);
+    }
+    throw new CustomAPIError(
+      "User registered successfully, but we failed to send a verification email. Please try again later.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
-    result: {
-      id: user.id,
-      fullname: user.personalInfo?.fullname,
-      email: user.personalInfo?.email,
-      username: user.personalInfo?.username,
-      profileImage: user.personalInfo.profileImage,
-    },
+    message:
+      "User registered successfully. Please check your email to verify your account.",
   };
 
   return res.status(data.statusCode).json(data);

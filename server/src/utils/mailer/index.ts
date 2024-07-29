@@ -1,9 +1,10 @@
 import "dotenv/config";
+import ejs from "ejs";
 import FormData from "form-data";
 import Mailgun, { MailgunMessageData } from "mailgun.js";
-import { MailOptions } from "../../types";
-import ejs from "ejs";
 import path from "path";
+import { getFormattedExpiryDate } from "..";
+import { MailOptions } from "../../types";
 
 const getMailgunConfig = () => {
   return {
@@ -43,4 +44,29 @@ export const sendEmail = (options: MailOptions) => {
   };
 
   return mailgun.messages.create(domain, mailOptions);
+};
+
+export const sendVerificationEmail = async (
+  to: string,
+  token: string,
+  expiresAt: Date
+) => {
+  // generate verification link
+  const verificationLink = `${process.env.EMAIL_VERIFICATION_BASE_URL}?email=${to}&token=${token}`;
+  const formattedExpiresAt = getFormattedExpiryDate(expiresAt);
+  const htmlTemplate = await renderTemplate("emailVerification.ejs", {
+    verificationLink: verificationLink,
+    tokenExpiresAt: formattedExpiresAt,
+  });
+
+  const emailOptions: MailOptions = {
+    to,
+    subject: "Account Verification",
+    text: `Welcome to Blogsphere👋. \n Please verify your email by clicking the following link: ${verificationLink}`,
+    html: htmlTemplate,
+  };
+
+  // console.log("emailOptions = ", emailOptions);
+
+  await sendEmail(emailOptions);
 };
