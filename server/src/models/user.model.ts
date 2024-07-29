@@ -1,7 +1,9 @@
 import config from "config";
+import crypto from "crypto";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
 import { Document, Schema, Types, model } from "mongoose";
+import ms from "ms";
 
 interface IUser extends Document {
   personalInfo: {
@@ -27,10 +29,20 @@ interface IUser extends Document {
     github: string;
     website: string;
   };
+  isVerified: boolean;
+  verificationToken: {
+    token: string;
+    expiresAt: Date;
+  };
 }
 
 interface IUserDocument extends IUser, Document {
   generateAuthToken(): string;
+  generateVerificationToken(): {
+    token: string;
+    hashedToken: string;
+    expiresAt: Date;
+  };
 }
 
 const userSchema = new Schema(
@@ -120,6 +132,14 @@ const userSchema = new Schema(
         default: "",
       },
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      token: String,
+      expiresAt: Date,
+    },
   },
   { timestamps: true }
 );
@@ -136,17 +156,37 @@ userSchema.methods.generateAuthToken = function (): string {
   );
 };
 
+// generate and return verification token with expiry
+userSchema.methods.generateVerificationToken = function (): {
+  token: string;
+  hashedToken: string;
+  expiresAt: Date;
+} {
+  // generate a random token
+  const token = crypto.randomBytes(32).toString("hex");
+
+  // hash the token to store in DB for data security
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  // set token expiration - 24hr or 1day
+  const expiresIn = ms("1d");
+  const expiresAt = new Date(Date.now() + expiresIn);
+
+  return { token, hashedToken, expiresAt };
+};
+
 const User = model<IUserDocument>("User", userSchema);
 
 const validateUser = (user: IUser) => {
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
 
   const schema = Joi.object({
-    fullname: Joi.string().min(2).max(50).required(),
-    email: Joi.string().min(5).max(255).required().email(),
+    fullname: Joi.string().min(2).max(50).trim().required(),
+    email: Joi.string().min(5).max(255).trim().required().email(),
     password: Joi.string()
       .min(5)
       .max(1024)
+      .trim()
       .required()
       .pattern(passwordRegex)
       .message(

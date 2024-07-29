@@ -5,7 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 
 import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
-import { generateUsername, getCookieOptions } from "../utils";
+import { generateUsername } from "../utils";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
@@ -19,14 +19,14 @@ export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);
 
   // validate request body
-  const { error } = validateUser(req.body);
+  const { error, value: validatedData } = validateUser(req.body);
   if (error) {
     let errorMessage = error.details[0].message;
     logger.error(`Input Validation Error! \n ${errorMessage}`);
     throw new BadRequestError(errorMessage);
   }
 
-  const { fullname, email, password } = req.body;
+  const { fullname, email, password } = validatedData;
   // check if user exists
   const existingUser = await User.findOne({ "personalInfo.email": email });
   if (existingUser) {
@@ -47,8 +47,17 @@ export const createUser = async (req: Request, res: Response) => {
       username,
     },
   });
+
+  // get verification token
+  const { hashedToken, expiresAt } = user.generateVerificationToken();
+
+  // set verification token and expiration date
+  user.verificationToken = {
+    token: hashedToken,
+    expiresAt,
+  };
+
   await user.save();
-  const accessToken = user.generateAuthToken();
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
@@ -62,11 +71,7 @@ export const createUser = async (req: Request, res: Response) => {
     },
   };
 
-  // send token inside cookies (`HTTP-only` secure)
-  return res
-    .cookie("authToken", accessToken, getCookieOptions())
-    .status(data.statusCode)
-    .json(data);
+  return res.status(data.statusCode).json(data);
 };
 
 export const getUsers = async (req: Request, res: Response) => {
