@@ -4,6 +4,7 @@ import http from "http";
 import { disconnect } from "mongoose";
 import request from "supertest";
 
+import bcrypt from "bcrypt";
 import appServer from "../../../src";
 import { IUser, User } from "../../../src/models/user.model";
 
@@ -126,15 +127,12 @@ describe("/api/v1/users", () => {
         .send(userData);
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
-      expect(res.headers["set-cookie"]).toBeDefined();
-      // Parse the set-cookie header to get authToken
-      const cookies = cookie.parse(res.headers["set-cookie"][0]);
-      expect(cookies.authToken).toBeDefined();
+      expect(res.body.message).toBe(
+        "User registered successfully. Please check your email to verify your account."
+      );
 
       const responseData = res.body.result;
-
       const { id, fullname, email, username, profileImage } = responseData;
-
       expect(id).toBeDefined();
       expect(fullname).toBe(userData.fullname.toLowerCase());
       expect(email).toBe(userData.email);
@@ -356,19 +354,24 @@ describe("/api/v1/users", () => {
     });
 
     it("should return BadRequest-400 if current password is incorrect", async () => {
-      // create new user and get token
-      const createUserRes = await request(server)
-        .post(`${endpoint}/register`)
-        .send({
+      // login user and get token
+      const password = "Clubhouse12";
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await User.create({
+        personalInfo: {
           fullname: "Mickey Mouse",
-          password: "Clubhouse12",
           email: "test@test.com",
-        });
-      expect(createUserRes.statusCode).toBe(201);
-
-      expect(createUserRes.headers["set-cookie"]).toBeDefined();
+          password: hashedPassword,
+        },
+      });
+      const loginRes = await request(server).post(`/api/v1/auth`).send({
+        email: user.personalInfo.email,
+        password: password,
+      });
+      expect(loginRes.statusCode).toBe(200);
+      expect(loginRes.headers["set-cookie"]).toBeDefined();
       // Parse the set-cookie header to get authToken
-      const cookies = cookie.parse(createUserRes.headers["set-cookie"][0]);
+      const cookies = cookie.parse(loginRes.headers["set-cookie"][0]);
       expect(cookies.authToken).toBeDefined();
       token = cookies.authToken;
 
@@ -387,22 +390,29 @@ describe("/api/v1/users", () => {
     });
 
     it("should update password successfully if valid data is passed", async () => {
-      // create new user and get token
-      const createUserRes = await request(server)
-        .post(`${endpoint}/register`)
-        .send({
+      // login user and get token
+      const password = "Clubhouse12";
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await User.create({
+        personalInfo: {
           fullname: "Mickey Mouse",
-          password: "Clubhouse12",
           email: "test@test.com",
-        });
-      expect(createUserRes.statusCode).toBe(201);
+          password: hashedPassword,
+        },
+      });
+      const loginRes = await request(server).post(`/api/v1/auth`).send({
+        email: user.personalInfo.email,
+        password: password,
+      });
+      expect(loginRes.statusCode).toBe(200);
+      expect(loginRes.headers["set-cookie"]).toBeDefined();
       // Parse the set-cookie header to get authToken
-      const cookies = cookie.parse(createUserRes.headers["set-cookie"][0]);
+      const cookies = cookie.parse(loginRes.headers["set-cookie"][0]);
       expect(cookies.authToken).toBeDefined();
       token = cookies.authToken;
 
       const res = await exec({
-        currentPassword: "Clubhouse12",
+        currentPassword: password,
         newPassword: "NewClubhouse12",
       });
 

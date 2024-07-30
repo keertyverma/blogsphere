@@ -26,6 +26,11 @@ export const renderTemplate = (
 };
 
 export const sendEmail = (options: MailOptions) => {
+  if (process.env.NODE_ENV === "test") {
+    console.log(`Email to ${options.to} not sent. This is a test environment.`);
+    return;
+  }
+
   const { baseUrl, apiKey, domain, emailFrom } = getMailgunConfig();
 
   // Initialize Mailgun client

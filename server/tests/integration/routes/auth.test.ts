@@ -135,19 +135,21 @@ describe("/api/v1/auth", () => {
 
     it("should authenticate user if request is valid", async () => {
       // call /register route so it can create user and store hash password
-      const user = {
-        fullname: "Mickey Mouse",
-        password: "Pluto123",
-        email: "test@test.com",
-      };
       const registerRes = await request(server)
         .post(`/api/v1/users/register`)
-        .send(user);
+        .send({
+          fullname: "Mickey Mouse",
+          password: "Pluto123",
+          email: "test@test.com",
+        });
       expect(registerRes.statusCode).toBe(201);
+      const { id, fullname, email, username, profileImage } =
+        registerRes.body.result;
+      expect(id).not.toBeNull;
 
       const userData = {
-        email: user.email,
-        password: user.password,
+        email: "test@test.com",
+        password: "Pluto123",
       };
       const res = await request(server).post(endpoint).send(userData);
 
@@ -155,8 +157,10 @@ describe("/api/v1/auth", () => {
       expect(res.body.status).toBe("success");
 
       const responseData = res.body.result;
-      expect(responseData.fullname).toBe(user.fullname.toLowerCase());
-      expect(responseData.email).toBe(user.email);
+      expect(responseData.fullname).toBe(fullname.toLowerCase());
+      expect(responseData.email).toBe(email);
+      expect(responseData.username).toBe(username);
+      expect(responseData.profileImage).toBe(profileImage);
 
       // Ensure the authToken is set in the cookie
       expect(res.headers["set-cookie"]).toBeDefined();
@@ -311,7 +315,7 @@ describe("/api/v1/auth", () => {
       const user = await User.findOne({ "personalInfo.email": mockUser.email });
       expect(user?.googleAuth).toBeTruthy();
 
-      // Ensure the lauthToken' is set in the cookie
+      // Ensure the 'authToken' is set in the cookie
       expect(res.headers["set-cookie"]).toBeDefined();
       // Parse the set-cookie header to get authToken
       const cookies = cookie.parse(res.headers["set-cookie"][0]);

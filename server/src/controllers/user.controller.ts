@@ -78,6 +78,13 @@ export const createUser = async (req: Request, res: Response) => {
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
+    result: {
+      id: user.id,
+      fullname: user.personalInfo?.fullname,
+      email: user.personalInfo?.email,
+      username: user.personalInfo?.username,
+      profileImage: user.personalInfo.profileImage,
+    },
     message:
       "User registered successfully. Please check your email to verify your account.",
   };
