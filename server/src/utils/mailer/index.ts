@@ -57,7 +57,7 @@ export const sendVerificationEmail = async (
   expiresAt: Date
 ) => {
   // generate verification link
-  const verificationLink = `${process.env.EMAIL_VERIFICATION_BASE_URL}?email=${to}&token=${token}`;
+  const verificationLink = `${process.env.EMAIL_VERIFICATION_LINK_BASE_URL}?email=${to}&token=${token}`;
   const formattedExpiresAt = getFormattedExpiryDate(expiresAt);
   const htmlTemplate = await renderTemplate("emailVerification.ejs", {
     verificationLink: verificationLink,
@@ -70,8 +70,6 @@ export const sendVerificationEmail = async (
     text: `Welcome to Blogsphere👋. \n Please verify your email by clicking the following link: ${verificationLink}`,
     html: htmlTemplate,
   };
-
-  // console.log("emailOptions = ", emailOptions);
 
   await sendEmail(emailOptions);
 };

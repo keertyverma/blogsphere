@@ -56,7 +56,6 @@ const authenticateUser = async (req: Request, res: Response) => {
     throw new BadRequestError("Invalid email or password");
   }
 
-  const accessToken = user.generateAuthToken();
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
@@ -70,6 +69,7 @@ const authenticateUser = async (req: Request, res: Response) => {
   };
 
   // send token inside cookies (`HTTP-only` secure)
+  const accessToken = user.generateAuthToken();
   return res
     .cookie("authToken", accessToken, getCookieOptions())
     .status(data.statusCode)
@@ -124,11 +124,11 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
           profileImage: picture,
         },
         googleAuth: true,
+        isVerified: true,
       });
       await user.save();
     }
 
-    const userAccessToken = user.generateAuthToken();
     const data: APIResponse = {
       status: APIStatus.SUCCESS,
       statusCode: StatusCodes.OK,
@@ -142,6 +142,7 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
     };
 
     // send token inside cookies (`HTTP-only` secure)
+    const userAccessToken = user.generateAuthToken();
     return res
       .cookie("authToken", userAccessToken, getCookieOptions())
       .status(data.statusCode)

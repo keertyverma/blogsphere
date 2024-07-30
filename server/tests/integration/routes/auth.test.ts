@@ -178,7 +178,7 @@ describe("/api/v1/auth", () => {
     };
 
     const mockUser = {
-      email: "test@test.com",
+      email: "test@gmail.com",
       name: "User-1",
       picture: "http://example.com/dummy=s96-c",
     } as DecodedIdToken;
@@ -312,8 +312,11 @@ describe("/api/v1/auth", () => {
       expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
 
       // check if user is created in DB and googleAuth is set
-      const user = await User.findOne({ "personalInfo.email": mockUser.email });
-      expect(user?.googleAuth).toBeTruthy();
+      const user = (await User.findOne({
+        "personalInfo.email": mockUser.email,
+      })) as IUser;
+      expect(user.googleAuth).toBeTruthy();
+      expect(user.isVerified).toBeTruthy();
 
       // Ensure the 'authToken' is set in the cookie
       expect(res.headers["set-cookie"]).toBeDefined();
