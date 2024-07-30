@@ -128,7 +128,7 @@ describe("/api/v1/users", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
       expect(res.body.message).toBe(
-        "User registered successfully. Please check your email to verify your account."
+        "Registration successfull!.Please check your email to verify your account."
       );
 
       const responseData = res.body.result;

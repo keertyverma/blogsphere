@@ -70,7 +70,7 @@ export const createUser = async (req: Request, res: Response) => {
       logger.error(`Error: ${error.message}`);
     }
     throw new CustomAPIError(
-      "User registered successfully, but we failed to send a verification email. Please try again later.",
+      "Registration completed, but we encountered an issue sending the verification email. Please try again later.",
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
@@ -86,7 +86,7 @@ export const createUser = async (req: Request, res: Response) => {
       profileImage: user.personalInfo.profileImage,
     },
     message:
-      "User registered successfully. Please check your email to verify your account.",
+      "Registration successfull!.Please check your email to verify your account.",
   };
 
   return res.status(data.statusCode).json(data);

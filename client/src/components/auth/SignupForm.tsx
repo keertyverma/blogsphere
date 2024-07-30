@@ -32,6 +32,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [hasSentEmail, setHasSentEmail] = useState(false);
 
   const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
     useCreateUserAccount();
@@ -55,24 +56,22 @@ const SignupForm = () => {
   const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
     try {
       const userResponse = await createUserAccount(user);
-      const userData = userResponse.data.result;
-      if (userData) {
-        setUserAuth({ ...userData });
+      if (userResponse.status === 201) {
+        // user registered and verification email has been sent.
+        setHasSentEmail(true);
       }
-
       form.reset();
-      const redirectedUrl = useAuthStore.getState().redirectedUrl;
-      if (redirectedUrl) {
-        navigate(redirectedUrl);
-        clearRedirectedUrl();
-      } else {
-        navigate("/");
-      }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
-      if (error instanceof AxiosError && error.code === "ERR_BAD_REQUEST") {
+      if (error instanceof AxiosError) {
         const errorResponse = error.response?.data as IFetchResponse<INewUser>;
-        errorMessage = (errorResponse.error as IFetchError).details;
+        const errorDetail = (errorResponse.error as IFetchError).details;
+        if (errorDetail.includes("verification email")) {
+          errorMessage =
+            "Failed to send verification email. Please try again later.";
+        } else if (error.code === "ERR_BAD_REQUEST") {
+          errorMessage = errorDetail;
+        }
       }
 
       toast.error(errorMessage, {
@@ -151,6 +150,12 @@ const SignupForm = () => {
               <p className="text-light-3 base-medium md:body-medium my-2 md:mb-4">
                 Create your account
               </p>
+              {hasSentEmail && (
+                <p className="max-sm:text-sm text-green-800 bg-green-100 border border-green-400 p-2 rounded-md">
+                  Verification email sent. Please verify to complete the
+                  registration.
+                </p>
+              )}
             </div>
             {isLoading && <LoadingSpinner className="flex-col m-auto" />}
             <FormField
