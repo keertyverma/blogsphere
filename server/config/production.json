@@ -3,5 +3,8 @@
   "database": {
     "name": "blogsphere_prod"
   },
-  "tokenExpiresIn": "7d"
+  "expiresIn": {
+    "authToken": "7d",
+    "verificationToken": "1d"
+  }
 }

@@ -3,5 +3,8 @@
     "name": "blogsphere_test"
   },
   "secretAccessKey": "test-secret-access-key",
-  "tokenExpiresIn": "5s"
+  "expiresIn": {
+    "authToken": "2s",
+    "verificationToken": "2s"
+  }
 }

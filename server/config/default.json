@@ -13,5 +13,8 @@
     "clientId": "",
     "clientX509CertUrl": ""
   },
-  "tokenExpiresIn": "7d"
+  "expiresIn": {
+    "authToken": "7d",
+    "verificationToken": "1d"
+  }
 }

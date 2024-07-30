@@ -4,8 +4,9 @@ import http from "http";
 import { disconnect } from "mongoose";
 import request from "supertest";
 
+import ms from "ms";
 import appServer from "../../../src";
-import { User } from "../../../src/models/user.model";
+import { IUser, User } from "../../../src/models/user.model";
 import FirebaseAuthError from "../../../src/utils/errors/firebase-error";
 import * as firebaseAuth from "../../../src/utils/firebase-auth";
 
@@ -134,21 +135,19 @@ describe("/api/v1/auth", () => {
 
     it("should authenticate user if request is valid", async () => {
       // call /register route so it can create user and store hash password
+      const user = {
+        fullname: "Mickey Mouse",
+        password: "Pluto123",
+        email: "test@test.com",
+      };
       const registerRes = await request(server)
         .post(`/api/v1/users/register`)
-        .send({
-          fullname: "Mickey Mouse",
-          password: "Pluto123",
-          email: "test@test.com",
-        });
+        .send(user);
       expect(registerRes.statusCode).toBe(201);
-      const { id, fullname, email, username, profileImage } =
-        registerRes.body.result;
-      expect(id).not.toBeNull;
 
       const userData = {
-        email: "test@test.com",
-        password: "Pluto123",
+        email: user.email,
+        password: user.password,
       };
       const res = await request(server).post(endpoint).send(userData);
 
@@ -156,10 +155,8 @@ describe("/api/v1/auth", () => {
       expect(res.body.status).toBe("success");
 
       const responseData = res.body.result;
-      expect(responseData.fullname).toBe(fullname.toLowerCase());
-      expect(responseData.email).toBe(email);
-      expect(responseData.username).toBe(username);
-      expect(responseData.profileImage).toBe(profileImage);
+      expect(responseData.fullname).toBe(user.fullname.toLowerCase());
+      expect(responseData.email).toBe(user.email);
 
       // Ensure the authToken is set in the cookie
       expect(res.headers["set-cookie"]).toBeDefined();
@@ -366,6 +363,112 @@ describe("/api/v1/auth", () => {
       // authToken must be empty within cookie token
       const cookies = cookie.parse(res.headers["set-cookie"][0]);
       expect(cookies.authToken).toBe("");
+    });
+  });
+
+  describe("GET /verify-email", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    it("should return BadRequest-400 if token is not passed", async () => {
+      // email and token are the required parameter for token verification.
+      const email = "test@test.com";
+      const res = await request(server).get(
+        `${endpoint}/verify-email?email=${email}`
+      );
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"token" is required',
+      });
+    });
+
+    it("should return BadRequest-400 if token is not valid", async () => {
+      // token is invalid
+      const email = "test@test.com";
+      const token = "invalid-token";
+      const res = await request(server).get(
+        `${endpoint}/verify-email?email=${email}&token=${token}`
+      );
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid Verification link",
+      });
+    });
+
+    it("should return BadRequest-400 if token has expired", async () => {
+      // create user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+      });
+
+      // set token expiration to previous day
+      const { token, hashedToken } = user.generateVerificationToken();
+      user.verificationToken = {
+        token: hashedToken,
+        expiresAt: new Date(Date.now() - ms("1d")),
+      };
+      await user.save();
+
+      const email = user.personalInfo.email;
+      const res = await request(server).get(
+        `${endpoint}/verify-email?email=${email}&token=${token}`
+      );
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Verification link expired. Please request a new one",
+      });
+    });
+
+    it("should verify user account successfully", async () => {
+      // create user and set verification token and expiration
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+      });
+      const { token, hashedToken, expiresAt } =
+        user.generateVerificationToken();
+      user.verificationToken = {
+        token: hashedToken,
+        expiresAt,
+      };
+      await user.save();
+      expect(user.isVerified).toBeFalsy();
+
+      const email = user.personalInfo.email;
+      const res = await request(server).get(
+        `${endpoint}/verify-email?email=${email}&token=${token}`
+      );
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Email verified successfully.");
+
+      const updatedUser = (await User.findById(user.id).select(
+        "isVerified verificationToken"
+      )) as IUser;
+      // user account is verified
+      const { isVerified, verificationToken } = updatedUser;
+      expect(isVerified).toBeTruthy();
+      // verification token is removed
+      expect(verificationToken?.token).not.toBeDefined();
+      expect(verificationToken?.expiresAt).not.toBeDefined();
     });
   });
 });

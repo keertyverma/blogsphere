@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 
+import crypto from "crypto";
 import { User } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
 import { generateUsername, getCookieOptions } from "../utils";
@@ -165,4 +166,60 @@ const logout = async (req: Request, res: Response) => {
   res.status(200).json({ message: "Logout successful" });
 };
 
-export { authenticateUser, authenticateWithGoogle, logout };
+const _validateVerifyUserAccount = (data: { email: string; token: string }) => {
+  const schema = Joi.object({
+    email: Joi.string().trim().required(),
+    token: Joi.string().trim().required(),
+  });
+
+  const { error, value: validatedData } = schema.validate(data);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  return validatedData;
+};
+
+const verifyEmail = async (req: Request, res: Response) => {
+  logger.debug(`GET Request on Route -> ${req.baseUrl}/verify-email`);
+
+  // validate request query parameter
+  const { email, token } = _validateVerifyUserAccount(
+    req.query as { email: string; token: string }
+  );
+
+  // hash token and find the user
+  const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await User.findOne({
+    "personalInfo.email": email,
+    "verificationToken.token": hashToken,
+  });
+  if (!user) {
+    throw new BadRequestError("Invalid Verification link");
+  }
+
+  // check for token expiration
+  if (user.verificationToken && user.verificationToken.expiresAt < new Date()) {
+    throw new BadRequestError(
+      "Verification link expired. Please request a new one"
+    );
+  }
+
+  // update user status to verified
+  user.isVerified = true;
+  // clear the verification token and expiry
+  user.verificationToken = undefined;
+  await user.save();
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    message: "Email verified successfully.",
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
+export { authenticateUser, authenticateWithGoogle, logout, verifyEmail };

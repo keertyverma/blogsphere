@@ -30,7 +30,7 @@ interface IUser extends Document {
     website: string;
   };
   isVerified: boolean;
-  verificationToken: {
+  verificationToken?: {
     token: string;
     expiresAt: Date;
   };
@@ -151,7 +151,7 @@ userSchema.methods.generateAuthToken = function (): string {
     },
     config.get("secretAccessKey") as string,
     {
-      expiresIn: config.get("tokenExpiresIn"),
+      expiresIn: config.get("expiresIn.authToken"),
     }
   );
 };
@@ -163,13 +163,13 @@ userSchema.methods.generateVerificationToken = function (): {
   expiresAt: Date;
 } {
   // generate a random token
-  const token = crypto.randomBytes(32).toString("hex");
+  const token = crypto.randomBytes(24).toString("hex");
 
   // hash the token to store in DB for data security
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-  // set token expiration - 24hr or 1day
-  const expiresIn = ms("1d");
+  // set token expiration
+  const expiresIn = ms(config.get("expiresIn.verificationToken"));
   const expiresAt = new Date(Date.now() + expiresIn);
 
   return { token, hashedToken, expiresAt };
