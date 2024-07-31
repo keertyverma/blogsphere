@@ -441,6 +441,27 @@ describe("/api/v1/auth", () => {
       });
     });
 
+    it("should notify user if account is already verified", async () => {
+      // create user and set verification status
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+        isVerified: true,
+      });
+
+      const token = "some-random-token";
+      const email = user.personalInfo.email;
+      const res = await request(server).get(
+        `${endpoint}/verify-email?email=${email}&token=${token}`
+      );
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Email is already verified.");
+    });
+
     it("should verify user account successfully", async () => {
       // create user and set verification token and expiration
       const user = await User.create({

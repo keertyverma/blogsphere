@@ -16,6 +16,7 @@ export type IFetchError = {
 export type IFetchResponse<T = any> = {
   result: T;
   error?: IFetchError;
+  message?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,6 +26,7 @@ export type IFetchAllResponse<T = any> = {
   previous: string | null;
   results: T[];
   error?: IFetchError;
+  message?: string;
 };
 
 export interface IUser {

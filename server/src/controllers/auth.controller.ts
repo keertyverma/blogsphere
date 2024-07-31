@@ -191,14 +191,26 @@ const verifyEmail = async (req: Request, res: Response) => {
     req.query as { email: string; token: string }
   );
 
-  // hash token and find the user
   const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  // Find the user by email and verification token
   const user = await User.findOne({
     "personalInfo.email": email,
-    "verificationToken.token": hashToken,
+    $or: [{ "verificationToken.token": hashToken }, { isVerified: true }],
   });
   if (!user) {
     throw new BadRequestError("Invalid Verification link");
+  }
+
+  // check if the user's email is already verified
+  if (user.isVerified) {
+    const data: APIResponse = {
+      status: APIStatus.SUCCESS,
+      statusCode: StatusCodes.OK,
+      message: "Email is already verified.",
+    };
+
+    return res.status(data.statusCode).json(data);
   }
 
   // check for token expiration

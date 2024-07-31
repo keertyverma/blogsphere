@@ -56,6 +56,16 @@ export const useLogout = () =>
     mutationFn: () => apiClient.post("/auth/logout"),
   });
 
+export const useVerifyEmail = () =>
+  useMutation({
+    mutationFn: (data: { email: string; token: string }) =>
+      apiClient
+        .get<IFetchResponse>("/auth/verify-email", {
+          params: { email: data.email, token: data.token },
+        })
+        .then((res) => res.data),
+  });
+
 export const useUpload = () =>
   useMutation({
     mutationFn: (data: string) =>

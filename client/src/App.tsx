@@ -14,6 +14,7 @@ import { usePingServer } from "./lib/react-query/queries";
 import BlogPage from "./pages/BlogPage";
 import Bookmarks from "./pages/Bookmarks";
 import Editor from "./pages/Editor";
+import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
 import Home from "./pages/Home";
 import UserProfile from "./pages/UserProfile";
@@ -43,6 +44,7 @@ const App = () => {
 
         <Route path="/editor" element={<Editor />} />
         <Route path="/editor/:blogId" element={<Editor />} />
+        <Route path="/verify-email" element={<EmailVerify />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 
