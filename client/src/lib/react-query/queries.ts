@@ -60,9 +60,7 @@ export const useVerifyEmail = () =>
   useMutation({
     mutationFn: (data: { email: string; token: string }) =>
       apiClient
-        .get<IFetchResponse>("/auth/verify-email", {
-          params: { email: data.email, token: data.token },
-        })
+        .post<IFetchResponse>("/auth/verify-email", data)
         .then((res) => res.data),
   });
 

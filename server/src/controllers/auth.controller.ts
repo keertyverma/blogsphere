@@ -184,12 +184,10 @@ const _validateVerifyUserAccount = (data: { email: string; token: string }) => {
 };
 
 const verifyEmail = async (req: Request, res: Response) => {
-  logger.debug(`GET Request on Route -> ${req.baseUrl}/verify-email`);
+  logger.debug(`POST Request on Route -> ${req.baseUrl}/verify-email`);
 
-  // validate request query parameter
-  const { email, token } = _validateVerifyUserAccount(
-    req.query as { email: string; token: string }
-  );
+  // validate request body
+  const { email, token } = _validateVerifyUserAccount(req.body);
 
   const hashToken = crypto.createHash("sha256").update(token).digest("hex");
 

@@ -382,9 +382,9 @@ describe("/api/v1/auth", () => {
     it("should return BadRequest-400 if token is not passed", async () => {
       // email and token are the required parameter for token verification.
       const email = "test@test.com";
-      const res = await request(server).get(
-        `${endpoint}/verify-email?email=${email}`
-      );
+      const res = await request(server).post(`${endpoint}/verify-email`).send({
+        email,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -398,9 +398,10 @@ describe("/api/v1/auth", () => {
       // token is invalid
       const email = "test@test.com";
       const token = "invalid-token";
-      const res = await request(server).get(
-        `${endpoint}/verify-email?email=${email}&token=${token}`
-      );
+      const res = await request(server).post(`${endpoint}/verify-email`).send({
+        email,
+        token,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -429,9 +430,10 @@ describe("/api/v1/auth", () => {
       await user.save();
 
       const email = user.personalInfo.email;
-      const res = await request(server).get(
-        `${endpoint}/verify-email?email=${email}&token=${token}`
-      );
+      const res = await request(server).post(`${endpoint}/verify-email`).send({
+        email,
+        token,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -454,9 +456,10 @@ describe("/api/v1/auth", () => {
 
       const token = "some-random-token";
       const email = user.personalInfo.email;
-      const res = await request(server).get(
-        `${endpoint}/verify-email?email=${email}&token=${token}`
-      );
+      const res = await request(server).post(`${endpoint}/verify-email`).send({
+        email,
+        token,
+      });
 
       expect(res.statusCode).toBe(200);
       expect(res.body.message).toBe("Email is already verified.");
@@ -481,9 +484,10 @@ describe("/api/v1/auth", () => {
       expect(user.isVerified).toBeFalsy();
 
       const email = user.personalInfo.email;
-      const res = await request(server).get(
-        `${endpoint}/verify-email?email=${email}&token=${token}`
-      );
+      const res = await request(server).post(`${endpoint}/verify-email`).send({
+        email,
+        token,
+      });
 
       expect(res.statusCode).toBe(200);
       expect(res.body.message).toBe("Email verified successfully.");

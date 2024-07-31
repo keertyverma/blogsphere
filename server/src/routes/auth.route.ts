@@ -12,4 +12,4 @@ export const authRouter = Router();
 authRouter.post("/", authenticateUser);
 authRouter.post("/google-auth", authenticateWithGoogle);
 authRouter.post("/logout", verifyToken, logout);
-authRouter.get("/verify-email", verifyEmail);
+authRouter.post("/verify-email", verifyEmail);
