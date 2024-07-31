@@ -19,28 +19,27 @@ const useAxiosInterceptors = () => {
     const interceptor = apiClient.interceptors.response.use(
       (response) => response,
       (error) => {
-        const {
-          response: {
+        if (error.response) {
+          const {
             status,
             data: {
               error: { details },
             },
-          },
-        } = error;
+          } = error.response;
 
-        if (status === 401 && details.includes("Token has expired")) {
-          // this will reset user auth and re-direct user to login page
-          setTokenExpired(true);
-          clearUserAuth();
+          if (status === 401 && details.includes("Token has expired")) {
+            // this will reset user auth and re-direct user to login page
+            setTokenExpired(true);
+            clearUserAuth();
 
-          setRedirectedUrl(location.pathname);
-          navigate("/login");
-          toast.error("Your session has expired. Please log in again.", {
-            position: "top-right",
-            className: "mt-20",
-          });
+            setRedirectedUrl(location.pathname);
+            navigate("/login");
+            toast.error("Your session has expired. Please log in again.", {
+              position: "top-right",
+              className: "mt-20",
+            });
+          }
         }
-
         return Promise.reject(error);
       }
     );
