@@ -26,6 +26,7 @@ import { Input } from "../ui/input";
 
 const LoginForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [verificationMsg, setVerificationMsg] = useState("");
 
   const { mutateAsync: login, isPending: isLoginUser } = useLogin();
   const { mutateAsync: loginWithGoogle, isPending: isGoogleLoginUser } =
@@ -62,6 +63,7 @@ const LoginForm = () => {
       }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
+      let verificationMessage = "";
       if (
         error instanceof AxiosError &&
         error.code === "ERR_BAD_REQUEST" &&
@@ -79,15 +81,26 @@ const LoginForm = () => {
         if (status === 403) {
           errorMessage =
             "Account was created using Google. Please log in using Google.";
+        } else if (details.toLowerCase().includes("not verified")) {
+          verificationMessage =
+            "Your account is not verified yet. Please check your email for the most recent verification link or request a new one.";
+          errorMessage = "";
         } else {
           errorMessage = details;
         }
       }
 
-      toast.error(errorMessage, {
-        position: "top-right",
-        className: "mt-20",
-      });
+      if (verificationMessage) {
+        setVerificationMsg(verificationMessage);
+      } else {
+        setVerificationMsg("");
+      }
+      if (errorMessage) {
+        toast.error(errorMessage, {
+          position: "top-right",
+          className: "mt-20",
+        });
+      }
     }
   };
 
@@ -223,6 +236,20 @@ const LoginForm = () => {
             >
               Log in
             </Button>
+
+            {verificationMsg && (
+              <div className="text-center mb-4 bg-red-100 border border-red-400 p-1 rounded-md">
+                <p className="max-sm:text-sm text-red-800  p-2 rounded-md">
+                  {verificationMsg}
+                </p>
+                <Link
+                  to="/resend-verification-link"
+                  className="text-primary underline text-sm md:text-base"
+                >
+                  Resend verification link
+                </Link>
+              </div>
+            )}
 
             <p className="text-sm md:text-base text-center text-secondary-foreground">
               Don't have an account?

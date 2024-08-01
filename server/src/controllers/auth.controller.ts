@@ -47,6 +47,10 @@ const authenticateUser = async (req: Request, res: Response) => {
     );
   }
 
+  // check if user is verified
+  if (!user.isVerified) {
+    throw new BadRequestError("Account is not verified.");
+  }
   // verify password
   const isValidPassword = await bcrypt.compare(
     password,

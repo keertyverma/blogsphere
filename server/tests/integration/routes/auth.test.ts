@@ -80,6 +80,30 @@ describe("/api/v1/auth", () => {
       });
     });
 
+    it("should return BadRequest-400 if user is not verified", async () => {
+      // create user
+      await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+      });
+
+      const userData = {
+        email: "test@test.com",
+        password: "Pluto123",
+      };
+      const res = await request(server).post(endpoint).send(userData);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Account is not verified.",
+      });
+    });
+
     it("should return BadRequest-400 if password is incorrect", async () => {
       // create user
       await User.create({
@@ -88,6 +112,7 @@ describe("/api/v1/auth", () => {
           email: "test@test.com",
           password: "Pluto123",
         },
+        isVerified: true,
       });
 
       // sending incorrect password
@@ -113,6 +138,7 @@ describe("/api/v1/auth", () => {
           email: "test@gmail.com",
           password: "Pluto123",
         },
+        isVerified: true,
         googleAuth: true,
       });
 
@@ -146,6 +172,12 @@ describe("/api/v1/auth", () => {
       const { id, fullname, email, username, profileImage } =
         registerRes.body.result;
       expect(id).not.toBeNull;
+      // verify user
+      const user = await User.findById(id);
+      if (user) {
+        user.isVerified = true;
+        await user.save();
+      }
 
       const userData = {
         email: "test@test.com",
