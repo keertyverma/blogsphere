@@ -64,6 +64,14 @@ export const useVerifyEmail = () =>
         .then((res) => res.data),
   });
 
+export const useResendVerificationEmail = () =>
+  useMutation({
+    mutationFn: (email: string) =>
+      apiClient
+        .post<IFetchResponse>("/auth/resend-verification", { email })
+        .then((res) => res.data),
+  });
+
 export const useUpload = () =>
   useMutation({
     mutationFn: (data: string) =>

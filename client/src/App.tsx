@@ -17,6 +17,7 @@ import Editor from "./pages/Editor";
 import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
 import Home from "./pages/Home";
+import ResendVerification from "./pages/ResendVerification";
 import UserProfile from "./pages/UserProfile";
 
 const App = () => {
@@ -45,6 +46,10 @@ const App = () => {
         <Route path="/editor" element={<Editor />} />
         <Route path="/editor/:blogId" element={<Editor />} />
         <Route path="/verify-email" element={<EmailVerify />} />
+        <Route
+          path="/resend-verification-link"
+          element={<ResendVerification />}
+        />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 
