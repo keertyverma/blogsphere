@@ -12,6 +12,7 @@ import CustomAPIError from "../utils/errors/custom-api";
 import FirebaseAuthError from "../utils/errors/firebase-error";
 import { verifyIdToken } from "../utils/firebase-auth";
 import logger from "../utils/logger";
+import { sendVerificationEmail } from "../utils/mailer";
 
 const validate = (req: { email: string; password: string }) => {
   const schema = Joi.object({
@@ -237,4 +238,83 @@ const verifyEmail = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
-export { authenticateUser, authenticateWithGoogle, logout, verifyEmail };
+const _validateResendVerification = (data: { email: string }) => {
+  const schema = Joi.object({
+    email: Joi.string().trim().required(),
+  });
+
+  const { error, value: validatedData } = schema.validate(data);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  return validatedData;
+};
+
+const resendVerification = async (req: Request, res: Response) => {
+  logger.debug(`POST Request on Route -> ${req.baseUrl}/resend-verification`);
+
+  // validate req body
+  const { email } = _validateResendVerification(req.body);
+
+  // find the user by email
+  const user = await User.findOne({ "personalInfo.email": email });
+  if (!user) {
+    throw new BadRequestError("Invalid email.");
+  }
+
+  if (user.isVerified) {
+    throw new BadRequestError("Account already verified.");
+  }
+
+  // check for token expiration
+  const tokenExpired = user.verificationToken?.expiresAt
+    ? new Date(user.verificationToken.expiresAt).getTime() < Date.now()
+    : true;
+
+  if (!tokenExpired) {
+    throw new BadRequestError("An active verification token already exists.");
+  }
+
+  // get verification token
+  const { token, hashedToken, expiresAt } = user.generateVerificationToken();
+
+  // set verification token and expiration date
+  user.verificationToken = {
+    token: hashedToken,
+    expiresAt,
+  };
+  await user.save();
+
+  try {
+    await sendVerificationEmail(email, token, expiresAt);
+    logger.info("Verification email sent successfully.");
+  } catch (error) {
+    logger.error(`Failed to send verification email to ${email}`);
+    if (error instanceof Error) {
+      logger.error(`Error: ${error.message}`);
+    }
+    throw new CustomAPIError(
+      "We encountered an issue sending the verification email. Please try again later.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    message: "Verification email sent successfully.",
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
+export {
+  authenticateUser,
+  authenticateWithGoogle,
+  logout,
+  resendVerification,
+  verifyEmail,
+};

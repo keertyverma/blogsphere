@@ -405,7 +405,7 @@ describe("/api/v1/auth", () => {
     });
   });
 
-  describe("GET /verify-email", () => {
+  describe("POST /verify-email", () => {
     afterEach(async () => {
       // db cleanup
       await User.deleteMany({});
@@ -533,6 +533,112 @@ describe("/api/v1/auth", () => {
       // verification token is removed
       expect(verificationToken?.token).not.toBeDefined();
       expect(verificationToken?.expiresAt).not.toBeDefined();
+    });
+  });
+
+  describe.only("POST /resend-verification", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    it("should return BadRequest-400 if user with email does not exists", async () => {
+      const email = "randomuser@test.com";
+      const res = await request(server)
+        .post(`${endpoint}/resend-verification`)
+        .send({ email });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid email.",
+      });
+    });
+
+    it("should return BadRequest-400 if user is already verified", async () => {
+      // create user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+        isVerified: true,
+      });
+
+      const res = await request(server)
+        .post(`${endpoint}/resend-verification`)
+        .send({
+          email: user.personalInfo.email,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Account already verified.",
+      });
+    });
+
+    it("should return BadRequest-400 if token has not expired yet", async () => {
+      // create user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+        isVerified: false,
+      });
+      // set token expiration to next day
+      const { hashedToken } = user.generateVerificationToken();
+      user.verificationToken = {
+        token: hashedToken,
+        expiresAt: new Date(Date.now() + ms("1d")),
+      };
+      await user.save();
+
+      const res = await request(server)
+        .post(`${endpoint}/resend-verification`)
+        .send({
+          email: user.personalInfo.email,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "An active verification token already exists.",
+      });
+    });
+
+    it("should resend verification email", async () => {
+      // if user is not verified and token has expired then resend verification email
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+        isVerified: false,
+      });
+      // set token expiration to previous day
+      const { hashedToken } = user.generateVerificationToken();
+      user.verificationToken = {
+        token: hashedToken,
+        expiresAt: new Date(Date.now() - ms("1d")),
+      };
+      await user.save();
+
+      const res = await request(server)
+        .post(`${endpoint}/resend-verification`)
+        .send({
+          email: user.personalInfo.email,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Verification email sent successfully.");
     });
   });
 });

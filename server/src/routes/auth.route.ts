@@ -3,6 +3,7 @@ import {
   authenticateUser,
   authenticateWithGoogle,
   logout,
+  resendVerification,
   verifyEmail,
 } from "../controllers/auth.controller";
 import { verifyToken } from "../middlewares";
@@ -13,3 +14,4 @@ authRouter.post("/", authenticateUser);
 authRouter.post("/google-auth", authenticateWithGoogle);
 authRouter.post("/logout", verifyToken, logout);
 authRouter.post("/verify-email", verifyEmail);
+authRouter.post("/resend-verification", resendVerification);
