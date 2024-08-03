@@ -20,14 +20,10 @@ const useAxiosInterceptors = () => {
       (response) => response,
       (error) => {
         if (error.response) {
-          const {
-            status,
-            data: {
-              error: { details },
-            },
-          } = error.response;
+          const { status, data } = error.response;
+          const errMsg = data?.error ? data.error.details : data;
 
-          if (status === 401 && details.includes("Token has expired")) {
+          if (status === 401 && errMsg.includes("Token has expired")) {
             // this will reset user auth and re-direct user to login page
             setTokenExpired(true);
             clearUserAuth();
@@ -38,6 +34,17 @@ const useAxiosInterceptors = () => {
               position: "top-right",
               className: "mt-20",
             });
+          }
+
+          if (status === 429) {
+            // api rate limit exceeds
+            toast.error(
+              "You have exceeded the request limit. Please try again later.",
+              {
+                position: "top-right",
+                className: "mt-20",
+              }
+            );
           }
         }
         return Promise.reject(error);
