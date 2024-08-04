@@ -16,6 +16,7 @@ import Bookmarks from "./pages/Bookmarks";
 import Editor from "./pages/Editor";
 import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
+import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
 import ResendVerification from "./pages/ResendVerification";
 import UserProfile from "./pages/UserProfile";
@@ -46,6 +47,7 @@ const App = () => {
         <Route path="/editor" element={<Editor />} />
         <Route path="/editor/:blogId" element={<Editor />} />
         <Route path="/verify-email" element={<EmailVerify />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/resend-verification-link"
           element={<ResendVerification />}

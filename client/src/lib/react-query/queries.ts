@@ -72,6 +72,14 @@ export const useResendVerificationEmail = () =>
         .then((res) => res.data),
   });
 
+export const useForgotPassword = () =>
+  useMutation({
+    mutationFn: (email: string) =>
+      apiClient
+        .post<IFetchResponse>("/auth/forgot-password", { email })
+        .then((res) => res.data),
+  });
+
 export const useUpload = () =>
   useMutation({
     mutationFn: (data: string) =>

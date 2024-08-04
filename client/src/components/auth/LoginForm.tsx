@@ -228,6 +228,14 @@ const LoginForm = () => {
                 </FormItem>
               )}
             />
+            <div className="flex justify-end">
+              <Link
+                to="/forgot-password"
+                className="underline text-primary ml-1 text-sm md:text-base"
+              >
+                Forgot Password?
+              </Link>
+            </div>
 
             <Button
               type="submit"
