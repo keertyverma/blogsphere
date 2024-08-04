@@ -34,11 +34,20 @@ interface IUser extends Document {
     token: string;
     expiresAt: Date;
   };
+  resetPasswordToken?: {
+    token: string;
+    expiresAt: Date;
+  };
 }
 
 interface IUserDocument extends IUser, Document {
   generateAuthToken(): string;
   generateVerificationToken(): {
+    token: string;
+    hashedToken: string;
+    expiresAt: Date;
+  };
+  generateResetPasswordToken(): {
     token: string;
     hashedToken: string;
     expiresAt: Date;
@@ -140,6 +149,10 @@ const userSchema = new Schema(
       token: String,
       expiresAt: Date,
     },
+    resetPasswordToken: {
+      token: String,
+      expiresAt: Date,
+    },
   },
   { timestamps: true }
 );
@@ -170,6 +183,25 @@ userSchema.methods.generateVerificationToken = function (): {
 
   // set token expiration
   const expiresIn = ms(config.get("expiresIn.verificationToken"));
+  const expiresAt = new Date(Date.now() + expiresIn);
+
+  return { token, hashedToken, expiresAt };
+};
+
+// generate and return reset password token with expiry
+userSchema.methods.generateResetPasswordToken = function (): {
+  token: string;
+  hashedToken: string;
+  expiresAt: Date;
+} {
+  // generate a random token
+  const token = crypto.randomBytes(24).toString("hex");
+
+  // hash the token to store in DB for data security
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  // set token expiration
+  const expiresIn = ms(config.get("expiresIn.resetPasswordToken"));
   const expiresAt = new Date(Date.now() + expiresIn);
 
   return { token, hashedToken, expiresAt };

@@ -73,3 +73,26 @@ export const sendVerificationEmail = async (
 
   await sendEmail(emailOptions);
 };
+
+export const sendResetPasswordEmail = async (
+  to: string,
+  token: string,
+  expiresAt: Date
+) => {
+  // generate reset password link
+  const resetPasswordLink = `${process.env.EMAIL_RESET_PASSWORD_LINK_BASE_URL}?email=${to}&token=${token}`;
+  const formattedExpiresAt = getFormattedExpiryDate(expiresAt);
+  const htmlTemplate = await renderTemplate("resetPassword.ejs", {
+    resetPasswordLink: resetPasswordLink,
+    tokenExpiresAt: formattedExpiresAt,
+  });
+
+  const emailOptions: MailOptions = {
+    to,
+    subject: "Reset password for Blogsphere account.",
+    text: `Password Reset Request. \n Please reset your password by clicking the following link: ${resetPasswordLink}`,
+    html: htmlTemplate,
+  };
+
+  await sendEmail(emailOptions);
+};

@@ -536,7 +536,7 @@ describe("/api/v1/auth", () => {
     });
   });
 
-  describe.only("POST /resend-verification", () => {
+  describe("POST /resend-verification", () => {
     afterEach(async () => {
       // db cleanup
       await User.deleteMany({});
@@ -639,6 +639,87 @@ describe("/api/v1/auth", () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.body.message).toBe("Verification email sent successfully.");
+    });
+  });
+
+  describe("POST /forgot-password", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    it("should return BadRequest-400 if user with email does not exists", async () => {
+      const email = "randomuser@test.com";
+      const res = await request(server)
+        .post(`${endpoint}/forgot-password`)
+        .send({ email });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid email.",
+      });
+    });
+
+    it("should return BadRequest-400 if password reset token has not expired yet", async () => {
+      // if token has not expired that means existing token can be use to verify and reset password
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+        isVerified: true,
+      });
+      // set token expiration to next day
+      const { hashedToken } = user.generateResetPasswordToken();
+      user.resetPasswordToken = {
+        token: hashedToken,
+        expiresAt: new Date(Date.now() + ms("1d")),
+      };
+      await user.save();
+
+      const res = await request(server)
+        .post(`${endpoint}/forgot-password`)
+        .send({
+          email: user.personalInfo.email,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "An active password reset token already exists.",
+      });
+    });
+
+    it("should send password reset email", async () => {
+      // if token has expired or not exists then send password reset email
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Pluto123",
+        },
+        isVerified: true,
+      });
+      // set token expiration to previous day
+      const { hashedToken } = user.generateResetPasswordToken();
+      user.resetPasswordToken = {
+        token: hashedToken,
+        expiresAt: new Date(Date.now() - ms("1d")),
+      };
+      await user.save();
+
+      const res = await request(server)
+        .post(`${endpoint}/forgot-password`)
+        .send({
+          email: user.personalInfo.email,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Password reset email sent successfully.");
     });
   });
 });

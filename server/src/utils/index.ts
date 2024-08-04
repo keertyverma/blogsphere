@@ -62,10 +62,7 @@ export const getFormattedExpiryDate = (date: Date): string => {
     minute: "2-digit", // "52"
     hour12: true, // "PM"
   };
-
-  const formattedExpiresAt = date
-    .toLocaleString("en-US", options)
-    .replace(",", ""); // Remove the comma after the date
+  const formattedExpiresAt = date.toLocaleString("en-US", options);
 
   return formattedExpiresAt;
 };

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   authenticateUser,
   authenticateWithGoogle,
+  forgotPassword,
   logout,
   resendVerification,
   verifyEmail,
@@ -19,3 +20,4 @@ authRouter.post(
   resendEmailRateLimiter,
   resendVerification
 );
+authRouter.post("/forgot-password", forgotPassword);

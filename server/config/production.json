@@ -5,6 +5,7 @@
   },
   "expiresIn": {
     "authToken": "7d",
-    "verificationToken": "1d"
+    "verificationToken": "1d",
+    "resetPasswordToken": "1d"
   }
 }

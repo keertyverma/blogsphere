@@ -5,6 +5,7 @@
   "secretAccessKey": "test-secret-access-key",
   "expiresIn": {
     "authToken": "2s",
-    "verificationToken": "2s"
+    "verificationToken": "2s",
+    "resetPasswordToken": "2s"
   }
 }

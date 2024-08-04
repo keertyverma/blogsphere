@@ -12,7 +12,7 @@ import CustomAPIError from "../utils/errors/custom-api";
 import FirebaseAuthError from "../utils/errors/firebase-error";
 import { verifyIdToken } from "../utils/firebase-auth";
 import logger from "../utils/logger";
-import { sendVerificationEmail } from "../utils/mailer";
+import { sendResetPasswordEmail, sendVerificationEmail } from "../utils/mailer";
 
 const validate = (req: { email: string; password: string }) => {
   const schema = Joi.object({
@@ -311,9 +311,79 @@ const resendVerification = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
+const _validateForgotPassword = (data: { email: string }) => {
+  const schema = Joi.object({
+    email: Joi.string().trim().required(),
+  });
+
+  const { error, value: validatedData } = schema.validate(data);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  return validatedData;
+};
+
+const forgotPassword = async (req: Request, res: Response) => {
+  logger.debug(`POST Request on Route -> ${req.baseUrl}/forgot-password`);
+
+  // validate req body
+  const { email } = _validateForgotPassword(req.body);
+
+  // find the user by email
+  const user = await User.findOne({ "personalInfo.email": email });
+  if (!user) {
+    throw new BadRequestError("Invalid email.");
+  }
+
+  // check for token expiration
+  const tokenExpired = user.resetPasswordToken?.expiresAt
+    ? new Date(user.resetPasswordToken.expiresAt).getTime() < Date.now()
+    : true;
+
+  if (!tokenExpired) {
+    throw new BadRequestError("An active password reset token already exists.");
+  }
+
+  // get reset password token
+  const { token, hashedToken, expiresAt } = user.generateResetPasswordToken();
+
+  // set reset password token and expiration date
+  user.resetPasswordToken = {
+    token: hashedToken,
+    expiresAt,
+  };
+  await user.save();
+
+  try {
+    await sendResetPasswordEmail(email, token, expiresAt);
+    logger.info("Password reset email sent successfully.");
+  } catch (error) {
+    logger.error(`Failed to send password reset email to ${email}`);
+    if (error instanceof Error) {
+      logger.error(`Error: ${error.message}`);
+    }
+    throw new CustomAPIError(
+      "We encountered an issue sending the password reset email. Please try again later.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    message: "Password reset email sent successfully.",
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
 export {
   authenticateUser,
   authenticateWithGoogle,
+  forgotPassword,
   logout,
   resendVerification,
   verifyEmail,
