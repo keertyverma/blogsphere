@@ -48,6 +48,7 @@ export const createUser = async (req: Request, res: Response) => {
       username,
     },
   });
+  await user.save();
 
   // get verification token
   const { token, hashedToken, expiresAt } = user.generateVerificationToken();
@@ -58,11 +59,10 @@ export const createUser = async (req: Request, res: Response) => {
     expiresAt,
   };
 
-  await user.save();
-
   // generate verification link and send verification email
   try {
     await sendVerificationEmail(email, token, expiresAt);
+    await user.save();
     logger.info("Verification email sent successfully.");
   } catch (error) {
     logger.error(`Failed to send verification email to ${email}`);

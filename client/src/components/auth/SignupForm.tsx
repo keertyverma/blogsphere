@@ -68,7 +68,7 @@ const SignupForm = () => {
         const errorDetail = (errorResponse.error as IFetchError).details;
         if (errorDetail.includes("verification email")) {
           errorMessage =
-            "Failed to send verification email. Please try again later.";
+            "Registration successful, but the verification email could not be sent. \n You can request a new one when you log in.";
         } else if (error.code === "ERR_BAD_REQUEST") {
           errorMessage = errorDetail;
         }
@@ -76,7 +76,8 @@ const SignupForm = () => {
 
       toast.error(errorMessage, {
         position: "top-right",
-        className: "mt-20",
+        className: "mt-10",
+        autoClose: 10000,
       });
     }
   };
