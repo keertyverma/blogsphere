@@ -36,4 +36,28 @@ describe("user.generateAuthToken", () => {
     expect(expiresAtMs).toBeGreaterThanOrEqual(lowerBoundMs);
     expect(expiresAtMs).toBeLessThanOrEqual(upperBoundMs);
   });
+
+  it("should return a valid password reset token", () => {
+    const user = new User();
+    const { token, hashedToken, expiresAt } = user.generateResetPasswordToken();
+
+    expect(token).toBeDefined();
+    expect(hashedToken).toBeDefined();
+
+    // check token expiration duration
+    const expiresAtMs = new Date(expiresAt).getTime();
+
+    // Calculate the expected expiration time in milliseconds
+    const expectedExpiresAtMs =
+      Date.now() + parseInt(ms(config.get("expiresIn.resetPasswordToken")));
+
+    // Allow for a small tolerance in milliseconds
+    const tolerance = 10000; // 10 seconds tolerance
+    const lowerBoundMs = expectedExpiresAtMs - tolerance;
+    const upperBoundMs = expectedExpiresAtMs + tolerance;
+
+    // Check if `expiresAt` is within the tolerance range
+    expect(expiresAtMs).toBeGreaterThanOrEqual(lowerBoundMs);
+    expect(expiresAtMs).toBeLessThanOrEqual(upperBoundMs);
+  });
 });

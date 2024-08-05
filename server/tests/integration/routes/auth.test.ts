@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import cookie from "cookie";
 import "dotenv/config";
 import http from "http";
@@ -720,6 +721,153 @@ describe("/api/v1/auth", () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.body.message).toBe("Password reset email sent successfully.");
+    });
+  });
+
+  describe("POST /reset-password", () => {
+    afterEach(async () => {
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    it("should return BadRequest-400 if token is not passed", async () => {
+      // token is the required parameter for token verification.
+      const email = "test@test.com";
+      const res = await request(server)
+        .post(`${endpoint}/reset-password`)
+        .send({
+          email,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"token" is required',
+      });
+    });
+
+    it("should return BadRequest-400 if password is invalid", async () => {
+      // valid password -> Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter.
+      const email = "test@test.com";
+      const token = "random-token";
+      const newPassword = "invalid-password";
+      const res = await request(server)
+        .post(`${endpoint}/reset-password`)
+        .send({
+          email,
+          token,
+          password: newPassword,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details:
+          "Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter.",
+      });
+    });
+
+    it("should return BadRequest-400 if token is not valid", async () => {
+      // token is invalid
+      const email = "test@test.com";
+      const token = "invalid-token";
+      const newPassword = "Clubhouse123";
+      const res = await request(server)
+        .post(`${endpoint}/reset-password`)
+        .send({
+          email,
+          token,
+          password: newPassword,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Invalid Password Reset link",
+      });
+    });
+
+    it("should return BadRequest-400 if token has expired", async () => {
+      // create user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Clubhouse123",
+        },
+      });
+
+      // set token expiration to previous day
+      const { token, hashedToken } = user.generateResetPasswordToken();
+      user.resetPasswordToken = {
+        token: hashedToken,
+        expiresAt: new Date(Date.now() - ms("1d")),
+      };
+      await user.save();
+
+      const newPassword = "Pluto123";
+      const res = await request(server)
+        .post(`${endpoint}/reset-password`)
+        .send({
+          email: user.personalInfo.email,
+          token,
+          password: newPassword,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "Password Reset link expired. Please request a new one",
+      });
+    });
+
+    it("should reset user password", async () => {
+      // create user
+      const user = await User.create({
+        personalInfo: {
+          fullname: "Mickey Mouse",
+          email: "test@test.com",
+          password: "Clubhouse123",
+        },
+      });
+      // set token expiration to next day
+      const { token, hashedToken } = user.generateResetPasswordToken();
+      user.resetPasswordToken = {
+        token: hashedToken,
+        expiresAt: new Date(Date.now() + ms("1d")),
+      };
+      await user.save();
+      const newPassword = "Pluto123";
+
+      const res = await request(server)
+        .post(`${endpoint}/reset-password`)
+        .send({
+          email: user.personalInfo.email,
+          token,
+          password: newPassword,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Password reset completed successfully.");
+      const updatedUser = (await User.findById(user.id)) as IUser;
+      const {
+        personalInfo: { password: userPassword },
+        resetPasswordToken,
+      } = updatedUser;
+
+      // check for user password
+      const isValidPassword = await bcrypt.compare(
+        newPassword,
+        userPassword || ""
+      );
+      expect(isValidPassword).toBeTruthy();
+      // reset password token is removed
+      expect(resetPasswordToken?.token).not.toBeDefined();
+      expect(resetPasswordToken?.expiresAt).not.toBeDefined();
     });
   });
 });

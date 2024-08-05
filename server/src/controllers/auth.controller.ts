@@ -380,11 +380,84 @@ const forgotPassword = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
+const _validateResetPassword = (data: {
+  email: string;
+  token: string;
+  password: string;
+}) => {
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
+
+  const schema = Joi.object({
+    email: Joi.string().trim().required(),
+    token: Joi.string().trim().required(),
+    password: Joi.string()
+      .min(5)
+      .max(1024)
+      .trim()
+      .required()
+      .pattern(passwordRegex)
+      .message(
+        "Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter."
+      ),
+  });
+
+  const { error, value: validatedData } = schema.validate(data);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  return validatedData;
+};
+const resetPassword = async (req: Request, res: Response) => {
+  logger.debug(`POST Request on Route -> ${req.baseUrl}/reset-password`);
+
+  // validate request body
+  const { email, token, password } = _validateResetPassword(req.body);
+
+  // Find the user by email and reset password token
+  const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await User.findOne({
+    "personalInfo.email": email,
+    "resetPasswordToken.token": hashToken,
+  });
+  if (!user) {
+    throw new BadRequestError("Invalid Password Reset link");
+  }
+
+  // check for token expiration
+  if (
+    user.resetPasswordToken &&
+    user.resetPasswordToken.expiresAt < new Date()
+  ) {
+    throw new BadRequestError(
+      "Password Reset link expired. Please request a new one"
+    );
+  }
+
+  // secure password and update user
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.personalInfo.password = hashedPassword;
+
+  // clear the reset password token and expiry
+  user.resetPasswordToken = undefined;
+  await user.save();
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    message: "Password reset completed successfully.",
+  };
+  return res.status(data.statusCode).json(data);
+};
+
 export {
   authenticateUser,
   authenticateWithGoogle,
   forgotPassword,
   logout,
   resendVerification,
+  resetPassword,
   verifyEmail,
 };

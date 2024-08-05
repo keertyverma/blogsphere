@@ -5,6 +5,7 @@ import {
   forgotPassword,
   logout,
   resendVerification,
+  resetPassword,
   verifyEmail,
 } from "../controllers/auth.controller";
 import { resendEmailRateLimiter, verifyToken } from "../middlewares";
@@ -20,4 +21,5 @@ authRouter.post(
   resendEmailRateLimiter,
   resendVerification
 );
-authRouter.post("/forgot-password", forgotPassword);
+authRouter.post("/forgot-password", resendEmailRateLimiter, forgotPassword);
+authRouter.post("/reset-password", resetPassword);
