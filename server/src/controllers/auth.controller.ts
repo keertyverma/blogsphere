@@ -286,10 +286,10 @@ const resendVerification = async (req: Request, res: Response) => {
     token: hashedToken,
     expiresAt,
   };
-  await user.save();
 
   try {
     await sendVerificationEmail(email, token, expiresAt);
+    await user.save();
     logger.info("Verification email sent successfully.");
   } catch (error) {
     logger.error(`Failed to send verification email to ${email}`);
@@ -355,10 +355,10 @@ const forgotPassword = async (req: Request, res: Response) => {
     token: hashedToken,
     expiresAt,
   };
-  await user.save();
 
   try {
     await sendResetPasswordEmail(email, token, expiresAt);
+    await user.save();
     logger.info("Password reset email sent successfully.");
   } catch (error) {
     logger.error(`Failed to send password reset email to ${email}`);
