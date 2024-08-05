@@ -1,6 +1,7 @@
 import "dotenv/config";
 import ejs from "ejs";
 import FormData from "form-data";
+import fs from "fs";
 import Mailgun, { MailgunMessageData } from "mailgun.js";
 import path from "path";
 import { getFormattedExpiryDate } from "..";
@@ -22,7 +23,26 @@ export const renderTemplate = (
 ): Promise<string> => {
   const templatesPath = path.join(__dirname, "templates");
   const filePath = path.join(templatesPath, templateName);
-  return ejs.renderFile(filePath, data);
+
+  return new Promise((resolve, reject) => {
+    // Check if the file exists
+    if (!fs.existsSync(filePath)) {
+      const errorMessage = `Template file does not exist: ${filePath}`;
+      console.error(errorMessage);
+      reject(new Error(errorMessage));
+      return;
+    }
+
+    // Render the EJS template
+    ejs.renderFile(filePath, data, (err, str) => {
+      if (err) {
+        console.error("Error rendering EJS template:", err);
+        reject(err);
+      } else {
+        resolve(str);
+      }
+    });
+  });
 };
 
 export const sendEmail = (options: MailOptions) => {
