@@ -1,4 +1,4 @@
-import AnimationWrapper from "@/components/shared/AnimationWrapper";
+import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -106,7 +106,11 @@ const ResetPassword = () => {
   }
 
   return (
-    <AnimationWrapper>
+    <div className="w-full h-full">
+      <nav className="navbar">
+        <Logo />
+      </nav>
+
       <section className="h-cover flex-center py-[20vh]">
         <Form {...form}>
           <form
@@ -215,7 +219,7 @@ const ResetPassword = () => {
           </form>
         </Form>
       </section>
-    </AnimationWrapper>
+    </div>
   );
 };
 

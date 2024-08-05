@@ -109,7 +109,7 @@ export const sendResetPasswordEmail = async (
 
   const emailOptions: MailOptions = {
     to,
-    subject: "Reset password for Blogsphere account.",
+    subject: "Reset Password",
     text: `Password Reset Request. \n Please reset your password by clicking the following link: ${resetPasswordLink}`,
     html: htmlTemplate,
   };

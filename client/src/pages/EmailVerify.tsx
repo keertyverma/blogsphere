@@ -79,7 +79,7 @@ const EmailVerify = () => {
 
   if (isLoading) return <LoadingSpinner className="mx-auto" />;
   return (
-    <div className="w-full h-full bg-gray-100 ">
+    <div className="w-full h-full">
       <nav className="navbar">
         <Logo />
       </nav>
