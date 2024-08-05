@@ -94,3 +94,11 @@ export const EditProfileValidation = z.object({
     .or(z.literal(""))
     .optional(),
 });
+
+export const ResetPasswordValidation = z.object({
+  newPassword: z.string().regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/, {
+    message:
+      "Password should be 8 to 20 characters long with atleast 1 numeric, 1 lowercase and 1 uppercase letters.",
+  }),
+  confirmNewPassword: z.string(),
+});

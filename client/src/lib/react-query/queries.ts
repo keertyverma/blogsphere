@@ -80,6 +80,14 @@ export const useForgotPassword = () =>
         .then((res) => res.data),
   });
 
+export const useResetPassword = () =>
+  useMutation({
+    mutationFn: (data: { email: string; token: string; password: string }) =>
+      apiClient
+        .post<IFetchResponse>("/auth/reset-password", { ...data })
+        .then((res) => res.data),
+  });
+
 export const useUpload = () =>
   useMutation({
     mutationFn: (data: string) =>
