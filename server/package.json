@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "build": "tsc & npm run copy-templates",
+    "build": "tsc && npm run copy-templates",
     "copy-templates": "copyfiles src/utils/mailer/templates/* dist",
     "start": "node dist/src/index.js",
     "dev": "nodemon src/index.ts",
