@@ -1,5 +1,9 @@
 import { useUpload } from "@/lib/react-query/queries";
-import { convertFileToUrl, fileToBase64 } from "@/lib/utils";
+import {
+  convertFileToUrl,
+  fileToBase64,
+  handleProfileImgErr,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useCallback, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
@@ -77,18 +81,17 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
         </div>
       )}
 
-      {previewUrl && (
-        <div className="w-36 h-36 cursor-pointer flex items-center gap-4 relative">
-          <div className="w-full h-full absolute top-0 left-0 flex-center text-white bg-black/60 opacity-0 hover:opacity-100 cursor-pointer rounded-full">
-            Upload Image
-          </div>
-          <img
-            src={previewUrl}
-            alt="profile image"
-            className="w-full h-full object-cover rounded-full border-2 border-border"
-          />
+      <div className="w-36 h-36 cursor-pointer flex items-center gap-4 relative">
+        <div className="w-full h-full absolute top-0 left-0 flex-center text-white bg-black/60 opacity-0 hover:opacity-100 cursor-pointer rounded-full">
+          Upload Image
         </div>
-      )}
+        <img
+          src={previewUrl}
+          alt="profile image"
+          className="w-full h-full object-cover rounded-full border-2 border-border"
+          onError={handleProfileImgErr}
+        />
+      </div>
     </div>
   );
 };
