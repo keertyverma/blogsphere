@@ -35,12 +35,25 @@ const UserInfo = ({ profileId, user }: Props) => {
         <div className="flex flex-col gap-1 justify-center">
           <h1 className="text-xl font-semibold capitalize">{fullname}</h1>
           <p className="text-muted-foreground leading-5">{bio}</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            <span className="font-semibold">{formateNumber(totalPosts)}</span>{" "}
-            Posts |{" "}
-            <span className="font-semibold">{formateNumber(totalReads)}</span>{" "}
-            Reads
-          </p>
+          <div className="text-sm text-muted-foreground mt-1 flex gap-1">
+            <p>
+              <span className="font-semibold text-slate-600 mr-1">
+                {formateNumber(totalPosts)}
+              </span>
+              Blogs
+            </p>
+            {totalReads > 0 && (
+              <>
+                <span>|</span>
+                <p>
+                  <span className="font-semibold text-slate-600 mr-1">
+                    {formateNumber(totalReads)}
+                  </span>
+                  Views
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex justify-between my-4">

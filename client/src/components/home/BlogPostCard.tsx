@@ -23,7 +23,7 @@ const BlogPostCard = ({
   content,
   author,
   showManageBlogButtons = false,
-  showReadCount = false,
+  showReadCount = true,
   showTimeAgo = false,
 }: Props) => {
   const {
@@ -105,7 +105,7 @@ const BlogPostCard = ({
               )}
             </div>
 
-            {showReadCount && user.username === username && (
+            {showReadCount && (
               <div className="flex-center gap-1">
                 <IoEyeOutline className="text-lg" />
                 {activity && activity?.totalReads > 0 && (

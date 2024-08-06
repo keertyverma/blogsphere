@@ -168,7 +168,7 @@ const BlogInteraction = ({
             </div>
           )}
 
-          {!isDraft && user.username === authorUsername && (
+          {!isDraft && (
             <div className="flex-center gap-1">
               <MdOutlineRemoveRedEye className="text-lg" />
               {activity && activity.totalReads !== 0 ? (
