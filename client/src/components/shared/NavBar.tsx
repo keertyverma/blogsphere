@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store";
-import { BsPencilSquare, BsSearch } from "react-icons/bs";
+import { BsPencilSquare } from "react-icons/bs";
+import { IoSearch } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import UserNavigationPanel from "../user-menu/UserNavigationPanel";
+import DarkThemeToggler from "./DarkThemeToggler";
 import Logo from "./Logo";
 
 const NavBar = () => {
@@ -17,11 +19,11 @@ const NavBar = () => {
           variant="ghost"
           size="sm"
           onClick={() => navigate("/search")}
-          className="bg-accent rounded-full flex-center"
+          className="w-10 h-10 p-0 bg-muted rounded-full flex-center border border-transparent hover:border hover:border-muted-foreground/40"
         >
-          <BsSearch className="text-muted-foreground" />
+          <IoSearch className="text-muted-foreground text-lg" />
         </Button>
-
+        <DarkThemeToggler />
         <Button
           onClick={() => navigate("/editor")}
           className="sm:flex-center max-sm:hidden rounded-full gap-2 ml-2"
