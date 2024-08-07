@@ -129,13 +129,13 @@ const BlogInteraction = ({
     <>
       <hr className="border-border my-1" />
       <div className="flex flex-row justify-between items-center">
-        <div className="flex-center gap-2 text-muted-foreground hover:text-slate-600">
+        <div className="flex-center gap-2">
           {!isDraft && (
             <div className="flex-center gap-1">
               <Button
                 variant="secondary"
                 size="sm"
-                className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent text-inherit"
+                className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent"
                 onClick={handlePostLikeUnlike}
                 aria-label="like this blog"
               >
@@ -181,13 +181,13 @@ const BlogInteraction = ({
         <div className="flex gap-3 items-center">
           <Button
             variant="secondary"
-            className="bg-transparent text-muted-foreground p-1 hover:bg-transparent"
+            className="bg-transparent hover:bg-transparent p-1 "
             onClick={handleBookmark}
           >
             {isBookmarked ? (
               <FaBookmark className="text-primary/90 text-lg hover:text-primary" />
             ) : (
-              <FaRegBookmark className="text-muted-foreground text-lg hover:text-slate-600" />
+              <FaRegBookmark className="text-secondary-foreground text-lg" />
             )}
           </Button>
           <ShareBlog title={title} description={description} />

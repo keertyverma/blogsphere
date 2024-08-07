@@ -10,9 +10,7 @@ const Logo = () => {
         height={60}
         className="object-contain"
       />
-      <h1 className="text-xl font-bold text-slate-900 max-sm:hidden">
-        BlogSphere
-      </h1>
+      <h1 className="text-xl font-bold max-sm:hidden">BlogSphere</h1>
     </Link>
   );
 };

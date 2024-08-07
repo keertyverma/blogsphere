@@ -37,10 +37,7 @@ const ManageBlog = ({ blogId }: Props) => {
     } catch (error) {
       toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.", {
-          position: "top-right",
-          className: "mt-20",
-        });
+        toast.error("An error occurred. Please try again later.");
       }
     }
   };
@@ -51,14 +48,14 @@ const ManageBlog = ({ blogId }: Props) => {
         variant="outline"
         size="icon"
         onClick={() => navigate(`/editor/${blogId}`)}
-        className="w-8 h-8 rounded-full flex-center"
+        className="w-8 h-8 rounded-full flex-center border border-muted-foreground/40"
       >
-        <MdEdit className="text-lg text-muted-foreground" />
+        <MdEdit className="text-lg text-secondary-foreground" />
       </Button>
 
       <AlertDialog>
         <AlertDialogTrigger>
-          <div className="w-8 h-8 rounded-full flex-center border bg-background hover:bg-accent hover:text-accent-foreground">
+          <div className="w-8 h-8 rounded-full flex-center border border-muted-foreground/40 bg-background hover:bg-accent hover:text-accent-foreground">
             <MdOutlineDelete className="text-lg text-destructive" />
           </div>
         </AlertDialogTrigger>

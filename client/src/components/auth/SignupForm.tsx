@@ -75,8 +75,6 @@ const SignupForm = () => {
       }
 
       toast.error(errorMessage, {
-        position: "top-right",
-        className: "mt-10",
         autoClose: 10000,
       });
     }
@@ -122,19 +120,13 @@ const SignupForm = () => {
           errorMessage =
             "Email already registered. Please use email & password to login";
           navigate("/login");
-          toast.error(errorMessage, {
-            position: "top-right",
-            className: "mt-20",
-          });
+          toast.error(errorMessage);
           return;
         } else if (details?.toLowerCase() === "access token has expired") {
           errorMessage = "Please re-login with google account";
         }
       }
-      toast.error(errorMessage, {
-        position: "top-right",
-        className: "mt-20",
-      });
+      toast.error(errorMessage);
     }
   };
 

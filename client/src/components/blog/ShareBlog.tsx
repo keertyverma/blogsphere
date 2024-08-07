@@ -53,14 +53,14 @@ const ShareBlog = ({ title, description }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="outline-none">
-        <MdIosShare className="text-xl text-muted-foreground hover:text-slate-600" />
+        <MdIosShare className="text-xl text-secondary-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mt-2 mr-8 text-muted-foreground p-0">
         <DropdownMenuItem className="p-1">
           <Button
             variant="secondary"
             onClick={copyToClipboard}
-            className="bg-transparent text-muted-foreground w-full justify-start p-2 hover:text-black"
+            className="bg-transparent text-inherit hover:text-foreground w-full justify-start p-2"
           >
             <IoIosLink className="text-lg mr-3" />
             Copy link
@@ -71,7 +71,7 @@ const ShareBlog = ({ title, description }: Props) => {
           <Button
             variant="secondary"
             onClick={handleXShare}
-            className="bg-transparent text-muted-foreground w-full justify-start p-2 hover:text-black"
+            className="bg-transparent text-inherit hover:text-foreground w-full justify-start p-2"
           >
             <RiTwitterXFill className="text-lg mr-3" />
             Share to X
@@ -82,7 +82,7 @@ const ShareBlog = ({ title, description }: Props) => {
           <Button
             variant="secondary"
             onClick={handleLinkedinShare}
-            className="bg-transparent text-muted-foreground w-full justify-start p-2 hover:text-black"
+            className="bg-transparent text-inherit hover:text-foreground w-full justify-start p-2"
           >
             <BsLinkedin className="text-lg mr-3" />
             Share to Linkedin

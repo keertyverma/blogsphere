@@ -26,6 +26,7 @@
     --input: 220 13% 91%;
     --ring: 262.1 83.3% 57.8%;
     --radius: 0.5rem;
+    --header: 210 20% 98%;
   }
 
   .dark {
@@ -48,6 +49,7 @@
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
     --ring: 263.4 70% 50.4%;
+    --header: 222 49.4% 12.2%;
   }
 }
 
@@ -76,7 +78,7 @@
   }
 
   .navbar {
-    @apply w-full h-[70px] fixed top-0 z-50 flex items-center px-[5vw] py-4 border-b border-border bg-background;
+    @apply w-full h-[70px] fixed top-0 z-50 flex items-center px-[5vw] py-4 border-b border-border bg-header;
   }
 
   /* SHADCN COMPONENTS */
@@ -250,7 +252,7 @@
   }
 
   .blog-title {
-    @apply font-semibold text-base md:text-lg 2xl:text-xl line-clamp-3 my-2 text-slate-800;
+    @apply font-semibold text-base md:text-lg 2xl:text-xl line-clamp-3 my-2 text-foreground;
   }
 }
 

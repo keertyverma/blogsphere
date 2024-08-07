@@ -25,17 +25,12 @@ const FileUploader = ({ onUpload }: Props) => {
         const url = result.url;
         onUpload(url);
         toast.success("Uploaded 👍", {
-          position: "top-right",
-          className: "mt-20",
           autoClose: 2000,
         });
       } catch (error) {
         setPreviewURL("");
         if (!useAuthStore.getState().isTokenExpired) {
-          toast.error("An error occurred. Please try again later.", {
-            position: "top-right",
-            className: "mt-20",
-          });
+          toast.error("An error occurred. Please try again later.");
         }
       }
     },

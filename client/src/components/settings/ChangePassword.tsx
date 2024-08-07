@@ -69,10 +69,7 @@ const ChangePassword = () => {
 
       toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error(errorMessage, {
-          position: "top-right",
-          className: "mt-20",
-        });
+        toast.error(errorMessage);
       }
     }
   };

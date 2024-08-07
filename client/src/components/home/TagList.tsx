@@ -19,9 +19,9 @@ const TagList = () => {
     "creativity",
     "art",
     "inspiration",
-    "artifical intelligence",
+    "artificial intelligence",
     "react js",
-    "javacript",
+    "javascript",
     "typescript",
     "next js",
   ];
@@ -67,10 +67,10 @@ const TagList = () => {
         <Button
           variant={"secondary"}
           size={"icon"}
-          className="max-md:hidden absolute left-0 top-0 bottom-0 z-10 flex-center bg-white hover:bg-gray-200"
+          className="max-md:hidden absolute left-0 top-0 bottom-0 z-10 flex-center bg-background hover:bg-accent border hover:border-muted-foreground/40"
           onClick={() => handleScroll("left")}
         >
-          <IoChevronBackOutline className="text-lg text-gray-500" />
+          <IoChevronBackOutline className="text-lg text-muted-foreground" />
         </Button>
       )}
 
@@ -105,10 +105,10 @@ const TagList = () => {
         <Button
           variant={"secondary"}
           size={"icon"}
-          className="max-md:hidden absolute right-0 top-0 bottom-0 z-10 flex-center bg-white hover:bg-gray-200"
+          className="max-md:hidden absolute right-0 top-0 bottom-0 z-10 flex-center bg-background hover:bg-accent border hover:border-muted-foreground/40"
           onClick={() => handleScroll("right")}
         >
-          <IoChevronForwardOutline className="text-lg text-gray-500" />
+          <IoChevronForwardOutline className="text-lg text-muted-foreground" />
         </Button>
       )}
     </div>

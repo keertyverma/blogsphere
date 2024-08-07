@@ -41,10 +41,7 @@ const ManageComment = ({
     } catch (error) {
       toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.", {
-          position: "top-right",
-          className: "mt-20",
-        });
+        toast.error("An error occurred. Please try again later.");
       }
     }
   };

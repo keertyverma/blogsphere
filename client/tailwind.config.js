@@ -62,6 +62,7 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        header: "hsl(var(--header))",
       },
       fontFamily: {
         inter: ["Inter", "Arial", "Helvetica", "sans-serif"],

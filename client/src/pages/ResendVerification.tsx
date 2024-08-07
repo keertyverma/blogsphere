@@ -52,10 +52,7 @@ const ResendVerification = () => {
         }
       }
 
-      toast.error(errorMessage, {
-        position: "top-right",
-        className: "mt-20",
-      });
+      toast.error(errorMessage);
     }
   };
 

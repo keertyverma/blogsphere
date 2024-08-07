@@ -77,7 +77,7 @@ const BlogPostCard = ({
           <div className="w-full flex flex-row gap-2 sm:gap-3 md:gap-6 justify-between">
             <div className="flex-1">
               <h1 className="blog-title">{title}</h1>
-              <p className="text-sm md:text-base text-accent-foreground line-clamp-2 leading-5 md:leading-6">
+              <p className="text-sm md:text-base text-muted-foreground line-clamp-2 leading-5 md:leading-6">
                 {description}
               </p>
             </div>

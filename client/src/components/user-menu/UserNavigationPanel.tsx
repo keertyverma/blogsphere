@@ -31,10 +31,7 @@ const UserNavigationPanel = () => {
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
         const errorMessage = "An error occurred. Please try again later.";
-        toast.error(errorMessage, {
-          position: "top-right",
-          className: "mt-20",
-        });
+        toast.error(errorMessage);
       }
     }
   };
@@ -47,7 +44,7 @@ const UserNavigationPanel = () => {
       <Menubar className="w-10 h-10 rounded-full flex-center">
         <MenubarMenu>
           <MenubarTrigger className="focus:bg-transparent data-[state=open]:bg-transparent">
-            <div className="w-10 h-10 rounded-full border-b border-border shadow-md cursor-pointer">
+            <div className="w-10 h-10 rounded-full border border-transparent hover:border hover:border-muted-foreground/40 shadow-md cursor-pointer">
               <img
                 src={user?.personalInfo.profileImage}
                 alt="profile image"

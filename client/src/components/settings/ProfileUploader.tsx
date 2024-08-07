@@ -27,17 +27,12 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
         const url = result.url;
         onUpload(url);
         toast.success("Profile Image Uploaded👍", {
-          position: "top-right",
-          className: "mt-20",
           autoClose: 2000,
         });
       } catch (error) {
         setPreviewUrl(mediaUrl);
         if (!useAuthStore.getState().isTokenExpired) {
-          toast.error("An error occurred. Please try again later.", {
-            position: "top-right",
-            className: "mt-20",
-          });
+          toast.error("An error occurred. Please try again later.");
         }
       }
     },

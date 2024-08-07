@@ -52,11 +52,7 @@ const ResetPassword = () => {
     try {
       await resetPassword({ email, token, password: data.newPassword });
       toast.success(
-        "Password reset complete. Please log in with your new password.",
-        {
-          position: "top-right",
-          className: "mt-20",
-        }
+        "Password reset complete. Please log in with your new password."
       );
       navigate("/login");
     } catch (error) {
@@ -91,10 +87,7 @@ const ResetPassword = () => {
       }
 
       if (errorMessage) {
-        toast.error(errorMessage, {
-          position: "top-right",
-          className: "mt-20",
-        });
+        toast.error(errorMessage);
       }
     } finally {
       form.reset();

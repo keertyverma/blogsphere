@@ -18,7 +18,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
 
   return (
     <div className={`flex mb-5 ${index === 9 ? "gap-2" : "gap-5"}`}>
-      <h1 className="text-3xl sm:text-[30px] font-bold text-primary/20 leading-none">
+      <h1 className="text-3xl sm:text-[30px] font-bold text-primary/60 leading-none">
         {index + 1}
       </h1>
 

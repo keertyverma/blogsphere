@@ -30,20 +30,13 @@ const useAxiosInterceptors = () => {
 
             setRedirectedUrl(location.pathname);
             navigate("/login");
-            toast.error("Your session has expired. Please log in again.", {
-              position: "top-right",
-              className: "mt-20",
-            });
+            toast.error("Your session has expired. Please log in again.");
           }
 
           if (status === 429) {
             // api rate limit exceeds
             toast.error(
-              "You have exceeded the request limit. Please try again later.",
-              {
-                position: "top-right",
-                className: "mt-20",
-              }
+              "You have exceeded the request limit. Please try again later."
             );
           }
         }

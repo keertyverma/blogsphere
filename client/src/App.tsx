@@ -9,6 +9,7 @@ import "react-toastify/ReactToastify.css";
 import ChangePassword from "./components/settings/ChangePassword";
 import EditProfile from "./components/settings/EditProfile";
 import SideNavbar from "./components/settings/SideNavbar";
+import CustomCloseButton from "./components/ui/custom-toastify-close-button";
 import { useAxiosInterceptors } from "./lib/api-client";
 import { usePingServer } from "./lib/react-query/queries";
 import BlogPage from "./pages/BlogPage";
@@ -57,7 +58,12 @@ const App = () => {
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 
-      <ToastContainer hideProgressBar={true} />
+      <ToastContainer
+        hideProgressBar={true}
+        toastClassName="bg-secondary text-secondary-foreground border border-muted-foreground/40 mt-20"
+        closeButton={<CustomCloseButton />}
+        position="top-right"
+      />
     </main>
   );
 };
