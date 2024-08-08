@@ -131,66 +131,71 @@ const BlogInteraction = ({
       <div className="flex flex-row justify-between items-center">
         <div className="flex-center gap-2">
           {!isDraft && (
-            <div className="flex-center gap-1">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent"
-                onClick={handlePostLikeUnlike}
-                aria-label="like this blog"
-              >
-                {checkIsLiked(blogLikes, user.id) ? (
-                  <FaHeart className="text-red-600 hover:text-red-500 like-animation" />
-                ) : (
-                  <FaRegHeart />
+            <>
+              <div className="flex-center gap-1">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent"
+                  onClick={handlePostLikeUnlike}
+                  aria-label="like this blog"
+                >
+                  {checkIsLiked(blogLikes, user.id) ? (
+                    <FaHeart className="text-red-600 hover:text-red-500 like-animation" />
+                  ) : (
+                    <FaRegHeart />
+                  )}
+                </Button>
+                {Object.keys(blogLikes).length > 0 && (
+                  <p className="text-sm">
+                    {formateNumber(Object.keys(blogLikes).length)}
+                  </p>
                 )}
-              </Button>
-              {Object.keys(blogLikes).length > 0 && (
-                <p className="text-sm">
-                  {formateNumber(Object.keys(blogLikes).length)}
-                </p>
-              )}
-            </div>
-          )}
+              </div>
 
-          {!isDraft && (
-            <div className="flex-center">
-              <BlogComment
-                blogId={id}
-                authorId={authorId}
-                totalComments={activity?.totalComments}
-              />
-              {activity && activity.totalComments !== 0 ? (
-                <p className="text-sm mr-1">
-                  {formateNumber(activity.totalComments)}
-                </p>
-              ) : null}
-            </div>
-          )}
+              <div className="flex-center">
+                <BlogComment
+                  blogId={id}
+                  authorId={authorId}
+                  totalComments={activity?.totalComments}
+                />
+                {activity && activity.totalComments !== 0 ? (
+                  <p className="text-sm mr-1">
+                    {formateNumber(activity.totalComments)}
+                  </p>
+                ) : null}
+              </div>
 
-          {!isDraft && (
-            <div className="flex-center gap-1">
-              <MdOutlineRemoveRedEye className="text-lg" />
-              {activity && activity.totalReads !== 0 ? (
-                <p className="text-sm">{formateNumber(activity.totalReads)}</p>
-              ) : null}
-            </div>
+              <div className="flex-center gap-1">
+                <MdOutlineRemoveRedEye className="text-lg" />
+                {activity && activity.totalReads !== 0 ? (
+                  <p className="text-sm">
+                    {formateNumber(activity.totalReads)}
+                  </p>
+                ) : null}
+              </div>
+            </>
           )}
         </div>
 
         <div className="flex gap-3 items-center">
-          <Button
-            variant="secondary"
-            className="bg-transparent hover:bg-transparent p-1 "
-            onClick={handleBookmark}
-          >
-            {isBookmarked ? (
-              <FaBookmark className="text-primary/90 text-lg hover:text-primary" />
-            ) : (
-              <FaRegBookmark className="text-secondary-foreground text-lg" />
-            )}
-          </Button>
-          <ShareBlog title={title} description={description} />
+          {!isDraft && (
+            <>
+              <Button
+                variant="secondary"
+                className="bg-transparent hover:bg-transparent p-1 "
+                onClick={handleBookmark}
+              >
+                {isBookmarked ? (
+                  <FaBookmark className="text-primary/90 text-lg hover:text-primary" />
+                ) : (
+                  <FaRegBookmark className="text-secondary-foreground text-lg" />
+                )}
+              </Button>
+              <ShareBlog title={title} description={description} />
+            </>
+          )}
+
           {user.username === authorUsername && <ManageBlog blogId={blogId} />}
         </div>
       </div>
