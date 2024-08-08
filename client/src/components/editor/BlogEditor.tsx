@@ -170,7 +170,7 @@ const BlogEditor = () => {
     <>
       <nav className="navbar">
         <Logo />
-        <p className="max-md:hidden w-full text-black line-clamp-1 ml-10">
+        <p className="max-md:hidden w-full line-clamp-1 ml-10">
           {title?.length ? title : "New Blog"}
         </p>
         <div className="flex gap-2 ml-auto">
@@ -233,7 +233,7 @@ const BlogEditor = () => {
               ref={textareaRef}
               value={title}
               placeholder="Title ..."
-              className="w-full h-11 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight"
+              className="w-full h-11 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight bg-background"
               onKeyDown={handleTitleKeyDown}
               onChange={handleTitleChange}
             ></textarea>

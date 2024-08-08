@@ -62,7 +62,7 @@ const ManageComment = ({
               <DropdownMenuItem className="p-0">
                 <Button
                   variant="secondary"
-                  className="bg-transparent text-muted-foreground w-full justify-start"
+                  className="bg-transparent text-inherit hover:text-foreground w-full justify-start"
                   onClick={() => onEdit()}
                 >
                   Edit
@@ -76,7 +76,7 @@ const ManageComment = ({
             <Button
               variant="secondary"
               onClick={handleDelete}
-              className="bg-transparent text-muted-foreground w-full justify-start"
+              className="bg-transparent text-inherit hover:text-foreground w-full justify-start"
               disabled={isDeleting}
             >
               Delete

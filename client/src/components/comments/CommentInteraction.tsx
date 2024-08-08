@@ -37,12 +37,12 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
 
   return (
     <div className="flex flex-col mb-2">
-      <div className="flex flex-row justify-between items-center flex-nowrap gap-2 text-muted-foreground hover:text-slate-600">
+      <div className="flex flex-row justify-between items-center flex-nowrap gap-2 text-secondary-foreground">
         <div className="flex-center">
           <Button
             variant="secondary"
             size="sm"
-            className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent text-inherit"
+            className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent"
             onClick={handleToggleReplies}
             aria-label="show reply list"
             disabled={!replyCount}
@@ -63,9 +63,9 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
           )}
         </div>
         <Button
-          variant="ghost"
+          variant="secondary"
           size="sm"
-          className="text-muted-foreground text-sm capitalize hover:bg-transparent hover:underline h-5"
+          className="text-sm capitalize bg-transparent hover:bg-transparent hover:underline h-5"
           aria-label="reply to comment"
           onClick={() => {
             setIsReplying(true);

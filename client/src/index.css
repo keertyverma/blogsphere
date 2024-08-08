@@ -59,7 +59,7 @@
   }
 
   ::selection {
-    @apply bg-primary/30;
+    @apply !bg-primary/30;
   }
 
   body {
@@ -247,6 +247,11 @@
     @apply text-primary underline hover:opacity-50;
   }
 
+  #text-editor a:hover,
+  .blog-page-content a:hover {
+    @apply text-primary underline hover:opacity-100;
+  }
+
   #text-editor img {
     @apply aspect-video rounded-lg object-cover;
   }
@@ -269,6 +274,65 @@
   padding: 0;
 }
 
+.ce-inline-toolbar__dropdown:hover,
+.ce-inline-tool:hover,
+.ce-popover-item:hover,
+.ce-toolbar__plus:hover,
+.ce-conversion-tool:hover,
+.ce-toolbar__settings-btn:hover {
+  background-color: hsl(var(--input)) !important;
+}
+
+.ce-conversion-toolbar,
+.ce-conversion-tool,
+.ce-conversion-tool__icon,
+.ce-popover-item__icon,
+.ce-inline-tool-input,
+.cdx-search-field,
+.ce-popover,
+.image-tool .cdx-button,
+.ce-inline-toolbar {
+  background-color: hsl(var(--header)) !important;
+}
+
+.ce-inline-toolbar {
+  padding: 5px 5px;
+}
+
+.ce-inline-toolbar__buttons button {
+  margin-left: 5px;
+}
+
+.ce-popover-item {
+  color: hsl(var(--foreground)) !important;
+}
+
+.inline-code,
+.ce-code__textarea {
+  background-color: hsl(var(--input)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--muted));
+}
+
+.cdx-marker {
+  background-color: hsl(65, 64%, 66%) !important;
+}
+
+.ce-toolbar__actions {
+  gap: 0.3rem;
+}
+
+.ce-toolbar__plus,
+.ce-toolbar__settings-btn {
+  background-color: hsl(var(--header)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--muted-foreground));
+}
+
+.ce-block--selected .ce-block__content {
+  background-color: hsl(var(--input)) !important;
+}
+
 .cdx-settings-button[data-tune="withBorder"],
 .cdx-settings-button[data-tune="withBackground"],
 .cdx-settings-button[data-tune="stretched"] {
@@ -288,4 +352,21 @@
 
 .like-animation {
   animation: heart-bounce 0.4s ease-in-out;
+}
+
+/* WebKit Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--header));
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  /* background-color: hsl(var(--muted)); */
+  background-color: hsl(var(--input));
+  border-radius: 10px;
+  border: 1px solid hsl(var(--popover));
 }

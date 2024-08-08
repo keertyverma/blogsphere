@@ -60,7 +60,7 @@ const App = () => {
 
       <ToastContainer
         hideProgressBar={true}
-        toastClassName="bg-secondary text-secondary-foreground border border-muted-foreground/40 mt-20"
+        toastClassName="bg-secondary text-secondary-foreground border border-muted-foreground/40"
         closeButton={<CustomCloseButton />}
         position="top-right"
       />

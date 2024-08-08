@@ -128,7 +128,7 @@ const CommentForm = ({
           ref={textareaRef}
           value={comment}
           placeholder="Share your thoughts..."
-          className="w-full min-h-[70px] resize-none outline-none py-2 !leading-6"
+          className="w-full min-h-[70px] resize-none outline-none py-2 !leading-6 bg-background"
           onChange={handleCommentChange}
           disabled={isTextareaDisabled}
         />

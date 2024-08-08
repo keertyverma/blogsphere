@@ -84,7 +84,7 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
           ref={textareaRef}
           value={reply}
           placeholder="Reply to this comment..."
-          className="w-full min-h-[70px] resize-none outline-none py-2 !leading-6"
+          className="w-full min-h-[70px] resize-none outline-none py-2 !leading-6 bg-background"
           onChange={handleReplyChange}
         />
         <div className="flex justify-end gap-2 ">
