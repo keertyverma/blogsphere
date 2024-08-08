@@ -36,7 +36,8 @@ const BlogContent = ({ block }: Props) => {
 
   if (type === "code") return <BlockCode code={data.code} />;
 
-  return <div>block content ...</div>;
+  // Fallback for missing or incorrect data
+  return <div>Invalid block data</div>;
 };
 
 export default BlogContent;

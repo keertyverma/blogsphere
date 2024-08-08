@@ -144,7 +144,7 @@ const SignupForm = () => {
                 Create your account
               </p>
               {hasSentEmail && (
-                <p className="max-sm:text-sm text-green-800 bg-green-100 border border-green-400 p-2 rounded-md">
+                <p className="max-sm:text-sm text-green-800 bg-green-100 border dark:bg-green-800/50 dark:text-green-50 border-green-400 p-2 rounded-md">
                   Verification email sent. Please verify to complete the
                   registration.
                 </p>

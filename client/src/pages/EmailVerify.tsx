@@ -77,7 +77,14 @@ const EmailVerify = () => {
     return <ErrorPage />;
   }
 
-  if (isLoading) return <LoadingSpinner className="mx-auto" />;
+  if (isLoading)
+    return (
+      <div className="flex-center gap-3 py-[20vh]">
+        <LoadingSpinner className="" />
+        <p>Verifying your email...</p>
+      </div>
+    );
+
   return (
     <div className="w-full h-full">
       <nav className="navbar">

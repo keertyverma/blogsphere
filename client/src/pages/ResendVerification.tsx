@@ -88,7 +88,7 @@ const ResendVerification = () => {
             </Button>
           </div>
           {isSuccess && (
-            <div className="mt-2 max-sm:text-sm text-green-800 bg-green-100 border border-green-400 p-2 rounded-md">
+            <div className="mt-2 max-sm:text-sm text-green-800 bg-green-100 dark:bg-green-800/50 dark:text-green-50 border border-green-400 p-2 rounded-md">
               <p>We have sent you an email with a verification link.</p>
               <p className="mt-2">
                 Please follow the instructions in the email to complete the

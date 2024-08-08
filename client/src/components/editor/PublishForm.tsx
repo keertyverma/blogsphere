@@ -202,7 +202,7 @@ const PublishForm = () => {
           </p>
 
           {coverImgURL && (
-            <div className="w-full rounded-lg overflow-hidden bg-gray-200 mt-4">
+            <div className="w-full rounded-lg overflow-hidden bg-header mt-4">
               <img src={coverImgURL} className="cover-img" />
             </div>
           )}

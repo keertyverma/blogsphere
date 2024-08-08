@@ -20,7 +20,7 @@ const GetLatestBlogs = () => {
   if (error) {
     console.error(error);
     return (
-      <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
+      <div className="text-center w-full p-3 rounded-full bg-secondary mt-10">
         <p>Error loading blogs</p>
       </div>
     );
@@ -29,7 +29,7 @@ const GetLatestBlogs = () => {
     data?.pages.reduce((total, page) => total + page.results.length, 0) || 0;
   if (fetchedBlogsCount === 0) {
     return (
-      <div className="text-center w-full p-3 rounded-full bg-muted mt-10">
+      <div className="text-center w-full p-3 rounded-full bg-secondary mt-10">
         <p>No Blogs found</p>
       </div>
     );
