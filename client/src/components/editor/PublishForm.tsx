@@ -111,14 +111,14 @@ const PublishForm = () => {
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    if (value) setTitleValue(value);
+    setTitleValue(value);
   };
 
   const handleDescriptionChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const value = event.target.value;
-    if (value) setDescriptionValue(value);
+    setDescriptionValue(value);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -216,7 +216,7 @@ const PublishForm = () => {
         {/* publish form */}
         <Form {...form}>
           <form
-            className="p-2 lg:p-6 border-[1px] border-border rounded-lg lg:shadow-md flex flex-col gap-4 md:gap-3 max-sm:mt-5 md:max-w-[700px]"
+            className="p-2 lg:p-6 border-[1px] border-muted-foreground/40 rounded-lg lg:shadow-md flex flex-col gap-4 md:gap-3 max-sm:mt-5 md:max-w-[700px]"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
             {(isPublishing || isUpdating) && (
@@ -227,14 +227,14 @@ const PublishForm = () => {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground">
+                  <FormLabel className="text-secondary-foreground">
                     Blog Title <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       placeholder="Title"
-                      className="shad-input md:text-base"
+                      className="shad-input md:text-base placeholder:text-sm"
                       {...field}
                       onChange={(e) => {
                         field.onChange(e);
@@ -252,7 +252,7 @@ const PublishForm = () => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground">
+                  <FormLabel className="text-secondary-foreground">
                     Blog Summary <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
@@ -283,16 +283,16 @@ const PublishForm = () => {
               name="tag"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground">
+                  <FormLabel className="text-secondary-foreground">
                     Tags - (Enhances blog searchability and ranking){" "}
                     <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <div className="relative input-box bg-muted">
+                    <div className="relative input-box">
                       <Input
                         type="text"
                         placeholder="Add Tag and press enter or comma"
-                        className="mt-1 input-box sticky top-0 left-0 bg-white mb-3 md:text-base placeholder:text-sm"
+                        className="mt-1 bg-muted sticky top-0 left-0 mb-3 md:text-base placeholder:text-sm"
                         {...field}
                         onChange={(e) => {
                           field.onChange(e);

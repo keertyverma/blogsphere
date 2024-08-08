@@ -158,7 +158,7 @@ const EditProfile = () => {
                   name="profileImageFile"
                   render={({ field }) => (
                     <FormItem className="flex flex-col justify-start">
-                      <FormLabel className="text-muted-foreground font-semibold">
+                      <FormLabel className="text-secondary-foreground font-semibold">
                         Profile Photo
                       </FormLabel>
                       <FormControl>
@@ -177,7 +177,7 @@ const EditProfile = () => {
                   name="fullname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
+                      <FormLabel className="text-secondary-foreground font-semibold">
                         Full name
                       </FormLabel>
                       <FormControl>
@@ -198,7 +198,7 @@ const EditProfile = () => {
                   name="bio"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-muted-foreground font-semibold">
+                      <FormLabel className="text-secondary-foreground font-semibold">
                         Bio (about you)
                       </FormLabel>
                       <FormControl>
@@ -229,7 +229,7 @@ const EditProfile = () => {
                   name="twitter"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
                         <RiTwitterXFill />
                         Twitter Profile
                       </FormLabel>
@@ -250,7 +250,7 @@ const EditProfile = () => {
                   name="instagram"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
                         <FaInstagram /> Instagram Profile
                       </FormLabel>
                       <FormControl>
@@ -270,7 +270,7 @@ const EditProfile = () => {
                   name="github"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
                         <FaGithub /> Github Profile
                       </FormLabel>
                       <FormControl>
@@ -290,7 +290,7 @@ const EditProfile = () => {
                   name="youtube"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
                         <FaYoutube /> YouTube Channel
                       </FormLabel>
                       <FormControl>
@@ -310,7 +310,7 @@ const EditProfile = () => {
                   name="facebook"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
                         <FaFacebook /> Facebook Profile
                       </FormLabel>
                       <FormControl>
@@ -330,7 +330,7 @@ const EditProfile = () => {
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex gap-2 text-muted-foreground font-semibold">
+                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
                         <SlGlobe /> Website URL
                       </FormLabel>
                       <FormControl>

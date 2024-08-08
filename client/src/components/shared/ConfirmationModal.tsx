@@ -11,10 +11,15 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: Props) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-4 rounded shadow-lg">
+      <div className="bg-background p-8 rounded-md shadow-lg border border-muted-foreground/40">
         <p>Are you sure you want to delete this comment?</p>
         <div className="mt-4 flex justify-end">
-          <Button variant="secondary" size="sm" onClick={onClose}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onClose}
+            className="border border-muted-foreground/40"
+          >
             Cancel
           </Button>
           <Button

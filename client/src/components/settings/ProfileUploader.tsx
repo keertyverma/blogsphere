@@ -83,7 +83,7 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
         <img
           src={previewUrl}
           alt="profile image"
-          className="w-full h-full object-cover rounded-full border-2 border-border"
+          className="w-full h-full object-cover rounded-full border-2 border-muted-foreground/40"
           onError={handleProfileImgErr}
         />
       </div>

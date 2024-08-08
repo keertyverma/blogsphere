@@ -27,7 +27,7 @@ const UserBookmarks = () => {
     return (
       <div className="w-full flex-center md:pt-28 md:pb-32 sm:pt-16 sm:pb-24 pt-14 pb-20 px-5">
         <div className="flex flex-col items-center gap-3 max-w-lg">
-          <p className="md:text-xl text-lg text-center font-semibold text-slate-700">
+          <p className="md:text-xl text-lg text-center font-semibold">
             You haven't bookmarked any blog yet.
           </p>
           <p className="sm:text-base text-sm text-muted-foreground text-center">

@@ -82,7 +82,7 @@ const TagList = () => {
           <Button
             variant="secondary"
             size="sm"
-            className={`h-6 md:h-8 text-xs md:text-sm rounded-[8px] capitalize px-2 md:px-3 m-1 ml-0 ${
+            className={`h-6 md:h-8 text-xs md:text-sm rounded-[8px] capitalize px-2 md:px-3 m-1 ml-0 border border-muted-foreground/40 ${
               selectedTag === category
                 ? "bg-slate-600 text-white hover:bg-slate-500"
                 : " "

@@ -265,7 +265,7 @@ const LoginForm = () => {
 
             <Button
               variant="secondary"
-              className="h-12 border-b border-slate-500 rounded-full flex-center gap-3 text-sm md:text-base"
+              className="h-12 border border-muted-foreground/40 rounded-full flex-center gap-3 text-sm md:text-base"
               onClick={handleGoogleAuth}
               disabled={isLoading}
             >

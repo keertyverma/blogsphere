@@ -64,7 +64,7 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
                   {fullname}
                 </p>
                 {commentedByUserId === blogAuthor && (
-                  <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                  <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full dark:bg-green-800 dark:text-green-50">
                     Author
                   </span>
                 )}

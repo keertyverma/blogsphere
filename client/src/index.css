@@ -186,11 +186,11 @@
   }
 
   .sidebar-link {
-    @apply flex gap-4 items-center py-2 md:py-5 pb-5 text-muted-foreground hover:text-black capitalize text-nowrap;
+    @apply flex gap-4 items-center py-2 md:py-5 pb-5 capitalize text-nowrap px-6 -ml-6;
   }
 
   .sidebar-link.active {
-    @apply text-black border-r-2 max-md:border-none border-muted-foreground bg-muted px-6 -ml-6 md:rounded-tl-lg md:rounded-bl-lg;
+    @apply border-r-2 max-md:border-none border-muted-foreground bg-header px-6 -ml-6 md:rounded-tl-lg md:rounded-bl-lg;
   }
 
   /* File uploader */

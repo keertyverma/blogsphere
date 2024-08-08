@@ -43,7 +43,7 @@ const SideNavbar = () => {
       {/* Side Navigation Bar */}
       <div className="sticky top-[70px] z-30">
         {/* Mobile screens side nav buttons*/}
-        <div className="md:hidden bg-white py-1 border-b border-border flex flex-nowrap overflow-x-auto">
+        <div className="md:hidden py-1 border-b border-border flex flex-nowrap overflow-x-auto bg-background">
           <Button
             ref={sideBarIconRef}
             variant="secondary"
@@ -72,14 +72,14 @@ const SideNavbar = () => {
         </div>
         <div
           className={
-            "min-w-[200px] h-[calc(100vh-70px-60px)] md:h-cover absolute md:sticky top-24 max-md:top-[64px] overflow-y-auto p-6 md:pr-0 md:border-border md:border-r bg-white max-md:w-[calc(100%+80px)] max-md:px-14 max-md:-ml-7 duration-400 " +
+            "min-w-[200px] h-[calc(100vh-70px-60px)] md:h-cover absolute md:sticky top-24 max-md:top-[64px] overflow-y-auto p-6 md:pr-0 md:border-border md:border-r  max-md:w-[calc(100%+80px)] max-md:px-14 max-md:-ml-7 duration-400 bg-background " +
             (showSideNav
               ? "opacity-100 pointer-events-auto"
               : "max-md:opacity-0 max-md:pointer-events-none")
           }
         >
           {/* Setting */}
-          <h1 className="text-base md:text-lg text-slate-900 mb-3">Setting</h1>
+          <h1 className="text-base md:text-lg mb-3">Setting</h1>
           <hr className="border-border mb-5 -ml-6 mr-6" />
           <NavLink
             to="/settings/edit-profile"
