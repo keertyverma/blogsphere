@@ -8,6 +8,7 @@ import Quote from "@editorjs/quote";
 import Code from "@editorjs/code";
 import { fileToBase64 } from "./utils";
 import apiClient from "./api-client";
+import CodeBox from "@bomdi/codebox";
 
 const uploadImageByURL = async (e: string) => {
   let imageURL = null;
@@ -83,6 +84,15 @@ export const editorJSTools = {
     inlineToolbar: true,
   },
   code: Code,
+  codeBox: {
+    class: CodeBox,
+    config: {
+      themeURL:
+        "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.1/build/styles/dracula.min.css", // Optional
+      themeName: "atom-one-dark", // Optional
+      useDefaultTheme: "dark", // Optional. This also determines the background color of the language select drop-down
+    },
+  },
   marker: Marker,
   inlineCode: InlineCode,
   embed: Embed,

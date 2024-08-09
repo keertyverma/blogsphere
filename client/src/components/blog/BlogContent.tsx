@@ -4,6 +4,7 @@ import BlockImage from "./BlockImage";
 import BlockList from "./BlockList";
 import BlockQuote from "./BlockQuote";
 import BlockCode from "./BlockCode";
+import { CodeBoxOutput } from "editorjs-react-renderer";
 
 interface Props {
   block: OutputBlockData;
@@ -35,6 +36,8 @@ const BlogContent = ({ block }: Props) => {
     return <BlockList style={data.style} items={data.items} />;
 
   if (type === "code") return <BlockCode code={data.code} />;
+
+  if (type === "codeBox") return CodeBoxOutput(block);
 
   // Fallback for missing or incorrect data
   return <div>Invalid block data</div>;
