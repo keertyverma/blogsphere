@@ -311,7 +311,14 @@
 .ce-code__textarea {
   background-color: hsl(var(--input)) !important;
   color: hsl(var(--foreground)) !important;
-  border: 1px solid hsl(var(--muted));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace !important;
+  font-size: medium !important;
+  border: none !important;
+}
+
+.ce-code__textarea {
+  border-radius: 10px !important;
 }
 
 .cdx-marker {

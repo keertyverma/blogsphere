@@ -5,7 +5,7 @@ interface Props {
 
 const BlockQuote = ({ quote, caption }: Props) => {
   return (
-    <div className="bg-primary/20 p-3 pl-5 border-l-4 border-primary">
+    <div className="bg-primary/20 p-3 pl-5 border-l-4 border-primary rounded-md">
       <blockquote className="!text-base lg:!text-lg !leading-6">
         &ldquo;{quote}&rdquo;
       </blockquote>
