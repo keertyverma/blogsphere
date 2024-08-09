@@ -36,7 +36,7 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
               onError={handleProfileImgErr}
             />
             <div className="flex-col text-sm ">
-              <p className="text-secondary-foreground font-semibold capitalize">
+              <p className="text-secondary-foreground font-medium capitalize">
                 {fullname}
               </p>
               <p className="text-muted-foreground font-normal">

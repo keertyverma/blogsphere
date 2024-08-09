@@ -39,6 +39,10 @@ const UserNavigationPanel = () => {
   if (error) console.error(error);
   if (isLoading) return <LoadingSpinner />;
 
+  // Fallback profile image URL
+  const profileImageUrl =
+    user?.personalInfo.profileImage || "/assets/images/default_profile.png";
+
   return (
     <AnimationWrapper transition={{ duration: 0.2 }}>
       <Menubar className="w-10 h-10 rounded-full flex-center">
@@ -46,7 +50,7 @@ const UserNavigationPanel = () => {
           <MenubarTrigger className="focus:bg-transparent data-[state=open]:bg-transparent">
             <div className="w-10 h-10 rounded-full border border-transparent hover:border hover:border-muted-foreground/40 shadow-md cursor-pointer">
               <img
-                src={user?.personalInfo.profileImage}
+                src={profileImageUrl}
                 alt="profile image"
                 className="object-cover w-full h-full rounded-full"
                 onError={handleProfileImgErr}
@@ -58,7 +62,7 @@ const UserNavigationPanel = () => {
               <div className="flex gap-3 p-1">
                 <div className="w-10 h-10 rounded-full shadow-lg">
                   <img
-                    src={user?.personalInfo.profileImage}
+                    src={profileImageUrl}
                     alt={"profile image"}
                     className="object-cover w-full h-full rounded-full"
                     onError={handleProfileImgErr}
