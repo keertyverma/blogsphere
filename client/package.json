@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@calumk/editorjs-codecup": "^1.1.1",
     "@editorjs/code": "^2.9.0",
     "@editorjs/editorjs": "^2.29.1",
     "@editorjs/embed": "^2.7.1",
@@ -32,11 +33,14 @@
     "@tanstack/react-query-devtools": "^5.32.0",
     "@types/axios": "^0.14.0",
     "@types/ms": "^0.7.34",
+    "ace-builds": "^1.35.4",
+    "ace-code-editorjs": "^1.0.3",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "dayjs": "^1.11.11",
     "dompurify": "^3.1.4",
+    "editorjs-react-renderer": "^3.5.1",
     "firebase": "^10.11.1",
     "framer-motion": "^11.1.7",
     "lucide-react": "^0.376.0",

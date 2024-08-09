@@ -377,3 +377,8 @@
   border-radius: 10px;
   border: 1px solid hsl(var(--popover));
 }
+
+/* EditorJS Ace code editor */
+.ace_gutter {
+  z-index: unset !important;
+}
