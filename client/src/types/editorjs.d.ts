@@ -6,3 +6,4 @@ declare module "@editorjs/quote";
 declare module "@editorjs/marker";
 declare module "@editorjs/inline-code";
 declare module "@editorjs/code";
+declare module "@calumk/editorjs-codecup";

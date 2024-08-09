@@ -4,6 +4,7 @@ import BlockImage from "./BlockImage";
 import BlockList from "./BlockList";
 import BlockQuote from "./BlockQuote";
 import BlockCode from "./BlockCode";
+// import { CodeBoxOutput } from "editorjs-react-renderer";
 
 interface Props {
   block: OutputBlockData;
@@ -11,6 +12,7 @@ interface Props {
 
 const BlogContent = ({ block }: Props) => {
   const { type, data } = block;
+  console.log("block = ", block);
 
   // sanitize the HTML content to prevent XSS attacks.
   const safeHTML = DOMPurify.sanitize(data.text);
@@ -35,6 +37,7 @@ const BlogContent = ({ block }: Props) => {
     return <BlockList style={data.style} items={data.items} />;
 
   if (type === "code") return <BlockCode code={data.code} />;
+  // if (type === "code") return CodeBoxOutput(block);
 
   // Fallback for missing or incorrect data
   return <div>Invalid block data</div>;
