@@ -36,7 +36,7 @@ const useAxiosInterceptors = () => {
           if (status === 429) {
             // api rate limit exceeds
             toast.error(
-              "You have exceeded the request limit. Please try again later."
+              "You have exceeded the request limit. Please try again later in 1 hour."
             );
           }
         }

@@ -111,7 +111,6 @@ export const useGetSearchedUsers = (searchTerm: string) =>
         ),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
-    refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
@@ -125,7 +124,6 @@ export const useGetUser = (profileId?: string) =>
         .then((res) => (res.data as unknown as IFetchResponse<IAuthor>).result),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
-    refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
     enabled: !!profileId, // Query only runs if profileId is truthy
@@ -231,7 +229,6 @@ export const useGetTrendingBlogs = () =>
         .then((res) => (res.data as unknown as IFetchAllResponse).results),
     staleTime: ms("5m"),
     gcTime: ms("10m"),
-    refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
@@ -258,7 +255,6 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
     initialPageParam: 1,
     staleTime: ms("5m"),
     gcTime: ms("10m"),
-    refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
@@ -296,7 +292,6 @@ export const useGetUserBlogs = (
     initialPageParam: 1,
     staleTime: ms("5m"),
     gcTime: ms("10m"),
-    refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
@@ -310,7 +305,6 @@ export const useGetBlog = (blogId?: string) =>
         .then((res) => (res.data as unknown as IFetchResponse).result),
     staleTime: ms("10m"),
     gcTime: ms("30m"),
-    refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to get updated blog after edit
     refetchOnReconnect: true, // Refetch on network reconnect
     enabled: !!blogId, // Query only runs if blogId is truthy
@@ -634,7 +628,6 @@ export const useGetUserBookmarks = (userId: string, blogId?: string) =>
     staleTime: ms("30m"),
     gcTime: ms("40m"),
     enabled: !!userId, // Query only runs if userId is truthy
-    refetchOnWindowFocus: false, // No need to refetch on window focus
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
