@@ -44,7 +44,7 @@
     --muted-foreground: 217.9 10.6% 64.9%;
     --accent: 215 27.9% 16.9%;
     --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
@@ -59,7 +59,7 @@
   }
 
   ::selection {
-    @apply !bg-primary/30;
+    @apply !bg-primary/30 dark:!bg-primary/50;
   }
 
   body {
@@ -266,10 +266,6 @@
   max-width: 900px;
 }
 
-/* .ce-paragraph {
-  padding: 0;
-} */
-
 .cdx-list {
   padding: 0;
 }
@@ -305,6 +301,10 @@
 
 .ce-popover-item {
   color: hsl(var(--foreground)) !important;
+}
+
+.ce-popover-item--confirmation:hover {
+  background-color: hsl(var(--destructive)) !important;
 }
 
 .inline-code,

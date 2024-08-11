@@ -2,6 +2,7 @@ import { useDeleteComment } from "@/lib/react-query/queries";
 import { useAuthStore } from "@/store";
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { MdEdit, MdOutlineDelete } from "react-icons/md";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../shared/ConfirmationModal";
 import { Button } from "../ui/button";
@@ -62,9 +63,10 @@ const ManageComment = ({
               <DropdownMenuItem className="p-0">
                 <Button
                   variant="secondary"
-                  className="bg-transparent text-inherit hover:text-foreground w-full justify-start"
+                  className="flex gap-2 bg-transparent text-inherit hover:text-foreground w-full justify-start"
                   onClick={() => onEdit()}
                 >
+                  <MdEdit className="text-lg text-secondary-foreground" />
                   Edit
                 </Button>
               </DropdownMenuItem>
@@ -76,9 +78,10 @@ const ManageComment = ({
             <Button
               variant="secondary"
               onClick={handleDelete}
-              className="bg-transparent text-inherit hover:text-foreground w-full justify-start"
+              className="flex gap-2 bg-transparent text-inherit hover:text-foreground w-full justify-start"
               disabled={isDeleting}
             >
+              <MdOutlineDelete className="text-lg text-destructive" />
               Delete
             </Button>
           </DropdownMenuItem>
