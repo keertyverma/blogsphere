@@ -212,6 +212,10 @@
     @apply text-base lg:text-xl leading-6 lg:leading-8;
   }
 
+  .quote-caption a {
+    @apply !text-sm md:!text-base;
+  }
+
   #text-editor h1,
   .blog-page-content h1 {
     @apply text-3xl font-semibold;
@@ -346,6 +350,12 @@
   display: none;
 }
 
+.cdx-quote__caption span {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--foreground)) !important;
+  opacity: 60%;
+}
+
 @keyframes heart-bounce {
   40% {
     transform: scale(1.1);
@@ -372,7 +382,6 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  /* background-color: hsl(var(--muted)); */
   background-color: hsl(var(--input));
   border-radius: 10px;
   border: 1px solid hsl(var(--popover));
