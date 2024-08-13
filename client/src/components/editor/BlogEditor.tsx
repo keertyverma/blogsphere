@@ -170,9 +170,6 @@ const BlogEditor = () => {
     <>
       <nav className="navbar">
         <Logo />
-        <p className="max-md:hidden w-full line-clamp-1 ml-10">
-          {title?.length ? title : "New Blog"}
-        </p>
         <div className="flex gap-2 ml-auto">
           {(!blogId || (blogId && isDraft === true)) && (
             <Button
