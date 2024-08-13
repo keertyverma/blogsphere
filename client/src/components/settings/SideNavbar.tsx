@@ -78,8 +78,8 @@ const SideNavbar = () => {
               : "max-md:opacity-0 max-md:pointer-events-none")
           }
         >
-          {/* Setting */}
-          <h1 className="text-base md:text-lg mb-3">Setting</h1>
+          {/* Settings */}
+          <h1 className="text-base md:text-lg mb-3">Settings</h1>
           <hr className="border-border mb-5 -ml-6 mr-6" />
           <NavLink
             to="/settings/edit-profile"

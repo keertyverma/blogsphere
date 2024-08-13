@@ -29,7 +29,14 @@ const UserDraftBlogList = ({ authorId, searchTerm }: Props) => {
   if (fetchedBlogsCount === 0) {
     return (
       <div className="text-base md:text-xl text-muted-foreground font-medium text-center py-10 flex-center flex-col md:flex-row gap-2 md:gap-1">
-        <p>No draft published yet.</p>
+        {searchTerm ? (
+          <>
+            <p>No results found.</p>
+            <p>Try new keyword or phrase.</p>
+          </>
+        ) : (
+          <p>No draft blogs yet.</p>
+        )}
       </div>
     );
   }
