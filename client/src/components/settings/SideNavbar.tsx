@@ -72,7 +72,7 @@ const SideNavbar = () => {
         </div>
         <div
           className={
-            "min-w-[200px] h-[calc(100vh-70px-60px)] md:h-cover absolute md:sticky top-24 max-md:top-[64px] overflow-y-auto p-6 md:pr-0 md:border-border md:border-r  max-md:w-[calc(100%+80px)] max-md:px-14 max-md:-ml-7 duration-400 bg-background " +
+            "min-w-[200px] h-[calc(100vh-70px-60px)] md:h-cover absolute md:sticky top-24 max-md:top-12 overflow-y-auto p-6 md:pr-0 md:border-border md:border-r  max-md:w-[calc(100%+80px)] max-md:px-14 max-md:-ml-7 duration-400 bg-background " +
             (showSideNav
               ? "opacity-100 pointer-events-auto"
               : "max-md:opacity-0 max-md:pointer-events-none")

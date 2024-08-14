@@ -22,7 +22,7 @@ const UserInfo = ({ profileId, user }: Props) => {
   } = user;
 
   return (
-    <div className="w-full md:w-[80%] md:px-4">
+    <div className="w-full md:px-4">
       <div className="flex gap-3">
         <div className="min-w-28">
           <img

@@ -76,91 +76,94 @@ const ChangePassword = () => {
 
   return (
     <AnimationWrapper>
-      <section className="h-cover flex justify-center p-0">
+      <section className="h-cover p-0">
+        <div className="max-md:hidden text-center mb-5">
+          <h3 className="h3-bold !font-semibold capitalize text-left">
+            Change password
+          </h3>
+          <hr className="mt-2 border-1 border-border" />
+        </div>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handlePasswordChange)}
-            className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
-          >
-            <div className="text-center mb-4">
-              <h3 className="max-md:hidden md:h3-bold !font-semibold capitalize">
-                Change Password
-              </h3>
-            </div>
-            <FormField
-              control={form.control}
-              name="currentPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={passwordVisible ? "text" : "password"}
-                        placeholder="Current Password"
-                        autoComplete="on"
-                        className="shad-input pl-11"
-                        {...field}
-                      />
-                      <IoKeyOutline className="input-icon left-4" />
-                      {passwordVisible ? (
-                        <IoEye
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      ) : (
-                        <IoEyeOff
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={passwordVisible ? "text" : "password"}
-                        placeholder="New Password"
-                        autoComplete="on"
-                        className="shad-input pl-11"
-                        {...field}
-                      />
-                      <IoKeyOutline className="input-icon left-4" />
-                      {passwordVisible ? (
-                        <IoEye
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      ) : (
-                        <IoEyeOff
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              type="submit"
-              className="h-12 rounded-full mt-2 text-sm md:text-base"
-              disabled={isUpdatingPassword}
+          <div className="flex-center">
+            <form
+              onSubmit={form.handleSubmit(handlePasswordChange)}
+              className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
             >
-              Update
-            </Button>
-          </form>
+              <FormField
+                control={form.control}
+                name="currentPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={passwordVisible ? "text" : "password"}
+                          placeholder="Current Password"
+                          autoComplete="on"
+                          className="shad-input pl-11"
+                          {...field}
+                        />
+                        <IoKeyOutline className="input-icon left-4" />
+                        {passwordVisible ? (
+                          <IoEye
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        ) : (
+                          <IoEyeOff
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={passwordVisible ? "text" : "password"}
+                          placeholder="New Password"
+                          autoComplete="on"
+                          className="shad-input pl-11"
+                          {...field}
+                        />
+                        <IoKeyOutline className="input-icon left-4" />
+                        {passwordVisible ? (
+                          <IoEye
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        ) : (
+                          <IoEyeOff
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                className="h-12 rounded-full mt-2 text-sm md:text-base"
+                disabled={isUpdatingPassword}
+              >
+                Update
+              </Button>
+            </form>
+          </div>
         </Form>
       </section>
     </AnimationWrapper>
