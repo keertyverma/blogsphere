@@ -8,7 +8,7 @@ import UserInfo from "@/components/user-profile/UserInfo";
 import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogList";
 import { useGetUser } from "@/lib/react-query/queries";
 import { useAuthStore } from "@/store";
-import { KeyboardEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
 import { useParams } from "react-router-dom";
@@ -19,6 +19,12 @@ const UserProfile = () => {
   const authUser = useAuthStore((s) => s.user);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    // Clear search input and term when user changes to prevent using outdated queries.
+    setSearchInput("");
+    setSearchTerm("");
+  }, [profileId]);
 
   if (isLoading)
     return (
@@ -41,12 +47,20 @@ const UserProfile = () => {
   const routes = ["Published Blogs"];
   if (authUser.username === user.personalInfo.username) routes.push("Drafts");
 
-  const handleSearch = (e: KeyboardEvent<HTMLInputElement>) => {
-    const input = e.target as HTMLInputElement;
-    const query = input.value;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setSearchInput(input);
 
-    if (e.key === "Enter" && query.length) {
-      setSearchTerm(query);
+    // Reset search term if input is cleared
+    if (input.length === 0) {
+      setSearchTerm("");
+    }
+  };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Update the search term when Enter is pressed, provided the search input is not empty.
+    if (e.key === "Enter" && searchInput.length > 0) {
+      setSearchTerm(searchInput);
     }
   };
 
@@ -70,7 +84,7 @@ const UserProfile = () => {
               className="bg-accent pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
               placeholder="Search"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={handleChange}
               onKeyDown={handleSearch}
             />
             {searchInput && (
