@@ -111,3 +111,25 @@ export const handleProfileImgErr = (
   const target = e.target as HTMLImageElement;
   target.src = "/assets/images/default_profile.png";
 };
+
+export const truncateText = (text: string, maxLength: number) => {
+  // truncate text while handling multi-byte characters like emojis
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  const truncated = text.slice(0, maxLength); // Slice the string to the countLimit
+
+  /*------ Handle multi-byte characters -----
+   - A surrogate pair is a way of encoding characters that requires more than 16 bits, like emojis.
+   - A surrogate pair consists of two 16-bit code units -> 
+      - High Surrogate: Falls in the range 0xD800 to 0xDBFF.
+      - Low Surrogate: Falls in the range 0xDC00 to 0xDFFF
+   - If the last character is a high surrogate then remove it.
+   */
+  return truncated.length < text.length &&
+    truncated.charCodeAt(truncated.length - 1) >= 0xd800 &&
+    truncated.charCodeAt(truncated.length - 1) <= 0xdbff
+    ? truncated.slice(0, -1)
+    : truncated;
+};

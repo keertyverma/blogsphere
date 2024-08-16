@@ -1,4 +1,4 @@
-import { getTimeAgo, handleProfileImgErr } from "@/lib/utils";
+import { getTimeAgo, handleProfileImgErr, truncateText } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IComment } from "@/types";
 import DOMPurify from "dompurify";
@@ -33,7 +33,7 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
   const CONTENT_CHAR_LIMIT = 200;
   const truncatedContent =
     content.length > CONTENT_CHAR_LIMIT && !isExpanded
-      ? content.slice(0, CONTENT_CHAR_LIMIT - 1)
+      ? truncateText(content, CONTENT_CHAR_LIMIT - 1)
       : content;
 
   const toggleContentExpansion = () => {
