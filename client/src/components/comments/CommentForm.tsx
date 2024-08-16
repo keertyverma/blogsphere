@@ -72,11 +72,17 @@ const CommentForm = ({
       return navigate("/login");
     }
 
+    if (!comment.trim()) {
+      toast.error("Comment can not be empty.");
+      textareaRef?.current && resetTextareaSize(textareaRef.current);
+      setComment("");
+      return;
+    }
+
     try {
       if (existingComment) {
         // update comment
         await updateComment({ id: existingComment.id, content: comment });
-
         toast.success("Comment updated 👍");
         if (closeEditForm) closeEditForm();
       } else {
@@ -88,6 +94,7 @@ const CommentForm = ({
         };
         await createComment(commentData);
       }
+      textareaRef?.current && resetTextareaSize(textareaRef.current);
       setComment("");
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
@@ -99,6 +106,10 @@ const CommentForm = ({
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto"; // Reset height to auto
     textarea.style.height = `${textarea.scrollHeight}px`; // Set height to scroll height
+  };
+
+  const resetTextareaSize = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto"; // Reset height to auto
   };
 
   const handleCommentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
