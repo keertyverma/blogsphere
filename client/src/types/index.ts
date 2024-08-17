@@ -35,6 +35,7 @@ export interface IUser {
   fullname: string;
   username: string;
   profileImage: string;
+  googleAuth?: boolean;
 }
 
 export interface SocialLink {
