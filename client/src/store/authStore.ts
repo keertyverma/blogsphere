@@ -21,6 +21,7 @@ const initialUser = {
   username: "",
   fullname: "",
   profileImage: "",
+  googleAuth: false,
 };
 
 // persist state in localStorage by default

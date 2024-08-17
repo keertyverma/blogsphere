@@ -95,7 +95,7 @@ const SignupForm = () => {
       const { result: userData } = data;
 
       if (userData) {
-        setUserAuth({ ...userData });
+        setUserAuth({ ...userData, googleAuth: true });
         const redirectedUrl = useAuthStore.getState().redirectedUrl;
         if (redirectedUrl) {
           navigate(redirectedUrl);

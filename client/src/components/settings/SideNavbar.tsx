@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 
 const SideNavbar = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { googleAuth } = useAuthStore((s) => s.user);
 
   const page = location.pathname.split("/")[2];
   const [pageUrl, setPageUrl] = useState(page?.replace("-", " ") || "");
@@ -90,15 +91,17 @@ const SideNavbar = () => {
           >
             <FaRegUserCircle className="text-xl" /> Edit Profile
           </NavLink>
-          <NavLink
-            to="/settings/change-password"
-            onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
-              setPageUrl((e.target as HTMLAnchorElement).innerText)
-            }
-            className="sidebar-link"
-          >
-            <MdOutlineLock className="text-xl" /> Change Password
-          </NavLink>
+          {!googleAuth && (
+            <NavLink
+              to="/settings/change-password"
+              onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
+                setPageUrl((e.target as HTMLAnchorElement).innerText)
+              }
+              className="sidebar-link"
+            >
+              <MdOutlineLock className="text-xl" /> Change Password
+            </NavLink>
+          )}
         </div>
       </div>
       <div className="max-md:-mt-7 mt-5 w-full">
