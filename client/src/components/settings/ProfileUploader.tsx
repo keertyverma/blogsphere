@@ -26,9 +26,6 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
         const result = await upload(base64EncodedImg);
         const url = result.url;
         onUpload(url);
-        toast.success("Profile Image Uploaded👍", {
-          autoClose: 2000,
-        });
       } catch (error) {
         setPreviewUrl(mediaUrl);
         if (!useAuthStore.getState().isTokenExpired) {
