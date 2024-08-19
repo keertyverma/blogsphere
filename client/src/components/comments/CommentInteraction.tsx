@@ -39,16 +39,17 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
     <div className="flex flex-col mb-2">
       <div className="flex flex-row justify-between items-center flex-nowrap gap-2 text-secondary-foreground">
         <div className="flex-center">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent"
-            onClick={handleToggleReplies}
-            aria-label="show reply list"
-            disabled={!replyCount}
-          >
-            <FaRegCommentDots className="text-lg" />
-          </Button>
+          {replyCount > 0 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="text-lg p-1 pl-0 bg-transparent hover:bg-transparent"
+              onClick={handleToggleReplies}
+              aria-label="show reply list"
+            >
+              <FaRegCommentDots className="text-lg" />
+            </Button>
+          )}
           {showReplies ? (
             <p
               className="hover:underline text-muted-foreground text-sm"
