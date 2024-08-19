@@ -9,6 +9,7 @@ import "react-toastify/ReactToastify.css";
 import ChangePassword from "./components/settings/ChangePassword";
 import EditProfile from "./components/settings/EditProfile";
 import SideNavbar from "./components/settings/SideNavbar";
+import ScrollToTopOnNavigate from "./components/shared/ScrollToTopOnNavigate";
 import CustomCloseButton from "./components/ui/custom-toastify-close-button";
 import { useAxiosInterceptors } from "./lib/api-client";
 import { usePingServer } from "./lib/react-query/queries";
@@ -31,6 +32,7 @@ const App = () => {
 
   return (
     <main className="w-full h-screen">
+      <ScrollToTopOnNavigate />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
