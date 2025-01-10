@@ -649,18 +649,16 @@ describe("/api/v1/auth", () => {
       await User.deleteMany({});
     });
 
-    it("should return BadRequest-400 if user with email does not exists", async () => {
+    it("should avoid explicitly indicating if the email is unregistered", async () => {
       const email = "randomuser@test.com";
       const res = await request(server)
         .post(`${endpoint}/forgot-password`)
         .send({ email });
 
-      expect(res.statusCode).toBe(400);
-      expect(res.body.error).toMatchObject({
-        code: "BAD_REQUEST",
-        message: "Invalid input data",
-        details: "Invalid email.",
-      });
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toMatch(
+        /If the email is associated with an account, a password reset email will be sent/i
+      );
     });
 
     it("should return BadRequest-400 if password reset token has not expired yet", async () => {
@@ -720,7 +718,9 @@ describe("/api/v1/auth", () => {
         });
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.message).toBe("Password reset email sent successfully.");
+      expect(res.body.message).toMatch(
+        /If the email is associated with an account, a password reset email will be sent/i
+      );
     });
   });
 

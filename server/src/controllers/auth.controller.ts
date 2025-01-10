@@ -334,47 +334,52 @@ const forgotPassword = async (req: Request, res: Response) => {
 
   // find the user by email
   const user = await User.findOne({ "personalInfo.email": email });
-  if (!user) {
-    throw new BadRequestError("Invalid email.");
-  }
+  if (user) {
+    // check for token expiration
+    const tokenExpired = user.resetPasswordToken?.expiresAt
+      ? new Date(user.resetPasswordToken.expiresAt).getTime() < Date.now()
+      : true;
 
-  // check for token expiration
-  const tokenExpired = user.resetPasswordToken?.expiresAt
-    ? new Date(user.resetPasswordToken.expiresAt).getTime() < Date.now()
-    : true;
-
-  if (!tokenExpired) {
-    throw new BadRequestError("An active password reset token already exists.");
-  }
-
-  // get reset password token
-  const { token, hashedToken, expiresAt } = user.generateResetPasswordToken();
-
-  // set reset password token and expiration date
-  user.resetPasswordToken = {
-    token: hashedToken,
-    expiresAt,
-  };
-
-  try {
-    await sendResetPasswordEmail(email, token, expiresAt);
-    await user.save();
-    logger.info("Password reset email sent successfully.");
-  } catch (error) {
-    logger.error(`Failed to send password reset email to ${email}`);
-    if (error instanceof Error) {
-      logger.error(`Error: ${error.message}`);
+    if (!tokenExpired) {
+      throw new BadRequestError(
+        "An active password reset token already exists."
+      );
     }
-    throw new CustomAPIError(
-      "We encountered an issue sending the password reset email. Please try again later.",
-      StatusCodes.INTERNAL_SERVER_ERROR
-    );
+
+    // get reset password token
+    const { token, hashedToken, expiresAt } = user.generateResetPasswordToken();
+
+    // set reset password token and expiration date
+    user.resetPasswordToken = {
+      token: hashedToken,
+      expiresAt,
+    };
+
+    try {
+      await sendResetPasswordEmail(email, token, expiresAt);
+      await user.save();
+      logger.info(`Password reset email sent successfully: ${email}`);
+    } catch (error) {
+      logger.error(`Failed to send password reset email to ${email}`);
+      if (error instanceof Error) {
+        logger.error(`Error: ${error.message}`);
+      }
+      throw new CustomAPIError(
+        "We encountered an issue sending the password reset email. Please try again later.",
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  } else {
+    // Avoid explicit notification and do not throw error for unregistered emails.
+    logger.info(`Password reset request for non-existent email: ${email}`);
   }
 
+  // Generic success response
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    message: "Password reset email sent successfully.",
+    message:
+      "If the email is associated with an account, a password reset email will be sent.",
   };
 
   return res.status(data.statusCode).json(data);

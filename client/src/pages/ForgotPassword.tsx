@@ -36,7 +36,9 @@ const ForgotPassword = () => {
       await forgotPassword(email);
       setEmail("");
     } catch (error) {
-      let errorMessage = "An error occurred. Please try again later.";
+      let errorMessage =
+        "There was an issue with your request. Please try again.";
+
       if (error instanceof AxiosError) {
         if (error.code === "ERR_BAD_REQUEST" && error.response) {
           const {
@@ -47,14 +49,9 @@ const ForgotPassword = () => {
             },
           } = error;
 
-          if (details.toLowerCase().includes("invalid")) {
-            errorMessage = "This email address is not registered.";
-          } else if (details.toLowerCase().includes("token already exists")) {
+          if (details.toLowerCase().includes("token already exists")) {
             errorMessage =
-              "An active token already exists. Please check your most recent email for a password reset link.";
-          } else {
-            errorMessage =
-              "There was an issue with your request. Please try again.";
+              "You already have an active password reset link. Please check your most recent email to reset your password.";
           }
         }
       }
@@ -103,7 +100,10 @@ const ForgotPassword = () => {
           </div>
           {isSuccess && (
             <div className="mt-2 max-sm:text-sm text-green-800 bg-green-100 dark:bg-green-800/50 dark:text-green-50 border border-green-400 p-2 rounded-md">
-              <p>We have sent you an email with a reset password link.</p>
+              <p>
+                If the email is associated with an account, a password reset
+                link will be sent shortly.
+              </p>
               <p className="mt-2">
                 Please follow the instructions in the email to reset your
                 password.
