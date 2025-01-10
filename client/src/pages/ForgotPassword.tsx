@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState<string>("");
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const {
     mutateAsync: forgotPassword,
@@ -18,10 +19,18 @@ const ForgotPassword = () => {
   const handleOnEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     setEmail(target.value.trim());
+    setEmailError(null);
   };
 
   const handleSendPasswordResetEmail = async () => {
     if (!email) return;
+
+    // Email validation
+    const emailRegex = /^(?!@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
 
     try {
       await forgotPassword(email);
@@ -70,20 +79,26 @@ const ForgotPassword = () => {
             <p className="text-muted-foreground mb-2">
               No worries, we'll send you reset instructions
             </p>
-            <Input
-              value={email}
-              id="email"
-              type="email"
-              placeholder="Enter your registered Email address"
-              onChange={handleOnEmailChange}
-              className="w-full bg-accent placeholder:text-muted-foreground text-accent-foreground focus-visible:ring-0 border border-primary"
-            />
+            <div>
+              <Input
+                value={email}
+                id="email"
+                type="email"
+                placeholder="Enter your registered email address"
+                onChange={handleOnEmailChange}
+                className="w-full bg-accent placeholder:text-muted-foreground text-accent-foreground focus-visible:ring-0 border border-primary"
+              />
+              {emailError && (
+                <p className="max-sm:text-sm text-red-800 mt-1">{emailError}</p>
+              )}
+            </div>
+
             <Button
               onClick={handleSendPasswordResetEmail}
               className="w-full max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
               disabled={!email || isPending}
             >
-              Reset Password
+              Send Instructions
             </Button>
           </div>
           {isSuccess && (
