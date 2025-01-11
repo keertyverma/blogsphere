@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 const ResendVerification = () => {
   const [email, setEmail] = useState<string>("");
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const {
     mutateAsync: resendVerificationEmail,
@@ -18,16 +19,25 @@ const ResendVerification = () => {
   const handleOnEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     setEmail(target.value.trim());
+    setEmailError(null);
   };
 
   const handleResendEmail = async () => {
     if (!email) return;
 
+    // Email validation
+    const emailRegex = /^(?!@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+
     try {
       await resendVerificationEmail(email);
       setEmail("");
     } catch (error) {
-      let errorMessage = "An error occurred. Please try again later.";
+      let errorMessage =
+        "There was an issue with your request. Please try again.";
       if (error instanceof AxiosError) {
         if (error.code === "ERR_BAD_REQUEST" && error.response) {
           const {
@@ -43,9 +53,6 @@ const ResendVerification = () => {
           } else if (details.toLowerCase().includes("token already exists")) {
             errorMessage =
               "You already have an active verification link. Please check your most recent email to complete the account verification process.";
-          } else {
-            errorMessage =
-              "There was an issue with your request. Please try again.";
           }
         }
       }
@@ -70,13 +77,19 @@ const ResendVerification = () => {
             <p className="text-muted-foreground">
               Enter your registered email address
             </p>
-            <Input
-              value={email}
-              type="email"
-              placeholder="Email"
-              onChange={handleOnEmailChange}
-              className="w-full bg-accent placeholder:text-muted-foreground text-accent-foreground focus-visible:ring-0 border border-primary"
-            />
+            <div className="w-full">
+              <Input
+                value={email}
+                type="email"
+                placeholder="Email"
+                onChange={handleOnEmailChange}
+                className="bg-accent placeholder:text-muted-foreground text-accent-foreground focus-visible:ring-0 border border-primary"
+              />
+              {emailError && (
+                <p className="max-sm:text-sm text-red-800 mt-1">{emailError}</p>
+              )}
+            </div>
+
             <Button
               onClick={handleResendEmail}
               className="w-full max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
