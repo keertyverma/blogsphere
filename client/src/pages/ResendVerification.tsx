@@ -38,13 +38,11 @@ const ResendVerification = () => {
             },
           } = error;
 
-          if (details.toLowerCase().includes("invalid")) {
-            errorMessage = "This email address is not registered.";
-          } else if (details.toLowerCase().includes("verified")) {
+          if (details.toLowerCase().includes("verified")) {
             errorMessage = "Your account is already verified. Please log in.";
           } else if (details.toLowerCase().includes("token already exists")) {
             errorMessage =
-              "An active token already exists. Please check your most recent email for a verification link.";
+              "You already have an active verification link. Please check your most recent email to complete the account verification process.";
           } else {
             errorMessage =
               "There was an issue with your request. Please try again.";
@@ -89,7 +87,10 @@ const ResendVerification = () => {
           </div>
           {isSuccess && (
             <div className="mt-2 max-sm:text-sm text-green-800 bg-green-100 dark:bg-green-800/50 dark:text-green-50 border border-green-400 p-2 rounded-md">
-              <p>We have sent you an email with a verification link.</p>
+              <p>
+                If the email is associated with an account, a verification link
+                will be sent shortly.
+              </p>
               <p className="mt-2">
                 Please follow the instructions in the email to complete the
                 verification process.

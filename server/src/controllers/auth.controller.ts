@@ -261,51 +261,56 @@ const resendVerification = async (req: Request, res: Response) => {
 
   // find the user by email
   const user = await User.findOne({ "personalInfo.email": email });
-  if (!user) {
-    throw new BadRequestError("Invalid email.");
-  }
-
-  if (user.isVerified) {
-    throw new BadRequestError("Account already verified.");
-  }
-
-  // check for token expiration
-  const tokenExpired = user.verificationToken?.expiresAt
-    ? new Date(user.verificationToken.expiresAt).getTime() < Date.now()
-    : true;
-
-  if (!tokenExpired) {
-    throw new BadRequestError("An active verification token already exists.");
-  }
-
-  // get verification token
-  const { token, hashedToken, expiresAt } = user.generateVerificationToken();
-
-  // set verification token and expiration date
-  user.verificationToken = {
-    token: hashedToken,
-    expiresAt,
-  };
-
-  try {
-    await sendVerificationEmail(email, token, expiresAt);
-    await user.save();
-    logger.info("Verification email sent successfully.");
-  } catch (error) {
-    logger.error(`Failed to send verification email to ${email}`);
-    if (error instanceof Error) {
-      logger.error(`Error: ${error.message}`);
+  if (user) {
+    if (user.isVerified) {
+      throw new BadRequestError("Account already verified.");
     }
-    throw new CustomAPIError(
-      "We encountered an issue sending the verification email. Please try again later.",
-      StatusCodes.INTERNAL_SERVER_ERROR
+
+    // check for token expiration
+    const tokenExpired = user.verificationToken?.expiresAt
+      ? new Date(user.verificationToken.expiresAt).getTime() < Date.now()
+      : true;
+
+    if (!tokenExpired) {
+      throw new BadRequestError("An active verification token already exists.");
+    }
+
+    // get verification token
+    const { token, hashedToken, expiresAt } = user.generateVerificationToken();
+
+    // set verification token and expiration date
+    user.verificationToken = {
+      token: hashedToken,
+      expiresAt,
+    };
+
+    try {
+      await sendVerificationEmail(email, token, expiresAt);
+      await user.save();
+      logger.info(`Verification email sent successfully to = ${email}`);
+    } catch (error) {
+      logger.error(`Failed to send verification email to ${email}`);
+      if (error instanceof Error) {
+        logger.error(`Error: ${error.message}`);
+      }
+      throw new CustomAPIError(
+        "We encountered an issue sending the verification email. Please try again later.",
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  } else {
+    // Avoid explicit notification and do not throw error for unregistered emails.
+    logger.info(
+      `Account verification request for non-existent email: ${email}`
     );
   }
 
+  // Generic success response
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    message: "Verification email sent successfully.",
+    message:
+      "If the email is associated with an account, a verfication email will be sent.",
   };
 
   return res.status(data.statusCode).json(data);
