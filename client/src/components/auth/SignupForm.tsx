@@ -32,7 +32,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [hasSentEmail, setHasSentEmail] = useState(false);
+  const [hasSentEmail, setHasSentEmail] = useState<boolean | null>(null);
 
   const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
     useCreateUserAccount();
@@ -58,6 +58,7 @@ const SignupForm = () => {
       const userResponse = await createUserAccount(user);
       if (userResponse.status === 201) {
         // user registered and verification email has been sent.
+        toast.success("Registration Successful");
         setHasSentEmail(true);
       }
       form.reset();
@@ -67,16 +68,21 @@ const SignupForm = () => {
         const errorResponse = error.response?.data as IFetchResponse<INewUser>;
         const errorDetail = (errorResponse.error as IFetchError).details;
         if (errorDetail.includes("verification email")) {
-          errorMessage =
-            "Registration successful, but the verification email could not be sent. \n You can request a new one when you log in.";
+          // user registered but verification email has not been sent.
+          setHasSentEmail(false);
+          toast.success("Registration Successful");
+          errorMessage = "";
+          form.reset();
         } else if (error.code === "ERR_BAD_REQUEST") {
           errorMessage = errorDetail;
         }
       }
 
-      toast.error(errorMessage, {
-        autoClose: 10000,
-      });
+      if (errorMessage) {
+        toast.error(errorMessage, {
+          autoClose: 10000,
+        });
+      }
     }
   };
 
@@ -143,12 +149,22 @@ const SignupForm = () => {
               <p className="text-light-3 base-medium md:body-medium my-2 md:mb-4">
                 Create your account
               </p>
-              {hasSentEmail && (
-                <p className="max-sm:text-sm text-green-800 bg-green-100 border dark:bg-green-800/50 dark:text-green-50 border-green-400 p-2 rounded-md">
-                  Verification email sent. Please verify to complete the
-                  registration.
+              {hasSentEmail ? (
+                <p className="text-left text-sm text-green-800 bg-green-100 border dark:bg-green-800/50 dark:text-green-50 border-green-400 p-2 rounded-md">
+                  A verification email has been sent to you.
+                  <br />
+                  Please verify your account by following the instructions in
+                  the email before logging in.
                 </p>
-              )}
+              ) : hasSentEmail === false ? (
+                <p className="text-left text-sm text-yellow-600 bg-yellow-100 border dark:bg-yellow-500/50 dark:text-yellow-50 border-yellow-400 p-2 rounded-md ">
+                  Registration completed, but the verification email could not
+                  be sent.
+                  <br />
+                  Please log in to request a new verification link and complete
+                  your account verification.
+                </p>
+              ) : null}
             </div>
             {isLoading && <LoadingSpinner className="flex-col m-auto" />}
             <FormField
