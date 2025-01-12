@@ -124,12 +124,13 @@ const SignupForm = () => {
 
         if (status === 403) {
           errorMessage =
-            "Email already registered. Please use email & password to login";
+            "Your account was created with email and password. Please log in using those credentials.";
           navigate("/login");
           toast.error(errorMessage);
           return;
         } else if (details?.toLowerCase() === "access token has expired") {
-          errorMessage = "Please re-login with google account";
+          errorMessage =
+            "Your session has expired. Please re-login with Google to continue.";
         }
       }
       toast.error(errorMessage);
@@ -144,6 +145,7 @@ const SignupForm = () => {
             onSubmit={form.handleSubmit(handleSignup)}
             className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
           >
+            {isLoading && <LoadingSpinner className="m-auto" />}
             <div className="text-center">
               <h2 className="h3-bold md:h2-bold capitalize">join us today</h2>
               <p className="text-light-3 base-medium md:body-medium my-2 md:mb-4">
@@ -166,7 +168,6 @@ const SignupForm = () => {
                 </p>
               ) : null}
             </div>
-            {isLoading && <LoadingSpinner className="flex-col m-auto" />}
             <FormField
               control={form.control}
               name="fullname"
