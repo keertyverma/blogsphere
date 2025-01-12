@@ -4,11 +4,13 @@ import { Input } from "@/components/ui/input";
 import { useResendVerificationEmail } from "@/lib/react-query/queries";
 import { AxiosError } from "axios";
 import { ChangeEvent, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ResendVerification = () => {
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const {
     mutateAsync: resendVerificationEmail,
@@ -49,15 +51,18 @@ const ResendVerification = () => {
           } = error;
 
           if (details.toLowerCase().includes("verified")) {
-            errorMessage = "Your account is already verified. Please log in.";
+            setErrorMsg("Your account is already verified. Please log in.");
+            errorMessage = "";
           } else if (details.toLowerCase().includes("token already exists")) {
-            errorMessage =
-              "You already have an active verification link. Please check your most recent email to complete the account verification process.";
+            setErrorMsg(
+              "You already have an active verification link. Please check your most recent email to complete the account verification process."
+            );
+            errorMessage = "";
           }
         }
       }
 
-      toast.error(errorMessage);
+      if (errorMessage) toast.error(errorMessage);
     }
   };
 
@@ -108,6 +113,21 @@ const ResendVerification = () => {
                 Please follow the instructions in the email to complete the
                 verification process.
               </p>
+            </div>
+          )}
+          {errorMsg && (
+            <div className="text-left max-sm:text-sm text-yellow-600 bg-yellow-100 border dark:bg-yellow-500/50 dark:text-yellow-50 border-yellow-400 p-2 rounded-md mt-3">
+              <p>{errorMsg}</p>
+              {errorMsg.toLowerCase().includes("verified") && (
+                <p className="text-center mt-2">
+                  <Link
+                    to="/login"
+                    className="text-primary underline text-sm md:text-base"
+                  >
+                    Login
+                  </Link>
+                </p>
+              )}
             </div>
           )}
         </div>

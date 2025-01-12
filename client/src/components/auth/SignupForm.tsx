@@ -157,7 +157,7 @@ const SignupForm = () => {
                   the email before logging in.
                 </p>
               ) : hasSentEmail === false ? (
-                <p className="text-left text-sm text-yellow-600 bg-yellow-100 border dark:bg-yellow-500/50 dark:text-yellow-50 border-yellow-400 p-2 rounded-md ">
+                <p className="text-left text-sm text-yellow-600 bg-yellow-100 border dark:bg-yellow-500/50 dark:text-yellow-50 border-yellow-400 p-2 rounded-md">
                   Registration completed, but the verification email could not
                   be sent.
                   <br />

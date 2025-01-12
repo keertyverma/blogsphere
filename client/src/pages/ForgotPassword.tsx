@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 const ForgotPassword = () => {
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const {
     mutateAsync: forgotPassword,
@@ -50,13 +51,15 @@ const ForgotPassword = () => {
           } = error;
 
           if (details.toLowerCase().includes("token already exists")) {
-            errorMessage =
-              "You already have an active password reset link. Please check your most recent email to reset your password.";
+            setErrorMsg(
+              "You already have an active password reset link. Please check your most recent email to reset your password."
+            );
+            errorMessage = "";
           }
         }
       }
 
-      toast.error(errorMessage);
+      if (errorMessage) toast.error(errorMessage);
     }
   };
 
@@ -108,6 +111,11 @@ const ForgotPassword = () => {
                 Please follow the instructions in the email to reset your
                 password.
               </p>
+            </div>
+          )}
+          {errorMsg && (
+            <div className="text-left max-sm:text-sm text-yellow-600 bg-yellow-100 border dark:bg-yellow-500/50 dark:text-yellow-50 border-yellow-400 p-2 rounded-md mt-3">
+              <p>{errorMsg}</p>
             </div>
           )}
         </div>
