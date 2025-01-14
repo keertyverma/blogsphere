@@ -36,6 +36,11 @@ export const verifyToken = (
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
+      // Allow requests to the logout route to continue even if the token has expired.
+      if (req.path === "/logout") {
+        return next();
+      }
+
       throw new CustomAPIError(
         "Token has expired. Please log in again.",
         StatusCodes.UNAUTHORIZED
