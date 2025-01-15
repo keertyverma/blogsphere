@@ -110,7 +110,7 @@ const EditProfile = () => {
 
       const toUpdate: IUpdateUserProfile = {
         ...(fullname && { fullname }),
-        ...(bio && { bio }),
+        bio,
         ...(profileImgUrl && { profileImage: profileImgUrl }),
         ...(Object.keys(socialLinks).length && {
           socialLinks: socialLinks as SocialLink,
@@ -136,17 +136,20 @@ const EditProfile = () => {
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const value = event.target.value;
-    if (value) setBioValue(value);
+    setBioValue(value);
   };
 
   return (
     <AnimationWrapper>
       <section className="h-cover p-0">
-        <div className="max-md:hidden text-center mb-5">
+        <div className="text-center mb-5">
           <h3 className="h3-bold !font-semibold capitalize text-left">
-            Edit Profile
+            Profile
           </h3>
-          <hr className="mt-2 border-1 border-border" />
+          <p className="text-left text-slate-500 dark:text-slate-400">
+            Manage your BlogSphere profile
+          </p>
+          <hr className="mt-3 border-1 border-border" />
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleProfileUpdate)}>
@@ -159,7 +162,7 @@ const EditProfile = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-col justify-start">
                       <FormLabel className="text-secondary-foreground font-semibold">
-                        Profile Photo
+                        Profile Image
                       </FormLabel>
                       <FormControl>
                         <ProfileUploader
@@ -199,11 +202,12 @@ const EditProfile = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-secondary-foreground font-semibold">
-                        Bio (about you)
+                        Bio (About You)
                       </FormLabel>
                       <FormControl>
                         <Textarea
                           className="shad-textarea custom-scrollbar md:text-base placeholder:text-sm"
+                          placeholder="Tell us your story"
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
@@ -223,7 +227,13 @@ const EditProfile = () => {
               </div>
               <div className="flex-1 flex flex-col gap-5">
                 <hr className="md:hidden" />
-                <h4 className="text-lg font-semibold">Social</h4>
+                <div>
+                  <h4 className="text-lg font-semibold">Social Profiles</h4>
+                  <p className="mt-2 text-left text-slate-500 dark:text-slate-400 text-sm md:text-base">
+                    The social links you add here will show up on your profile.
+                  </p>
+                </div>
+
                 <FormField
                   control={form.control}
                   name="twitter"

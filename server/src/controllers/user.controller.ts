@@ -208,9 +208,7 @@ export const updateUser = async (req: Request, res: Response) => {
   if (fullname) {
     updateObj["personalInfo.fullname"] = fullname;
   }
-  if (bio) {
-    updateObj["personalInfo.bio"] = bio;
-  }
+  updateObj["personalInfo.bio"] = bio;
   if (profileImage) {
     updateObj["personalInfo.profileImage"] = profileImage;
   }

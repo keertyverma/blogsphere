@@ -7,7 +7,7 @@ import logger from "./logger";
 export const validateUserUpdate = (data: IUserUpdate) => {
   const schema = Joi.object({
     fullname: Joi.string().trim().min(2).max(50),
-    bio: Joi.string().trim().max(200),
+    bio: Joi.string().trim().max(200).allow(""),
     profileImage: Joi.string().trim(),
     socialLinks: Joi.object({
       youtube: Joi.string()

@@ -83,7 +83,7 @@
 
   /* SHADCN COMPONENTS */
   .shad-input {
-    @apply h-12 bg-muted border-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
+    @apply h-12 bg-muted border placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
   }
 
   .shad-form_message {
@@ -91,7 +91,7 @@
   }
 
   .shad-textarea {
-    @apply h-32 bg-muted rounded-xl border-none focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
+    @apply h-32 bg-muted rounded-xl border focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-accent !important;
   }
 }
 
