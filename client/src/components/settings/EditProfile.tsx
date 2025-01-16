@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { FaFacebook, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa";
 import { RiTwitterXFill } from "react-icons/ri";
 import { SlGlobe } from "react-icons/sl";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -36,8 +35,6 @@ const EditProfile = () => {
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateUserProfile();
 
-  const navigate = useNavigate();
-
   const form = useForm<z.infer<typeof EditProfileValidation>>({
     resolver: zodResolver(EditProfileValidation),
     defaultValues: {
@@ -51,6 +48,7 @@ const EditProfile = () => {
       github: "",
       website: "",
     },
+    mode: "onBlur", // Validate when the input field loses focus (i.e., when the user clicks away or tabs out of the field)
   });
 
   useEffect(() => {
@@ -122,8 +120,6 @@ const EditProfile = () => {
 
       toast.dismiss(loadingToast);
       toast.success("Profile Updated.👍");
-      form.reset();
-      navigate(`/user/${user.personalInfo.username}`);
     } catch (error) {
       toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
@@ -241,11 +237,10 @@ const EditProfile = () => {
                     <FormItem>
                       <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
                         <RiTwitterXFill />
-                        Twitter Profile
+                        X/Twitter
                       </FormLabel>
                       <FormControl>
                         <Input
-                          type="url"
                           placeholder="https://x.com/username"
                           className="shad-input md:text-base"
                           {...field}
@@ -261,11 +256,10 @@ const EditProfile = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaInstagram /> Instagram Profile
+                        <FaInstagram /> Instagram
                       </FormLabel>
                       <FormControl>
                         <Input
-                          type="url"
                           placeholder="https://instagram.com/username"
                           className="shad-input md:text-base"
                           {...field}
@@ -281,32 +275,11 @@ const EditProfile = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaGithub /> Github Profile
+                        <FaGithub /> Github
                       </FormLabel>
                       <FormControl>
                         <Input
-                          type="url"
                           placeholder="https://github.com/username"
-                          className="shad-input md:text-base"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="youtube"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaYoutube /> YouTube Channel
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="url"
-                          placeholder="https://www.youtube.com/channel/channel-name"
                           className="shad-input md:text-base"
                           {...field}
                         />
@@ -321,12 +294,30 @@ const EditProfile = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaFacebook /> Facebook Profile
+                        <FaFacebook /> Facebook
                       </FormLabel>
                       <FormControl>
                         <Input
-                          type="url"
                           placeholder="https://facebook.com/username"
+                          className="shad-input md:text-base"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="shad-form_message" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="youtube"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
+                        <FaYoutube /> YouTube
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://youtube.com/username"
                           className="shad-input md:text-base"
                           {...field}
                         />
@@ -341,11 +332,10 @@ const EditProfile = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <SlGlobe /> Website URL
+                        <SlGlobe /> Website
                       </FormLabel>
                       <FormControl>
                         <Input
-                          type="url"
                           placeholder="https://username.com"
                           className="shad-input md:text-base"
                           {...field}

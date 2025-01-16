@@ -80,28 +80,29 @@ export const checkIsLiked = (
 };
 
 export const isValidUrl = (url: string) => {
-  // List of valid top-level domains (TLDs)
-  const validTLDs = [
-    "com",
-    "org",
-    "net",
-    "edu",
-    "gov",
-    "mil",
-    "co",
-    "io",
-    "ai",
-    "in",
-  ]; // Add more as needed
-
+  // parse the url and extract the hostname
   try {
     const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname;
-    const tld = hostname.substring(hostname.lastIndexOf(".") + 1);
-    return validTLDs.includes(tld);
+    return !!parsedUrl.hostname;
   } catch (e) {
     return false;
   }
+};
+
+export const isValidSocialPlatformUrl = (url: string, platform: string) => {
+  const patterns: Record<string, RegExp> = {
+    instagram: /^(https?:\/\/)(www\.)?instagram\.com\/.+$/, // Accepts anything after "instagram.com/"
+    facebook: /^(https?:\/\/)(www\.)?facebook\.com\/.+$/, // Accepts anything after "facebook.com/"
+    twitter: /^(https?:\/\/)(www\.)?(x\.com|twitter\.com)\/.+$/, // Accepts anything after "x.com/" or "twitter.com/"
+    github: /^(https?:\/\/)(www\.)?github\.com\/.+$/, // Accepts anything after "github.com/"
+    youtube: /^(https?:\/\/)(www\.)?youtube\.com\/.+$/, // Accepts anything after "youtube.com/"
+    website: /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}.*$/, // Generic website pattern
+  };
+
+  if (!isValidUrl(url)) return false;
+
+  const platformPattern = patterns[platform];
+  return platformPattern ? platformPattern.test(url) : false;
 };
 
 export const handleProfileImgErr = (

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isValidUrl } from "../utils";
+import { isValidSocialPlatformUrl } from "../utils";
 
 export const SignupValidation = z.object({
   fullname: z
@@ -60,37 +60,49 @@ export const EditProfileValidation = z.object({
   youtube: z
     .string()
     .trim()
-    .refine(isValidUrl, { message: "YouTube URL must be a valid URL." })
+    .refine((url) => isValidSocialPlatformUrl(url, "youtube"), {
+      message: "Please enter a valid YouTube profile URL",
+    })
     .or(z.literal(""))
     .optional(),
   instagram: z
     .string()
     .trim()
-    .refine(isValidUrl, { message: "Instagram URL must be a valid URL." })
+    .refine((url) => isValidSocialPlatformUrl(url, "instagram"), {
+      message: "Please enter a valid Instagram profile URL",
+    })
     .or(z.literal(""))
     .optional(),
   facebook: z
     .string()
     .trim()
-    .refine(isValidUrl, { message: "Facebook URL must be a valid URL." })
+    .refine((url) => isValidSocialPlatformUrl(url, "facebook"), {
+      message: "Please enter a valid Facebook profile URL",
+    })
     .or(z.literal(""))
     .optional(),
   twitter: z
     .string()
     .trim()
-    .refine(isValidUrl, { message: "Twitter URL must be a valid URL." })
+    .refine((url) => isValidSocialPlatformUrl(url, "twitter"), {
+      message: "Please enter a valid X/Twitter profile URL",
+    })
     .or(z.literal(""))
     .optional(),
   github: z
     .string()
     .trim()
-    .refine(isValidUrl, { message: "GitHub URL must be a valid URL." })
+    .refine((url) => isValidSocialPlatformUrl(url, "github"), {
+      message: "Please enter a valid GitHub profile URL",
+    })
     .or(z.literal(""))
     .optional(),
   website: z
     .string()
     .trim()
-    .refine(isValidUrl, { message: "Website URL must be a valid URL." })
+    .refine((url) => isValidSocialPlatformUrl(url, "website"), {
+      message: "Please enter a valid Website URL",
+    })
     .or(z.literal(""))
     .optional(),
 });
