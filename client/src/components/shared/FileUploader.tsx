@@ -57,6 +57,7 @@ const FileUploader = ({ onUpload }: Props) => {
     accept: {
       "image/*": [".png", ".jpeg", ".jpg"],
     },
+    multiple: false,
   });
 
   return (
@@ -98,7 +99,7 @@ const FileUploader = ({ onUpload }: Props) => {
             Upload Image
           </Button>
           <p className="small-regular mb-6 text-muted-foreground text-center">
-            only JPEG and PNG files are allowed.
+            Supports JPEG and PNG files.
           </p>
         </div>
       )}

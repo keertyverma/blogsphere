@@ -9,7 +9,6 @@ import {
   getAllUploadedImages,
   getPublicIdFromUrl,
 } from "./cloudinary";
-import { count } from "console";
 
 connectDB();
 const db = mongoose.connection;
