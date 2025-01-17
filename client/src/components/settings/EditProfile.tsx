@@ -345,7 +345,7 @@ const EditProfile = () => {
               </div>
             </div>
             {/* fixed update button located at the footer of the page */}
-            <div className="w-full fixed bottom-0 left-0 border-t-2 bg-header p-4 z-30">
+            <div className="w-full md:w-[calc(100%-200px)] xl:w-[calc(100%-350px)] fixed bottom-0 left-0 md:left-[200px] xl:left-[350px] border-t-2 bg-header p-4 z-30">
               <div className="flex justify-center">
                 <Button
                   type="submit"
