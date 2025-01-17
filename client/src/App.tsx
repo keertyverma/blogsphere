@@ -62,7 +62,7 @@ const App = () => {
 
       <ToastContainer
         hideProgressBar={true}
-        toastClassName="bg-secondary text-secondary-foreground border border-muted-foreground/40"
+        toastClassName="bg-secondary text-secondary-foreground border border-muted-foreground/40 mt-[3.8rem]"
         style={{
           width: "auto",
         }}

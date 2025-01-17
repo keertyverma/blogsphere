@@ -88,7 +88,6 @@ const EditProfile = () => {
   const handleProfileUpdate = async (
     data: z.infer<typeof EditProfileValidation>
   ) => {
-    const loadingToast = toast.loading("Updating...");
     try {
       const { fullname, bio, ...socialData } = data;
       const socialKeys: (keyof SocialLink)[] = [
@@ -118,10 +117,8 @@ const EditProfile = () => {
       // Update profile
       await updateProfile(toUpdate);
 
-      toast.dismiss(loadingToast);
       toast.success("Profile Updated.👍");
     } catch (error) {
-      toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
         toast.error("An error occurred. Please try again later.");
       }
@@ -137,7 +134,7 @@ const EditProfile = () => {
 
   return (
     <AnimationWrapper>
-      <section className="h-cover p-0">
+      <section className="h-cover p-0 pb-20">
         <div className="text-center mb-5">
           <h3 className="h3-bold !font-semibold capitalize text-left">
             Profile
@@ -149,7 +146,7 @@ const EditProfile = () => {
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleProfileUpdate)}>
-            <div className="flex flex-col md:flex-row gap-5 md:gap-10">
+            <div className="flex flex-col lg:flex-row gap-5 md:gap-10">
               <div className="flex-1 flex flex-col gap-5">
                 <h4 className="text-lg font-semibold">Basic Info</h4>
                 <FormField
@@ -347,15 +344,18 @@ const EditProfile = () => {
                 />
               </div>
             </div>
-            <div className="max-md:flex-center">
-              <Button
-                type="submit"
-                size="lg"
-                className="rounded-full my-4"
-                disabled={isUpdating}
-              >
-                Update
-              </Button>
+            {/* fixed update button located at the footer of the page */}
+            <div className="w-full fixed bottom-0 left-0 border-t-2 bg-header p-4 z-30">
+              <div className="flex justify-center">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="rounded-full"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? "Updating..." : "Update"}
+                </Button>
+              </div>
             </div>
           </form>
         </Form>
