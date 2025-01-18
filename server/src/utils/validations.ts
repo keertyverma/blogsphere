@@ -82,14 +82,7 @@ export const validatePasswordUpdate = (data: {
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
 
   const schema = Joi.object({
-    currentPassword: Joi.string()
-      .min(5)
-      .max(1024)
-      .required()
-      .pattern(passwordRegex)
-      .message(
-        "Current Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter."
-      ),
+    currentPassword: Joi.string().min(5).max(1024).required(),
     newPassword: Joi.string()
       .min(5)
       .max(1024)

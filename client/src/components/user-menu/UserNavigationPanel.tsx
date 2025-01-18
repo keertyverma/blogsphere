@@ -94,7 +94,7 @@ const UserNavigationPanel = () => {
             <MenubarSeparator />
             <Link to="/settings/edit-profile" className="text-muted-foreground">
               <MenubarItem>
-                <IoSettingsOutline className="text-lg mr-2" /> Account settings
+                <IoSettingsOutline className="text-lg mr-2" /> Account Settings
               </MenubarItem>
             </Link>
             <MenubarSeparator />

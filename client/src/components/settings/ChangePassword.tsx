@@ -20,11 +20,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const ChangePassword = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const { mutateAsync: updatePassword, isPending: isUpdatingPassword } =
     useUpdatePassword();
+  const clearUserAuth = useAuthStore((s) => s.clearUserAuth);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof ChangePasswordValidation>>({
@@ -33,12 +35,12 @@ const ChangePassword = () => {
       currentPassword: "",
       newPassword: "",
     },
+    mode: "onBlur", // Validate when the input field loses focus (i.e., when the user clicks away or tabs out of the field)
   });
 
   const handlePasswordChange = async (
     data: z.infer<typeof ChangePasswordValidation>
   ) => {
-    const loadingToast = toast.loading("Updating...");
     try {
       const { currentPassword, newPassword } = data;
       await updatePassword({
@@ -46,10 +48,10 @@ const ChangePassword = () => {
         newPassword,
       });
 
-      toast.dismiss(loadingToast);
-      toast.success("Password Updated. Please login again.");
+      toast.success("Password updated successfully! Please login again.");
       form.reset();
       navigate("/login");
+      clearUserAuth();
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.response) {
@@ -67,7 +69,6 @@ const ChangePassword = () => {
         }
       }
 
-      toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
         toast.error(errorMessage);
       }
@@ -77,12 +78,15 @@ const ChangePassword = () => {
   return (
     <AnimationWrapper>
       <section className="h-cover p-0">
-        <div className="max-md:hidden text-center mb-5">
+        <div className="max-md:hidden text-center">
           <h3 className="h3-bold !font-semibold capitalize text-left">
             Change password
           </h3>
           <hr className="mt-2 border-1 border-border" />
         </div>
+        <p className="mt-2 mb-5 text-left text-slate-500 dark:text-slate-400">
+          Enhance your security by updating your password regularly.
+        </p>
         <Form {...form}>
           <div className="flex-center">
             <form
@@ -157,10 +161,13 @@ const ChangePassword = () => {
 
               <Button
                 type="submit"
-                className="h-12 rounded-full mt-2 text-sm md:text-base"
+                className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-2 space-x-2"
                 disabled={isUpdatingPassword}
               >
-                Update
+                {isUpdatingPassword ? "Updating..." : "Update"}
+                {isUpdatingPassword && (
+                  <LoadingSpinner className="h-6 md:w-6 text-white" />
+                )}
               </Button>
             </form>
           </div>
