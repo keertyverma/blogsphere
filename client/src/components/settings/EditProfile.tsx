@@ -350,10 +350,13 @@ const EditProfile = () => {
                 <Button
                   type="submit"
                   size="lg"
-                  className="rounded-full"
+                  className="rounded-full flex-center gap-1"
                   disabled={isUpdating}
                 >
                   {isUpdating ? "Updating..." : "Update"}
+                  {isUpdating && (
+                    <LoadingSpinner className="h-6 md:w-6 text-white" />
+                  )}
                 </Button>
               </div>
             </div>

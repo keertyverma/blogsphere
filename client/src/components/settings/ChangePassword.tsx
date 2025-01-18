@@ -161,7 +161,7 @@ const ChangePassword = () => {
 
               <Button
                 type="submit"
-                className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-2 space-x-2"
+                className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
                 disabled={isUpdatingPassword}
               >
                 {isUpdatingPassword ? "Updating..." : "Update"}
