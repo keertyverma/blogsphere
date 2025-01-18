@@ -193,6 +193,10 @@
     @apply border-r-2 max-md:border-none border-muted-foreground bg-header px-6 -ml-6 md:rounded-tl-lg md:rounded-bl-lg;
   }
 
+  .custom-toast-container .Toastify__toast:first-child {
+    @apply mt-[3.8rem];
+  }
+
   /* File uploader */
   .cover-img {
     @apply aspect-video w-full h-full rounded-lg object-cover border-[1px] border-border;
