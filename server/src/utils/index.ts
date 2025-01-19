@@ -1,4 +1,6 @@
+import config from "config";
 import { CookieOptions } from "express";
+import ms from "ms";
 import { nanoid } from "nanoid";
 import { User } from "../models/user.model";
 
@@ -41,6 +43,20 @@ export const isValidUrl = (url: string) => {
 export const getCookieOptions = (): CookieOptions => {
   // cookies option to create secure cookies
   const isProduction = process.env.NODE_ENV === "production";
+  const expiresIn = config.get<string>("expiresIn.authToken");
+  let maxAge: number;
+
+  try {
+    maxAge = ms(expiresIn);
+    if (typeof maxAge !== "number") {
+      throw new Error(`Invalid cookie expiresIn format: ${expiresIn}`);
+    }
+  } catch (error) {
+    console.error(
+      `Invalid expiresIn value: ${expiresIn}. Falling back to default.`
+    );
+    maxAge = ms("7d"); // Use a default duration of 7 days
+  }
 
   return {
     httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
@@ -48,6 +64,7 @@ export const getCookieOptions = (): CookieOptions => {
     secure: isProduction, // Ensures cookie is sent only over HTTPS in production
     domain: isProduction ? ".360verse.co" : "localhost",
     path: "/api/v1/", // Ensures cookie is accessible only within a specific subset of URLs within the domain that begin with /api/v1/
+    maxAge, // Cookie's lifetime in milliseconds. After this time, the cookie will expire and be removed from the client’s browser.
   };
 };
 

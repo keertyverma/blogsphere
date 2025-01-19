@@ -20,10 +20,9 @@ const useAxiosInterceptors = () => {
       (response) => response,
       (error) => {
         if (error.response) {
-          const { status, data } = error.response;
-          const errMsg = data?.error ? data.error.details : data;
-
-          if (status === 401 && errMsg.includes("Token has expired")) {
+          const { status } = error.response;
+          if (status === 401) {
+            // Unauthorized - Handle token expiration or missing token case
             // this will reset user auth and re-direct user to login page
             setTokenExpired(true);
             clearUserAuth();

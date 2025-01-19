@@ -29,8 +29,9 @@ const UserNavigationPanel = () => {
       await logout();
       clearUserAuth();
     } catch (error) {
-      const errorMessage = "An error occurred. Please try again later.";
-      toast.error(errorMessage);
+      if (!useAuthStore.getState().isTokenExpired) {
+        toast.error("An error occurred. Please try again later.");
+      }
     }
   };
 
