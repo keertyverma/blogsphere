@@ -145,7 +145,6 @@ const SignupForm = () => {
             onSubmit={form.handleSubmit(handleSignup)}
             className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
           >
-            {isLoading && <LoadingSpinner className="m-auto" />}
             <div className="text-center">
               <h2 className="h3-bold md:h2-bold capitalize">join us today</h2>
               <p className="text-light-3 base-medium md:body-medium my-2 md:mb-4">
@@ -245,10 +244,13 @@ const SignupForm = () => {
 
             <Button
               type="submit"
-              className="h-12 rounded-full mt-2 text-sm md:text-base"
+              className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
               disabled={isLoading}
             >
               Sign Up
+              {isLoading && (
+                <LoadingSpinner className="h-6 md:w-6 text-white" />
+              )}
             </Button>
 
             <p className="text-sm md:text-base text-center text-secondary-foreground">
@@ -272,6 +274,9 @@ const SignupForm = () => {
             >
               <FcGoogle size={20} />
               Continue with Google
+              {isLoading && (
+                <LoadingSpinner className="h-6 md:w-6 text-muted-foreground" />
+              )}
             </Button>
           </form>
         </Form>

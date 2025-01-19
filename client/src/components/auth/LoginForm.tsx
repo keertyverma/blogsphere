@@ -160,7 +160,6 @@ const LoginForm = () => {
             onSubmit={form.handleSubmit(handleLogin)}
             className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
           >
-            {isLoading && <LoadingSpinner className="m-auto" />}
             <div className="text-center mb-4">
               <h2 className="h3-bold md:h2-bold capitalize">welcome back</h2>
               <p className="text-light-3 base-medium md:body-medium my-2 md:mb-4">
@@ -231,10 +230,13 @@ const LoginForm = () => {
 
             <Button
               type="submit"
-              className="h-12 rounded-full mt-2 text-sm md:text-base"
+              className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
               disabled={isLoading}
             >
               Log in
+              {isLoading && (
+                <LoadingSpinner className="h-6 md:w-6 text-white" />
+              )}
             </Button>
 
             {verificationMsg && (
@@ -272,6 +274,9 @@ const LoginForm = () => {
             >
               <FcGoogle size={20} />
               Continue with Google
+              {isLoading && (
+                <LoadingSpinner className="h-6 md:w-6 text-muted-foreground" />
+              )}
             </Button>
           </form>
         </Form>
