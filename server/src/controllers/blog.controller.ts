@@ -175,6 +175,7 @@ const getLatestBlogs = async (req: Request, res: Response) => {
     ? {
         $or: [
           { title: new RegExp(`${search}`, "i") },
+          { description: new RegExp(`${search}`, "i") },
           {
             "authorDetails.personalInfo.fullname": new RegExp(`${search}`, "i"),
           },

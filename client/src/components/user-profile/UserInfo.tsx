@@ -36,12 +36,14 @@ const UserInfo = ({ profileId, user }: Props) => {
           <h1 className="text-xl font-semibold capitalize">{fullname}</h1>
           <p className="text-muted-foreground leading-5">{bio}</p>
           <div className="text-sm text-secondary-foreground mt-1 flex gap-1">
-            <p>
-              <span className="font-semibold mr-1">
-                {formateNumber(totalPosts)}
-              </span>
-              Blogs
-            </p>
+            {totalPosts > 0 && (
+              <p>
+                <span className="font-semibold mr-1">
+                  {formateNumber(totalPosts)}
+                </span>
+                Blogs
+              </p>
+            )}
             {totalReads > 0 && (
               <>
                 <span>|</span>
