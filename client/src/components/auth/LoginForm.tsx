@@ -31,7 +31,6 @@ const LoginForm = () => {
   const { mutateAsync: login, isPending: isLoginUser } = useLogin();
   const { mutateAsync: loginWithGoogle, isPending: isGoogleLoginUser } =
     useLoginWithGoogle();
-  const isLoading = isLoginUser || isGoogleLoginUser;
 
   const setUserAuth = useAuthStore((s) => s.setUserAuth);
   const clearRedirectedUrl = useAuthStore((s) => s.clearRedirectedUrl);
@@ -231,10 +230,10 @@ const LoginForm = () => {
             <Button
               type="submit"
               className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
-              disabled={isLoading}
+              disabled={isLoginUser}
             >
               Log in
-              {isLoading && (
+              {isLoginUser && (
                 <LoadingSpinner className="h-6 md:w-6 text-white" />
               )}
             </Button>
@@ -270,11 +269,11 @@ const LoginForm = () => {
               variant="secondary"
               className="h-12 border border-muted-foreground/40 rounded-full flex-center gap-3 text-sm md:text-base"
               onClick={handleGoogleAuth}
-              disabled={isLoading}
+              disabled={isGoogleLoginUser}
             >
               <FcGoogle size={20} />
               Continue with Google
-              {isLoading && (
+              {isGoogleLoginUser && (
                 <LoadingSpinner className="h-6 md:w-6 text-muted-foreground" />
               )}
             </Button>

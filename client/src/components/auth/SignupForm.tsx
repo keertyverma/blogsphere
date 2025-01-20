@@ -38,7 +38,6 @@ const SignupForm = () => {
     useCreateUserAccount();
   const { mutateAsync: loginWithGoogle, isPending: isGoogleLoginUser } =
     useLoginWithGoogle();
-  const isLoading = isCreatingUser || isGoogleLoginUser;
 
   const setUserAuth = useAuthStore((s) => s.setUserAuth);
   const clearRedirectedUrl = useAuthStore((s) => s.clearRedirectedUrl);
@@ -245,10 +244,10 @@ const SignupForm = () => {
             <Button
               type="submit"
               className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
-              disabled={isLoading}
+              disabled={isCreatingUser}
             >
               Sign Up
-              {isLoading && (
+              {isCreatingUser && (
                 <LoadingSpinner className="h-6 md:w-6 text-white" />
               )}
             </Button>
@@ -270,11 +269,11 @@ const SignupForm = () => {
               variant="secondary"
               className="h-12 border border-muted-foreground/40 rounded-full flex-center gap-3 text-sm md:text-base"
               onClick={handleGoogleAuth}
-              disabled={isLoading}
+              disabled={isGoogleLoginUser}
             >
               <FcGoogle size={20} />
               Continue with Google
-              {isLoading && (
+              {isGoogleLoginUser && (
                 <LoadingSpinner className="h-6 md:w-6 text-muted-foreground" />
               )}
             </Button>
