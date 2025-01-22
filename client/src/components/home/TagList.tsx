@@ -26,6 +26,11 @@ const TagList = () => {
     "next js",
   ];
 
+  // Reset selected tag on component mount
+  useEffect(() => {
+    setSelectedTag("all");
+  }, [setSelectedTag]);
+
   const handleScroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
       const { scrollLeft, clientWidth } = scrollContainerRef.current;
@@ -62,7 +67,7 @@ const TagList = () => {
   }, []);
 
   return (
-    <div className="relative w-full max-w-[90%] md:max-w-[400px] lg:max-w-[500px] xl:max-w-[800px] p-0 md:mt-4 mb-4">
+    <div className="relative w-full -max-w-[90%] md:max-w-[400px] lg:max-w-[500px] xl:max-w-[800px] p-0 md:mt-4 mb-4">
       {showLeftArrow && (
         <Button
           variant={"secondary"}

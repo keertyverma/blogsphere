@@ -43,11 +43,12 @@ export const useEditorStore = create<EditorStore>()(
     }),
     {
       name: "BlogsphereEditorStore",
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.selectedTag = "all";
-        }
-      },
+      partialize: (state) =>
+        Object.fromEntries(
+          Object.entries(state).filter(
+            ([key]) => !["selectedTag"].includes(key)
+          )
+        ), // Exclude selectedTag from persistence
     }
   )
 );
