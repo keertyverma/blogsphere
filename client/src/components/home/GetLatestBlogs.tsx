@@ -30,7 +30,7 @@ const GetLatestBlogs = () => {
   if (fetchedBlogsCount === 0) {
     return (
       <div className="text-center w-full p-3 rounded-full bg-secondary mt-10">
-        <p>No Blogs found</p>
+        <p>No blogs found</p>
       </div>
     );
   }

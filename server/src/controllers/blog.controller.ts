@@ -176,12 +176,17 @@ const getLatestBlogs = async (req: Request, res: Response) => {
         $or: [
           { title: new RegExp(`${search}`, "i") },
           { description: new RegExp(`${search}`, "i") },
-          {
-            "authorDetails.personalInfo.fullname": new RegExp(`${search}`, "i"),
-          },
-          {
-            "authorDetails.personalInfo.username": new RegExp(`${search}`, "i"),
-          },
+          // Include fullname match only when 'authorId' is not provided
+          ...(authorId
+            ? []
+            : [
+                {
+                  "authorDetails.personalInfo.fullname": new RegExp(
+                    `${search}`,
+                    "i"
+                  ),
+                },
+              ]),
         ],
       }
     : {};

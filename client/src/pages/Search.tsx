@@ -33,7 +33,7 @@ const Search = () => {
 
         {!searchTerm && (
           <h1 className="text-lg md:text-2xl text-muted-foreground font-medium text-center py-10">
-            Search for articles, people and tags
+            Search for articles, people and more
           </h1>
         )}
       </section>
