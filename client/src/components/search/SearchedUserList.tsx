@@ -18,8 +18,8 @@ const SearchedUserList = ({ searchTerm }: Props) => {
   if (!users?.length)
     return (
       <div className="text-lg md:text-2xl text-muted-foreground font-medium text-center py-10 flex-center flex-col md:flex-row gap-2 md:gap-1">
-        <p>No results found.</p>
-        <p>Try new keyword or phrase.</p>
+        <p>No users found.</p>
+        <p>Try a different name.</p>
       </div>
     );
 

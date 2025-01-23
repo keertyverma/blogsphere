@@ -24,8 +24,8 @@ const SearchedBlogList = ({ searchTerm }: Props) => {
   if (fetchedBlogsCount === 0)
     return (
       <div className="text-lg md:text-2xl text-muted-foreground font-medium text-center py-10 flex-center flex-col md:flex-row gap-2 md:gap-1">
-        <p>No results found.</p>
-        <p>Try new keyword or phrase.</p>
+        <p>No blogs found.</p>
+        <p>Try a different topic, keyword or phrase.</p>
       </div>
     );
 
