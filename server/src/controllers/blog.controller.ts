@@ -4,6 +4,8 @@ import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 import { nanoid } from "nanoid";
+import escapeStringRegexp from "escape-string-regexp";
+
 import { Blog } from "../models/blog.model";
 import { Bookmark } from "../models/bookmark.model";
 import { Comment } from "../models/comment.model";
@@ -171,18 +173,21 @@ const getLatestBlogs = async (req: Request, res: Response) => {
     ...(tag && { tags: (tag as string).toLowerCase() }),
   };
 
-  const searchQuery: any = search
+  // Escape the search string to ensure it's safely used in a regular expression, preventing any special characters from causing errors
+  const safeSearchString = search ? escapeStringRegexp(search as string) : null;
+
+  const searchQuery: any = safeSearchString
     ? {
         $or: [
-          { title: new RegExp(`${search}`, "i") },
-          { description: new RegExp(`${search}`, "i") },
+          { title: new RegExp(`${safeSearchString}`, "i") },
+          { description: new RegExp(`${safeSearchString}`, "i") },
           // Include fullname match only when 'authorId' is not provided
           ...(authorId
             ? []
             : [
                 {
                   "authorDetails.personalInfo.fullname": new RegExp(
-                    `${search}`,
+                    `${safeSearchString}`,
                     "i"
                   ),
                 },

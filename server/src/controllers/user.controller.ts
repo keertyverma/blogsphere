@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
+import escapeStringRegexp from "escape-string-regexp";
 
 import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
@@ -99,11 +100,14 @@ export const getUsers = async (req: Request, res: Response) => {
 
   const max_limit = limit ? parseInt(limit as string) : 10;
 
+  // Escape the search string to ensure it's safely used in a regular expression, preventing any special characters from causing errors
+  const safeSearchString = search ? escapeStringRegexp(search as string) : null;
+
   const findQuery = {
-    ...(search && {
+    ...(safeSearchString && {
       $or: [
-        { "personalInfo.username": new RegExp(`${search}`, "i") },
-        { "personalInfo.fullname": new RegExp(`${search}`, "i") },
+        { "personalInfo.username": new RegExp(`${safeSearchString}`, "i") },
+        { "personalInfo.fullname": new RegExp(`${safeSearchString}`, "i") },
       ],
     }),
   };
