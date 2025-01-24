@@ -359,7 +359,7 @@ describe("/api/v1/blogs", () => {
         .map((blog) => blog.blogId);
       const pageSize = 1;
       const res = await request(server).get(
-        `${endpoint}?draft=false&page=2&pageSize=${pageSize}`
+        `${endpoint}?&page=2&pageSize=${pageSize}`
       );
 
       expect(res.statusCode).toBe(200);
@@ -369,7 +369,7 @@ describe("/api/v1/blogs", () => {
       // 'previous' must point to page-1
       const { count, previous, next, results } = res.body;
       expect(count).toBe(publishedBlogIds.length);
-      expect(previous).toMatch(/draft=false&page=1/i);
+      expect(previous).toMatch(/&page=1/i);
       expect(next).toBeNull();
       expect(results).toHaveLength(pageSize);
 
@@ -424,22 +424,6 @@ describe("/api/v1/blogs", () => {
       // blog with tag must be returned
       res.body.results.forEach((blog: IBlog) => {
         expect(blog.title).toContain(searchTerm);
-      });
-    });
-
-    it("should return all draft blogs", async () => {
-      const res = await request(server).get(`${endpoint}?draft=true`);
-
-      expect(res.statusCode).toBe(200);
-      const draftBlogIds = blogs
-        .filter((blog) => blog.isDraft === true)
-        .map((blog) => blog.blogId);
-
-      expect(res.body.results).toHaveLength(draftBlogIds.length);
-
-      // only draft blog must be returned
-      res.body.results.forEach((blog: IBlog) => {
-        expect(draftBlogIds.includes(blog.blogId)).toBe(true);
       });
     });
   });

@@ -3,7 +3,7 @@ import {
   createBlog,
   deleteBlogByBlogId,
   getBlogById,
-  getLatestBlogs,
+  getAllPublishedBlogs,
   updateBlogById,
   updateLike,
   updateReadCount,
@@ -13,7 +13,7 @@ import { verifyToken } from "../middlewares";
 export const blogRouter = Router();
 
 // public routes
-blogRouter.get("/", getLatestBlogs);
+blogRouter.get("/", getAllPublishedBlogs);
 blogRouter.get("/:blogId", getBlogById);
 
 // protected routes

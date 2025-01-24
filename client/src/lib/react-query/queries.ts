@@ -178,21 +178,19 @@ export const useCreateBlog = () => {
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
-      });
+
+      // TODO: add user draft blogs invalidate query
     },
   });
 };
 
-export const useGetLatestBlogs = (tag: string) =>
+export const useGetPublishedBlogs = (tag: string) =>
   useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, tag],
     queryFn: async ({ pageParam = 1 }) => {
       const params: IBlogQuery = {
-        draft: false,
         page: pageParam,
         pageSize: 10,
       };
@@ -240,7 +238,6 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
       await apiClient
         .get("/blogs", {
           params: {
-            draft: false,
             search: searchTerm,
             pageSize: 10,
             page: pageParam,
@@ -259,17 +256,15 @@ export const useGetSearchedBlogs = (searchTerm: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-export const useGetUserBlogs = (
+export const useGetUserPublishedBlogs = (
   authorId: string,
-  isDraft: boolean,
   searchTerm?: string
 ) =>
   useInfiniteQuery({
-    queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft, searchTerm }],
+    queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId, searchTerm }],
     queryFn: async ({ pageParam = 1 }) => {
       const params: IBlogQuery = {
         authorId,
-        draft: isDraft,
         pageSize: 10,
         page: pageParam,
       };
@@ -347,11 +342,9 @@ export const useUpdateBlog = () => {
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
-      });
+      // TODO: add user draft blogs invalidate query
     },
   });
 };
@@ -380,7 +373,7 @@ export const useLikePost = () => {
       }
 
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
     },
   });
@@ -400,11 +393,9 @@ export const useDeleteBlog = () => {
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: false }],
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BLOGS, { authorId, isDraft: true }],
-      });
+      // TODO: add user draft blogs invalidate query
 
       // refetch latest blog with or without tag filter
       queryClient.invalidateQueries({

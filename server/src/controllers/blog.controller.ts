@@ -133,7 +133,6 @@ const validateBlogQueryParams = (query: any) => {
     authorId: mongoIdValidator.objectId(),
     page: Joi.number(),
     pageSize: Joi.number(),
-    draft: Joi.boolean(),
   });
 
   const { error } = schema.validate(query);
@@ -144,7 +143,7 @@ const validateBlogQueryParams = (query: any) => {
   }
 };
 
-const getLatestBlogs = async (req: Request, res: Response) => {
+const getAllPublishedBlogs = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}`);
 
   // validate request query params
@@ -157,18 +156,13 @@ const getLatestBlogs = async (req: Request, res: Response) => {
     ordering,
     page = 1,
     pageSize = 10,
-    draft,
   } = req.query;
 
   const max_limit = parseInt(pageSize as string);
   const skip = (parseInt(page as string) - 1) * max_limit;
 
   const matchQuery: any = {
-    isDraft: draft
-      ? (draft as string).toLowerCase() === "true"
-        ? true
-        : false
-      : false,
+    isDraft: false,
     ...(authorId && { author: new Types.ObjectId(authorId as string) }),
     ...(tag && { tags: (tag as string).toLowerCase() }),
   };
@@ -252,7 +246,6 @@ const getLatestBlogs = async (req: Request, res: Response) => {
         "authorDetails.personalInfo.fullname": 1,
         "authorDetails.personalInfo.username": 1,
         "authorDetails.personalInfo.profileImage": 1,
-        isDraft: 1,
       },
     },
   ]);
@@ -498,7 +491,7 @@ export {
   createBlog,
   deleteBlogByBlogId,
   getBlogById,
-  getLatestBlogs,
+  getAllPublishedBlogs,
   updateBlogById,
   updateLike,
   updateReadCount,

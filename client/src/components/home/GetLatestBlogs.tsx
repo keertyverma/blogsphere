@@ -1,4 +1,4 @@
-import { useGetLatestBlogs } from "@/lib/react-query/queries";
+import { useGetPublishedBlogs } from "@/lib/react-query/queries";
 import { useEditorStore } from "@/store";
 import { IBlog } from "@/types";
 import React from "react";
@@ -11,7 +11,7 @@ import BlogPostCardSkeleton from "./BlogPostCardSkeleton";
 const GetLatestBlogs = () => {
   const selectedTag = useEditorStore((s) => s.selectedTag);
   const { data, isLoading, error, fetchNextPage, hasNextPage } =
-    useGetLatestBlogs(selectedTag);
+    useGetPublishedBlogs(selectedTag);
 
   if (isLoading) {
     return <BlogPostCardSkeleton />;

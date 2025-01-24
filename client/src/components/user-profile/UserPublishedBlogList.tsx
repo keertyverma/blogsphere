@@ -1,4 +1,4 @@
-import { useGetUserBlogs } from "@/lib/react-query/queries";
+import { useGetUserPublishedBlogs } from "@/lib/react-query/queries";
 import { IBlog } from "@/types";
 import React from "react";
 import BlogPostCard from "../home/BlogPostCard";
@@ -18,7 +18,7 @@ const UserPublishedBlogList = ({ authorId, searchTerm }: Props) => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useGetUserBlogs(authorId, false, searchTerm);
+  } = useGetUserPublishedBlogs(authorId, searchTerm);
 
   if (isLoading) return <BlogPostCardSkeleton />;
 
