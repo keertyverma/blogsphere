@@ -487,6 +487,132 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
+const _validateDraftBlogsQueryParams = (query: any) => {
+  const schema = Joi.object({
+    search: Joi.string().trim(),
+    page: Joi.number(),
+    pageSize: Joi.number(),
+  });
+
+  return schema.validate(query);
+};
+
+const getAllDraftBlogs = async (req: Request, res: Response) => {
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/drafts`);
+
+  // validate request query params
+  const { error, value: validatedReqQuery } = _validateDraftBlogsQueryParams(
+    req.query
+  );
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  const { id: authorId } = req.user as JwtPayload;
+  const { search = "", page = 1, pageSize = 10 } = validatedReqQuery;
+
+  // for pagination
+  const maxLimit = parseInt(pageSize as string);
+  const skip = (parseInt(page as string) - 1) * maxLimit;
+
+  const matchQuery = {
+    author: new Types.ObjectId(authorId as string),
+    isDraft: true,
+  };
+
+  // Escape the search string to ensure it's safely used in a regular expression, preventing any special characters from causing errors
+  const safeSearchString = search ? escapeStringRegexp(search) : "";
+  const searchQuery = safeSearchString
+    ? {
+        $or: [
+          { title: new RegExp(`${safeSearchString}`, "i") },
+          { description: new RegExp(`${safeSearchString}`, "i") },
+        ],
+      }
+    : {};
+
+  // Get total count of documents for pagination
+  const totalCount = await Blog.countDocuments({
+    ...matchQuery,
+    ...searchQuery,
+  });
+
+  const blogs = await Blog.aggregate([
+    {
+      $match: { ...matchQuery, ...searchQuery },
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+    {
+      $skip: skip,
+    },
+    {
+      $limit: maxLimit,
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "authorDetails",
+      },
+    },
+    {
+      $unwind: "$authorDetails",
+    },
+    {
+      $project: {
+        _id: 0,
+        blogId: 1,
+        title: 1,
+        description: 1,
+        coverImgURL: 1,
+        tags: 1,
+        activity: 1,
+        createdAt: 1,
+        "authorDetails.personalInfo.fullname": 1,
+        "authorDetails.personalInfo.username": 1,
+        "authorDetails.personalInfo.profileImage": 1,
+      },
+    },
+  ]);
+
+  const queryParams = new URLSearchParams(req.query as any);
+  queryParams.delete("page");
+  queryParams.delete("pageSize");
+
+  const baseUrlWithQuery = `${req.protocol}://${req.get("host")}${
+    req.baseUrl
+  }/drafts?${queryParams.toString()}`;
+
+  const nextPage =
+    skip + maxLimit < totalCount
+      ? `${baseUrlWithQuery}&page=${
+          parseInt(page as string) + 1
+        }&pageSize=${maxLimit}`
+      : null;
+  const previousPage =
+    skip > 0
+      ? `${baseUrlWithQuery}&page=${
+          parseInt(page as string) - 1
+        }&pageSize=${maxLimit}`
+      : null;
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    count: totalCount,
+    next: nextPage,
+    previous: previousPage,
+    results: blogs,
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
 export {
   createBlog,
   deleteBlogByBlogId,
@@ -495,4 +621,5 @@ export {
   updateBlogById,
   updateLike,
   updateReadCount,
+  getAllDraftBlogs,
 };

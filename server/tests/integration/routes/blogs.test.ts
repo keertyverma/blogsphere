@@ -25,12 +25,19 @@ const createUser = async () => {
 
 const createBlogs = async (userId: string) => {
   // draft blog
-  const draftBlog = {
-    blogId: "my-draft-blog-sub125bfjvj",
-    title: "My draft blog",
+  const draftBlog1 = {
+    blogId: "my-draft-1-blog-sub125bfjvj",
+    title: "My draft blog-1",
     author: userId,
     isDraft: true,
   };
+  const draftBlog2 = {
+    blogId: "my-draft-2-blog-random1234",
+    title: "My draft blog-2",
+    author: userId,
+    isDraft: true,
+  };
+
   // published blogs
   const publishedBlog1 = {
     isDraft: false,
@@ -90,7 +97,7 @@ const createBlogs = async (userId: string) => {
     },
   };
 
-  const blogs = [draftBlog, publishedBlog1, publishedBlog2];
+  const blogs = [draftBlog1, draftBlog2, publishedBlog1, publishedBlog2];
   await Blog.create(blogs);
   return blogs as IBlog[];
 };
@@ -517,10 +524,12 @@ describe("/api/v1/blogs", () => {
 
     it("should update read count of blog and user", async () => {
       token = user.generateAuthToken();
+      // get published blog
+      const [publishedBlog, ...rest] = blogs.filter((blog) => !blog.isDraft);
       const {
         blogId,
         activity: { totalReads: BlogTotalReads },
-      } = blogs[1];
+      } = publishedBlog;
       const UserTotalReads = user.accountInfo.totalReads;
 
       const res = await exec(blogId);
@@ -903,6 +912,115 @@ describe("/api/v1/blogs", () => {
       if (totalPost) {
         expect(author?.accountInfo.totalPosts).toBe(totalPost - 1);
       }
+    });
+  });
+
+  describe("GET /drafts", () => {
+    let blogs: IBlog[];
+    let user: any;
+
+    beforeAll(async () => {
+      user = await createUser();
+      blogs = await createBlogs(user.id);
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (queryParams?: string) => {
+      return await request(server)
+        .get(
+          queryParams
+            ? `${endpoint}/drafts?${queryParams}`
+            : `${endpoint}/drafts`
+        )
+        .set("Cookie", `authToken=${token}`);
+    };
+
+    it("should return Unauthorized-401 if user is not authorized", async () => {
+      // token cookie is not set
+      token = "";
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
+    });
+
+    it("Should return all the latest draft blogs for the authenticated author", async () => {
+      token = user.generateAuthToken();
+      const draftBlogIds = blogs
+        .filter((blog) => blog.isDraft === true && blog.author === user.id)
+        .map((blog) => blog.blogId);
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(200);
+      const { count, previous, next, results } = res.body;
+      console.log(res.body);
+
+      expect(count).toBe(draftBlogIds.length);
+      expect(previous).toBeNull();
+      expect(next).toBeNull();
+      expect(results).toHaveLength(draftBlogIds.length);
+
+      // only draft blog must be returned
+      results.forEach((blog: IBlog) => {
+        expect(draftBlogIds.includes(blog.blogId)).toBe(true);
+      });
+    });
+
+    it("should return draft blogs starting from page 2", async () => {
+      token = user.generateAuthToken();
+      const draftBlogIds = blogs
+        .filter((blog) => blog.isDraft === true && blog.author === user.id)
+        .map((blog) => blog.blogId);
+      const pageSize = 1;
+
+      const res = await exec(`page=2&pageSize=${pageSize}`);
+
+      expect(res.statusCode).toBe(200);
+
+      // total draft blog is 2 and if 'pageSize' is 1 then there will be 2 pages.
+      // page-2 will have 1 blog and there will be no more page so 'next = null'
+      // 'previous' must point to page-1
+      const { count, previous, next, results } = res.body;
+      expect(count).toBe(draftBlogIds.length);
+      expect(previous).toMatch(/&page=1/i);
+      expect(next).toBeNull();
+      expect(results).toHaveLength(pageSize);
+
+      // only draft blog must be returned
+      results.forEach((blog: IBlog) => {
+        expect(draftBlogIds.includes(blog.blogId)).toBe(true);
+      });
+    });
+
+    it("should return draft blogs matching the search query when the search parameter is provided", async () => {
+      token = user.generateAuthToken();
+      const [draftBlog1, ...rest] = blogs.filter(
+        (blog) => blog.isDraft === true && blog.author === user.id
+      );
+
+      // search draft blog by title
+      const searchTerm = draftBlog1.title;
+      const res = await exec(`search=${searchTerm}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.results.length).toBeGreaterThan(0);
+
+      // blog with tag must be returned
+      res.body.results.forEach((blog: IBlog) => {
+        expect(blog.title).toContain(searchTerm);
+      });
     });
   });
 });

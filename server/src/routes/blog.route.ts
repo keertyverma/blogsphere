@@ -7,18 +7,30 @@ import {
   updateBlogById,
   updateLike,
   updateReadCount,
+  getAllDraftBlogs,
 } from "../controllers/blog.controller";
 import { verifyToken } from "../middlewares";
 
 export const blogRouter = Router();
 
-// public routes
-blogRouter.get("/", getAllPublishedBlogs);
-blogRouter.get("/:blogId", getBlogById);
+/**
+ * Order matters here: Specific routes (e.g., /drafts) should be registered before Dynamic routes (e.g, /:blogId)
+ */
 
-// protected routes
-blogRouter.post("/", verifyToken, createBlog);
-blogRouter.patch("/:blogId", verifyToken, updateBlogById);
-blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount);
-blogRouter.patch("/:blogId/like", verifyToken, updateLike);
-blogRouter.delete("/:blogId", verifyToken, deleteBlogByBlogId);
+/**
+ * Protected Routes
+ * These routes require authentication.
+ */
+blogRouter.post("/", verifyToken, createBlog); // Create a new blog
+blogRouter.get("/drafts", verifyToken, getAllDraftBlogs); // Fetch all draft blogs for the authenticated user
+blogRouter.patch("/:blogId", verifyToken, updateBlogById); // Update a blog by its ID
+blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount); // Increment read count for a blog
+blogRouter.patch("/:blogId/like", verifyToken, updateLike); // Like or unlike a blog
+blogRouter.delete("/:blogId", verifyToken, deleteBlogByBlogId); // Delete a blog by its ID
+
+/**
+ * Public Routes
+ * These routes are accessible without authentication.
+ */
+blogRouter.get("/", getAllPublishedBlogs); // Fetch all published blogs
+blogRouter.get("/:blogId", getBlogById); // Fetch a specific blog by its ID
