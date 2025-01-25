@@ -180,8 +180,9 @@ export const useCreateBlog = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
-
-      // TODO: add user draft blogs invalidate query
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+      });
     },
   });
 };
@@ -291,6 +292,30 @@ export const useGetUserPublishedBlogs = (
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
+export const useGetUserDraftBlogs = (searchTerm?: string) =>
+  useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, searchTerm],
+    queryFn: async ({ pageParam = 1 }) =>
+      await apiClient
+        .get("/blogs/drafts", {
+          params: {
+            pageSize: 10,
+            page: pageParam,
+            ...(searchTerm ? { search: searchTerm } : {}),
+          },
+        })
+        .then((res) => res.data),
+    getNextPageParam: (lastPage, allPages) => {
+      // to get next page number
+      return lastPage.next ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
+    staleTime: ms("5m"),
+    gcTime: ms("10m"),
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });
+
 export const useGetBlog = (blogId?: string) =>
   useQuery<IBlog>({
     queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
@@ -344,7 +369,9 @@ export const useUpdateBlog = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
-      // TODO: add user draft blogs invalidate query
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+      });
     },
   });
 };
@@ -395,7 +422,9 @@ export const useDeleteBlog = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
-      // TODO: add user draft blogs invalidate query
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+      });
 
       // refetch latest blog with or without tag filter
       queryClient.invalidateQueries({

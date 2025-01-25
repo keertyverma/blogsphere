@@ -17,14 +17,16 @@ interface Props {
   showManageBlogButtons?: boolean;
   showReadCount?: boolean;
   showTimeAgo?: boolean;
+  isDraft?: boolean;
 }
 
 const BlogPostCard = ({
   content,
   author,
   showManageBlogButtons = false,
-  showReadCount = true,
+  showReadCount = false,
   showTimeAgo = false,
+  isDraft = false,
 }: Props) => {
   const {
     blogId: id,
@@ -34,7 +36,6 @@ const BlogPostCard = ({
     tags,
     createdAt: publishedAt,
     activity,
-    isDraft,
   } = content;
 
   const {

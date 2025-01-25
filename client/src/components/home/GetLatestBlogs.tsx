@@ -53,7 +53,6 @@ const GetLatestBlogs = () => {
                 content={blog}
                 author={blog.authorDetails}
                 showTimeAgo={true}
-                showReadCount={false}
               />
             </AnimationWrapper>
           ))}

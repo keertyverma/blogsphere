@@ -1,4 +1,4 @@
-import { useGetUserPublishedBlogs } from "@/lib/react-query/queries";
+import { useGetUserDraftBlogs } from "@/lib/react-query/queries";
 import { IBlog } from "@/types";
 import React from "react";
 import BlogPostCard from "../home/BlogPostCard";
@@ -10,7 +10,7 @@ interface Props {
   authorId: string;
   searchTerm?: string;
 }
-const UserDraftBlogList = ({ authorId, searchTerm }: Props) => {
+const UserDraftBlogList = ({ searchTerm }: Props) => {
   const {
     data,
     isLoading,
@@ -18,7 +18,7 @@ const UserDraftBlogList = ({ authorId, searchTerm }: Props) => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useGetUserPublishedBlogs(authorId, searchTerm);
+  } = useGetUserDraftBlogs(searchTerm);
 
   if (isLoading) return <BlogPostCardSkeleton />;
 
@@ -54,6 +54,7 @@ const UserDraftBlogList = ({ authorId, searchTerm }: Props) => {
                 content={blog}
                 author={blog.authorDetails}
                 showManageBlogButtons={true}
+                isDraft={true}
               />
             </AnimationWrapper>
           ))}
