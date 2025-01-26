@@ -384,7 +384,7 @@ export const useLikePost = () => {
     mutationFn: (blogId: string) =>
       apiClient.patch(`/blogs/${blogId}/like`).then((res) => res.data.result),
     onSuccess: (data) => {
-      const authorId = data.authorDetails;
+      const authorId = data.author;
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
       });

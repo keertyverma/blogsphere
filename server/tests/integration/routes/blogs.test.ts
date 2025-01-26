@@ -866,7 +866,11 @@ describe("/api/v1/blogs", () => {
 
       // blog must be removed from author blog list
       const author = await User.findById(_id);
-      expect(author?.blogs).not.toContain(draftBlog?.id);
+
+      // compare actual value of the ObjectId, not the object reference
+      expect(author?.blogs.map((id) => id.toString())).not.toContain(
+        draftBlog?._id.toString()
+      );
 
       // when draft blog is deleted then user total post must not change
       expect(author?.accountInfo.totalPosts).toBe(totalPost);
@@ -906,7 +910,10 @@ describe("/api/v1/blogs", () => {
 
       // blog must be removed from author blog list
       const author = await User.findById(_id);
-      expect(author?.blogs).not.toContain(publishedBlog?.id);
+      // compare actual value of the ObjectId, not the object reference
+      expect(author?.blogs.map((id) => id.toString())).not.toContain(
+        publishedBlog?._id.toString()
+      );
 
       // when published blog is deleted then user total post must be decrement by 1
       if (totalPost) {
@@ -955,7 +962,7 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("Should return all the latest draft blogs for the authenticated author", async () => {
+    it("should return all the latest draft blogs for the authenticated author", async () => {
       token = user.generateAuthToken();
       const draftBlogIds = blogs
         .filter((blog) => blog.isDraft === true && blog.author === user.id)
@@ -965,7 +972,6 @@ describe("/api/v1/blogs", () => {
 
       expect(res.statusCode).toBe(200);
       const { count, previous, next, results } = res.body;
-      console.log(res.body);
 
       expect(count).toBe(draftBlogIds.length);
       expect(previous).toBeNull();

@@ -25,15 +25,12 @@ const bookmarkSchema = new Schema(
   { timestamps: true }
 );
 
-// Customize 'toJSON' method to convert Map to plain object
-bookmarkSchema.set("toJSON", {
-  transform: (doc, ret) => {
-    if (ret.blogId) {
-      ret.blog = ret.blogId;
-      delete ret.blogId;
-    }
-    return ret;
-  },
+// Virtual field to populate the 'blog' associated with a bookmark
+bookmarkSchema.virtual("blog", {
+  ref: "Blog",
+  localField: "blogId",
+  foreignField: "_id",
+  justOne: true, // Each blog can have only one bookmark, so there's no need for an array.
 });
 
 const Bookmark = model<IBookmark>("Bookmark", bookmarkSchema);

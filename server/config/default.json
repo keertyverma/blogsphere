@@ -14,7 +14,7 @@
     "clientX509CertUrl": ""
   },
   "expiresIn": {
-    "authToken": "1d",
+    "authToken": "7d",
     "verificationToken": "1d",
     "resetPasswordToken": "1d"
   }

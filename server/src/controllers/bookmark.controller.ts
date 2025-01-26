@@ -126,18 +126,19 @@ export const getBookmarksForUser = async (req: Request, res: Response) => {
   // find user bookmarked blogs
   const bookmarks = await Bookmark.find(matchQuery)
     .populate({
-      path: "blogId",
+      path: "blog", // populate 'blogs' virtual field
+      select: "-_id -content -likes -updatedAt -__v",
       populate: {
-        path: "author",
+        path: "authorDetails",
         select:
           "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id",
       },
-      select: "-_id -content -likes -updatedAt -__v",
     })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(maxLimit)
-    .select("-__v -_id -createdAt -updatedAt");
+    .select("-__v -_id -createdAt -updatedAt")
+    .lean();
 
   // handle paginated response
   const queryParams = new URLSearchParams(req.query as any);

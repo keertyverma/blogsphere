@@ -72,18 +72,12 @@ const blogSchema = new Schema(
   { timestamps: true }
 );
 
-// Customize 'toJSON' method to convert Map to plain object
-blogSchema.set("toJSON", {
-  transform: (doc, ret) => {
-    if (ret.likes instanceof Map) {
-      ret.likes = Object.fromEntries(ret.likes);
-    }
-    if (ret.author) {
-      ret.authorDetails = ret.author;
-      delete ret.author;
-    }
-    return ret;
-  },
+// Virtual field to populate the 'authorDetails' for a blog
+blogSchema.virtual("authorDetails", {
+  ref: "User",
+  localField: "author",
+  foreignField: "_id",
+  justOne: true, // Each blog has only one author, so there's no need for an array.
 });
 
 const Blog = model<IBlog>("Blog", blogSchema);

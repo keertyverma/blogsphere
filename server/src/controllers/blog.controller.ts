@@ -214,11 +214,11 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
         from: "users",
         localField: "author",
         foreignField: "_id",
-        as: "authorDetails",
+        as: "authorDetails", // The joined data will be an array
       },
     },
     {
-      $unwind: "$authorDetails",
+      $unwind: "$authorDetails", // Flatten the array or extract the first element
     },
     {
       $match: searchQuery,
@@ -288,20 +288,22 @@ const getBlogById = async (req: Request, res: Response) => {
 
   const { blogId } = req.params;
   const blog = await Blog.findOne({ blogId })
-    .populate(
-      "author",
-      "personalInfo.fullname personalInfo.username personalInfo.profileImage _id"
-    )
+    .populate({
+      path: "authorDetails", //use the virtual 'authorDetails' to populates
+      select:
+        "_id personalInfo.fullname personalInfo.username personalInfo.profileImage",
+    })
     .select(
-      "blogId title description content coverImgURL tags activity createdAt likes isDraft _id"
-    );
+      "blogId title description content coverImgURL author tags activity createdAt likes isDraft _id"
+    )
+    .lean();
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    result: blog.toJSON(),
+    result: blog,
   };
 
   return res.status(data.statusCode).json(data);
@@ -320,16 +322,19 @@ const updateReadCount = async (req: Request, res: Response) => {
     { $inc: { "activity.totalReads": 1 } },
     { new: true }
   )
-    .populate("author", "personalInfo.fullname personalInfo.username -_id")
-    .select("blogId title activity createdAt -_id");
+    .populate({
+      path: "authorDetails", //use the virtual 'authorDetails' to populates
+      select:
+        "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id",
+    })
+    .select("blogId title author activity createdAt -_id")
+    .lean();
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
   // Increment total read count of user by 1
   const user = await User.findOneAndUpdate(
-    {
-      "personalInfo.username": blog.author.personalInfo.username,
-    },
+    { _id: blog.author },
     { $inc: { "accountInfo.totalReads": 1 } },
     { new: true }
   );
@@ -355,7 +360,7 @@ const updateBlogById = async (req: Request, res: Response) => {
 
   // get blog by blogId
   const { blogId } = req.params;
-  const blog = await Blog.findOne({ blogId });
+  const blog = await Blog.findOne({ blogId }).lean();
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
   const isDraft = Boolean(req.body.isDraft);
@@ -373,13 +378,15 @@ const updateBlogById = async (req: Request, res: Response) => {
       new: true,
     }
   )
-    .populate(
-      "author",
-      "personalInfo.fullname personalInfo.username personalInfo.profileImage _id"
-    )
+    .populate({
+      path: "authorDetails", //use the virtual 'authorDetails' to populates
+      select:
+        "personalInfo.fullname personalInfo.username personalInfo.profileImage",
+    })
     .select(
-      "blogId title description content coverImgURL tags activity createdAt isDraft -_id"
-    );
+      "blogId title description content author coverImgURL tags activity createdAt isDraft -_id"
+    )
+    .lean();
 
   // increment user total post count if draft blog is getting published
   if (blog.isDraft && !isDraft) {
@@ -450,17 +457,22 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
 
   // delete blog
   const deletedBlog = await Blog.findOneAndDelete({ blogId })
-    .populate("author", "personalInfo.fullname personalInfo.username _id")
-    .select("blogId title isDraft");
+    .populate({
+      path: "authorDetails", //use the virtual 'authorDetails' to populates
+      select:
+        "personalInfo.fullname personalInfo.username personalInfo.profileImage",
+    })
+    .select("blogId title isDraft author")
+    .lean();
 
   if (!deletedBlog)
     throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
-  const { id, author, isDraft } = deletedBlog;
+  const { _id: id, author, isDraft } = deletedBlog;
   // update author
   // - remove blog from author blogs list
   // - decrement total post count if published blog is deleted
-  const user = await User.findByIdAndUpdate(author.id, {
+  const user = await User.findByIdAndUpdate(author, {
     $inc: { "accountInfo.totalPosts": isDraft ? 0 : -1 },
     $pull: {
       blogs: id,
@@ -539,46 +551,22 @@ const getAllDraftBlogs = async (req: Request, res: Response) => {
     ...searchQuery,
   });
 
-  const blogs = await Blog.aggregate([
-    {
-      $match: { ...matchQuery, ...searchQuery },
-    },
-    {
-      $sort: { createdAt: -1 },
-    },
-    {
-      $skip: skip,
-    },
-    {
-      $limit: maxLimit,
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "author",
-        foreignField: "_id",
-        as: "authorDetails",
-      },
-    },
-    {
-      $unwind: "$authorDetails",
-    },
-    {
-      $project: {
-        _id: 0,
-        blogId: 1,
-        title: 1,
-        description: 1,
-        coverImgURL: 1,
-        tags: 1,
-        activity: 1,
-        createdAt: 1,
-        "authorDetails.personalInfo.fullname": 1,
-        "authorDetails.personalInfo.username": 1,
-        "authorDetails.personalInfo.profileImage": 1,
-      },
-    },
-  ]);
+  const blogs = await Blog.find({
+    ...matchQuery,
+    ...searchQuery,
+  })
+    .select(
+      "blogId title description author coverImgURL tags activity createdAt -_id"
+    )
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(maxLimit)
+    .populate({
+      path: "authorDetails", //use the virtual 'authorDetails' to populates
+      select:
+        "-_id personalInfo.fullname personalInfo.username personalInfo.profileImage",
+    })
+    .lean();
 
   const queryParams = new URLSearchParams(req.query as any);
   queryParams.delete("page");
