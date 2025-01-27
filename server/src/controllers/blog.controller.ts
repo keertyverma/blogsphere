@@ -283,11 +283,11 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
-const getBlogById = async (req: Request, res: Response) => {
+const getPublishedBlogById = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:blogId`);
 
   const { blogId } = req.params;
-  const blog = await Blog.findOne({ blogId })
+  const blog = await Blog.findOne({ blogId, isDraft: false })
     .populate({
       path: "authorDetails", //use the virtual 'authorDetails' to populates
       select:
@@ -604,7 +604,7 @@ const getAllDraftBlogs = async (req: Request, res: Response) => {
 export {
   createBlog,
   deleteBlogByBlogId,
-  getBlogById,
+  getPublishedBlogById,
   getAllPublishedBlogs,
   updateBlogById,
   updateLike,

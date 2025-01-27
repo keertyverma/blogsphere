@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createBlog,
   deleteBlogByBlogId,
-  getBlogById,
+  getPublishedBlogById,
   getAllPublishedBlogs,
   updateBlogById,
   updateLike,
@@ -33,4 +33,4 @@ blogRouter.delete("/:blogId", verifyToken, deleteBlogByBlogId); // Delete a blog
  * These routes are accessible without authentication.
  */
 blogRouter.get("/", getAllPublishedBlogs); // Fetch all published blogs
-blogRouter.get("/:blogId", getBlogById); // Fetch a specific blog by its ID
+blogRouter.get("/:blogId", getPublishedBlogById); // Fetch a specific blog by its ID

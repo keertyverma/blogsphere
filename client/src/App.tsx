@@ -13,7 +13,7 @@ import ScrollToTopOnNavigate from "./components/shared/ScrollToTopOnNavigate";
 import CustomCloseButton from "./components/ui/custom-toastify-close-button";
 import { useAxiosInterceptors } from "./lib/api-client";
 import { usePingServer } from "./lib/react-query/queries";
-import BlogPage from "./pages/BlogPage";
+import PublishedBlogPage from "./pages/PublishedBlogPage";
 import Bookmarks from "./pages/Bookmarks";
 import Editor from "./pages/Editor";
 import EmailVerify from "./pages/EmailVerify";
@@ -40,7 +40,7 @@ const App = () => {
           <Route path="login" element={<LoginForm />} />
           <Route path="search" element={<Search />} />
           <Route path="user/:username" element={<UserProfile />} />
-          <Route path="blogs/:blogId" element={<BlogPage />} />
+          <Route path="blogs/:blogId" element={<PublishedBlogPage />} />
           <Route path="settings" element={<SideNavbar />}>
             <Route path="edit-profile" element={<EditProfile />} />
             <Route path="change-password" element={<ChangePassword />} />
@@ -57,6 +57,7 @@ const App = () => {
           path="/resend-verification-link"
           element={<ResendVerification />}
         />
+        <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 

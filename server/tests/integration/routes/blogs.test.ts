@@ -461,15 +461,23 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return blog for given valid blogId", async () => {
-      const existingBlog = blogs[0];
-      const blogId = existingBlog.blogId;
+    it("should return published blog for given valid blogId", async () => {
+      const publishedBlog = blogs.filter((blog) => !blog.isDraft)[0];
+      const blogId = publishedBlog.blogId;
       const res = await request(server).get(`${endpoint}/${blogId}`);
 
       expect(res.statusCode).toBe(200);
       const { title, blogId: id } = res.body.result;
       expect(id).toBe(blogId);
-      expect(title).toBe(existingBlog.title);
+      expect(title).toBe(publishedBlog.title);
+    });
+
+    it("should not return draft blog", async () => {
+      const draftBlog = blogs.filter((blog) => blog.isDraft)[0];
+      const blogId = draftBlog.blogId;
+      const res = await request(server).get(`${endpoint}/${blogId}`);
+
+      expect(res.statusCode).toBe(404);
     });
   });
 

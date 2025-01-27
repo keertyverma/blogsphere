@@ -6,8 +6,9 @@ import { formatDate, handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import BlogNotFound from "./BlogNotFound";
 
-const BlogPage = () => {
+const PublishedBlogPage = () => {
   const { blogId } = useParams();
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -15,30 +16,41 @@ const BlogPage = () => {
   const updateReads = useUpdateReads();
 
   useEffect(() => {
-    // Check if read count has already been updated for this blog in the current session
-    const readCountKey = `hasUpdatedReadCount_${blogId}`;
-    const hasUpdatedReadCount = sessionStorage.getItem(readCountKey);
-    // update read count for authenticated users
-    if (isAuthenticated && blogId && !hasUpdatedReadCount) {
-      updateReads.mutate(blogId);
-      sessionStorage.setItem(readCountKey, "true"); // Set the flag after updating read count
+    // Check if blogId is valid and if the read count has already been updated for this blog in the current session
+
+    if (blogId) {
+      const readCountKey = `hasUpdatedReadCount_${blogId}`;
+      const hasUpdatedReadCount = sessionStorage.getItem(readCountKey);
+
+      // Update read count for authenticated users only if it hasn't been updated in this session
+      if (isAuthenticated && !hasUpdatedReadCount) {
+        updateReads.mutate(blogId);
+        sessionStorage.setItem(readCountKey, "true"); // Set the flag after updating the read count
+      }
     }
   }, [isAuthenticated, blogId]);
+
+  useEffect(() => {
+    if (blogId) {
+      document.title = blogId; // Set the title of the browser tab
+    }
+  }, [blogId]);
 
   if (!blogId) return null;
 
   if (isLoading) return <BlogPageSkeleton />;
 
-  if (error) console.error(error);
+  if (error) {
+    console.error("Error fetching blog data", {
+      message: error.message,
+      stack: error.stack,
+      blogId: blogId,
+    });
+  }
 
-  if (!blog)
-    return (
-      <section>
-        <div className="text-lg md:text-2xl text-muted-foreground font-medium text-center py-10 flex-center flex-col md:flex-row gap-2 md:gap-1">
-          <p>No blog found.</p>
-        </div>
-      </section>
-    );
+  if (!blog) {
+    return <BlogNotFound />;
+  }
 
   const {
     _id,
@@ -118,4 +130,4 @@ const BlogPage = () => {
   );
 };
 
-export default BlogPage;
+export default PublishedBlogPage;
