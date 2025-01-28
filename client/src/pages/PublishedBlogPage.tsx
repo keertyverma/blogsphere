@@ -30,12 +30,6 @@ const PublishedBlogPage = () => {
     }
   }, [isAuthenticated, blogId]);
 
-  useEffect(() => {
-    if (blogId) {
-      document.title = blogId; // Set the title of the browser tab
-    }
-  }, [blogId]);
-
   if (!blogId) return null;
 
   if (isLoading) return <BlogPageSkeleton />;

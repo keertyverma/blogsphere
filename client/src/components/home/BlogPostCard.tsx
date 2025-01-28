@@ -42,6 +42,7 @@ const BlogPostCard = ({
     personalInfo: { fullname, username, profileImage },
   } = author;
   const user = useAuthStore((s) => s.user);
+  const blogPageUrl = isDraft ? `/blogs/drafts/${id}` : `/blogs/${id}`;
 
   return (
     <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 pt-0 md:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
@@ -74,7 +75,7 @@ const BlogPostCard = ({
           )}
         </div>
 
-        <Link to={`/blogs/${id}`}>
+        <Link to={blogPageUrl}>
           <div className="w-full flex flex-row gap-2 sm:gap-3 md:gap-6 justify-between">
             <div className="flex-1">
               <h1 className="blog-title">{title}</h1>

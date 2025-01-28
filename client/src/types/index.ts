@@ -72,6 +72,7 @@ export interface IBlog {
   coverImgURL: string;
   description: string;
   tags: string[];
+  author?: string;
   authorDetails: IAuthor;
   content: OutputData;
   createdAt?: string; //timestamp

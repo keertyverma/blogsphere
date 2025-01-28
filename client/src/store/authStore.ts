@@ -11,7 +11,7 @@ interface AuthStore {
   setUserAuth: (user: IUser) => void;
   clearUserAuth: () => void;
   setTokenExpired: (expired: boolean) => void;
-  setRedirectedUrl: (url: string) => void;
+  setRedirectedUrl: (url: string | null) => void;
   clearRedirectedUrl: () => void;
 }
 

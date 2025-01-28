@@ -330,6 +330,20 @@ export const useGetBlog = (blogId?: string) =>
     enabled: !!blogId, // Query only runs if blogId is truthy
   });
 
+export const useGetDraftBlog = (blogId?: string) =>
+  useQuery<IBlog>({
+    queryKey: [QUERY_KEYS.GET_DRAFT_BLOG_BY_ID, blogId],
+    queryFn: () =>
+      apiClient
+        .get<IBlog>(`/blogs/drafts/${blogId}`)
+        .then((res) => (res.data as unknown as IFetchResponse).result),
+    staleTime: ms("10m"),
+    gcTime: ms("30m"),
+    refetchOnMount: true, // Refetch on component mount to get updated draft blog after edit
+    refetchOnReconnect: true, // Refetch on network reconnect
+    enabled: !!blogId, // Query only runs if blogId is truthy
+  });
+
 export const useUpdateReads = () =>
   useMutation({
     mutationFn: (blogId: string) =>

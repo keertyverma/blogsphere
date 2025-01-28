@@ -13,13 +13,14 @@ import ScrollToTopOnNavigate from "./components/shared/ScrollToTopOnNavigate";
 import CustomCloseButton from "./components/ui/custom-toastify-close-button";
 import { useAxiosInterceptors } from "./lib/api-client";
 import { usePingServer } from "./lib/react-query/queries";
-import PublishedBlogPage from "./pages/PublishedBlogPage";
 import Bookmarks from "./pages/Bookmarks";
+import DraftBlogPage from "./pages/DraftBlogPage";
 import Editor from "./pages/Editor";
 import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
+import PublishedBlogPage from "./pages/PublishedBlogPage";
 import ResendVerification from "./pages/ResendVerification";
 import ResetPassword from "./pages/ResetPassword";
 import UserProfile from "./pages/UserProfile";
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="login" element={<LoginForm />} />
           <Route path="search" element={<Search />} />
           <Route path="user/:username" element={<UserProfile />} />
+          <Route path="blogs/drafts/:blogId" element={<DraftBlogPage />} />
           <Route path="blogs/:blogId" element={<PublishedBlogPage />} />
           <Route path="settings" element={<SideNavbar />}>
             <Route path="edit-profile" element={<EditProfile />} />

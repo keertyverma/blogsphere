@@ -4,7 +4,7 @@ import { useAuthStore } from "@/store";
 import { IoBookmarksOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuUserCircle } from "react-icons/lu";
 import { MdLogout } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import { Button } from "../ui/button";
@@ -21,13 +21,17 @@ import {
 const UserNavigationPanel = () => {
   const authUser = useAuthStore((s) => s.user);
   const clearUserAuth = useAuthStore((s) => s.clearUserAuth);
+  const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
   const { data: user, isLoading, error } = useGetUser(authUser.username);
   const { mutateAsync: logout } = useLogout();
+  const navigate = useNavigate();
 
   const logoutUser = async () => {
     try {
       await logout();
       clearUserAuth();
+      setRedirectedUrl(null);
+      return navigate("/login");
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
         toast.error("An error occurred. Please try again later.");

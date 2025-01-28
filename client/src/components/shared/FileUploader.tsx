@@ -63,7 +63,7 @@ const FileUploader = ({ onUpload }: Props) => {
   return (
     <div
       {...getRootProps()}
-      className="flex flex-center bg-header flex-col rounded-xl cursor-pointer"
+      className="flex flex-center bg-header flex-col cursor-pointer"
     >
       <input
         {...getInputProps()}
