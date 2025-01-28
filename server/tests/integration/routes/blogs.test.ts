@@ -5,13 +5,13 @@ import request from "supertest";
 
 import appServer from "../../../src";
 import { Blog, IBlog } from "../../../src/models/blog.model";
-import { User } from "../../../src/models/user.model";
+import { IUserDocument, User } from "../../../src/models/user.model";
 
 let server: http.Server;
 let endpoint: string = `/api/v1/blogs`;
 
-const createUser = async () => {
-  const user = await User.create({
+const createUsers = async () => {
+  const user1 = await User.create({
     personalInfo: {
       fullname: "Mickey Mouse",
       password: "Clubhouse12",
@@ -20,7 +20,19 @@ const createUser = async () => {
       profileImage: "http://example-img.png",
     },
   });
-  return user;
+
+  const user2 = await User.create({
+    personalInfo: {
+      fullname: "Donald Duck",
+      password: "Letsgo1234",
+      email: "donald@test.com",
+      username: "donald",
+      profileImage: "http://example-img2.png",
+    },
+  });
+
+  const users: IUserDocument[] = [user1, user2];
+  return users;
 };
 
 const createBlogs = async (userId: string) => {
@@ -137,7 +149,7 @@ describe("/api/v1/blogs", () => {
       token = user.generateAuthToken();
     });
 
-    it("should return UnAuthorized-401 if user is not authorized", async () => {
+    it("should return Unauthorized-401 if user is not authorized", async () => {
       // token cookie is not set
       token = "";
 
@@ -331,7 +343,7 @@ describe("/api/v1/blogs", () => {
     let blogs: IBlog[];
 
     beforeAll(async () => {
-      const user = await createUser();
+      const [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
@@ -439,7 +451,7 @@ describe("/api/v1/blogs", () => {
     let blogs: IBlog[];
 
     beforeAll(async () => {
-      const user = await createUser();
+      const [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
@@ -449,7 +461,7 @@ describe("/api/v1/blogs", () => {
       await Blog.deleteMany({});
     });
 
-    it("should return 404-NotFound if blog with given blogId is not found", async () => {
+    it("should return 404-NotFound if published blog with given blogId is not found", async () => {
       const blogId = "invalid-blog-id";
       const res = await request(server).get(`${endpoint}/${blogId}`);
 
@@ -483,10 +495,10 @@ describe("/api/v1/blogs", () => {
 
   describe("PATCH /:blogId/readCount", () => {
     let blogs: IBlog[];
-    let user: any;
+    let user: IUserDocument;
 
     beforeAll(async () => {
-      user = await createUser();
+      [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
@@ -503,7 +515,7 @@ describe("/api/v1/blogs", () => {
         .set("Cookie", `authToken=${token}`);
     };
 
-    it("should return UnAuthorized-401 if user is not authorized", async () => {
+    it("should return Unauthorized-401 if user is not authorized", async () => {
       // token cookie is not set
       token = "";
 
@@ -559,10 +571,10 @@ describe("/api/v1/blogs", () => {
 
   describe("PATCH /:blogId", () => {
     let blogs: IBlog[];
-    let user: any;
+    let user: IUserDocument;
 
     beforeAll(async () => {
-      user = await createUser();
+      [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
@@ -580,7 +592,7 @@ describe("/api/v1/blogs", () => {
         .set("Cookie", `authToken=${token}`);
     };
 
-    it("should return UnAuthorized-401 if user is not authorized", async () => {
+    it("should return Unauthorized-401 if user is not authorized", async () => {
       // token cookie is not set
       token = "";
 
@@ -699,10 +711,10 @@ describe("/api/v1/blogs", () => {
 
   describe("PATCH /:blogId/like", () => {
     let blogs: IBlog[];
-    let user: any;
+    let user: IUserDocument;
 
     beforeAll(async () => {
-      user = await createUser();
+      [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
@@ -719,7 +731,7 @@ describe("/api/v1/blogs", () => {
         .set("Cookie", `authToken=${token}`);
     };
 
-    it("should return UnAuthorized-401 if user is not authorized", async () => {
+    it("should return Unauthorized-401 if user is not authorized", async () => {
       // token cookie is not set
       token = "";
 
@@ -794,10 +806,10 @@ describe("/api/v1/blogs", () => {
 
   describe("DELETE /:blogId", () => {
     let blogs: IBlog[];
-    let user: any;
+    let user: IUserDocument;
 
     beforeAll(async () => {
-      user = await createUser();
+      [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
@@ -814,7 +826,7 @@ describe("/api/v1/blogs", () => {
         .set("Cookie", `authToken=${token}`);
     };
 
-    it("should return UnAuthorized-401 if user is not authorized", async () => {
+    it("should return Unauthorized-401 if user is not authorized", async () => {
       // token cookie is not set
       token = "";
 
@@ -932,10 +944,10 @@ describe("/api/v1/blogs", () => {
 
   describe("GET /drafts", () => {
     let blogs: IBlog[];
-    let user: any;
+    let user: IUserDocument;
 
     beforeAll(async () => {
-      user = await createUser();
+      [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
@@ -1035,6 +1047,86 @@ describe("/api/v1/blogs", () => {
       res.body.results.forEach((blog: IBlog) => {
         expect(blog.title).toContain(searchTerm);
       });
+    });
+  });
+
+  describe("GET /drafts/:blogId", () => {
+    let blogs: IBlog[];
+    let user1: IUserDocument;
+    let user2: IUserDocument;
+
+    beforeAll(async () => {
+      [user1, user2] = await createUsers();
+      blogs = await createBlogs(user1.id);
+    });
+
+    afterAll(async () => {
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (blogId: string) => {
+      return await request(server)
+        .get(`${endpoint}/drafts/${blogId}`)
+        .set("Cookie", `authToken=${token}`);
+    };
+
+    it("should return Unauthorized-401 if user is not authorized", async () => {
+      // token cookie is not set
+      token = "";
+
+      const res = await exec("invalid-blogId");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
+    });
+
+    it("should return 404-NotFound if draft blog with given blogId is not found", async () => {
+      token = user1.generateAuthToken();
+      const blogId = "invalid-blog-id";
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `No blog found with blogId = ${blogId}`,
+      });
+    });
+
+    it("should return 403 Forbidden when a draft blog is accessed by a non-author", async () => {
+      token = user2.generateAuthToken();
+      const draftBlog = blogs.filter((blog) => blog.isDraft)[0];
+      const blogId = draftBlog.blogId;
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details: "This draft blog can only be accessed by its author.",
+      });
+    });
+
+    it("should return draft blog for given valid blogId and author", async () => {
+      token = user1.generateAuthToken();
+      const draftBlog = blogs.filter((blog) => blog.isDraft)[0];
+      const blogId = draftBlog.blogId;
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(200);
+      const { title, blogId: id } = res.body.result;
+      expect(id).toBe(blogId);
+      expect(title).toBe(draftBlog.title);
     });
   });
 });

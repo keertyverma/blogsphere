@@ -276,4 +276,4 @@ const getRandomProfileImage = (): string => {
 
   return `https://api.dicebear.com/8.x/${randomCollection}/svg?seed=${randomImageName}`;
 };
-export { IUser, User, validateUser };
+export { IUser, IUserDocument, User, validateUser };

@@ -601,6 +601,41 @@ const getAllDraftBlogs = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
+const getDraftBlogById = async (req: Request, res: Response) => {
+  logger.debug(
+    `${req.method} Request on Route -> ${req.baseUrl}/drafts/:blogId`
+  );
+
+  const { id: userId } = req.user as JwtPayload;
+  const { blogId } = req.params;
+
+  // fetch the draft blog
+  const draftBlog = await Blog.findOne({ blogId, isDraft: true })
+    .select(
+      "_id blogId title description content coverImgURL author tags createdAt"
+    )
+    .lean();
+
+  if (!draftBlog)
+    throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  // Ensure that only the blog author can access the draft blog
+  if (draftBlog.author.toString() !== userId) {
+    throw new CustomAPIError(
+      "This draft blog can only be accessed by its author.",
+      StatusCodes.FORBIDDEN
+    );
+  }
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    result: draftBlog,
+  };
+
+  return res.status(data.statusCode).json(data);
+};
+
 export {
   createBlog,
   deleteBlogByBlogId,
@@ -610,4 +645,5 @@ export {
   updateLike,
   updateReadCount,
   getAllDraftBlogs,
+  getDraftBlogById,
 };

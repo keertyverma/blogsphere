@@ -8,6 +8,7 @@ import {
   updateLike,
   updateReadCount,
   getAllDraftBlogs,
+  getDraftBlogById,
 } from "../controllers/blog.controller";
 import { verifyToken } from "../middlewares";
 
@@ -23,6 +24,7 @@ export const blogRouter = Router();
  */
 blogRouter.post("/", verifyToken, createBlog); // Create a new blog
 blogRouter.get("/drafts", verifyToken, getAllDraftBlogs); // Fetch all draft blogs for the authenticated user
+blogRouter.get("/drafts/:blogId", verifyToken, getDraftBlogById);
 blogRouter.patch("/:blogId", verifyToken, updateBlogById); // Update a blog by its ID
 blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount); // Increment read count for a blog
 blogRouter.patch("/:blogId/like", verifyToken, updateLike); // Like or unlike a blog
