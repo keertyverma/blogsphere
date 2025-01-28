@@ -4,26 +4,16 @@ import ManageBlog from "@/components/blog/ManageBlog";
 import { useGetDraftBlog } from "@/lib/react-query/queries";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
-import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import BlogNotFound from "./BlogNotFound";
 
 const DraftBlogPage = () => {
   const { blogId } = useParams();
-
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
 
   const { data: blog, isLoading, error } = useGetDraftBlog(blogId);
-
-  useEffect(() => {
-    // If the user is not authenticated and attempts to access the draft blog page, prompt them to log in.
-    if (blogId && !isAuthenticated) {
-      return navigate("/login");
-    }
-  }, [isAuthenticated, blogId]);
 
   if (!blogId) return null;
 
@@ -41,9 +31,11 @@ const DraftBlogPage = () => {
       }
     }
 
-    if (!useAuthStore.getState().isTokenExpired) {
-      toast.error("An error occurred. Please try again later.");
-    }
+    console.error("Error fetching draft blog data", {
+      message: error.message,
+      stack: error.stack,
+      blogId: blogId,
+    });
   }
 
   if (!blog) {

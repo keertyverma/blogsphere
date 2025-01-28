@@ -6,6 +6,7 @@ import Search from "./pages/Search";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ChangePassword from "./components/settings/ChangePassword";
 import EditProfile from "./components/settings/EditProfile";
 import SideNavbar from "./components/settings/SideNavbar";
@@ -41,7 +42,14 @@ const App = () => {
           <Route path="login" element={<LoginForm />} />
           <Route path="search" element={<Search />} />
           <Route path="user/:username" element={<UserProfile />} />
-          <Route path="blogs/drafts/:blogId" element={<DraftBlogPage />} />
+          <Route
+            path="blogs/drafts/:blogId"
+            element={
+              <ProtectedRoute>
+                <DraftBlogPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="blogs/:blogId" element={<PublishedBlogPage />} />
           <Route path="settings" element={<SideNavbar />}>
             <Route path="edit-profile" element={<EditProfile />} />
