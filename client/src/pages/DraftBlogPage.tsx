@@ -33,6 +33,12 @@ const DraftBlogPage = () => {
     }
   }, [error, navigate]);
 
+  useEffect(() => {
+    if (blog && blog.title) {
+      document.title = blog.title; // Set blog page title
+    }
+  }, [blog]);
+
   if (!blogId) return null;
 
   if (isLoading) return <BlogPageSkeleton />;

@@ -2,7 +2,7 @@ import BlogContent from "@/components/blog/BlogContent";
 import BlogInteraction from "@/components/blog/BlogInteraction";
 import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
-import { formatDate, handleProfileImgErr } from "@/lib/utils";
+import { capitalize, formatDate, handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useEffect } from "react";
@@ -43,6 +43,20 @@ const PublishedBlogPage = () => {
       }
     }
   }, [error]);
+
+  useEffect(() => {
+    if (blog) {
+      const {
+        title,
+        authorDetails: {
+          personalInfo: { fullname: authorName },
+        },
+      } = blog;
+
+      document.title = `${title} | by ${capitalize(authorName)} | BlogSphere`;
+      // Set blog page title
+    }
+  }, [blog]);
 
   if (!blogId) return null;
 
