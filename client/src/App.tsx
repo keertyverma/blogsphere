@@ -42,6 +42,14 @@ const App = () => {
           <Route path="login" element={<LoginForm />} />
           <Route path="search" element={<Search />} />
           <Route path="user/:username" element={<UserProfile />} />
+          <Route path="settings" element={<SideNavbar />}>
+            <Route path="edit-profile" element={<EditProfile />} />
+            <Route path="change-password" element={<ChangePassword />} />
+          </Route>
+          <Route path="bookmarks" element={<Bookmarks />} />
+
+          {/* Explicitly handle the /blogs/drafts route to prevent any conflicts with the dynamic /blogs/:blogId route. */}
+          <Route path="blogs/drafts" element={<ErrorPage />} />
           <Route
             path="blogs/drafts/:blogId"
             element={
@@ -51,11 +59,6 @@ const App = () => {
             }
           />
           <Route path="blogs/:blogId" element={<PublishedBlogPage />} />
-          <Route path="settings" element={<SideNavbar />}>
-            <Route path="edit-profile" element={<EditProfile />} />
-            <Route path="change-password" element={<ChangePassword />} />
-          </Route>
-          <Route path="bookmarks" element={<Bookmarks />} />
         </Route>
 
         <Route path="/editor" element={<Editor />} />
@@ -67,7 +70,6 @@ const App = () => {
           path="/resend-verification-link"
           element={<ResendVerification />}
         />
-        <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 
