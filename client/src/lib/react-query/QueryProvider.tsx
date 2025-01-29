@@ -7,11 +7,13 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error) => {
-        // Do not retry if rate limit is hit
-        if (isAxiosError(error) && error.response?.status === 429) {
+        // Skip retry for client errors -> 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden), 404 (Not Found), and 429 (Rate Limit Exceeded)
+        const statusCode = isAxiosError(error) ? error.response?.status : null;
+        if (statusCode && [400, 401, 403, 404, 429].includes(statusCode)) {
           return false;
         }
-        return failureCount < 1; // Retry only twice
+
+        return failureCount < 1; // Retry once (1 initial request + 1 retry -> 2 total attempts)
       },
       refetchOnReconnect: true, // Refetch on network reconnect
       refetchOnWindowFocus: false, // No need to refetch on window focus

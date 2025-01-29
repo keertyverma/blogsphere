@@ -4,6 +4,7 @@ import ManageBlog from "@/components/blog/ManageBlog";
 import { useGetDraftBlog } from "@/lib/react-query/queries";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import BlogNotFound from "./BlogNotFound";
@@ -15,20 +16,30 @@ const DraftBlogPage = () => {
 
   const { data: blog, isLoading, error } = useGetDraftBlog(blogId);
 
+  useEffect(() => {
+    if (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 403) {
+          toast.error("You do not have permission to view this draft.");
+          // Redirect to the home page and prevent going back to the denied draft page.
+          // This replaces the current entry in the history stack, so the user cannot navigate back to it.
+          navigate("/", { replace: true });
+        } else if (error.code === "ERR_NETWORK") {
+          toast.error("An error occurred. Please try again later.");
+        }
+      } else {
+        toast.error("An unknown error occurred.");
+      }
+    }
+  }, [error, navigate]);
+
   if (!blogId) return null;
 
   if (isLoading) return <BlogPageSkeleton />;
 
   if (error) {
-    if (error instanceof AxiosError && error.response) {
-      const {
-        response: { status },
-      } = error;
-
-      if (status === 403) {
-        toast.error("You do not have permission to view this draft.");
-        navigate("/");
-      }
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      return <BlogNotFound />;
     }
 
     console.error("Error fetching draft blog data", {
@@ -38,9 +49,7 @@ const DraftBlogPage = () => {
     });
   }
 
-  if (!blog) {
-    return <BlogNotFound />;
-  }
+  if (!blog) return null;
 
   const { title, coverImgURL, content, author } = blog;
 

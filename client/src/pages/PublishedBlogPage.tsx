@@ -4,8 +4,10 @@ import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
 import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
 import { formatDate, handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
+import { AxiosError } from "axios";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import BlogNotFound from "./BlogNotFound";
 
 const PublishedBlogPage = () => {
@@ -30,11 +32,27 @@ const PublishedBlogPage = () => {
     }
   }, [isAuthenticated, blogId]);
 
+  useEffect(() => {
+    if (error) {
+      if (error instanceof AxiosError) {
+        if (error.code === "ERR_NETWORK") {
+          toast.error("An error occurred. Please try again later.");
+        }
+      } else {
+        toast.error("An unknown error occurred.");
+      }
+    }
+  }, [error]);
+
   if (!blogId) return null;
 
   if (isLoading) return <BlogPageSkeleton />;
 
   if (error) {
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      return <BlogNotFound />;
+    }
+
     console.error("Error fetching blog data", {
       message: error.message,
       stack: error.stack,
@@ -42,9 +60,7 @@ const PublishedBlogPage = () => {
     });
   }
 
-  if (!blog) {
-    return <BlogNotFound />;
-  }
+  if (!blog) return null;
 
   const {
     _id,
