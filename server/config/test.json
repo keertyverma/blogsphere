@@ -7,5 +7,9 @@
     "authToken": "2s",
     "verificationToken": "2s",
     "resetPasswordToken": "2s"
+  },
+  "rateLimiter": {
+    "globalMaxRequestsPerHour": 5000,
+    "resendEmailMaxRequestsPerHour": 50
   }
 }

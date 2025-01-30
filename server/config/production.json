@@ -7,5 +7,9 @@
     "authToken": "7d",
     "verificationToken": "1d",
     "resetPasswordToken": "1d"
+  },
+  "rateLimiter": {
+    "globalMaxRequestsPerHour": 1000,
+    "resendEmailMaxRequestsPerHour": 5
   }
 }

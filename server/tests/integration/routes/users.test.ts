@@ -363,6 +363,7 @@ describe("/api/v1/users", () => {
           email: "test@test.com",
           password: hashedPassword,
         },
+        isVerified: true,
       });
       const loginRes = await request(server).post(`/api/v1/auth`).send({
         email: user.personalInfo.email,
@@ -399,6 +400,7 @@ describe("/api/v1/users", () => {
           email: "test@test.com",
           password: hashedPassword,
         },
+        isVerified: true,
       });
       const loginRes = await request(server).post(`/api/v1/auth`).send({
         email: user.personalInfo.email,
