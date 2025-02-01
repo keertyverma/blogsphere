@@ -353,18 +353,22 @@ describe("/api/v1/blogs", () => {
       await Blog.deleteMany({});
     });
 
-    it("should return all latest published blogs from first page", async () => {
+    it("should return the latest published blogs within the specified limit and set nextCursor for pagination", async () => {
       const publishedBlogIds = blogs
         .filter((blog) => blog.isDraft === false)
         .map((blog) => blog.blogId);
-      const res = await request(server).get(`${endpoint}`);
+      const limit = 1;
+      const res = await request(server).get(`${endpoint}?limit=${limit}`);
 
       expect(res.statusCode).toBe(200);
-      const { count, previous, next, results } = res.body;
-      expect(count).toBe(publishedBlogIds.length);
-      expect(previous).toBeNull();
-      expect(next).toBeNull();
-      expect(results).toHaveLength(publishedBlogIds.length);
+      const { nextCursor, results } = res.body;
+      // Ensure `nextCursor` is passed
+      expect(nextCursor).not.toBeNull();
+      const lastBlog = results[limit - 1];
+      expect(nextCursor).toBe(`${lastBlog.createdAt}_${lastBlog._id}`);
+
+      // results count is same as limit
+      expect(results.length).toBe(limit);
 
       // only published blog must be returned
       results.forEach((blog: IBlog) => {
@@ -372,25 +376,49 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return published blogs from page 2", async () => {
+    it("should not return any blogs if nextCursor is invalid for pagination", async () => {
       const publishedBlogIds = blogs
         .filter((blog) => blog.isDraft === false)
         .map((blog) => blog.blogId);
-      const pageSize = 1;
+      const limit = 1;
       const res = await request(server).get(
-        `${endpoint}?&page=2&pageSize=${pageSize}`
+        `${endpoint}?&limit=${limit}&nextCursor=invalid-cursor`
+      );
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"nextCursor" contains an invalid value',
+      });
+    });
+
+    it("should return published blogs from page 2 if more data exists", async () => {
+      const publishedBlogIds = blogs
+        .filter((blog) => blog.isDraft === false)
+        .map((blog) => blog.blogId);
+      const limit = publishedBlogIds.length / 2;
+      // Fetch data from page-1 by passing `limit` and get `nextCursor` which is required to fetch data from page-2
+      const firstPageResponse = await request(server).get(
+        `${endpoint}?limit=${limit}`
+      );
+      expect(firstPageResponse.statusCode).toBe(200);
+      const { nextCursor } = firstPageResponse.body;
+      expect(nextCursor).not.toBeNull();
+
+      // Fetch data from page-2 by passing `limit` and `nextCursor`
+      const res = await request(server).get(
+        `${endpoint}?limit=${limit}&nextCursor=${nextCursor}`
       );
 
       expect(res.statusCode).toBe(200);
+      // When the limit is set to half of the total number of published blogs, there will be two pages.
+      // If fetching from the second page, there will be no data beyond this page, so `nextCursor` should be null.
+      const { nextCursor: secondPageNextCursor, results } = res.body;
+      expect(secondPageNextCursor).toBeNull();
 
-      // total published blog is 2 and if 'pageSize' is 1 then there will be 2 pages.
-      // page-2 will have 1 blog and there will be no more page so 'next = null'
-      // 'previous' must point to page-1
-      const { count, previous, next, results } = res.body;
-      expect(count).toBe(publishedBlogIds.length);
-      expect(previous).toMatch(/&page=1/i);
-      expect(next).toBeNull();
-      expect(results).toHaveLength(pageSize);
+      // results count is same as limit
+      expect(results.length).toBe(limit);
 
       // only published blog must be returned
       results.forEach((blog: IBlog) => {
@@ -412,16 +440,14 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return latest trending blogs when ordering and pageSize query parameters are set", async () => {
-      const pageSize = 2;
+    it("should return latest trending blogs when ordering and limit query parameters are set", async () => {
+      const limit = 2;
       const res = await request(server).get(
-        `${endpoint}?ordering=trending&pageSize=${pageSize}`
+        `${endpoint}?ordering=trending&limit=${limit}`
       );
 
       expect(res.statusCode).toBe(200);
-
-      // check pageSize = 2
-      expect(res.body.results).toHaveLength(pageSize);
+      expect(res.body.results).toHaveLength(limit);
 
       const [blog1, blog2] = res.body.results;
       expect(blog1.activity.totalLikes).toBeGreaterThan(

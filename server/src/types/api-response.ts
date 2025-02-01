@@ -6,16 +6,32 @@ export enum APIStatus {
   ERROR = "error",
 }
 
-export type APIResponse<T = any> = {
+export type APIResponse<T = any> =
+  | SingleAPIResponse<T>
+  | OffsetPaginatedAPIResponse<T>
+  | CursorPaginatedAPIResponse<T>;
+
+export type BaseAPIResponse = {
   status: APIStatus;
   statusCode: number;
+  error?: APIError;
+  message?: string;
+};
+
+export type SingleAPIResponse<T = any> = BaseAPIResponse & {
+  result: T;
+};
+
+export type OffsetPaginatedAPIResponse<T = any> = BaseAPIResponse & {
+  results?: T[];
   count?: number;
   next?: string | null;
   previous?: string | null;
+};
+
+export type CursorPaginatedAPIResponse<T = any> = BaseAPIResponse & {
   results?: T[];
-  result?: T;
-  error?: APIError;
-  message?: string;
+  nextCursor?: string | null;
 };
 
 export type APIError = {

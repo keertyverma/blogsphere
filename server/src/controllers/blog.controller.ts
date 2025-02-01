@@ -1,17 +1,22 @@
+import escapeStringRegexp from "escape-string-regexp";
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi";
 import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 import { nanoid } from "nanoid";
-import escapeStringRegexp from "escape-string-regexp";
 
 import { Blog } from "../models/blog.model";
 import { Bookmark } from "../models/bookmark.model";
 import { Comment } from "../models/comment.model";
 import { User } from "../models/user.model";
 import { SortQuery } from "../types";
-import { APIResponse, APIStatus } from "../types/api-response";
+import {
+  APIResponse,
+  APIStatus,
+  CursorPaginatedAPIResponse,
+} from "../types/api-response";
+import { isValidCursor } from "../utils";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
@@ -131,8 +136,15 @@ const validateBlogQueryParams = (query: any) => {
     search: Joi.string(),
     ordering: Joi.string(),
     authorId: mongoIdValidator.objectId(),
-    page: Joi.number(),
-    pageSize: Joi.number(),
+    nextCursor: Joi.string()
+      .optional()
+      .custom((value, helper) => {
+        if (!isValidCursor(value)) {
+          return helper.error("any.invalid");
+        }
+        return value;
+      }, "Cursor Validation"),
+    limit: Joi.number(),
   });
 
   const { error } = schema.validate(query);
@@ -154,18 +166,37 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
     authorId,
     search,
     ordering,
-    page = 1,
-    pageSize = 10,
+    nextCursor = "",
+    limit = 10,
   } = req.query;
 
-  const max_limit = parseInt(pageSize as string);
-  const skip = (parseInt(page as string) - 1) * max_limit;
+  // Ensure the provided `limit` does not exceed the maximum allowed limit
+  const maxLimit = 50;
+  const finalLimit = Math.min(parseInt(limit as string), maxLimit);
 
   const matchQuery: any = {
     isDraft: false,
     ...(authorId && { author: new Types.ObjectId(authorId as string) }),
     ...(tag && { tags: (tag as string).toLowerCase() }),
   };
+
+  // Query for cursor based pagination
+  // Fetch documents older than the cursor's timestamp, or with the same timestamp but a smaller ID.
+  //    1. Fetch documents where `createdAt` timestamp is less than the cursor's timestamp.
+  //    2. If timestamps are equal, use `_id` to break ties and fetch documents with a smaller `_id`.
+  let cursorQuery = {};
+  if (nextCursor) {
+    const [createdAt, id] = (nextCursor as string).split("_");
+    cursorQuery = {
+      $or: [
+        { createdAt: { $lt: new Date(createdAt) } },
+        {
+          createdAt: new Date(createdAt),
+          _id: { $lt: new Types.ObjectId(id) },
+        },
+      ],
+    };
+  }
 
   // Escape the search string to ensure it's safely used in a regular expression, preventing any special characters from causing errors
   const safeSearchString = search ? escapeStringRegexp(search as string) : null;
@@ -197,17 +228,12 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
           "activity.totalLikes": -1,
           createdAt: -1,
         }
-      : { createdAt: -1 };
+      : { createdAt: -1, _id: -1 };
 
-  // Get total count of documents for pagination
-  const totalCount = await Blog.countDocuments({
-    ...matchQuery,
-    ...searchQuery,
-  });
-
+  // Fetch blogs using cursor based pagination
   const blogs = await Blog.aggregate([
     {
-      $match: matchQuery,
+      $match: { ...matchQuery, ...cursorQuery },
     },
     {
       $lookup: {
@@ -223,19 +249,14 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
     {
       $match: searchQuery,
     },
-
     {
       $sort: sortQuery,
     },
     {
-      $skip: skip,
-    },
-    {
-      $limit: max_limit,
+      $limit: finalLimit + 1, // Fetch one extra to determine `nextCursor`
     },
     {
       $project: {
-        _id: 0,
         blogId: 1,
         title: 1,
         description: 1,
@@ -250,33 +271,22 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
     },
   ]);
 
-  const queryParams = new URLSearchParams(req.query as any);
-  queryParams.delete("page");
-  queryParams.delete("pageSize");
+  // Determine the `nextCursor` for pagination
+  // - Fetching `limit + 1` documents ensures there is more data beyond the current page.
+  // - If more results exist, `nextCursor` is generated using the `createdAt` timestamp and `_id` of the last document.
+  // - `nextCursor` acts as a boundary for fetching the next page while maintaining stable ordering,
+  //    ensuring that records are neither skipped nor duplicated between pages when data is updated.
+  let cursor = null;
+  if (blogs.length > finalLimit) {
+    blogs.pop(); // Remove extra item
+    const lastBlog = blogs[blogs.length - 1]; // get last item from current page
+    cursor = `${lastBlog.createdAt.toISOString()}_${lastBlog._id}`;
+  }
 
-  const baseUrlWithQuery = `${req.protocol}://${req.get("host")}${
-    req.baseUrl
-  }?${queryParams.toString()}`;
-
-  const nextPage =
-    skip + max_limit < totalCount
-      ? `${baseUrlWithQuery}&page=${
-          parseInt(page as string) + 1
-        }&pageSize=${max_limit}`
-      : null;
-  const previousPage =
-    skip > 0
-      ? `${baseUrlWithQuery}&page=${
-          parseInt(page as string) - 1
-        }&pageSize=${max_limit}`
-      : null;
-
-  const data: APIResponse = {
+  const data: CursorPaginatedAPIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
-    count: totalCount,
-    next: nextPage,
-    previous: previousPage,
+    nextCursor: cursor,
     results: blogs,
   };
 
@@ -639,11 +649,11 @@ const getDraftBlogById = async (req: Request, res: Response) => {
 export {
   createBlog,
   deleteBlogByBlogId,
-  getPublishedBlogById,
+  getAllDraftBlogs,
   getAllPublishedBlogs,
+  getDraftBlogById,
+  getPublishedBlogById,
   updateBlogById,
   updateLike,
   updateReadCount,
-  getAllDraftBlogs,
-  getDraftBlogById,
 };

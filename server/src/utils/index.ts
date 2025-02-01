@@ -1,5 +1,6 @@
 import config from "config";
 import { CookieOptions } from "express";
+import { Types } from "mongoose";
 import ms from "ms";
 import { nanoid } from "nanoid";
 import { User } from "../models/user.model";
@@ -82,4 +83,25 @@ export const getFormattedExpiryDate = (date: Date): string => {
   const formattedExpiresAt = date.toLocaleString("en-US", options);
 
   return formattedExpiresAt;
+};
+
+export const isValidCursor = (cursor: string): boolean => {
+  // Cursor valid format -> `<createdAt>_<id>`
+  const [createdAt, id] = (cursor as string).split("_");
+
+  if (!createdAt || !id) return false;
+
+  // Ensure `createdAt` is a valid ISO 8601 string by checking its format and parsing result
+  const date = new Date(createdAt);
+  if (
+    isNaN(date.getTime()) || // Ensures it's a valid date
+    createdAt !== date.toISOString() // Ensures exact format match
+  ) {
+    return false;
+  }
+
+  // Ensure `id` is a valid MongoDB ObjectId
+  if (!Types.ObjectId.isValid(id)) return false;
+
+  return true;
 };
