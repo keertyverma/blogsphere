@@ -72,6 +72,10 @@ const blogSchema = new Schema(
   { timestamps: true }
 );
 
+// Create a compound index on `createdAt` and `_id` in descending order to optimize cursor-based pagination
+// by efficiently sorting documents based on creation date and document ID.
+blogSchema.index({ createdAt: -1, _id: -1 });
+
 // Virtual field to populate the 'authorDetails' for a blog
 blogSchema.virtual("authorDetails", {
   ref: "User",
