@@ -12,21 +12,34 @@ export type IFetchError = {
   details: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IFetchResponse<T = any> = {
-  result: T;
+type BaseApiResponse = {
+  statusCode: number;
   error?: IFetchError;
   message?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IFetchAllResponse<T = any> = {
+export type IFetchResponse<T = any> = BaseApiResponse & {
+  result: T;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IFetchAllResponse<T = any> =
+  | IFetchOffsetPaginatedResult<T>
+  | IFetchCursorPaginatedResult<T>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IFetchOffsetPaginatedResult<T = any> = BaseApiResponse & {
+  results: T[];
   count: number;
   next: string | null;
   previous: string | null;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IFetchCursorPaginatedResult<T = any> = BaseApiResponse & {
   results: T[];
-  error?: IFetchError;
-  message?: string;
+  nextCursor: string | null;
 };
 
 export interface IUser {
@@ -99,8 +112,8 @@ export interface IBlogQuery {
   search?: string;
   authorId?: string;
   draft?: boolean;
-  pageSize?: number;
-  page?: number;
+  limit?: number;
+  nextCursor?: string;
 }
 
 export interface IUpdateUserProfile {

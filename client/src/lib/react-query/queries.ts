@@ -7,6 +7,7 @@ import {
   IBookmarkGetQuery,
   ICommentQuery,
   IFetchAllResponse,
+  IFetchCursorPaginatedResult,
   IFetchResponse,
   INewUser,
   IUpdateUserProfile,
@@ -190,10 +191,10 @@ export const useCreateBlog = () => {
 export const useGetPublishedBlogs = (tag: string) =>
   useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, tag],
-    queryFn: async ({ pageParam = 1 }) => {
+    queryFn: async ({ pageParam = "" }) => {
       const params: IBlogQuery = {
-        page: pageParam,
-        pageSize: 10,
+        limit: 10,
+        ...(pageParam ? { nextCursor: pageParam } : {}),
       };
       if (tag !== "all") params.tag = tag;
       return await apiClient
@@ -203,11 +204,8 @@ export const useGetPublishedBlogs = (tag: string) =>
         })
         .then((res) => res.data);
     },
-    getNextPageParam: (lastPage, allPages) => {
-      // to get next page number
-      return lastPage.next ? allPages.length + 1 : undefined;
-    },
-    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined, // Return nextCursor if available
+    initialPageParam: null, // Start with no cursor
     staleTime: ms("2m"),
     gcTime: ms("5m"),
     refetchOnWindowFocus: true, // Refetch on window focus
@@ -222,7 +220,7 @@ export const useGetTrendingBlogs = () =>
     queryFn: () =>
       apiClient
         .get<IBlog[]>("/blogs", {
-          params: { ordering: "trending", pageSize: 10 },
+          params: { ordering: "trending", limit: 10 },
           withCredentials: false,
         })
         .then((res) => (res.data as unknown as IFetchAllResponse).results),
@@ -233,24 +231,21 @@ export const useGetTrendingBlogs = () =>
   });
 
 export const useGetSearchedBlogs = (searchTerm: string) =>
-  useInfiniteQuery<IFetchAllResponse<IBlog>>({
+  useInfiniteQuery<IFetchCursorPaginatedResult<IBlog>>({
     queryKey: [QUERY_KEYS.GET_SEARCHED_BLOGS, searchTerm],
-    queryFn: async ({ pageParam = 1 }) =>
+    queryFn: async ({ pageParam = "" }) =>
       await apiClient
         .get("/blogs", {
           params: {
             search: searchTerm,
-            pageSize: 10,
-            page: pageParam,
+            limit: 10,
+            ...(pageParam ? { nextCursor: pageParam } : {}),
           },
           withCredentials: false,
         })
         .then((res) => res.data),
-    getNextPageParam: (lastPage, allPages) => {
-      // to get next page number
-      return lastPage.next ? allPages.length + 1 : undefined;
-    },
-    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined, // Return nextCursor if available
+    initialPageParam: null, // Start with no cursor
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
@@ -263,13 +258,12 @@ export const useGetUserPublishedBlogs = (
 ) =>
   useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId, searchTerm }],
-    queryFn: async ({ pageParam = 1 }) => {
+    queryFn: async ({ pageParam = "" }) => {
       const params: IBlogQuery = {
         authorId,
-        pageSize: 10,
-        page: pageParam,
+        limit: 10,
+        ...(pageParam ? { nextCursor: pageParam } : {}),
       };
-
       if (searchTerm) {
         params["search"] = searchTerm;
       }
@@ -281,11 +275,8 @@ export const useGetUserPublishedBlogs = (
         })
         .then((res) => res.data);
     },
-    getNextPageParam: (lastPage, allPages) => {
-      // to get next page number
-      return lastPage.next ? allPages.length + 1 : undefined;
-    },
-    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined, // Return nextCursor if available
+    initialPageParam: null, // Start with no cursor
     staleTime: ms("5m"),
     gcTime: ms("10m"),
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
