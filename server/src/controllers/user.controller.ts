@@ -102,12 +102,13 @@ export const getUsers = async (req: Request, res: Response) => {
 
   // Escape the search string to ensure it's safely used in a regular expression, preventing any special characters from causing errors
   const safeSearchString = search ? escapeStringRegexp(search as string) : null;
+  const regexQuery = { $regex: `${safeSearchString}`, $options: "i" };
 
   const findQuery = {
     ...(safeSearchString && {
       $or: [
-        { "personalInfo.username": new RegExp(`${safeSearchString}`, "i") },
-        { "personalInfo.fullname": new RegExp(`${safeSearchString}`, "i") },
+        { "personalInfo.username": regexQuery },
+        { "personalInfo.fullname": regexQuery },
       ],
     }),
   };
