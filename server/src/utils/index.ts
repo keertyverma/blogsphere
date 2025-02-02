@@ -69,6 +69,18 @@ export const getCookieOptions = (): CookieOptions => {
   };
 };
 
+const handleTimeZoneAbbreviation = (timeZone: string): string => {
+  // To map time zone offsets to abbreviations
+  const timeZoneMap: Record<string, string> = {
+    "GMT+5:30": "IST", // India Standard Time
+    "GMT-8:00": "PST", // Pacific Standard Time
+    "GMT+0:00": "UTC", // Coordinated Universal Time
+    // ...Add more time zone mappings as needed
+  };
+
+  return timeZoneMap[timeZone] || timeZone;
+};
+
 export const getFormattedExpiryDate = (date: Date): string => {
   // Format the provided date as a local string in the format: Month DD, YYYY at H:M
 
@@ -80,9 +92,23 @@ export const getFormattedExpiryDate = (date: Date): string => {
     minute: "2-digit", // "52"
     hour12: true, // "PM"
   };
+
+  // Get the formatted date based on the local time zone
   const formattedExpiresAt = date.toLocaleString("en-US", options);
 
-  return formattedExpiresAt;
+  // Detect the time zone
+  const timeZone =
+    new Intl.DateTimeFormat("en-US", { timeZoneName: "short" })
+      .formatToParts(date)
+      .find((part) => part.type === "timeZoneName")?.value || "UTC";
+
+  // Handle known time zone offsets (e.g., GMT+5:30 -> IST)
+  const timeZoneAbbreviation = handleTimeZoneAbbreviation(timeZone);
+
+  // Return the formatted expiry date along with the time zone information
+  const formattedExpiryWithTimeZone = `${formattedExpiresAt} (${timeZoneAbbreviation})`;
+
+  return formattedExpiryWithTimeZone;
 };
 
 export const isValidCursor = (cursor: string): boolean => {

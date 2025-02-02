@@ -8,7 +8,9 @@ import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState<string>("");
-  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailValidationError, setEmailValidationError] = useState<
+    string | null
+  >(null);
   const [errorMsg, setErrorMsg] = useState("");
 
   const {
@@ -20,7 +22,8 @@ const ForgotPassword = () => {
   const handleOnEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     setEmail(target.value.trim());
-    setEmailError(null);
+    setEmailValidationError(null);
+    setErrorMsg("");
   };
 
   const handleSendPasswordResetEmail = async () => {
@@ -29,13 +32,12 @@ const ForgotPassword = () => {
     // Email validation
     const emailRegex = /^(?!@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address.");
+      setEmailValidationError("Please enter a valid email address.");
       return;
     }
 
     try {
       await forgotPassword(email);
-      setEmail("");
     } catch (error) {
       let errorMessage =
         "There was an issue with your request. Please try again.";
@@ -60,6 +62,8 @@ const ForgotPassword = () => {
       }
 
       if (errorMessage) toast.error(errorMessage);
+    } finally {
+      setEmail("");
     }
   };
 
@@ -88,8 +92,10 @@ const ForgotPassword = () => {
                 onChange={handleOnEmailChange}
                 className="w-full bg-accent placeholder:text-muted-foreground text-accent-foreground focus-visible:ring-0 border border-primary"
               />
-              {emailError && (
-                <p className="max-sm:text-sm text-red-800 mt-1">{emailError}</p>
+              {emailValidationError && (
+                <p className="max-sm:text-sm text-red-800 mt-1">
+                  {emailValidationError}
+                </p>
               )}
             </div>
 
@@ -101,7 +107,7 @@ const ForgotPassword = () => {
               Send Instructions
             </Button>
           </div>
-          {isSuccess && (
+          {isSuccess && !errorMsg && (
             <div className="mt-2 max-sm:text-sm text-green-800 bg-green-100 dark:bg-green-800/50 dark:text-green-50 border border-green-400 p-2 rounded-md">
               <p>
                 If the email is associated with an account, a password reset
