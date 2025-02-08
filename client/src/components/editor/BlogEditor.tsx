@@ -196,7 +196,7 @@ const BlogEditor = () => {
         <section className="xl:px-[1vw] mx-auto w-full max-w-[900px]">
           <Button
             variant="ghost"
-            className="capitalize rounded-full flex-center gap-2 text-sm md:text-base text-secondary-foreground px-1"
+            className="capitalize rounded-full flex-center gap-2 text-sm md:text-base text-secondary-foreground px-2"
             onClick={() => setToggleFileUploader((prev) => !prev)}
           >
             <IoImageOutline className="text-xl md:text-2xl text-secondary-foreground" />

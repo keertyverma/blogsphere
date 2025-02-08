@@ -30,7 +30,7 @@ const FileUploader = ({ onUpload }: Props) => {
       } catch (error) {
         setPreviewURL("");
         if (!useAuthStore.getState().isTokenExpired) {
-          toast.error("An error occurred. Please try again later.");
+          toast.error("Failed to upload cover image. Please try again later.");
         }
       }
     },
