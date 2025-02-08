@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { editorJSTools } from "../../lib/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
+import DarkThemeToggler from "../shared/DarkThemeToggler";
 import FileUploader from "../shared/FileUploader";
 import Logo from "../shared/Logo";
 import { Button } from "../ui/button";
@@ -175,6 +176,8 @@ const BlogEditor = () => {
       <nav className="navbar">
         <Logo />
         <div className="flex gap-2 ml-auto">
+          <DarkThemeToggler classname="md:mr-2" />
+
           {(!blogId || (blogId && isDraft === true)) && (
             <Button
               variant="secondary"
