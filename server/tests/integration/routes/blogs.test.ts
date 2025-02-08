@@ -271,8 +271,8 @@ describe("/api/v1/blogs", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
 
-      const { id } = res.body.result;
-      expect(id).toBeDefined();
+      const { blogId } = res.body.result;
+      expect(blogId).toBeDefined();
 
       // check user
       const updatedUser = await User.findById(user.id);
@@ -327,8 +327,8 @@ describe("/api/v1/blogs", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
 
-      const { id } = res.body.result;
-      expect(id).toBeDefined();
+      const { blogId } = res.body.result;
+      expect(blogId).toBeDefined();
 
       // check user
       const updatedUser = await User.findById(user.id);

@@ -123,7 +123,7 @@ const createBlog = async (req: Request, res: Response) => {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
     result: {
-      id: blog.blogId,
+      blogId: blog.blogId,
     },
   };
 

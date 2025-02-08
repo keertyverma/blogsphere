@@ -1,7 +1,7 @@
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
 import { useAuthStore, useEditorStore } from "@/store";
-import { ICreateBlog } from "@/types";
+import { IBlog, ICreateBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -94,9 +94,9 @@ const PublishForm = () => {
         blogUrl = `/blogs/${updatedBlog.blogId}`;
       } else {
         // create mode - publish new blog
-        const newBlog = await createBlog(publishedBlog);
+        const newBlog: IBlog = await createBlog(publishedBlog);
         message = "Blog Published 🥳";
-        blogUrl = `/blogs/${newBlog.id}`;
+        blogUrl = `/blogs/${newBlog.blogId}`;
       }
       toast.success(message);
       navigate(blogUrl);

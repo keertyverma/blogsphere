@@ -4,10 +4,11 @@ import {
   useUpdateBlog,
 } from "@/lib/react-query/queries";
 import { useAuthStore, useEditorStore } from "@/store";
+import { IBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { editorJSTools } from "../../lib/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -36,6 +37,7 @@ const BlogEditor = () => {
   const { blogId } = useParams();
   const { data, isLoading } = useGetBlog(blogId);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const navigate = useNavigate();
 
   const initializeEditor = (content = {} as OutputData) => {
     setTextEditor(
@@ -121,7 +123,7 @@ const BlogEditor = () => {
 
   const handleSaveDraft = async () => {
     if (!title.length) {
-      return toast.error("Add title to save the blog");
+      return toast.error("Please add a title to save the draft.");
     }
 
     let content;
@@ -156,8 +158,10 @@ const BlogEditor = () => {
         toast.success("Blog Updated");
       } else {
         // create mode - save new blog as draft
-        await saveBlog(draftBlog);
-        toast.success("Saved 👍");
+        const blog: IBlog = await saveBlog(draftBlog);
+        const blogUrl = `/blogs/drafts/${blog.blogId}`;
+        toast.success("Draft saved.");
+        navigate(blogUrl);
       }
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
