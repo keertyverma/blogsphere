@@ -180,8 +180,8 @@ const BlogEditor = () => {
 
           {(!blogId || (blogId && isDraft === true)) && (
             <Button
-              variant="secondary"
-              className="rounded-full capitalize border-b border-border"
+              variant="outline"
+              className="rounded-full capitalize"
               onClick={handleSaveDraft}
               disabled={isSaving || isUpdating}
             >

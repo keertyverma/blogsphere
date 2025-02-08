@@ -39,7 +39,7 @@ const NavBar = () => {
           size="sm"
           className="max-sm:flex sm:hidden rounded-full gap-2"
         >
-          <BsPencilSquare className="text-xl" />
+          <BsPencilSquare className="text-2xl" />
         </Button>
 
         {isAuthenticated ? (
