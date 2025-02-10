@@ -3,6 +3,7 @@ import {
   useGetBlog,
   useUpdateBlog,
 } from "@/lib/react-query/queries";
+import { isValidBlockContent } from "@/lib/utils";
 import { useAuthStore, useEditorStore } from "@/store";
 import { IBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
@@ -106,10 +107,15 @@ const BlogEditor = () => {
 
     try {
       const blogContent = await textEditor.save();
+      // Ensure the blog content contains at least one block with non-empty data, which is required for publishing the blog
+      const hasValidContent = blogContent.blocks.some((block) =>
+        isValidBlockContent(block)
+      );
+
       // validate blog title and content before publishing
-      if (!title.trim() || !blogContent?.blocks?.length) {
+      if (!title.trim() || !hasValidContent) {
         const errorMsg = !title.trim()
-          ? !blogContent?.blocks?.length
+          ? !hasValidContent
             ? "You cannot publish an empty blog. Both the title and content are required."
             : "Please add a title to publish your blog."
           : "Please add content to the blog before publishing.";

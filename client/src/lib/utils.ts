@@ -1,3 +1,4 @@
+import { OutputBlockData } from "@editorjs/editorjs";
 import { clsx, type ClassValue } from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -140,4 +141,33 @@ export const capitalize = (text: string): string => {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
+};
+
+/**
+ * Validates the content of a block to ensure it is not empty or invalid.
+ * This function checks the content of various block types (e.g., paragraph, header, list, image, quote, code)
+ * to ensure they contain meaningful content. If a block is empty or contains only whitespace or a <br> tag,
+ * it will be considered invalid. At least one non-empty block is required for valid content.
+ */
+export const isValidBlockContent = (block: OutputBlockData): boolean => {
+  const { type, data } = block;
+
+  // Paragraph and Quote Blocks: Check if text is not just <br>
+  if (type === "paragraph" || type === "quote")
+    return data.text && data.text.trim() !== "<br>";
+
+  // Header Blocks: Ensure that the header text is not empty
+  if (type === "header") return data.text.trim() !== "";
+
+  // Image Blocks: Check for a valid url
+  if (type === "image") return Boolean(data.file?.url);
+
+  // List Blocks: Ensure there are items in the list
+  if (type === "list") return data.items && data.items.length > 0;
+
+  // Code Blocks: Check if the code block has non-empty code content
+  if (type === "code") return data.code && data.code.trim() !== "";
+
+  // For other block types, return true (content is considered valid)
+  return true;
 };
