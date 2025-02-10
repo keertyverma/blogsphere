@@ -102,23 +102,26 @@ const BlogEditor = () => {
   };
 
   const handlePublish = async () => {
-    // validate blog editor data
-    if (!title.length) {
-      return toast.error("Add title to publish it");
-    }
+    if (!textEditor) return;
 
-    if (textEditor) {
-      try {
-        const data = await textEditor.save();
-        if (data?.blocks.length) {
-          setBlog({ ...blog, content: data });
-          setIsPublish(true);
-        } else {
-          return toast.error("Can not publish an empty blog. Add content");
-        }
-      } catch (error) {
-        console.log(error);
+    try {
+      const blogContent = await textEditor.save();
+      // validate blog title and content before publishing
+      if (!title.trim() || !blogContent?.blocks?.length) {
+        const errorMsg = !title.trim()
+          ? !blogContent?.blocks?.length
+            ? "You cannot publish an empty blog. Both the title and content are required."
+            : "Please add a title to publish your blog."
+          : "Please add content to the blog before publishing.";
+
+        return toast.error(errorMsg);
       }
+
+      setBlog({ ...blog, content: blogContent });
+      setIsPublish(true);
+    } catch (error) {
+      console.error("Error saving blog content:", error);
+      toast.error("Failed to save blog content. Please try again.");
     }
   };
 
