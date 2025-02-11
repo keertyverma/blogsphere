@@ -36,7 +36,6 @@ const PublishForm = () => {
   const setIsPublish = useEditorStore((s) => s.setIsPublish);
   const setIsPublishClose = useEditorStore((s) => s.setIsPublishClose);
 
-  const [titleValue, setTitleValue] = useState(title);
   const [descriptionValue, setDescriptionValue] = useState(description);
 
   const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
@@ -60,7 +59,7 @@ const PublishForm = () => {
 
     // tags are required
     if (blog.tags.length === 0 && !tag) {
-      toast.error("Add atleast one tag to publish");
+      toast.error("Please add at least one tag to publish.");
       return;
     }
 
@@ -109,11 +108,6 @@ const PublishForm = () => {
     }
   };
 
-  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setTitleValue(value);
-  };
-
   const handleDescriptionChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -132,7 +126,9 @@ const PublishForm = () => {
       if (tag.length && !tags.includes(tag))
         setBlog({ ...blog, tags: [...tags, tag] });
     } else {
-      toast.error(`You can add maximum of ${TAG_LIMIT} tags`);
+      toast.error(
+        `Maximum tag limit of ${TAG_LIMIT} reached. You can’t add any more tags.`
+      );
     }
   };
 
@@ -184,62 +180,46 @@ const PublishForm = () => {
 
   return (
     <AnimationWrapper>
-      <section className="w-screen grid lg:grid-cols-2 py-16 xl:px-[1vw] gap-2 lg:gap-1">
+      <section className="px-6 mx-auto md:max-w-[728px] flex flex-col gap-2 py-12">
+        <div className="mb-5">
+          <h3 className="h3-bold !font-semibold capitalize text-left">
+            Publish your blog
+          </h3>
+          <p className="mt-1 text-muted-foreground">
+            Share your thoughts with the world.
+          </p>
+          <hr className="mt-2 border-1 border-border" />
+        </div>
         <Button
-          variant="ghost"
-          className="absolute right-[5vw] top-[1%] md:top-[2%] z-10"
+          variant="outline"
+          size="sm"
+          className="absolute right-[5vw] top-[2%] z-10 bg-muted rounded-lg"
           onClick={() => {
             setIsPublish(false);
             setIsPublishClose(true);
           }}
         >
-          <IoClose className="text-xl md:text-2xl" />
+          <IoClose className="text-xl" />
         </Button>
-        {/* preview */}
-        <div className="max-w-[550px] md:center">
-          <p className="text-md md:text-lg text-muted-foreground mb-1">
-            Preview
-          </p>
-
-          {coverImgURL && (
-            <div className="w-full rounded-lg overflow-hidden bg-header mt-4">
-              <img src={coverImgURL} className="cover-img" />
-            </div>
-          )}
-
-          <h1 className="h1-medium mt-2">{titleValue}</h1>
-          <p className="text-base md:text-lg line-clamp-2 md:line-clamp-4 leading-7 mt-4 overflow-hidden">
-            {descriptionValue}
-          </p>
-        </div>
-
-        {/* publish form */}
         <Form {...form}>
           <form
-            className="p-2 lg:p-6 border-[1px] border-muted-foreground/40 rounded-lg lg:shadow-md flex flex-col gap-4 md:gap-3 max-sm:mt-5 md:max-w-[700px]"
+            className="w-full flex flex-col gap-4 md:border-[1px] border-border md:shadow-md rounded-lg p-0 md:p-6"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            {(isPublishing || isUpdating) && (
-              <LoadingSpinner className="flex-col m-auto" />
-            )}
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-secondary-foreground">
+                  <FormLabel className="text-base text-secondary-foreground">
                     Blog Title <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       placeholder="Title"
-                      className="shad-input md:text-base placeholder:text-sm"
+                      className="shad-input text-base placeholder:text-sm"
                       {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleTitleChange(e);
-                      }}
                     />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
@@ -252,12 +232,16 @@ const PublishForm = () => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-secondary-foreground">
+                  <FormLabel className="text-base text-secondary-foreground">
                     Blog Summary <span className="text-red-500">*</span>
                   </FormLabel>
+                  <FormDescription className="text-muted-foreground">
+                    Summary will be displayed in the feed and search results.
+                    Keep it brief and informative.
+                  </FormDescription>
                   <FormControl>
                     <Textarea
-                      className="shad-textarea custom-scrollbar md:text-base placeholder:text-sm"
+                      className="shad-textarea custom-scrollbar text-base placeholder:text-sm"
                       placeholder="Summarize your blog in a few words"
                       {...field}
                       onChange={(e) => {
@@ -268,12 +252,13 @@ const PublishForm = () => {
                     />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
-                  {descriptionValue.length < DESCRIPTION_CHAR_LIMIT && (
-                    <FormDescription className="text-sm text-muted-foreground text-right">
-                      {DESCRIPTION_CHAR_LIMIT - descriptionValue.length}{" "}
-                      characters left
-                    </FormDescription>
-                  )}
+                  {descriptionValue.length > 0 &&
+                    descriptionValue.length < DESCRIPTION_CHAR_LIMIT && (
+                      <FormDescription className="text-sm text-muted-foreground text-right">
+                        {DESCRIPTION_CHAR_LIMIT - descriptionValue.length}{" "}
+                        characters left
+                      </FormDescription>
+                    )}
                 </FormItem>
               )}
             />
@@ -283,15 +268,18 @@ const PublishForm = () => {
               name="tag"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-secondary-foreground">
-                    Tags - (Enhances blog searchability and ranking){" "}
-                    <span className="text-red-500">*</span>
+                  <FormLabel className="text-base text-secondary-foreground">
+                    Tags <span className="text-red-500">*</span>
                   </FormLabel>
+                  <FormDescription className="text-muted-foreground">
+                    Add relevant tags to improve your blog's visibility in
+                    search results.
+                  </FormDescription>
                   <FormControl>
                     <div className="relative input-box">
                       <Input
                         type="text"
-                        placeholder="Add Tag and press enter or comma"
+                        placeholder="Type a tag and press enter or comma to add"
                         className="mt-1 bg-muted sticky top-0 left-0 mb-3 md:text-base placeholder:text-sm"
                         {...field}
                         onChange={(e) => {
@@ -305,7 +293,7 @@ const PublishForm = () => {
                       ))}
                     </div>
                   </FormControl>
-                  {tags.length < TAG_LIMIT && (
+                  {tags.length > 0 && tags.length < TAG_LIMIT && (
                     <FormDescription className="text-sm text-muted-foreground text-right">
                       {TAG_LIMIT - tags.length} tags left
                     </FormDescription>
@@ -314,14 +302,16 @@ const PublishForm = () => {
                 </FormItem>
               )}
             />
-
             <div className="flex-center">
               <Button
                 type="submit"
-                className="rounded-full text-sm md:text-base capitalize"
+                className="rounded-full text-base capitalize flex-center gap-1"
                 disabled={isPublishing || isUpdating}
               >
                 {blogId && !isDraft ? "update" : "publish"}
+                {(isPublishing || isUpdating) && (
+                  <LoadingSpinner className="h-6 md:w-6 text-white" />
+                )}
               </Button>
             </div>
           </form>

@@ -20,13 +20,15 @@ export const LoginValidation = z.object({
 });
 
 export const BlogValidation = z.object({
-  title: z
-    .string()
-    .min(10, { message: "Title must be at least 10 characters." }),
+  title: z.string().min(10, {
+    message: "Title is too short. It must be at least 10 characters.",
+  }),
   description: z
     .string()
-    .min(20, { message: "Short description must be atleast 20 characters." })
-    .max(200, { message: "Short description must be within 200 characters." }),
+    .min(20, {
+      message: "Blog summary must be atleast 20 characters long.",
+    })
+    .max(200, { message: "Blog summary must be within 200 characters." }),
   tag: z.string(),
 });
 
