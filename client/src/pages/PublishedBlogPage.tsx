@@ -1,7 +1,7 @@
 import BlogContent from "@/components/blog/BlogContent";
 import BlogInteraction from "@/components/blog/BlogInteraction";
 import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
-import { useGetBlog, useUpdateReads } from "@/lib/react-query/queries";
+import { useGetPublishedBlog, useUpdateReads } from "@/lib/react-query/queries";
 import { capitalize, formatDate, handleProfileImgErr } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
@@ -14,7 +14,7 @@ const PublishedBlogPage = () => {
   const { blogId } = useParams();
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { data: blog, isLoading, error } = useGetBlog(blogId);
+  const { data: blog, isLoading, error } = useGetPublishedBlog(blogId);
   const updateReads = useUpdateReads();
 
   useEffect(() => {

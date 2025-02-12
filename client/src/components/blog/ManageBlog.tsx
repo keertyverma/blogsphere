@@ -19,9 +19,10 @@ import { Button } from "../ui/button";
 
 interface Props {
   blogId: string;
+  isDraft: boolean;
 }
 
-const ManageBlog = ({ blogId }: Props) => {
+const ManageBlog = ({ blogId, isDraft }: Props) => {
   const { mutateAsync: deleteBlog } = useDeleteBlog();
   const navigate = useNavigate();
 
@@ -47,7 +48,7 @@ const ManageBlog = ({ blogId }: Props) => {
       <Button
         variant="outline"
         size="icon"
-        onClick={() => navigate(`/editor/${blogId}`)}
+        onClick={() => navigate(`/editor/${blogId}?isDraft=${isDraft}`)}
         className="w-8 h-8 rounded-full flex-center border border-muted-foreground/40"
       >
         <MdEdit className="text-lg text-secondary-foreground" />

@@ -307,7 +307,22 @@ export const useGetUserDraftBlogs = (searchTerm?: string) =>
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-export const useGetBlog = (blogId?: string) =>
+export const useGetBlog = ({
+  isDraft,
+  blogId,
+}: {
+  isDraft: boolean;
+  blogId?: string;
+}) => {
+  // Fetch draft blog if `isDraft` is set
+  const draftBlog = useGetDraftBlog(isDraft ? blogId : undefined);
+
+  // Fetch published blog if `isDraft` is not set
+  const publishedBlog = useGetPublishedBlog(isDraft ? undefined : blogId);
+  return isDraft ? draftBlog : publishedBlog;
+};
+
+export const useGetPublishedBlog = (blogId?: string) =>
   useQuery<IBlog>({
     queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
     queryFn: () =>

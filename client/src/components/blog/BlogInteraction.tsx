@@ -196,7 +196,9 @@ const BlogInteraction = ({
             </>
           )}
 
-          {user.username === authorUsername && <ManageBlog blogId={blogId} />}
+          {user.username === authorUsername && (
+            <ManageBlog blogId={blogId} isDraft={isDraft} />
+          )}
         </div>
       </div>
       <hr className="border-border my-1" />

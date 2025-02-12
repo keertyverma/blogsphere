@@ -81,7 +81,7 @@ const DraftBlogPage = () => {
           <>
             <hr className="border-border my-1" />
             <div className="flex flex-row justify-end items-center">
-              <ManageBlog blogId={blogId} />
+              <ManageBlog blogId={blogId} isDraft={true} />
             </div>
             <hr className="border-border my-1" />
           </>

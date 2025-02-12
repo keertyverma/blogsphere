@@ -9,7 +9,7 @@ import { IBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoClose, IoImageOutline } from "react-icons/io5";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { editorJSTools } from "../../lib/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -36,8 +36,14 @@ const BlogEditor = () => {
   const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
     useUpdateBlog();
+
   const { blogId } = useParams();
-  const { data, isLoading } = useGetBlog(blogId);
+  const [searchParams] = useSearchParams();
+  const { data, isLoading } = useGetBlog({
+    isDraft: searchParams.get("isDraft") === "true",
+    blogId,
+  });
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
 

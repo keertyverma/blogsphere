@@ -70,7 +70,7 @@ const BlogPostCard = ({
           </Link>
           {showManageBlogButtons && user.username === username && id && (
             <div className="mb-3">
-              <ManageBlog blogId={id} />
+              <ManageBlog blogId={id} isDraft={isDraft} />
             </div>
           )}
         </div>

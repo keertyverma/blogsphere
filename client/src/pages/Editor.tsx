@@ -3,7 +3,7 @@ import PublishForm from "@/components/editor/PublishForm";
 import { useGetBlog } from "@/lib/react-query/queries";
 import { INITIAL_BLOG, useAuthStore, useEditorStore } from "@/store";
 import { useEffect } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useSearchParams } from "react-router-dom";
 
 const Editor = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -12,7 +12,11 @@ const Editor = () => {
   const setBlog = useEditorStore((s) => s.setBlog);
 
   const { blogId } = useParams();
-  const { data } = useGetBlog(blogId);
+  const [searchParams] = useSearchParams();
+  const { data } = useGetBlog({
+    isDraft: searchParams.get("isDraft") === "true",
+    blogId,
+  });
 
   useEffect(() => {
     if (blogId && data) {
