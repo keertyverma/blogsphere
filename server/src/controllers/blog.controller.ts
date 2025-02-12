@@ -365,10 +365,19 @@ const updateReadCount = async (req: Request, res: Response) => {
 const updateBlogById = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:blogId`);
 
-  // get blog by blogId
+  // Find existing blog
   const { blogId } = req.params;
-  const blog = await Blog.findOne({ blogId }).lean();
+  const blog = await Blog.findOne({ blogId }).select("author isDraft").lean();
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  // Ensure authenticated user is the author of the blog
+  const { id: userId } = req.user as JwtPayload;
+  if (userId !== blog.author.toString()) {
+    throw new CustomAPIError(
+      "You are not authorized to update this blog.",
+      StatusCodes.FORBIDDEN
+    );
+  }
 
   const isDraft = Boolean(req.body.isDraft);
   // validate request body
@@ -383,32 +392,31 @@ const updateBlogById = async (req: Request, res: Response) => {
     { ...req.body, tags },
     {
       new: true,
+      projection:
+        "blogId title description content author coverImgURL tags activity createdAt isDraft -_id",
+      populate: {
+        path: "authorDetails", //use the virtual 'authorDetails' to populates
+        select:
+          "personalInfo.fullname personalInfo.username personalInfo.profileImage",
+      },
     }
-  )
-    .populate({
-      path: "authorDetails", //use the virtual 'authorDetails' to populates
-      select:
-        "personalInfo.fullname personalInfo.username personalInfo.profileImage",
-    })
-    .select(
-      "blogId title description content author coverImgURL tags activity createdAt isDraft -_id"
-    )
-    .lean();
+  ).lean();
 
-  // increment user total post count if draft blog is getting published
+  // increment user total post count if transitioning from draft to published blog
   if (blog.isDraft && !isDraft) {
-    const user = await User.findOneAndUpdate(
+    const updatedUserResult = await User.updateOne(
       { _id: blog.author },
       {
         $inc: { "accountInfo.totalPosts": 1 },
       }
     );
 
-    if (!user)
+    if (updatedUserResult.modifiedCount === 0) {
       throw new CustomAPIError(
         "Failed to update total posts count",
         StatusCodes.INTERNAL_SERVER_ERROR
       );
+    }
   }
 
   const data: APIResponse = {

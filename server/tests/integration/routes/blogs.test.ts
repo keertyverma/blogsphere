@@ -597,11 +597,12 @@ describe("/api/v1/blogs", () => {
 
   describe("PATCH /:blogId", () => {
     let blogs: IBlog[];
-    let user: IUserDocument;
+    let user1: IUserDocument;
+    let user2: IUserDocument;
 
     beforeAll(async () => {
-      [user] = await createUsers();
-      blogs = await createBlogs(user.id);
+      [user1, user2] = await createUsers();
+      blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
@@ -633,7 +634,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
-      token = user.generateAuthToken();
+      token = user1.generateAuthToken();
       const blogId = "invalid-blogId";
       const res = await exec(blogId);
 
@@ -645,8 +646,25 @@ describe("/api/v1/blogs", () => {
       });
     });
 
+    it("should return 403 Forbidden if user is unauthorized to update the blog", async () => {
+      // user2 is not the author of the blog
+      token = user2.generateAuthToken();
+      const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
+
+      const res = await exec(publishedBlog.blogId, {
+        title: `updated ${publishedBlog.title}`,
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details: "You are not authorized to update this blog.",
+      });
+    });
+
     it("should return BadRequest-400 if published blog description exceeds 200 characters limit is not passed", async () => {
-      token = user.generateAuthToken();
+      token = user1.generateAuthToken();
       const publishedBlog = blogs.filter((blog) => blog.isDraft === false)[0];
 
       const res = await exec(publishedBlog.blogId, {
@@ -664,7 +682,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should update draft blog", async () => {
-      token = user.generateAuthToken();
+      token = user1.generateAuthToken();
       const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
       const toUpdate = {
         title: `updated ${draftBlog.title}`,
@@ -698,7 +716,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should update draft blog and publish it", async () => {
-      token = user.generateAuthToken();
+      token = user1.generateAuthToken();
       const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
       const toUpdate = {
         title: draftBlog.title,
@@ -729,7 +747,7 @@ describe("/api/v1/blogs", () => {
       expect(tags).toEqual(toUpdate.tags);
       expect(isDraft).toBe(toUpdate.isDraft);
 
-      // when draft blog is updated then it should not update user total post
+      // when draft blog is published then it should increment user total post by 1
       const author = await User.findById(draftBlog.author);
       expect(author?.accountInfo.totalPosts).toBe(1);
     });
