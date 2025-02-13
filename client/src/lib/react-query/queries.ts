@@ -324,7 +324,7 @@ export const useGetBlog = ({
 
 export const useGetPublishedBlog = (blogId?: string) =>
   useQuery<IBlog>({
-    queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+    queryKey: [QUERY_KEYS.GET_PUBLISHED_BLOG_BY_ID, blogId],
     queryFn: () =>
       apiClient
         .get<IBlog>(`/blogs/${blogId}`, { withCredentials: false })
@@ -361,37 +361,82 @@ export const useUpdateBlog = () => {
   const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
-    mutationFn: (data: { blogId: string; blog: object }) =>
+    mutationFn: (data: {
+      blogId: string;
+      blog: object;
+      isPublishingDraft?: boolean;
+    }) =>
       apiClient
         .patch(`/blogs/${data.blogId}`, data.blog)
         .then((res) => res.data.result),
-    onSuccess: (data) => {
-      // refetch given blog
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
-      });
+    onSuccess: (updatedBlog, toUpdateRequest) => {
+      const { blogId, authorDetails, isDraft } = updatedBlog;
+      const { _id: authorId, personalInfo } = authorDetails;
+      const { isPublishingDraft } = toUpdateRequest;
 
-      // refetch latest blog with or without tag filter
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
-      });
-      if (selectedTag !== "all") {
+      // Transitioning from draft to published blog status
+      if (isPublishingDraft) {
+        // refetch user to update the total post count accurately
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+          queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
         });
+
+        // refetch user's draft list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+        });
+
+        // refetch user's published list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
+        });
+
+        // refetch latest blog with or without tag filter
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
+        });
+        if (selectedTag !== "all") {
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+          });
+        }
+        // Exit early, no need to check for draft or published updates
+        return;
       }
 
-      // refetch user profile and all blogs
-      const { _id: authorId, personalInfo } = data.authorDetails;
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
-      });
+      if (isDraft) {
+        // draft blog updated
+        // refetch given draft blog data
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_DRAFT_BLOG_BY_ID, blogId],
+        });
+
+        // refetch user's draft list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+        });
+      } else {
+        // published blog updated
+        // refetch given published blog data
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_PUBLISHED_BLOG_BY_ID, blogId],
+        });
+
+        // refetch user's published list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
+        });
+
+        // refetch latest blog with or without tag filter
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
+        });
+        if (selectedTag !== "all") {
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+          });
+        }
+      }
     },
   });
 };
@@ -406,7 +451,7 @@ export const useLikePost = () => {
     onSuccess: (data) => {
       const authorId = data.author;
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, data.blogId],
+        queryKey: [QUERY_KEYS.GET_PUBLISHED_BLOG_BY_ID, data.blogId],
       });
 
       // refetch latest blog with or without tag filter
@@ -478,7 +523,7 @@ export const useCreateComment = () => {
       } = data;
       if (blogId) {
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+          queryKey: [QUERY_KEYS.GET_PUBLISHED_BLOG_BY_ID, blogId],
         });
       }
       queryClient.invalidateQueries({
@@ -530,7 +575,7 @@ export const useCreateReply = () => {
       if (blogId) {
         // refresh blog page to show correct 'totalComments' count
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+          queryKey: [QUERY_KEYS.GET_PUBLISHED_BLOG_BY_ID, blogId],
         });
       }
 
@@ -560,7 +605,7 @@ export const useDeleteComment = () => {
       } = data;
       // refresh blog page
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_BY_ID, blogId],
+        queryKey: [QUERY_KEYS.GET_PUBLISHED_BLOG_BY_ID, blogId],
       });
 
       // refresh reply list for given comment

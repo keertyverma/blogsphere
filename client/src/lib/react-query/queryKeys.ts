@@ -5,7 +5,7 @@ export enum QUERY_KEYS {
   GET_SEARCHED_BLOGS = "getSearchedBlogs",
   GET_USER_PUBLISHED_BLOGS = "getUserPublishedBlogs",
   GET_USER_DRAFT_BLOGS = "getUserDraftBlogs",
-  GET_BLOG_BY_ID = "getBlogById",
+  GET_PUBLISHED_BLOG_BY_ID = "getPublishedBlogById",
   GET_DRAFT_BLOG_BY_ID = "getDraftBlogById",
   GET_BLOG_COMMENTS = "getBlogComments",
   GET_USER_BOOKMARKS = "getUserBookmarks",

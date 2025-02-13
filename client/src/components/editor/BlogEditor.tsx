@@ -22,7 +22,7 @@ const BlogEditor = () => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
   const {
     blog,
-    blog: { title, coverImgURL, description, tags, isDraft },
+    blog: { title, coverImgURL, description, tags },
   } = useEditorStore((s) => ({ blog: s.blog }));
   const {
     setIsPublish,
@@ -39,10 +39,8 @@ const BlogEditor = () => {
 
   const { blogId } = useParams();
   const [searchParams] = useSearchParams();
-  const { data, isLoading } = useGetBlog({
-    isDraft: searchParams.get("isDraft") === "true",
-    blogId,
-  });
+  const isDraft = searchParams.get("isDraft") === "true";
+  const { data, isLoading } = useGetBlog({ isDraft, blogId });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
@@ -171,7 +169,7 @@ const BlogEditor = () => {
           blogId,
           blog: draftBlog,
         });
-        toast.success("Blog Updated");
+        toast.success("Draft saved.");
       } else {
         // create mode - save new blog as draft
         const blog: IBlog = await saveBlog(draftBlog);
@@ -200,7 +198,7 @@ const BlogEditor = () => {
               onClick={handleSaveDraft}
               disabled={isSaving || isUpdating}
             >
-              {blogId && isDraft ? "update" : "save draft"}
+              save draft
             </Button>
           )}
 

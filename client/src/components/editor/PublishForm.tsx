@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -30,11 +30,13 @@ const PublishForm = () => {
   const DESCRIPTION_CHAR_LIMIT = 200;
   const {
     blog,
-    blog: { title, coverImgURL, description, tags, content, isDraft },
+    blog: { title, coverImgURL, description, tags, content },
   } = useEditorStore((s) => ({ blog: s.blog }));
   const setBlog = useEditorStore((s) => s.setBlog);
   const setIsPublish = useEditorStore((s) => s.setIsPublish);
   const setIsPublishClose = useEditorStore((s) => s.setIsPublishClose);
+  const [searchParams] = useSearchParams();
+  const isDraft = searchParams.get("isDraft") === "true";
 
   const [descriptionValue, setDescriptionValue] = useState(description);
 
@@ -88,8 +90,9 @@ const PublishForm = () => {
         const updatedBlog = await updatePublishedBlog({
           blogId,
           blog: publishedBlog,
+          isPublishingDraft: isDraft ? true : false,
         });
-        message = "Blog Updated";
+        message = isDraft ? "Blog Published 🥳" : "Blog Updated";
         blogUrl = `/blogs/${updatedBlog.blogId}`;
       } else {
         // create mode - publish new blog
@@ -98,9 +101,9 @@ const PublishForm = () => {
         blogUrl = `/blogs/${newBlog.blogId}`;
       }
       toast.success(message);
-      navigate(blogUrl);
       form.reset();
       setIsPublish(false);
+      navigate(blogUrl);
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
         toast.error("An error occurred. Please try again later.");
