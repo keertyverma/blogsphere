@@ -7,8 +7,11 @@ import { isValidBlockContent } from "@/lib/utils";
 import { useAuthStore, useEditorStore } from "@/store";
 import { IBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
+import { useMediaQuery } from "@react-hook/media-query";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { IoMdSave } from "react-icons/io";
 import { IoClose, IoImageOutline } from "react-icons/io5";
+import { MdOutlinePreview } from "react-icons/md";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { editorJSTools } from "../../lib/editorjs-tools";
@@ -41,9 +44,11 @@ const BlogEditor = () => {
   const [searchParams] = useSearchParams();
   const isDraft = searchParams.get("isDraft") === "true";
   const { data, isLoading } = useGetBlog({ isDraft, blogId });
+  const [draftBlogId, setDraftBlogId] = useState<string | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
+  const isMobile = useMediaQuery("(max-width:640px)");
 
   const initializeEditor = (content = {} as OutputData) => {
     setTextEditor(
@@ -165,17 +170,19 @@ const BlogEditor = () => {
     try {
       if (blogId) {
         // edit mode - save updated blog as draft
-        await updateDraftBlog({
+        const updatedBlog: IBlog = await updateDraftBlog({
           blogId,
           blog: draftBlog,
         });
         toast.success("Draft saved.");
+        if (updatedBlog.blogId) setDraftBlogId(updatedBlog.blogId);
       } else {
         // create mode - save new blog as draft
-        const blog: IBlog = await saveBlog(draftBlog);
-        const blogUrl = `/blogs/drafts/${blog.blogId}`;
+        const newBlog: IBlog = await saveBlog(draftBlog);
         toast.success("Draft saved.");
-        navigate(blogUrl);
+        const newBlogId = newBlog.blogId;
+        if (newBlogId) setDraftBlogId(newBlogId);
+        navigate(`/editor/${newBlogId}?isDraft=true`);
       }
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
@@ -184,21 +191,42 @@ const BlogEditor = () => {
     }
   };
 
+  const handleDraftPreview = async () => {
+    if (draftBlogId) navigate(`/blogs/drafts/${draftBlogId}`);
+  };
+
   return (
     <>
       <nav className="navbar">
         <Logo />
-        <div className="flex gap-2 ml-auto">
+        <div className="flex-center gap-2 md:gap-2 ml-auto">
           <DarkThemeToggler classname="md:mr-2" />
 
           {(!blogId || (blogId && isDraft === true)) && (
             <Button
-              variant="outline"
-              className="rounded-full capitalize"
+              variant={isMobile ? "ghost" : "outline"}
+              className={isMobile ? "w-10 h-10 p-0" : "rounded-full capitalize"}
               onClick={handleSaveDraft}
               disabled={isSaving || isUpdating}
             >
-              save draft
+              <IoMdSave className="md:hidden text-muted-foreground text-3xl" />
+              <span className="hidden md:inline">save draft</span>
+            </Button>
+          )}
+
+          {(!blogId || (blogId && isDraft === true)) && (
+            <Button
+              variant={isMobile ? "ghost" : "outline"}
+              className={
+                isMobile
+                  ? "w-10 h-10 p-0"
+                  : "rounded-full capitalize text-primary hover:text-primary/90"
+              }
+              disabled={!draftBlogId}
+              onClick={handleDraftPreview}
+            >
+              <MdOutlinePreview className="md:hidden text-3xl -text-[2rem] text-primary" />
+              <span className="hidden md:inline">preview</span>
             </Button>
           )}
 
