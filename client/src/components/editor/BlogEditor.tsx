@@ -4,7 +4,7 @@ import {
   useUpdateBlog,
 } from "@/lib/react-query/queries";
 import { isValidBlockContent } from "@/lib/utils";
-import { useAuthStore, useEditorStore } from "@/store";
+import { INITIAL_BLOG, useAuthStore, useEditorStore } from "@/store";
 import { IBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { useMediaQuery } from "@react-hook/media-query";
@@ -34,9 +34,10 @@ const BlogEditor = () => {
     setTextEditor,
     isPublishClose,
     setIsPublishClose,
+    setLastSavedBlog,
   } = useEditorStore();
 
-  const { mutateAsync: saveBlog, isPending: isSaving } = useCreateBlog();
+  const { mutateAsync: createDraftBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
     useUpdateBlog();
 
@@ -44,7 +45,6 @@ const BlogEditor = () => {
   const [searchParams] = useSearchParams();
   const isDraft = searchParams.get("isDraft") === "true";
   const { data, isLoading } = useGetBlog({ isDraft, blogId });
-  const [draftBlogId, setDraftBlogId] = useState<string | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
@@ -61,12 +61,11 @@ const BlogEditor = () => {
     );
   };
 
-  // Initialize isPublishClose once on mount
   useEffect(() => {
     setIsPublishClose(false);
   }, []);
 
-  // set text editor content
+  // Initialize text editor
   const isReady = useRef(false);
   useEffect(() => {
     if (blogId) {
@@ -141,10 +140,12 @@ const BlogEditor = () => {
   };
 
   const handleSaveDraft = async () => {
+    // Ensure title is provided
     if (!title.length) {
       return toast.error("Please add a title to save the draft.");
     }
 
+    // Save editor content if text editor is present
     let content;
     if (textEditor) {
       try {
@@ -154,7 +155,7 @@ const BlogEditor = () => {
           setBlog({ ...blog, content: data });
         }
       } catch (error) {
-        console.log(error);
+        console.error("Error saving text editor content:", error);
       }
     }
 
@@ -167,22 +168,32 @@ const BlogEditor = () => {
       isDraft: true,
     };
 
-    try {
-      if (blogId) {
-        // edit mode - save updated blog as draft
-        const updatedBlog: IBlog = await updateDraftBlog({
-          blogId,
-          blog: draftBlog,
-        });
-        toast.success("Draft saved.");
-        if (updatedBlog.blogId) setDraftBlogId(updatedBlog.blogId);
+    const saveDraft = async (
+      draftBlog: IBlog,
+      blogId?: string
+    ): Promise<IBlog> => {
+      // Handle saving draft for both create and edit mode
+      const response = blogId
+        ? await updateDraftBlog({ blogId, blog: draftBlog }) // Edit mode - update existing draft blog
+        : await createDraftBlog(draftBlog); // create mode - save new blog as draft
+
+      if (response?.blogId) {
+        // Update `lastSavedBlog` with the current blog after successful blog save
+        setLastSavedBlog({ ...blog });
       } else {
-        // create mode - save new blog as draft
-        const newBlog: IBlog = await saveBlog(draftBlog);
-        toast.success("Draft saved.");
-        const newBlogId = newBlog.blogId;
-        if (newBlogId) setDraftBlogId(newBlogId);
-        navigate(`/editor/${newBlogId}?isDraft=true`);
+        console.error("Failed to save draft, no blogId returned in response");
+      }
+
+      return response;
+    };
+
+    try {
+      const savedBlog = await saveDraft(draftBlog as IBlog, blogId);
+      toast.success("Draft saved.");
+
+      // If the blog is newly created, redirect the user to the editor in edit mode to make further changes.
+      if (!blogId && savedBlog?.blogId) {
+        navigate(`/editor/${savedBlog.blogId}?isDraft=true`);
       }
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
@@ -191,8 +202,47 @@ const BlogEditor = () => {
     }
   };
 
+  const hasUnsavedChanges = (): boolean => {
+    // compare current editor blog and last saved blog for any unsaved changes
+    const { blog: currentBlog, lastSavedBlog } = useEditorStore.getState();
+    const isTitleChanged = currentBlog.title !== lastSavedBlog.title;
+    const isCoverImageChanged =
+      currentBlog.coverImgURL !== lastSavedBlog.coverImgURL;
+    const isContentChanged =
+      JSON.stringify(currentBlog.content.blocks) !==
+      JSON.stringify(lastSavedBlog.content.blocks);
+
+    return isTitleChanged || isCoverImageChanged || isContentChanged;
+  };
+
   const handleDraftPreview = async () => {
-    if (draftBlogId) navigate(`/blogs/drafts/${draftBlogId}`);
+    // check if the blog is empty; nothing to preview.
+    if (!blogId && JSON.stringify(blog) === JSON.stringify(INITIAL_BLOG)) {
+      return toast.error("Your draft is empty. Make changes to preview it.");
+    }
+
+    // update editor content before previewing
+    if (textEditor) {
+      try {
+        const data = await textEditor.save();
+        if (data?.blocks.length) {
+          setBlog({ ...blog, content: data });
+        }
+      } catch (error) {
+        console.error("Error saving editor content:", error);
+      }
+    }
+
+    // check for unsaved changes before previewing
+    if (hasUnsavedChanges()) {
+      return toast.error(
+        "You have unsaved changes. Please save your draft before previewing."
+      );
+
+      // TODO: Implement auto-save feature in the future to improve user experience
+    }
+
+    navigate(`/blogs/drafts/${blogId}`);
   };
 
   return (
@@ -222,7 +272,6 @@ const BlogEditor = () => {
                   ? "w-10 h-10 p-0"
                   : "rounded-full capitalize text-primary hover:text-primary/90"
               }
-              disabled={!draftBlogId}
               onClick={handleDraftPreview}
             >
               <MdOutlinePreview className="md:hidden text-3xl -text-[2rem] text-primary" />

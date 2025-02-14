@@ -10,6 +10,7 @@ const Editor = () => {
   const isPublish = useEditorStore((s) => s.isPublish);
   const setIsPublish = useEditorStore((s) => s.setIsPublish);
   const setBlog = useEditorStore((s) => s.setBlog);
+  const setLastSavedBlog = useEditorStore((s) => s.setLastSavedBlog);
 
   const { blogId } = useParams();
   const [searchParams] = useSearchParams();
@@ -20,11 +21,13 @@ const Editor = () => {
 
   useEffect(() => {
     if (blogId && data) {
-      // edit mode
+      // Edit mode: Load existing blog data for editing
       setBlog(data);
+      setLastSavedBlog(data);
     } else {
-      // create mode
+      // Create mode: Initialize the blog with default values (no data yet)
       setBlog(INITIAL_BLOG);
+      setLastSavedBlog(INITIAL_BLOG);
     }
 
     setIsPublish(false);
