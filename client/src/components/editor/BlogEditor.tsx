@@ -5,7 +5,6 @@ import {
 } from "@/lib/react-query/queries";
 import { isValidBlockContent } from "@/lib/utils";
 import { INITIAL_BLOG, useAuthStore, useEditorStore } from "@/store";
-import { IBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { useMediaQuery } from "@react-hook/media-query";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
@@ -139,66 +138,72 @@ const BlogEditor = () => {
     }
   };
 
-  const handleSaveDraft = async () => {
-    // Ensure title is provided
-    if (!title.length) {
-      return toast.error("Please add a title to save the draft.");
-    }
-
-    // Save editor content if text editor is present
-    let content;
-    if (textEditor) {
-      try {
-        const data = await textEditor.save();
-        if (data?.blocks.length) {
-          content = data;
-          setBlog({ ...blog, content: data });
-        }
-      } catch (error) {
-        console.error("Error saving text editor content:", error);
-      }
-    }
-
-    const draftBlog = {
-      title,
-      description,
-      content: content ? { blocks: content?.blocks } : undefined,
-      coverImgURL,
-      tags: tags,
-      isDraft: true,
-    };
-
-    const saveDraft = async (
-      draftBlog: IBlog,
-      blogId?: string
-    ): Promise<IBlog> => {
-      // Handle saving draft for both create and edit mode
-      const response = blogId
-        ? await updateDraftBlog({ blogId, blog: draftBlog }) // Edit mode - update existing draft blog
-        : await createDraftBlog(draftBlog); // create mode - save new blog as draft
-
-      if (response?.blogId) {
-        // Update `lastSavedBlog` with the current blog after successful blog save
-        setLastSavedBlog({ ...blog });
-      } else {
-        console.error("Failed to save draft, no blogId returned in response");
-      }
-
-      return response;
-    };
-
+  const getEditorContent = async (): Promise<OutputData | null> => {
+    // Retrieves the current content from the text editor.
+    if (!textEditor) return null;
     try {
-      const savedBlog = await saveDraft(draftBlog as IBlog, blogId);
-      toast.success("Draft saved.");
+      const data = await textEditor.save();
+      return data?.blocks.length ? data : null;
+    } catch (error) {
+      console.error("Error retrieving text editor content:", error);
+      return null;
+    }
+  };
 
-      // If the blog is newly created, redirect the user to the editor in edit mode to make further changes.
-      if (!blogId && savedBlog?.blogId) {
-        navigate(`/editor/${savedBlog.blogId}?isDraft=true`);
+  const saveDraft = async (): Promise<string | null> => {
+    try {
+      // Ensure title is provided
+      if (!title.trim()) {
+        toast.error("Please add a title to save the draft.");
+        return null;
+      }
+
+      // Retrieve the latest editor content and update the blog state if content exists.
+      const content = await getEditorContent();
+      if (content) {
+        setBlog({ ...blog, content });
+      }
+
+      const draftBlog = {
+        title,
+        description,
+        content: content ? { blocks: content?.blocks } : undefined,
+        coverImgURL,
+        tags: tags,
+        isDraft: true,
+      };
+
+      // Create a new draft or update the existing one
+      const response = blogId
+        ? await updateDraftBlog({ blogId, blog: draftBlog })
+        : await createDraftBlog(draftBlog);
+      if (!response?.blogId) return null;
+
+      // Update `lastSavedBlog` with the current blog after successfully saving the draft
+      setLastSavedBlog({ ...blog });
+      return response.blogId;
+    } catch (error) {
+      if (useAuthStore.getState().isTokenExpired) {
+        return null;
+      }
+      throw new Error("Failed to save draft. Please try again later.");
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    try {
+      const savedBlogId = await saveDraft();
+      if (!savedBlogId) return;
+
+      toast.success("Draft saved.");
+      // If the blog is newly created, navigate to the editor in `edit` mode, allowing the user to continue making modifications.
+      if (!blogId) {
+        navigate(`/editor/${savedBlogId}?isDraft=true`);
       }
     } catch (error) {
-      if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
-      }
+      toast.error(
+        error instanceof Error ? error.message : "An unexpected error occurred."
+      );
     }
   };
 
@@ -216,33 +221,38 @@ const BlogEditor = () => {
   };
 
   const handleDraftPreview = async () => {
-    // check if the blog is empty; nothing to preview.
-    if (!blogId && JSON.stringify(blog) === JSON.stringify(INITIAL_BLOG)) {
-      return toast.error("Your draft is empty. Make changes to preview it.");
-    }
-
-    // update editor content before previewing
-    if (textEditor) {
-      try {
-        const data = await textEditor.save();
-        if (data?.blocks.length) {
-          setBlog({ ...blog, content: data });
-        }
-      } catch (error) {
-        console.error("Error saving editor content:", error);
+    try {
+      // Retrieve the latest editor content and update the blog state if content exists.
+      const content = await getEditorContent();
+      if (content) {
+        setBlog({ ...blog, content });
       }
-    }
 
-    // check for unsaved changes before previewing
-    if (hasUnsavedChanges()) {
-      return toast.error(
-        "You have unsaved changes. Please save your draft before previewing."
+      // Prevent preview if the draft is empty
+      const { blog: currentBlog } = useEditorStore.getState();
+      if (
+        !blogId &&
+        JSON.stringify(currentBlog) === JSON.stringify(INITIAL_BLOG)
+      ) {
+        return toast.error("Your draft is empty. Make changes to preview it.");
+      }
+
+      let draftBlogId: string | undefined | null = blogId;
+      if (hasUnsavedChanges()) {
+        // Auto-save draft before previewing
+        draftBlogId = await saveDraft();
+        if (!draftBlogId) return; // prevent navigation if auto-save failed
+      }
+
+      // Navigate to blog preview
+      navigate(`/blogs/drafts/${draftBlogId}`);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? "Auto-save failed before previewing the draft. Please try again."
+          : "An unexpected error occurred."
       );
-
-      // TODO: Implement auto-save feature in the future to improve user experience
     }
-
-    navigate(`/blogs/drafts/${blogId}`);
   };
 
   return (
