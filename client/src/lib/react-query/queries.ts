@@ -182,7 +182,7 @@ export const useCreateBlog = () => {
         queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
       });
     },
   });
@@ -283,9 +283,14 @@ export const useGetUserPublishedBlogs = (
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 
-export const useGetUserDraftBlogs = (searchTerm?: string) =>
-  useInfiniteQuery({
-    queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, searchTerm],
+export const useGetUserDraftBlogs = (searchTerm?: string) => {
+  const { username } = useAuthStore.getState().user;
+
+  return useInfiniteQuery({
+    queryKey: [
+      QUERY_KEYS.GET_USER_DRAFT_BLOGS,
+      { username, searchTerm: searchTerm || "" },
+    ],
     queryFn: async ({ pageParam = 1 }) =>
       await apiClient
         .get("/blogs/drafts", {
@@ -306,6 +311,7 @@ export const useGetUserDraftBlogs = (searchTerm?: string) =>
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
+};
 
 export const useGetBlog = ({
   isDraft,
@@ -371,19 +377,22 @@ export const useUpdateBlog = () => {
         .then((res) => res.data.result),
     onSuccess: (updatedBlog, toUpdateRequest) => {
       const { blogId, authorDetails, isDraft } = updatedBlog;
-      const { _id: authorId, personalInfo } = authorDetails;
+      const {
+        _id: authorId,
+        personalInfo: { username },
+      } = authorDetails;
       const { isPublishingDraft } = toUpdateRequest;
 
       // Transitioning from draft to published blog status
       if (isPublishingDraft) {
         // refetch user to update the total post count accurately
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
+          queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
         });
 
         // refetch user's draft list
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
         });
 
         // refetch user's published list
@@ -413,7 +422,7 @@ export const useUpdateBlog = () => {
 
         // refetch user's draft list
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
         });
       } else {
         // published blog updated
@@ -479,16 +488,19 @@ export const useDeleteBlog = () => {
     mutationFn: (blogId: string) =>
       apiClient.delete(`blogs/${blogId}`).then((res) => res.data.result),
     onSuccess: (data) => {
-      const { _id: authorId, personalInfo } = data.authorDetails;
+      const {
+        _id: authorId,
+        personalInfo: { username },
+      } = data.authorDetails;
       // refetch user profile and all blogs
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BY_ID, personalInfo.username],
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, ""],
+        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
       });
 
       // refetch latest blog with or without tag filter
