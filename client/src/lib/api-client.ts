@@ -22,18 +22,19 @@ const useAxiosInterceptors = () => {
         if (error.response) {
           const { status } = error.response;
           if (status === 401) {
-            // Unauthorized - Handle token expiration or missing token case
-            // this will reset user auth and re-direct user to login page
+            // Handle unauthorized access due to token expiration or missing token
             setTokenExpired(true);
             clearUserAuth();
 
-            setRedirectedUrl(location.pathname);
+            // Save the current URL to redirect the user after login
+            setRedirectedUrl(`${location.pathname}${location.search || ""}`);
             navigate("/login");
+
             toast.error("Your session has expired. Please log in again.");
           }
 
           if (status === 429) {
-            // api rate limit exceeds
+            // Api rate limit exceeds
             toast.error(
               "You have exceeded the request limit. Please try again later in 1 hour."
             );
