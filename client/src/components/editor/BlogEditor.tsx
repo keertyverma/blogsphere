@@ -19,9 +19,12 @@ import DarkThemeToggler from "../shared/DarkThemeToggler";
 import FileUploader from "../shared/FileUploader";
 import Logo from "../shared/Logo";
 import { Button } from "../ui/button";
+import IconWithLoader from "../ui/icon-with-loader";
+import TextWithLoader from "../ui/text-with-loader";
 
 const BlogEditor = () => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const {
     blog,
     blog: { title, coverImgURL, description, tags },
@@ -39,6 +42,7 @@ const BlogEditor = () => {
   const { mutateAsync: createDraftBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
     useUpdateBlog();
+  const isSavingDraft = (isSaving || isUpdating) && !isAutoSaving;
 
   const { blogId } = useParams();
   const [searchParams] = useSearchParams();
@@ -240,6 +244,7 @@ const BlogEditor = () => {
       let draftBlogId: string | undefined | null = blogId;
       if (hasUnsavedChanges()) {
         // Auto-save draft before previewing
+        setIsAutoSaving(true);
         draftBlogId = await saveDraft();
         if (!draftBlogId) return; // prevent navigation if auto-save failed
       }
@@ -252,6 +257,8 @@ const BlogEditor = () => {
           ? "Auto-save failed before previewing the draft. Please try again."
           : "An unexpected error occurred."
       );
+    } finally {
+      if (isAutoSaving) setIsAutoSaving(false);
     }
   };
 
@@ -262,31 +269,44 @@ const BlogEditor = () => {
         <div className="flex-center gap-2 md:gap-2 ml-auto">
           <DarkThemeToggler classname="md:mr-2" />
 
+          {/* Show these buttons only if the blog is a draft (not yet published). */}
           {(!blogId || (blogId && isDraft === true)) && (
-            <Button
-              variant={isMobile ? "ghost" : "outline"}
-              className={isMobile ? "w-10 h-10 p-0" : "rounded-full capitalize"}
-              onClick={handleSaveDraft}
-              disabled={isSaving || isUpdating}
-            >
-              <IoMdSave className="md:hidden text-muted-foreground text-3xl" />
-              <span className="hidden md:inline">save draft</span>
-            </Button>
-          )}
-
-          {(!blogId || (blogId && isDraft === true)) && (
-            <Button
-              variant={isMobile ? "ghost" : "outline"}
-              className={
-                isMobile
-                  ? "w-10 h-10 p-0"
-                  : "rounded-full capitalize text-primary hover:text-primary/90"
-              }
-              onClick={handleDraftPreview}
-            >
-              <MdOutlinePreview className="md:hidden text-3xl -text-[2rem] text-primary" />
-              <span className="hidden md:inline">preview</span>
-            </Button>
+            <>
+              <Button
+                variant={isMobile ? "ghost" : "outline"}
+                className={
+                  isMobile ? "w-10 h-10 p-0" : "rounded-full capitalize"
+                }
+                onClick={handleSaveDraft}
+                disabled={isSavingDraft}
+              >
+                {isMobile ? (
+                  <IconWithLoader icon={IoMdSave} isLoading={isSavingDraft} />
+                ) : (
+                  <TextWithLoader text="save draft" isLoading={isSavingDraft} />
+                )}
+              </Button>
+              <Button
+                variant={isMobile ? "ghost" : "outline"}
+                className={
+                  isMobile
+                    ? "w-10 h-10 p-0"
+                    : "rounded-full capitalize text-primary hover:text-primary/90"
+                }
+                onClick={handleDraftPreview}
+                disabled={isAutoSaving}
+              >
+                {isMobile ? (
+                  <IconWithLoader
+                    icon={MdOutlinePreview}
+                    isLoading={isAutoSaving}
+                    colorClass="text-primary"
+                  />
+                ) : (
+                  <TextWithLoader text="preview" isLoading={isAutoSaving} />
+                )}
+              </Button>
+            </>
           )}
 
           <Button onClick={handlePublish} className="rounded-full capitalize">
