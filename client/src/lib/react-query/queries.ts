@@ -6,6 +6,8 @@ import {
   IBookmark,
   IBookmarkGetQuery,
   ICommentQuery,
+  ICreateDraftBlog,
+  ICreatePublishedBlog,
   IFetchAllResponse,
   IFetchCursorPaginatedResult,
   IFetchResponse,
@@ -158,13 +160,34 @@ export const useUpdateUserProfile = () => {
 // ----------------- Blog -------------------
 export const useCreateBlog = () => {
   const queryClient = useQueryClient();
-  const { id: authorId, username } = useAuthStore((s) => s.user);
-  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
-    mutationFn: (data: object) =>
+    mutationFn: (data: ICreateDraftBlog | ICreatePublishedBlog) =>
       apiClient.post("/blogs", data).then((res) => res.data.result),
-    onSuccess: () => {
+    onSuccess: (
+      _,
+      toCreateRequest: ICreateDraftBlog | ICreatePublishedBlog
+    ) => {
+      const { isDraft } = toCreateRequest;
+      const { id: authorId, username } = useAuthStore.getState().user;
+      const selectedTag = useEditorStore.getState().selectedTag;
+
+      if (isDraft) {
+        // refetch user's draft blogs
+        return queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
+        });
+      }
+
+      // refetch user data to update the total post count and refresh the list of published blogs.
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
+      });
+
+      // refetch latest blog with or without tag filter
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
       });
@@ -173,17 +196,6 @@ export const useCreateBlog = () => {
           queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
         });
       }
-
-      // refresh authenticated user published and draft blog lists
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
-      });
     },
   });
 };
@@ -364,7 +376,6 @@ export const useUpdateReads = () =>
 
 export const useUpdateBlog = () => {
   const queryClient = useQueryClient();
-  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
     mutationFn: (data: {
@@ -382,6 +393,7 @@ export const useUpdateBlog = () => {
         personalInfo: { username },
       } = authorDetails;
       const { isPublishingDraft } = toUpdateRequest;
+      const selectedTag = useEditorStore.getState().selectedTag;
 
       // Transitioning from draft to published blog status
       if (isPublishingDraft) {
@@ -452,13 +464,14 @@ export const useUpdateBlog = () => {
 
 export const useLikePost = () => {
   const queryClient = useQueryClient();
-  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
     mutationFn: (blogId: string) =>
       apiClient.patch(`/blogs/${blogId}/like`).then((res) => res.data.result),
     onSuccess: (data) => {
       const authorId = data.author;
+      const selectedTag = useEditorStore.getState().selectedTag;
+
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_PUBLISHED_BLOG_BY_ID, data.blogId],
       });
@@ -482,7 +495,6 @@ export const useLikePost = () => {
 
 export const useDeleteBlog = () => {
   const queryClient = useQueryClient();
-  const selectedTag = useEditorStore((s) => s.selectedTag);
 
   return useMutation({
     mutationFn: (blogId: string) =>
@@ -492,6 +504,8 @@ export const useDeleteBlog = () => {
         _id: authorId,
         personalInfo: { username },
       } = data.authorDetails;
+      const selectedTag = useEditorStore.getState().selectedTag;
+
       // refetch user profile and all blogs
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],

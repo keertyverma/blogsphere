@@ -5,6 +5,7 @@ import {
 } from "@/lib/react-query/queries";
 import { isValidBlockContent } from "@/lib/utils";
 import { INITIAL_BLOG, useAuthStore, useEditorStore } from "@/store";
+import { ICreateDraftBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { useMediaQuery } from "@react-hook/media-query";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
@@ -27,7 +28,7 @@ const BlogEditor = () => {
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const {
     blog,
-    blog: { title, coverImgURL, description, tags },
+    blog: { title, coverImgURL },
   } = useEditorStore((s) => ({ blog: s.blog }));
   const {
     setIsPublish,
@@ -170,17 +171,15 @@ const BlogEditor = () => {
 
       const draftBlog = {
         title,
-        description,
         content: content ? { blocks: content?.blocks } : undefined,
         coverImgURL,
-        tags: tags,
         isDraft: true,
       };
 
       // Create a new draft or update the existing one
       const response = blogId
         ? await updateDraftBlog({ blogId, blog: draftBlog })
-        : await createDraftBlog(draftBlog);
+        : await createDraftBlog(draftBlog as ICreateDraftBlog);
       if (!response?.blogId) return null;
 
       // Update `lastSavedBlog` with the current blog after successfully saving the draft

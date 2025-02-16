@@ -1,4 +1,4 @@
-import { OutputData } from "@editorjs/editorjs";
+import { OutputBlockData, OutputData } from "@editorjs/editorjs";
 
 export type INewUser = {
   fullname: string;
@@ -99,12 +99,20 @@ export interface IBlog {
   isDraft?: boolean;
 }
 
-export interface ICreateBlog {
+export interface ICreateDraftBlog {
   title: string;
-  description: string;
-  content: OutputData;
+  isDraft: boolean;
+  content?: { blocks: OutputBlockData<string, Record<string, unknown>>[] };
   coverImgURL?: string;
+}
+
+export interface ICreatePublishedBlog {
+  title: string;
+  content: { blocks: OutputBlockData<string, Record<string, unknown>>[] };
+  description: string;
   tags: string[];
+  isDraft?: boolean;
+  coverImgURL?: string;
 }
 
 export interface IBlogQuery {

@@ -1,7 +1,7 @@
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
 import { BlogValidation } from "@/lib/validation";
 import { useAuthStore, useEditorStore } from "@/store";
-import { IBlog, ICreateBlog } from "@/types";
+import { IBlog, ICreatePublishedBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,7 +30,7 @@ const PublishForm = () => {
   const DESCRIPTION_CHAR_LIMIT = 200;
   const {
     blog,
-    blog: { title, coverImgURL, description, tags, content },
+    blog: { title, coverImgURL, description = "", tags = [], content },
   } = useEditorStore((s) => ({ blog: s.blog }));
   const setBlog = useEditorStore((s) => s.setBlog);
   const setIsPublish = useEditorStore((s) => s.setIsPublish);
@@ -65,7 +65,7 @@ const PublishForm = () => {
       return;
     }
 
-    const updatedBlog: ICreateBlog = {
+    const updatedBlog: ICreatePublishedBlog = {
       title,
       description,
       content: { blocks: content.blocks },
