@@ -1,4 +1,5 @@
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { BlogValidation } from "@/lib/validation";
 import { useAuthStore, useEditorStore } from "@/store";
 import { IBlog, ICreatePublishedBlog } from "@/types";
@@ -7,7 +8,6 @@ import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -61,7 +61,7 @@ const PublishForm = () => {
 
     // tags are required
     if (blog.tags.length === 0 && !tag) {
-      toast.error("Please add at least one tag to publish.");
+      showErrorToast("Please add at least one tag to publish.");
       return;
     }
 
@@ -100,13 +100,13 @@ const PublishForm = () => {
         message = "Blog Published 🥳";
         blogUrl = `/blogs/${newBlog.blogId}`;
       }
-      toast.success(message);
+      showSuccessToast(message);
       form.reset();
       setIsPublish(false);
       navigate(blogUrl);
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };
@@ -129,7 +129,7 @@ const PublishForm = () => {
       if (tag.length && !tags.includes(tag))
         setBlog({ ...blog, tags: [...tags, tag] });
     } else {
-      toast.error(
+      showErrorToast(
         `Maximum tag limit of ${TAG_LIMIT} reached. You can’t add any more tags.`
       );
     }

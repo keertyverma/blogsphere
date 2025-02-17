@@ -1,9 +1,8 @@
 import { useCreateReply, useGetUser } from "@/lib/react-query/queries";
-import { handleProfileImgErr } from "@/lib/utils";
+import { handleProfileImgErr, showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 
@@ -35,7 +34,7 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      toast.error("Please log in to add a reply.");
+      showErrorToast("Please log in to add a reply.");
       setRedirectedUrl(location.pathname);
       return navigate("/login");
     }
@@ -47,7 +46,7 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
       onClose();
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };

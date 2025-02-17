@@ -26,6 +26,7 @@ export const uploadSecurely = async (data: string) => {
     return result.secure_url;
   } catch (error) {
     const err = error as UploadApiErrorResponse;
+    console.error("Error uploading image to Cloudinary:", err);
     if (err.http_code === 400) throw new BadRequestError("Invalid image file");
     throw err;
   }

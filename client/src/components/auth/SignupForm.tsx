@@ -26,8 +26,8 @@ import AnimationWrapper from "../shared/AnimationWrapper";
 import { Input } from "../ui/input";
 
 import { googleAuth } from "@/lib/firebase/Firebase";
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
-import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
 const SignupForm = () => {
@@ -57,7 +57,7 @@ const SignupForm = () => {
       const userResponse = await createUserAccount(user);
       if (userResponse.status === 201) {
         // user registered and verification email has been sent.
-        toast.success("Registration Successful");
+        showSuccessToast("Registration Successful");
         setHasSentEmail(true);
       }
       form.reset();
@@ -69,7 +69,7 @@ const SignupForm = () => {
         if (errorDetail.includes("verification email")) {
           // user registered but verification email has not been sent.
           setHasSentEmail(false);
-          toast.success("Registration Successful");
+          showSuccessToast("Registration Successful");
           errorMessage = "";
           form.reset();
         } else if (error.code === "ERR_BAD_REQUEST") {
@@ -78,7 +78,7 @@ const SignupForm = () => {
       }
 
       if (errorMessage) {
-        toast.error(errorMessage, {
+        showErrorToast(errorMessage, {
           autoClose: 10000,
         });
       }
@@ -125,14 +125,14 @@ const SignupForm = () => {
           errorMessage =
             "Your account was created with email and password. Please log in using those credentials.";
           navigate("/login");
-          toast.error(errorMessage);
+          showErrorToast(errorMessage);
           return;
         } else if (details?.toLowerCase() === "access token has expired") {
           errorMessage =
             "Your session has expired. Please re-login with Google to continue.";
         }
       }
-      toast.error(errorMessage);
+      showErrorToast(errorMessage);
     }
   };
 

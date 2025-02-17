@@ -4,14 +4,18 @@ import {
   useGetUserBookmarks,
   useLikePost,
 } from "@/lib/react-query/queries";
-import { checkIsLiked, formateNumber } from "@/lib/utils";
+import {
+  checkIsLiked,
+  formateNumber,
+  showErrorToast,
+  showSuccessToast,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
 import { useEffect, useState } from "react";
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import BlogComment from "./BlogComment";
 import ManageBlog from "./ManageBlog";
@@ -70,7 +74,7 @@ const BlogInteraction = ({
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      toast.error("Please login to like this blog");
+      showErrorToast("Please login to like this blog");
       setRedirectedUrl(location.pathname);
       return navigate("/login");
     }
@@ -98,7 +102,7 @@ const BlogInteraction = ({
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      toast.error("Please login to bookmark this blog");
+      showErrorToast("Please login to bookmark this blog");
       setRedirectedUrl(location.pathname);
       return navigate("/login");
     }
@@ -107,15 +111,15 @@ const BlogInteraction = ({
       if (isBookmarked) {
         // remove bookmark
         await deleteBookmark(id as string);
-        toast.success("Blog unsaved");
+        showSuccessToast("Blog unsaved");
       } else {
         // add bookmark
         await createBookmark(id as string);
-        toast.success("Blog saved");
+        showSuccessToast("Blog saved");
       }
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };

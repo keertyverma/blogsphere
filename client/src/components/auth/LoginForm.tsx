@@ -13,13 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { googleAuth } from "@/lib/firebase/Firebase";
 import { useLogin, useLoginWithGoogle } from "@/lib/react-query/queries";
+import { showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { FormEvent, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Input } from "../ui/input";
@@ -95,7 +95,7 @@ const LoginForm = () => {
         setVerificationMsg("");
       }
       if (errorMessage) {
-        toast.error(errorMessage);
+        showErrorToast(errorMessage);
       }
     }
   };
@@ -140,14 +140,14 @@ const LoginForm = () => {
           errorMessage =
             "Your account was created with email and password. Please log in using those credentials.";
           navigate("/login");
-          toast.error(errorMessage);
+          showErrorToast(errorMessage);
           return;
         } else if (details?.toLowerCase() === "access token has expired") {
           errorMessage =
             "Your session has expired. Please re-login with Google to continue.";
         }
       }
-      toast.error(errorMessage);
+      showErrorToast(errorMessage);
     }
   };
 

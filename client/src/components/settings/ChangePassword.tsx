@@ -12,12 +12,12 @@ import {
 } from "../ui/form";
 
 import { useUpdatePassword } from "@/lib/react-query/queries";
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -48,7 +48,7 @@ const ChangePassword = () => {
         newPassword,
       });
 
-      toast.success("Password updated successfully! Please login again.");
+      showSuccessToast("Password updated successfully! Please login again.");
       form.reset();
       navigate("/login");
       clearUserAuth();
@@ -70,7 +70,7 @@ const ChangePassword = () => {
       }
 
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error(errorMessage);
+        showErrorToast(errorMessage);
       }
     }
   };

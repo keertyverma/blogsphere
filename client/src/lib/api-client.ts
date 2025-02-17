@@ -2,7 +2,7 @@ import { useAuthStore } from "@/store";
 import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { showErrorToast } from "./utils";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_SERVER_DOMAIN,
@@ -30,12 +30,12 @@ const useAxiosInterceptors = () => {
             setRedirectedUrl(`${location.pathname}${location.search || ""}`);
             navigate("/login");
 
-            toast.error("Your session has expired. Please log in again.");
+            showErrorToast("Your session has expired. Please log in again.");
           }
 
           if (status === 429) {
             // Api rate limit exceeds
-            toast.error(
+            showErrorToast(
               "You have exceeded the request limit. Please try again later in 1 hour."
             );
           }

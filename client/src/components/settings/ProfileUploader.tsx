@@ -3,12 +3,12 @@ import {
   convertFileToUrl,
   fileToBase64,
   handleProfileImgErr,
+  showErrorToast,
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useCallback, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 
@@ -31,7 +31,7 @@ const ProfileUploader = ({ fieldChange, mediaUrl, onUpload }: Props) => {
       } catch (error) {
         setPreviewUrl(mediaUrl);
         if (!useAuthStore.getState().isTokenExpired) {
-          toast.error("An error occurred. Please try again later.");
+          showErrorToast("An error occurred. Please try again later.");
         }
       }
     },

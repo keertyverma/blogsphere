@@ -3,7 +3,11 @@ import {
   useGetBlog,
   useUpdateBlog,
 } from "@/lib/react-query/queries";
-import { isValidBlockContent } from "@/lib/utils";
+import {
+  isValidBlockContent,
+  showErrorToast,
+  showSuccessToast,
+} from "@/lib/utils";
 import { INITIAL_BLOG, useAuthStore, useEditorStore } from "@/store";
 import { ICreateDraftBlog } from "@/types";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
@@ -13,7 +17,6 @@ import { IoMdSave } from "react-icons/io";
 import { IoClose, IoImageOutline } from "react-icons/io5";
 import { MdOutlinePreview } from "react-icons/md";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import { editorJSTools } from "../../lib/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import DarkThemeToggler from "../shared/DarkThemeToggler";
@@ -132,14 +135,14 @@ const BlogEditor = () => {
             : "Please add a title to publish your blog."
           : "Please add content to the blog before publishing.";
 
-        return toast.error(errorMsg);
+        return showErrorToast(errorMsg);
       }
 
       setBlog({ ...blog, content: blogContent });
       setIsPublish(true);
     } catch (error) {
       console.error("Error saving blog content:", error);
-      toast.error("Failed to save blog content. Please try again.");
+      showErrorToast("Failed to save blog content. Please try again.");
     }
   };
 
@@ -159,7 +162,7 @@ const BlogEditor = () => {
     try {
       // Ensure title is provided
       if (!title.trim()) {
-        toast.error("Please add a title to save the draft.");
+        showErrorToast("Please add a title to save the draft.");
         return null;
       }
 
@@ -198,13 +201,13 @@ const BlogEditor = () => {
       const savedBlogId = await saveDraft();
       if (!savedBlogId) return;
 
-      toast.success("Draft saved.");
+      showSuccessToast("Draft saved.");
       // If the blog is newly created, navigate to the editor in `edit` mode, allowing the user to continue making modifications.
       if (!blogId) {
         navigate(`/editor/${savedBlogId}?isDraft=true`);
       }
     } catch (error) {
-      toast.error(
+      showErrorToast(
         error instanceof Error ? error.message : "An unexpected error occurred."
       );
     }
@@ -237,7 +240,9 @@ const BlogEditor = () => {
         !blogId &&
         JSON.stringify(currentBlog) === JSON.stringify(INITIAL_BLOG)
       ) {
-        return toast.error("Your draft is empty. Make changes to preview it.");
+        return showErrorToast(
+          "Your draft is empty. Make changes to preview it."
+        );
       }
 
       let draftBlogId: string | undefined | null = blogId;
@@ -251,7 +256,7 @@ const BlogEditor = () => {
       // Navigate to blog preview
       navigate(`/blogs/drafts/${draftBlogId}`);
     } catch (error) {
-      toast.error(
+      showErrorToast(
         error instanceof Error
           ? "Auto-save failed before previewing the draft. Please try again."
           : "An unexpected error occurred."
@@ -322,7 +327,7 @@ const BlogEditor = () => {
             onClick={() => setToggleFileUploader((prev) => !prev)}
           >
             <IoImageOutline className="text-xl md:text-2xl text-secondary-foreground" />
-            {blogId ? "edit" : "add"} cover
+            {coverImgURL ? "edit" : "add"} cover
           </Button>
           {toggleFileUploader && (
             <div className="border-[1px] border-border rounded-lg shadow-md w-full max-w-[725px]">

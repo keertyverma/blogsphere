@@ -1,4 +1,5 @@
 import { useDeleteBlog } from "@/lib/react-query/queries";
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IBlog } from "@/types";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
@@ -33,12 +34,12 @@ const ManageBlog = ({ blogId, isDraft }: Props) => {
       const authorUsername = deletedBlog.authorDetails.personalInfo.username;
 
       toast.dismiss(loadingToast);
-      toast.success("Blog Deleted.👍");
+      showSuccessToast("Blog Deleted.👍");
       navigate(`/user/${authorUsername}`);
     } catch (error) {
       toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };

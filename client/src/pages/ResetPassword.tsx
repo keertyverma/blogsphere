@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useResetPassword } from "@/lib/react-query/queries";
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { ResetPasswordValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
@@ -17,7 +18,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import * as z from "zod";
 import ErrorPage from "./ErrorPage";
 
@@ -46,12 +46,12 @@ const ResetPassword = () => {
     if (!email && !token) return;
 
     if (data.newPassword !== data.confirmNewPassword) {
-      return toast.error("Both passwords must match.");
+      return showErrorToast("Both passwords must match.");
     }
 
     try {
       await resetPassword({ email, token, password: data.newPassword });
-      toast.success(
+      showSuccessToast(
         "Password reset complete. Please log in with your new password."
       );
       navigate("/login");
@@ -87,7 +87,7 @@ const ResetPassword = () => {
       }
 
       if (errorMessage) {
-        toast.error(errorMessage);
+        showErrorToast(errorMessage);
       }
     } finally {
       form.reset();

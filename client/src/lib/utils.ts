@@ -2,6 +2,7 @@ import { OutputBlockData } from "@editorjs/editorjs";
 import { clsx, type ClassValue } from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { toast, ToastContainerProps, ToastOptions } from "react-toastify";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -170,4 +171,36 @@ export const isValidBlockContent = (block: OutputBlockData): boolean => {
 
   // For other block types, return true (content is considered valid)
   return true;
+};
+
+export const getToastOptions = (): ToastContainerProps => ({
+  position: "bottom-right",
+  style: {
+    width: "auto", // Keeps width dynamic
+    minWidth: "100px", // Ensures small toasts don’t get too tiny
+    maxWidth: "400px", // Prevents full-width expansion
+  },
+  autoClose: 5000,
+  hideProgressBar: true,
+  pauseOnHover: false,
+});
+
+// Success Toast Notification
+export const showSuccessToast = (
+  message: React.ReactNode,
+  options?: ToastOptions<unknown>
+) => {
+  toast.success(message, {
+    autoClose: 3000,
+    closeButton: false,
+    ...options,
+  });
+};
+
+// Error Toast Notification
+export const showErrorToast = (
+  message: React.ReactNode,
+  options?: ToastOptions<unknown>
+) => {
+  toast.error(message, { ...options });
 };

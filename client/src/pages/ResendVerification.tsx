@@ -2,10 +2,10 @@ import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useResendVerificationEmail } from "@/lib/react-query/queries";
+import { showErrorToast } from "@/lib/utils";
 import { AxiosError } from "axios";
 import { ChangeEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 
 const ResendVerification = () => {
   const [email, setEmail] = useState<string>("");
@@ -64,7 +64,7 @@ const ResendVerification = () => {
         }
       }
 
-      if (errorMessage) toast.error(errorMessage);
+      if (errorMessage) showErrorToast(errorMessage);
     } finally {
       setEmail("");
     }

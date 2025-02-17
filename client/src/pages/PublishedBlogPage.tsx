@@ -2,12 +2,16 @@ import BlogContent from "@/components/blog/BlogContent";
 import BlogInteraction from "@/components/blog/BlogInteraction";
 import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
 import { useGetPublishedBlog, useUpdateReads } from "@/lib/react-query/queries";
-import { capitalize, formatDate, handleProfileImgErr } from "@/lib/utils";
+import {
+  capitalize,
+  formatDate,
+  handleProfileImgErr,
+  showErrorToast,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import BlogNotFound from "./BlogNotFound";
 
 const PublishedBlogPage = () => {
@@ -36,10 +40,10 @@ const PublishedBlogPage = () => {
     if (error) {
       if (error instanceof AxiosError) {
         if (error.code === "ERR_NETWORK") {
-          toast.error("An error occurred. Please try again later.");
+          showErrorToast("An error occurred. Please try again later.");
         }
       } else {
-        toast.error("An unknown error occurred.");
+        showErrorToast("An unknown error occurred.");
       }
     }
   }, [error]);

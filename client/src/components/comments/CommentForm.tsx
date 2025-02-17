@@ -3,11 +3,14 @@ import {
   useGetUser,
   useUpdateComment,
 } from "@/lib/react-query/queries";
-import { handleProfileImgErr } from "@/lib/utils";
+import {
+  handleProfileImgErr,
+  showErrorToast,
+  showSuccessToast,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 
@@ -67,13 +70,13 @@ const CommentForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      toast.error("Please log in to add a comment.");
+      showErrorToast("Please log in to add a comment.");
       setRedirectedUrl(location.pathname);
       return navigate("/login");
     }
 
     if (!comment.trim()) {
-      toast.error("Comment can not be empty.");
+      showErrorToast("Comment can not be empty.");
       textareaRef?.current && resetTextareaSize(textareaRef.current);
       setComment("");
       return;
@@ -83,7 +86,7 @@ const CommentForm = ({
       if (existingComment) {
         // update comment
         await updateComment({ id: existingComment.id, content: comment });
-        toast.success("Comment updated 👍");
+        showSuccessToast("Comment updated 👍");
         if (closeEditForm) closeEditForm();
       } else {
         // create comment
@@ -98,7 +101,7 @@ const CommentForm = ({
       setComment("");
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };

@@ -1,10 +1,14 @@
 import { useCallback, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
 
 import { useUpload } from "@/lib/react-query/queries";
-import { convertFileToUrl, fileToBase64 } from "@/lib/utils";
+import {
+  convertFileToUrl,
+  fileToBase64,
+  showErrorToast,
+  showSuccessToast,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
@@ -24,13 +28,13 @@ const FileUploader = ({ onUpload }: Props) => {
         const result = await upload(base64EncodedImg);
         const url = result.url;
         onUpload(url);
-        toast.success("Uploaded 👍", {
-          autoClose: 2000,
-        });
+        showSuccessToast("Successfully uploaded!");
       } catch (error) {
         setPreviewURL("");
         if (!useAuthStore.getState().isTokenExpired) {
-          toast.error("Failed to upload cover image. Please try again later.");
+          showErrorToast(
+            "Failed to upload cover image. Please try again later."
+          );
         }
       }
     },

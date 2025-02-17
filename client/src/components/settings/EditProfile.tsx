@@ -1,4 +1,5 @@
 import { useGetUser, useUpdateUserProfile } from "@/lib/react-query/queries";
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { EditProfileValidation } from "@/lib/validation";
 import { useAuthStore } from "@/store";
 import { IUpdateUserProfile, SocialLink } from "@/types";
@@ -8,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { FaFacebook, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa";
 import { RiTwitterXFill } from "react-icons/ri";
 import { SlGlobe } from "react-icons/sl";
-import { toast } from "react-toastify";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -117,10 +117,10 @@ const EditProfile = () => {
       // Update profile
       await updateProfile(toUpdate);
 
-      toast.success("Profile Updated.👍");
+      showSuccessToast("Profile Updated.");
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };

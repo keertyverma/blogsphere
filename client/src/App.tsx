@@ -4,6 +4,7 @@ import SignupForm from "./components/auth/SignupForm";
 import Layout from "./pages/Layout";
 import Search from "./pages/Search";
 
+import { useMediaQuery } from "@react-hook/media-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -14,6 +15,7 @@ import ScrollToTopOnNavigate from "./components/shared/ScrollToTopOnNavigate";
 import CustomCloseButton from "./components/ui/custom-toastify-close-button";
 import { useAxiosInterceptors } from "./lib/api-client";
 import { usePingServer } from "./lib/react-query/queries";
+import { getToastOptions } from "./lib/utils";
 import Bookmarks from "./pages/Bookmarks";
 import DraftBlogPage from "./pages/DraftBlogPage";
 import Editor from "./pages/Editor";
@@ -31,6 +33,7 @@ const App = () => {
   usePingServer();
   // to intercept response and handle token expiration
   useAxiosInterceptors();
+  const isMobile = useMediaQuery("(max-width:640px)");
 
   return (
     <main className="w-full h-screen">
@@ -74,14 +77,12 @@ const App = () => {
       </Routes>
 
       <ToastContainer
-        hideProgressBar={true}
-        toastClassName="bg-secondary text-secondary-foreground border border-muted-foreground/40 mt-2"
-        className="custom-toast-container"
-        style={{
-          width: "auto",
-        }}
+        {...getToastOptions()}
+        position={isMobile ? "bottom-center" : "bottom-right"}
         closeButton={<CustomCloseButton />}
-        position="top-right"
+        draggable={isMobile} // Draggable only on mobile
+        draggableDirection="y"
+        toastClassName="bg-secondary text-secondary-foreground border border-muted-foreground/40 my-2"
       />
     </main>
   );

@@ -1,8 +1,8 @@
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { BsLinkedin } from "react-icons/bs";
 import { IoIosLink } from "react-icons/io";
 import { MdIosShare } from "react-icons/md";
 import { RiTwitterXFill } from "react-icons/ri";
-import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -23,15 +23,19 @@ const ShareBlog = ({ title, description }: Props) => {
     navigator.clipboard
       .writeText(currentURL)
       .then(() => {
-        toast.dark("Link copied.", {
-          position: "bottom-right",
-        });
+        showSuccessToast(
+          <div className="flex items-center space-x-2">
+            <IoIosLink className="text-muted-foreground text-xl" />
+            <span>Link copied successfully!</span>
+          </div>,
+          {
+            icon: false,
+          }
+        );
       })
       .catch((err) => {
         console.error(err);
-        toast.error("Failed to copy link.", {
-          position: "bottom-right",
-        });
+        showErrorToast("Failed to copy link.");
       });
   };
 

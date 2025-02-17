@@ -2,11 +2,11 @@ import BlogContent from "@/components/blog/BlogContent";
 import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
 import ManageBlog from "@/components/blog/ManageBlog";
 import { useGetDraftBlog } from "@/lib/react-query/queries";
+import { showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import BlogNotFound from "./BlogNotFound";
 
 const DraftBlogPage = () => {
@@ -20,15 +20,15 @@ const DraftBlogPage = () => {
     if (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 403) {
-          toast.error("You do not have permission to view this draft.");
+          showErrorToast("You do not have permission to view this draft.");
           // Redirect to the home page and prevent going back to the denied draft page.
           // This replaces the current entry in the history stack, so the user cannot navigate back to it.
           navigate("/", { replace: true });
         } else if (error.code === "ERR_NETWORK") {
-          toast.error("An error occurred. Please try again later.");
+          showErrorToast("An error occurred. Please try again later.");
         }
       } else {
-        toast.error("An unknown error occurred.");
+        showErrorToast("An unknown error occurred.");
       }
     }
   }, [error, navigate]);

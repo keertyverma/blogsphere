@@ -1,11 +1,10 @@
 import { useGetUser, useLogout } from "@/lib/react-query/queries";
-import { handleProfileImgErr } from "@/lib/utils";
+import { handleProfileImgErr, showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IoBookmarksOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuUserCircle } from "react-icons/lu";
 import { MdLogout } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import { Button } from "../ui/button";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -34,7 +33,7 @@ const UserNavigationPanel = () => {
       return navigate("/login");
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };

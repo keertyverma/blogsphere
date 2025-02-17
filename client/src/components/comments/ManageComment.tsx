@@ -1,4 +1,5 @@
 import { useDeleteComment } from "@/lib/react-query/queries";
+import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -38,11 +39,11 @@ const ManageComment = ({
     try {
       await deleteBlog(commentId);
       toast.dismiss(loadingToast);
-      toast.success("Comment Deleted.");
+      showSuccessToast("Comment Deleted.");
     } catch (error) {
       toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
-        toast.error("An error occurred. Please try again later.");
+        showErrorToast("An error occurred. Please try again later.");
       }
     }
   };
