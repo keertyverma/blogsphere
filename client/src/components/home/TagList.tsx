@@ -59,9 +59,13 @@ const TagList = () => {
     updateArrowsVisibility();
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
-      scrollContainer.addEventListener("scroll", updateArrowsVisibility);
+      const controller = new AbortController();
+      scrollContainer.addEventListener("scroll", updateArrowsVisibility, {
+        signal: controller.signal,
+      });
+
       return () => {
-        scrollContainer.removeEventListener("scroll", updateArrowsVisibility);
+        controller.abort();
       };
     }
   }, []);
@@ -102,7 +106,7 @@ const TagList = () => {
               }
             }}
           >
-            {category}
+            {category === "all" ? "home" : category}
           </Button>
         ))}
       </div>
