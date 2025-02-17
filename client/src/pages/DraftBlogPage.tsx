@@ -80,7 +80,8 @@ const DraftBlogPage = () => {
         {user.id === author && (
           <>
             <hr className="border-border my-1" />
-            <div className="flex flex-row justify-end items-center">
+            <div className="flex flex-row justify-between items-center">
+              <span className="draft-badge">Draft</span>
               <ManageBlog blogId={blogId} isDraft={true} />
             </div>
             <hr className="border-border my-1" />

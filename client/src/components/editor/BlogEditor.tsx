@@ -25,6 +25,7 @@ import Logo from "../shared/Logo";
 import { Button } from "../ui/button";
 import IconWithLoader from "../ui/icon-with-loader";
 import TextWithLoader from "../ui/text-with-loader";
+import BlogEditorSkeleton from "./BlogEditorSkeleton";
 
 const BlogEditor = () => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
@@ -262,9 +263,12 @@ const BlogEditor = () => {
           : "An unexpected error occurred."
       );
     } finally {
-      if (isAutoSaving) setIsAutoSaving(false);
+      setIsAutoSaving(false);
     }
   };
+
+  // show loading skeleton while fetching blog data on edit mode
+  if (blogId && isLoading) return <BlogEditorSkeleton />;
 
   return (
     <>
@@ -321,6 +325,12 @@ const BlogEditor = () => {
 
       <AnimationWrapper>
         <section className="xl:px-[1vw] mx-auto w-full max-w-[900px]">
+          {/* show "Draft" badge if creating or editing a draft */}
+          {(!blogId || (blogId && isDraft)) && (
+            <span className="draft-badge inline-block my-1 md:my-2 ml-1">
+              Draft
+            </span>
+          )}
           <Button
             variant="ghost"
             className="capitalize rounded-full flex-center gap-2 text-sm md:text-base text-secondary-foreground px-2"
@@ -361,7 +371,7 @@ const BlogEditor = () => {
               ref={textareaRef}
               value={title}
               placeholder="Title ..."
-              className="w-full h-11 h2-semibold mt-5 md:mt-10 outline-none resize-none leading-tight bg-background"
+              className="w-full h-11 h2-semibold mt-5 outline-none resize-none leading-tight bg-background"
               onKeyDown={handleTitleKeyDown}
               onChange={handleTitleChange}
             ></textarea>
