@@ -84,6 +84,7 @@ const createBlog = async (req: Request, res: Response) => {
     nanoid();
 
   tags = tags?.map((tag: string) => tag.toLowerCase());
+  const publishedAt = !isDraft ? new Date() : undefined;
 
   //create blog
   let blog = new Blog({
@@ -95,6 +96,7 @@ const createBlog = async (req: Request, res: Response) => {
     tags,
     author: authorId,
     isDraft,
+    ...(publishedAt && { publishedAt }),
   });
 
   // save blog
@@ -385,15 +387,21 @@ const updateBlogById = async (req: Request, res: Response) => {
 
   let { tags } = req.body;
   tags = tags?.map((tag: string) => tag.toLowerCase());
+  // check if blog is transitioning from draft to published
+  const isDraftToPublished = blog.isDraft && !isDraft;
 
   // update Blog
   const updatedBlog = await Blog.findOneAndUpdate(
     { blogId },
-    { ...req.body, tags },
+    {
+      ...req.body,
+      tags,
+      ...(isDraftToPublished && { publishedAt: new Date() }), // set 'publishedAt' when transitioning from draft to published
+    },
     {
       new: true,
       projection:
-        "blogId title description content author coverImgURL tags activity createdAt isDraft -_id",
+        "blogId title description content author coverImgURL tags activity createdAt isDraft publishedAt -_id",
       populate: {
         path: "authorDetails", //use the virtual 'authorDetails' to populates
         select:
@@ -403,7 +411,7 @@ const updateBlogById = async (req: Request, res: Response) => {
   ).lean();
 
   // increment user total post count if transitioning from draft to published blog
-  if (blog.isDraft && !isDraft) {
+  if (isDraftToPublished) {
     const updatedUserResult = await User.updateOne(
       { _id: blog.author },
       {

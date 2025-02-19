@@ -12,6 +12,7 @@ interface IBlog extends Document {
   tags: string[];
   author: string | IUser["_id"];
   isDraft: boolean;
+  publishedAt: Date | null;
   activity: {
     totalLikes: number;
     totalReads: number;
@@ -19,6 +20,8 @@ interface IBlog extends Document {
     totalParentComments: number;
   };
   likes: Map<string, boolean>;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const blogSchema = new Schema(
@@ -57,6 +60,7 @@ const blogSchema = new Schema(
       required: true,
       index: true,
     },
+    publishedAt: { type: Date, default: null, index: true },
     activity: {
       totalLikes: { type: Number, default: 0 },
       totalReads: { type: Number, default: 0 },
