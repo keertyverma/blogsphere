@@ -274,6 +274,14 @@ describe("/api/v1/blogs", () => {
       const { blogId } = res.body.result;
       expect(blogId).toBeDefined();
 
+      // check for draft blog -> publishedAt is not set and createdAt is set
+      const createdBlog = await Blog.findOne({ blogId })
+        .select("createdAt publishedAt")
+        .lean();
+      expect(createdBlog).toBeTruthy();
+      expect(createdBlog!.publishedAt).toBeNull();
+      expect(createdBlog!.createdAt).toBeDefined();
+
       // check user
       const updatedUser = await User.findById(user.id);
       // draft blog must be added to blogs
@@ -329,6 +337,15 @@ describe("/api/v1/blogs", () => {
 
       const { blogId } = res.body.result;
       expect(blogId).toBeDefined();
+
+      // check for published blog -> publishedAt and createdAt both are set
+      const createBlog = await Blog.findOne({ blogId })
+        .select("createdAt publishedAt")
+        .lean();
+      expect(createBlog?.publishedAt).toBeDefined();
+      const publishedTimestamp = new Date(createBlog!.publishedAt!).getTime();
+      expect(publishedTimestamp).not.toBeNaN();
+      expect(createBlog?.createdAt).toBeDefined();
 
       // check user
       const updatedUser = await User.findById(user.id);
@@ -704,18 +721,19 @@ describe("/api/v1/blogs", () => {
       const res = await exec(draftBlog.blogId, toUpdate);
 
       expect(res.statusCode).toBe(200);
-      const { blogId, title, isDraft, content } = res.body.result;
+      const { blogId, title, isDraft, content, publishedAt } = res.body.result;
       expect(blogId).toBe(draftBlog.blogId);
       expect(title).toBe(toUpdate.title);
       expect(content.blocks).toHaveLength(1);
       expect(isDraft).toBe(toUpdate.isDraft);
+      expect(publishedAt).toBeNull();
 
-      // when draft blog is updated then it should not update user total post
+      // when draft blog is updated then it should not update author's total published blog count
       const author = await User.findById(draftBlog.author);
       expect(author?.accountInfo.totalPosts).toBe(0);
     });
 
-    it("should update draft blog and publish it", async () => {
+    it("should publish a draft blog and update the author's post count", async () => {
       token = user1.generateAuthToken();
       const draftBlog = blogs.filter((blog) => blog.isDraft === true)[0];
       const toUpdate = {
@@ -740,14 +758,19 @@ describe("/api/v1/blogs", () => {
       const res = await exec(draftBlog.blogId, toUpdate);
 
       expect(res.statusCode).toBe(200);
-      const { blogId, content, description, tags, isDraft } = res.body.result;
+      const { blogId, content, description, tags, isDraft, publishedAt } =
+        res.body.result;
       expect(blogId).toBe(draftBlog.blogId);
       expect(content.blocks).toHaveLength(1);
       expect(description).toBe(toUpdate.description);
       expect(tags).toEqual(toUpdate.tags);
       expect(isDraft).toBe(toUpdate.isDraft);
 
-      // when draft blog is published then it should increment user total post by 1
+      // verify that transitioning from draft to published sets a valid publishedAt timestamp.
+      expect(publishedAt).toBeDefined();
+      expect(new Date(publishedAt).getTime()).not.toBeNaN();
+
+      // publishing a draft blog should increments the author's total post count by 1.
       const author = await User.findById(draftBlog.author);
       expect(author?.accountInfo.totalPosts).toBe(1);
     });
