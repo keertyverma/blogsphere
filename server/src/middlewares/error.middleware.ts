@@ -41,7 +41,11 @@ export const errorHandler = (
     details: "Something went wrong",
   };
 
-  if (err instanceof CustomAPIError) {
+  // Handle invalid JSON errors thrown by express.json()
+  if (err instanceof SyntaxError && "body" in err) {
+    customError.statusCode = StatusCodes.BAD_REQUEST;
+    customError.details = `Invalid JSON format in ${req.method} ${req.url}. Please check your request payload.`;
+  } else if (err instanceof CustomAPIError) {
     customError.statusCode = err.statusCode;
     customError.details = err.message;
   } else if (err instanceof MongooseError.ValidationError) {
@@ -70,5 +74,5 @@ export const errorHandler = (
     },
   };
 
-  res.status(customError.statusCode).send(errorResponse);
+  res.status(customError.statusCode).json(errorResponse);
 };
