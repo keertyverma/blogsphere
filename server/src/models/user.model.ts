@@ -219,12 +219,17 @@ const validateUser = (user: IUser) => {
       "string.min": "Full name must be at least 2 characters long.",
       "string.max": "Full name must be at most 50 characters long.",
     }),
-    email: Joi.string().trim().required().max(255).email().messages({
-      "string.empty": "Email is required.", // Empty string case
-      "any.required": "Email is required.", // Missing value case
-      "string.email": "Invalid email format.", // Invalid email format
-      "string.max": "Email must be at most 255 characters long.",
-    }),
+    email: Joi.string()
+      .trim() // Remove leading/trailing spaces
+      .required() // Ensure email is provided
+      .max(255) // Limit email length to 255 characters (RFC 5321 standard)
+      .email({ tlds: { allow: false } }) // Allow any TLD (relying on email verification instead)
+      .messages({
+        "string.empty": "Email is required.", // Empty string case
+        "any.required": "Email is required.", // Missing value case
+        "string.email": "Invalid email format.", // Invalid email format
+        "string.max": "Email must be at most 255 characters long.",
+      }),
     password: Joi.string()
       .min(8) // Quickly reject passwords that are too short before running regex
       .max(20) // Quickly reject overly long passwords before running regex

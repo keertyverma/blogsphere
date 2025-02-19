@@ -20,7 +20,7 @@ const _validateAuthUser = (data: { email: string; password: string }) => {
       .trim() // Remove leading/trailing spaces
       .required() // Ensure email is provided
       .max(255) // Limit email length to 255 characters (RFC 5321 standard)
-      .email()
+      .email({ tlds: { allow: false } }) // Allow any TLD (relying on email verification instead)
       .messages({
         "string.empty": "Email is required.", // Empty string case
         "any.required": "Email is required.", // Missing value case
