@@ -69,7 +69,7 @@ describe("/api/v1/users", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"email" is required',
+        details: "Email is required.",
       });
     });
 
@@ -77,7 +77,7 @@ describe("/api/v1/users", () => {
       // valid password -> Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter.
       const userData = {
         fullname: "Mickey Mouse",
-        password: "pluto",
+        password: "plutonic",
         email: "test@test.com",
       };
       const res = await request(server)
@@ -92,7 +92,7 @@ describe("/api/v1/users", () => {
       });
     });
 
-    it("should return BadRequest-400 if user already registered", async () => {
+    it("should return BadRequest-400 if an account with the given email already exists.", async () => {
       await User.create({
         personalInfo: {
           fullname: "Mickey Mouse",
@@ -112,7 +112,7 @@ describe("/api/v1/users", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: "User already registered.",
+        details: "An account with this email already exists.",
       });
     });
 

@@ -14,27 +14,42 @@ import { verifyIdToken } from "../utils/firebase-auth";
 import logger from "../utils/logger";
 import { sendResetPasswordEmail, sendVerificationEmail } from "../utils/mailer";
 
-const validate = (req: { email: string; password: string }) => {
+const _validateAuthUser = (data: { email: string; password: string }) => {
   const schema = Joi.object({
-    email: Joi.string().min(5).max(255).required().email(),
-    password: Joi.string().min(8).max(1024).required(),
+    email: Joi.string()
+      .trim() // Remove leading/trailing spaces
+      .required() // Ensure email is provided
+      .max(255) // Limit email length to 255 characters (RFC 5321 standard)
+      .email()
+      .messages({
+        "string.empty": "Email is required.", // Empty string case
+        "any.required": "Email is required.", // Missing value case
+        "string.email": "Invalid email format.", // Invalid email format
+        "string.max": "Email must be at most 255 characters long.",
+      }),
+    password: Joi.string().required().messages({
+      "string.empty": "Password is required.",
+      "any.required": "Password is required.",
+    }),
   });
 
-  return schema.validate(req);
-};
-
-const authenticateUser = async (req: Request, res: Response) => {
-  logger.debug(`POST Request on Route -> ${req.baseUrl}`);
-  // validate request body
-  const { error } = validate(req.body);
+  const { error, value } = schema.validate(data);
   if (error) {
     let errorMessage = error.details[0].message;
     logger.error(`Input Validation Error! \n ${errorMessage}`);
     throw new BadRequestError(errorMessage);
   }
 
+  return value;
+};
+
+const authenticateUser = async (req: Request, res: Response) => {
+  logger.debug(`POST Request on Route -> ${req.baseUrl}`);
+
+  // validate request body
+  const { email, password } = _validateAuthUser(req.body);
+
   // check if user exists
-  const { email, password } = req.body;
   const user = await User.findOne({ "personalInfo.email": email });
   if (!user) {
     throw new BadRequestError("Invalid email or password");

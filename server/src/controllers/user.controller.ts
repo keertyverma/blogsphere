@@ -32,7 +32,7 @@ export const createUser = async (req: Request, res: Response) => {
   // check if user exists
   const existingUser = await User.findOne({ "personalInfo.email": email });
   if (existingUser) {
-    throw new BadRequestError(`User already registered.`);
+    throw new BadRequestError(`An account with this email already exists.`);
   }
 
   // secure password

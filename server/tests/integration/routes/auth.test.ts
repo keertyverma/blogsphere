@@ -61,7 +61,7 @@ describe("/api/v1/auth", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"email" is required',
+        details: "Email is required.",
       });
     });
 

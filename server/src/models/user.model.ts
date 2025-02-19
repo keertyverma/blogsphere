@@ -213,17 +213,31 @@ const validateUser = (user: IUser) => {
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/;
 
   const schema = Joi.object({
-    fullname: Joi.string().min(2).max(50).trim().required(),
-    email: Joi.string().min(5).max(255).trim().required().email(),
+    fullname: Joi.string().trim().min(2).max(50).required().messages({
+      "string.empty": "Full name is required.",
+      "any.required": "Full name is required.",
+      "string.min": "Full name must be at least 2 characters long.",
+      "string.max": "Full name must be at most 50 characters long.",
+    }),
+    email: Joi.string().trim().required().max(255).email().messages({
+      "string.empty": "Email is required.", // Empty string case
+      "any.required": "Email is required.", // Missing value case
+      "string.email": "Invalid email format.", // Invalid email format
+      "string.max": "Email must be at most 255 characters long.",
+    }),
     password: Joi.string()
-      .min(5)
-      .max(1024)
-      .trim()
+      .min(8) // Quickly reject passwords that are too short before running regex
+      .max(20) // Quickly reject overly long passwords before running regex
       .required()
       .pattern(passwordRegex)
-      .message(
-        "Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter."
-      ),
+      .messages({
+        "string.empty": "Password is required.",
+        "any.required": "Password is required.",
+        "string.min": "Password must be at least 8 characters long.",
+        "string.max": "Password must be at most 20 characters long.",
+        "string.pattern.base":
+          "Password must be 8 to 20 characters long and contain at least 1 numeric digit, 1 lowercase letter and 1 uppercase letter.",
+      }),
   });
 
   return schema.validate(user);
