@@ -263,6 +263,7 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
         tags: 1,
         activity: 1,
         createdAt: 1,
+        publishedAt: 1,
         "authorDetails.personalInfo.fullname": 1,
         "authorDetails.personalInfo.username": 1,
         "authorDetails.personalInfo.profileImage": 1,
@@ -303,7 +304,7 @@ const getPublishedBlogById = async (req: Request, res: Response) => {
         "_id personalInfo.fullname personalInfo.username personalInfo.profileImage",
     })
     .select(
-      "blogId title description content coverImgURL author tags activity createdAt likes isDraft _id"
+      "blogId title description content coverImgURL author tags activity createdAt likes isDraft publishedAt _id"
     )
     .lean();
 
@@ -633,7 +634,7 @@ const getDraftBlogById = async (req: Request, res: Response) => {
   // fetch the draft blog
   const draftBlog = await Blog.findOne({ blogId, isDraft: true })
     .select(
-      "_id blogId title description content coverImgURL author tags createdAt"
+      "_id blogId title description content coverImgURL author tags createdAt publishedAt"
     )
     .lean();
 

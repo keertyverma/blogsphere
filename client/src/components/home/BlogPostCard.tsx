@@ -34,7 +34,8 @@ const BlogPostCard = ({
     description,
     coverImgURL,
     tags,
-    createdAt: publishedAt,
+    createdAt,
+    publishedAt,
     activity,
   } = content;
 
@@ -61,7 +62,11 @@ const BlogPostCard = ({
                   {fullname}
                 </p>
                 <p className="text-muted-foreground font-normal">
-                  {publishedAt && showTimeAgo
+                  {isDraft
+                    ? createdAt && showTimeAgo
+                      ? getTimeAgo(createdAt)
+                      : formatDate(createdAt)
+                    : publishedAt && showTimeAgo
                     ? getTimeAgo(publishedAt)
                     : formatDate(publishedAt)}
                 </p>
