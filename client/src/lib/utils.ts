@@ -204,3 +204,25 @@ export const showErrorToast = (
 ) => {
   toast.error(message, { ...options });
 };
+
+// Prefix used for localStorage keys related to blog read timestamps.
+const READKEYPREFIX = "lastReadTimestamp_";
+
+export const setLastReadTimestamp = (blogId: string, value: string) => {
+  // Stores the last read timestamp for a specific blog.
+  localStorage.setItem(`${READKEYPREFIX}${blogId}`, value);
+};
+
+export const getLastReadTimestamp = (blogId: string): string | null => {
+  // Retrieves the last read timestamp for a specific blog.
+  return localStorage.getItem(`${READKEYPREFIX}${blogId}`);
+};
+
+export const clearBlogReadTimestamps = () => {
+  // Clears all blog read tracking timestamps from localStorage.
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith(READKEYPREFIX)) {
+      localStorage.removeItem(key);
+    }
+  });
+};

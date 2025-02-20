@@ -5,11 +5,14 @@ import { useGetPublishedBlog, useUpdateReads } from "@/lib/react-query/queries";
 import {
   capitalize,
   formatDate,
+  getLastReadTimestamp,
   handleProfileImgErr,
+  setLastReadTimestamp,
   showErrorToast,
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
+import ms from "ms";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import BlogNotFound from "./BlogNotFound";
@@ -22,17 +25,21 @@ const PublishedBlogPage = () => {
   const updateReads = useUpdateReads();
 
   useEffect(() => {
-    // Check if blogId is valid and if the read count has already been updated for this blog in the current session
+    if (!blogId || !isAuthenticated) return;
 
-    if (blogId) {
-      const readCountKey = `hasUpdatedReadCount_${blogId}`;
-      const hasUpdatedReadCount = sessionStorage.getItem(readCountKey);
+    const THRESHOLD = ms("24h");
+    const lastRead = getLastReadTimestamp(blogId);
+    const now = Date.now();
 
-      // Update read count for authenticated users only if it hasn't been updated in this session
-      if (isAuthenticated && !hasUpdatedReadCount) {
-        updateReads.mutate(blogId);
-        sessionStorage.setItem(readCountKey, "true"); // Set the flag after updating the read count
-      }
+    // If no previous read or the last read is beyond the threshold, update the read count
+    if (!lastRead || now - Number(lastRead) > THRESHOLD) {
+      updateReads.mutate(blogId, {
+        onError: (error) => {
+          console.error("Failed to update read count:", error);
+        },
+      });
+      // Store the current timestamp in localStorage for future checks
+      setLastReadTimestamp(blogId, now.toString());
     }
   }, [isAuthenticated, blogId]);
 

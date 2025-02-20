@@ -326,39 +326,36 @@ const updateReadCount = async (req: Request, res: Response) => {
 
   const { blogId } = req.params;
 
-  // Increment total read count of blog by 1
+  // Increment the blog's total read count by 1
   const blog = await Blog.findOneAndUpdate(
     { blogId },
     { $inc: { "activity.totalReads": 1 } },
     { new: true }
   )
-    .populate({
-      path: "authorDetails", //use the virtual 'authorDetails' to populates
-      select:
-        "personalInfo.fullname personalInfo.username personalInfo.profileImage -_id",
-    })
-    .select("blogId title author activity createdAt -_id")
+    .select("blogId author -_id")
     .lean();
 
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
-  // Increment total read count of user by 1
-  const user = await User.findOneAndUpdate(
+  // Increment author's total read count by 1
+  const updatedUserResult = await User.updateOne(
     { _id: blog.author },
-    { $inc: { "accountInfo.totalReads": 1 } },
-    { new: true }
+    { $inc: { "accountInfo.totalReads": 1 } }
   );
 
-  if (!user) throw new Error("User not found. Unable to update read counts");
+  if (updatedUserResult.modifiedCount === 0) {
+    throw new CustomAPIError(
+      "Failed to update the author's total read count.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
     result: {
       blogId: blog.blogId,
-      title: blog.title,
       author: blog.author,
-      activity: blog.activity,
     },
   };
 
@@ -422,7 +419,7 @@ const updateBlogById = async (req: Request, res: Response) => {
 
     if (updatedUserResult.modifiedCount === 0) {
       throw new CustomAPIError(
-        "Failed to update total posts count",
+        "Failed to update author's total posts count.",
         StatusCodes.INTERNAL_SERVER_ERROR
       );
     }

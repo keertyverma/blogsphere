@@ -616,7 +616,9 @@ describe("/api/v1/blogs", () => {
       const res = await exec(blogId);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.result.activity.totalReads).toBe(BlogTotalReads + 1);
+      const { blogId: updatedBlogId, author: authorId } = res.body.result;
+      expect(updatedBlogId).toBe(blogId);
+      expect(authorId).toBeDefined();
 
       // check blog total read increment by 1
       const blog = await Blog.findOne({ blogId });
@@ -624,7 +626,7 @@ describe("/api/v1/blogs", () => {
       expect(blog?.activity.totalReads).toBe(BlogTotalReads + 1);
 
       // check user total read increment by 1
-      const author = await User.findById(user.id);
+      const author = await User.findById(authorId);
       expect(author).not.toBeNull();
       expect(author?.accountInfo.totalReads).toBe(UserTotalReads + 1);
     });

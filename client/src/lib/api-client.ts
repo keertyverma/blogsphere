@@ -2,7 +2,7 @@ import { useAuthStore } from "@/store";
 import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { showErrorToast } from "./utils";
+import { clearBlogReadTimestamps, showErrorToast } from "./utils";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_SERVER_DOMAIN,
@@ -25,6 +25,7 @@ const useAxiosInterceptors = () => {
             // Handle unauthorized access due to token expiration or missing token
             setTokenExpired(true);
             clearUserAuth();
+            clearBlogReadTimestamps(); // clear blog read tracking timestamp
 
             // Save the current URL to redirect the user after login
             setRedirectedUrl(`${location.pathname}${location.search || ""}`);

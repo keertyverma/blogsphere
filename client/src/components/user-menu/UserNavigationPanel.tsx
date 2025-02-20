@@ -1,5 +1,9 @@
 import { useGetUser, useLogout } from "@/lib/react-query/queries";
-import { handleProfileImgErr, showErrorToast } from "@/lib/utils";
+import {
+  clearBlogReadTimestamps,
+  handleProfileImgErr,
+  showErrorToast,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IoBookmarksOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuUserCircle } from "react-icons/lu";
@@ -29,6 +33,7 @@ const UserNavigationPanel = () => {
     try {
       await logout();
       clearUserAuth();
+      clearBlogReadTimestamps(); // clear blog read tracking timestamp
       setRedirectedUrl(null);
       return navigate("/login");
     } catch (error) {
