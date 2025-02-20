@@ -91,7 +91,7 @@ const PublishedBlogPage = () => {
     likes,
     activity,
     content,
-    createdAt: publishedAt,
+    publishedAt,
     isDraft,
     description,
   } = blog;

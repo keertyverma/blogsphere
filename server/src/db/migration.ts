@@ -10,13 +10,7 @@ connectDB();
 const db = mongoose.connection;
 db.once("open", async () => {
   try {
-    // await addActivityFieldToBlog();
-    // await addSocialLinksFieldToUser();
-    // //  await updateContentFieldType();
-    // await addLikesFieldToBlog();
-    // // await deleteCommentsFieldOnBlog();
-
-    // await updateCommentsSchema();
+    await addPublishedAtFieldToBlog();
     console.log("Migration completed successfully!");
   } catch (error) {
     console.error("Migration failed:", error);
@@ -24,6 +18,25 @@ db.once("open", async () => {
     db.close();
   }
 });
+
+const addPublishedAtFieldToBlog = async () => {
+  // Locate blogs missing the 'publishedAt' field.
+  // For published blogs, set 'publishedAt' to 'createdAt'.
+  // For draft blogs, explicitly set 'publishedAt' to null.
+  await Blog.updateMany({ publishedAt: { $exists: false } }, [
+    {
+      $set: {
+        publishedAt: {
+          $cond: {
+            if: "$isDraft",
+            then: null,
+            else: "$createdAt",
+          },
+        },
+      },
+    },
+  ]);
+};
 
 const addActivityFieldToBlog = async () => {
   // Find blogs without the 'activity' field and update them

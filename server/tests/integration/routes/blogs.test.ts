@@ -42,12 +42,14 @@ const createBlogs = async (userId: string) => {
     title: "My draft blog-1",
     author: userId,
     isDraft: true,
+    publishedAt: null,
   };
   const draftBlog2 = {
     blogId: "my-draft-2-blog-random1234",
     title: "My draft blog-2",
     author: userId,
     isDraft: true,
+    publishedAt: null,
   };
 
   // published blogs
@@ -83,6 +85,7 @@ const createBlogs = async (userId: string) => {
       totalLikes: 1,
       totalReads: 2,
     },
+    publishedAt: new Date(),
   };
   const publishedBlog2 = {
     isDraft: false,
@@ -107,6 +110,7 @@ const createBlogs = async (userId: string) => {
       totalLikes: 5,
       totalReads: 5,
     },
+    publishedAt: new Date(),
   };
 
   const blogs = [draftBlog1, draftBlog2, publishedBlog1, publishedBlog2];
@@ -279,6 +283,7 @@ describe("/api/v1/blogs", () => {
         .select("createdAt publishedAt")
         .lean();
       expect(createdBlog).toBeTruthy();
+      expect(createdBlog!.publishedAt).toBeDefined();
       expect(createdBlog!.publishedAt).toBeNull();
       expect(createdBlog!.createdAt).toBeDefined();
 
@@ -339,13 +344,15 @@ describe("/api/v1/blogs", () => {
       expect(blogId).toBeDefined();
 
       // check for published blog -> publishedAt and createdAt both are set
-      const createBlog = await Blog.findOne({ blogId })
+      const createdBlog = await Blog.findOne({ blogId })
         .select("createdAt publishedAt")
         .lean();
-      expect(createBlog?.publishedAt).toBeDefined();
-      const publishedTimestamp = new Date(createBlog!.publishedAt!).getTime();
+      expect(createdBlog).toBeTruthy();
+      expect(createdBlog!.publishedAt).toBeDefined();
+      expect(createdBlog!.publishedAt).not.toBeNull();
+      const publishedTimestamp = new Date(createdBlog!.publishedAt!).getTime();
       expect(publishedTimestamp).not.toBeNaN();
-      expect(createBlog?.createdAt).toBeDefined();
+      expect(createdBlog!.createdAt).toBeDefined();
 
       // check user
       const updatedUser = await User.findById(user.id);
@@ -375,6 +382,7 @@ describe("/api/v1/blogs", () => {
         .filter((blog) => blog.isDraft === false)
         .map((blog) => blog.blogId);
       const limit = 1;
+
       const res = await request(server).get(`${endpoint}?limit=${limit}`);
 
       expect(res.statusCode).toBe(200);
@@ -390,6 +398,8 @@ describe("/api/v1/blogs", () => {
       // only published blog must be returned
       results.forEach((blog: IBlog) => {
         expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
+        expect(blog.publishedAt).toBeDefined();
+        expect(blog.publishedAt).not.toBeNull();
       });
     });
 
@@ -440,6 +450,8 @@ describe("/api/v1/blogs", () => {
       // only published blog must be returned
       results.forEach((blog: IBlog) => {
         expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
+        expect(blog.publishedAt).toBeDefined();
+        expect(blog.publishedAt).not.toBeNull();
       });
     });
 
@@ -486,6 +498,8 @@ describe("/api/v1/blogs", () => {
       // blog with tag must be returned
       res.body.results.forEach((blog: IBlog) => {
         expect(blog.title).toContain(searchTerm);
+        expect(blog.publishedAt).toBeDefined();
+        expect(blog.publishedAt).not.toBeNull();
       });
     });
   });
@@ -519,12 +533,15 @@ describe("/api/v1/blogs", () => {
     it("should return published blog for given valid blogId", async () => {
       const publishedBlog = blogs.filter((blog) => !blog.isDraft)[0];
       const blogId = publishedBlog.blogId;
+
       const res = await request(server).get(`${endpoint}/${blogId}`);
 
       expect(res.statusCode).toBe(200);
-      const { title, blogId: id } = res.body.result;
+      const { title, blogId: id, publishedAt } = res.body.result;
       expect(id).toBe(blogId);
       expect(title).toBe(publishedBlog.title);
+      expect(publishedAt).toBeDefined();
+      expect(publishedAt).not.toBeNull();
     });
 
     it("should not return draft blog", async () => {
@@ -726,6 +743,7 @@ describe("/api/v1/blogs", () => {
       expect(title).toBe(toUpdate.title);
       expect(content.blocks).toHaveLength(1);
       expect(isDraft).toBe(toUpdate.isDraft);
+      expect(publishedAt).toBeDefined();
       expect(publishedAt).toBeNull();
 
       // when draft blog is updated then it should not update author's total published blog count
@@ -768,6 +786,7 @@ describe("/api/v1/blogs", () => {
 
       // verify that transitioning from draft to published sets a valid publishedAt timestamp.
       expect(publishedAt).toBeDefined();
+      expect(publishedAt).not.toBeNull();
       expect(new Date(publishedAt).getTime()).not.toBeNaN();
 
       // publishing a draft blog should increments the author's total post count by 1.
@@ -1191,9 +1210,11 @@ describe("/api/v1/blogs", () => {
       const res = await exec(blogId);
 
       expect(res.statusCode).toBe(200);
-      const { title, blogId: id } = res.body.result;
+      const { title, blogId: id, publishedAt } = res.body.result;
       expect(id).toBe(blogId);
       expect(title).toBe(draftBlog.title);
+      expect(publishedAt).toBeDefined();
+      expect(publishedAt).toBeNull();
     });
   });
 });
