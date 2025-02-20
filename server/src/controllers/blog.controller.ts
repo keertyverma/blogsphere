@@ -184,16 +184,16 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
 
   // Query for cursor based pagination
   // Fetch documents older than the cursor's timestamp, or with the same timestamp but a smaller ID.
-  //    1. Fetch documents where `createdAt` timestamp is less than the cursor's timestamp.
+  //    1. Fetch documents where `publishedAt` timestamp is less than the cursor's timestamp.
   //    2. If timestamps are equal, use `_id` to break ties and fetch documents with a smaller `_id`.
   let cursorQuery = {};
   if (nextCursor) {
-    const [createdAt, id] = (nextCursor as string).split("_");
+    const [publishedAtTimestamp, id] = (nextCursor as string).split("_");
     cursorQuery = {
       $or: [
-        { createdAt: { $lt: new Date(createdAt) } },
+        { publishedAt: { $lt: new Date(publishedAtTimestamp) } },
         {
-          createdAt: new Date(createdAt),
+          publishedAt: new Date(publishedAtTimestamp),
           _id: { $lt: new Types.ObjectId(id) },
         },
       ],
@@ -225,9 +225,9 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
       ? {
           "activity.totalReads": -1,
           "activity.totalLikes": -1,
-          createdAt: -1,
+          publishedAt: -1,
         }
-      : { createdAt: -1, _id: -1 };
+      : { publishedAt: -1, _id: -1 };
 
   // Fetch blogs using cursor based pagination
   const blogs = await Blog.aggregate([
@@ -273,14 +273,14 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
 
   // Determine the `nextCursor` for pagination
   // - Fetching `limit + 1` documents ensures there is more data beyond the current page.
-  // - If more results exist, `nextCursor` is generated using the `createdAt` timestamp and `_id` of the last document.
+  // - If more results exist, `nextCursor` is generated using the `publishedAt` timestamp and `_id` of the last document.
   // - `nextCursor` acts as a boundary for fetching the next page while maintaining stable ordering,
   //    ensuring that records are neither skipped nor duplicated between pages when data is updated.
   let cursor = null;
   if (blogs.length > finalLimit) {
     blogs.pop(); // Remove extra item
     const lastBlog = blogs[blogs.length - 1]; // get last item from current page
-    cursor = `${lastBlog.createdAt.toISOString()}_${lastBlog._id}`;
+    cursor = `${lastBlog.publishedAt.toISOString()}_${lastBlog._id}`;
   }
 
   const data: CursorPaginatedAPIResponse = {

@@ -112,16 +112,16 @@ export const getFormattedExpiryDate = (date: Date): string => {
 };
 
 export const isValidCursor = (cursor: string): boolean => {
-  // Cursor valid format -> `<createdAt>_<id>`
-  const [createdAt, id] = (cursor as string).split("_");
+  // Cursor valid format -> `<timestamp>_<id>`
+  const [timestamp, id] = (cursor as string).split("_");
 
-  if (!createdAt || !id) return false;
+  if (!timestamp || !id) return false;
 
-  // Ensure `createdAt` is a valid ISO 8601 string by checking its format and parsing result
-  const date = new Date(createdAt);
+  // Ensure `timestamp` is a valid ISO 8601 string by checking its format and parsing result
+  const date = new Date(timestamp);
   if (
     isNaN(date.getTime()) || // Ensures it's a valid date
-    createdAt !== date.toISOString() // Ensures exact format match
+    timestamp !== date.toISOString() // Ensures exact format match
   ) {
     return false;
   }
