@@ -3,6 +3,7 @@ import http from "http";
 import { disconnect } from "mongoose";
 import request from "supertest";
 
+import ms from "ms";
 import appServer from "../../../src";
 import { Blog, IBlog } from "../../../src/models/blog.model";
 import { IUserDocument, User } from "../../../src/models/user.model";
@@ -85,7 +86,7 @@ const createBlogs = async (userId: string) => {
       totalLikes: 1,
       totalReads: 2,
     },
-    publishedAt: new Date(),
+    publishedAt: new Date(new Date().getTime() + ms("1d")), // set published date 1 day after creation
   };
   const publishedBlog2 = {
     isDraft: false,
@@ -110,7 +111,7 @@ const createBlogs = async (userId: string) => {
       totalLikes: 5,
       totalReads: 5,
     },
-    publishedAt: new Date(),
+    publishedAt: new Date(new Date().getTime() + ms("2d")), // set published date 2 days after creation
   };
 
   const blogs = [draftBlog1, draftBlog2, publishedBlog1, publishedBlog2];
@@ -377,32 +378,6 @@ describe("/api/v1/blogs", () => {
       await Blog.deleteMany({});
     });
 
-    it("should return the latest published blogs within the specified limit and set nextCursor for pagination", async () => {
-      const publishedBlogIds = blogs
-        .filter((blog) => blog.isDraft === false)
-        .map((blog) => blog.blogId);
-      const limit = 1;
-
-      const res = await request(server).get(`${endpoint}?limit=${limit}`);
-
-      expect(res.statusCode).toBe(200);
-      const { nextCursor, results } = res.body;
-      // Ensure `nextCursor` is passed
-      expect(nextCursor).not.toBeNull();
-      const lastBlog = results[limit - 1];
-      expect(nextCursor).toBe(`${lastBlog.createdAt}_${lastBlog._id}`);
-
-      // results count is same as limit
-      expect(results.length).toBe(limit);
-
-      // only published blog must be returned
-      results.forEach((blog: IBlog) => {
-        expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
-        expect(blog.publishedAt).toBeDefined();
-        expect(blog.publishedAt).not.toBeNull();
-      });
-    });
-
     it("should not return any blogs if nextCursor is invalid for pagination", async () => {
       const publishedBlogIds = blogs
         .filter((blog) => blog.isDraft === false)
@@ -417,6 +392,32 @@ describe("/api/v1/blogs", () => {
         code: "BAD_REQUEST",
         message: "Invalid input data",
         details: '"nextCursor" contains an invalid value',
+      });
+    });
+
+    it("should return the latest published blogs within the specified limit and set nextCursor for pagination", async () => {
+      const publishedBlogIds = blogs
+        .filter((blog) => blog.isDraft === false)
+        .map((blog) => blog.blogId);
+      const limit = 1;
+
+      const res = await request(server).get(`${endpoint}?limit=${limit}`);
+
+      expect(res.statusCode).toBe(200);
+      const { nextCursor, results } = res.body;
+      // Ensure `nextCursor` is passed
+      expect(nextCursor).not.toBeNull();
+      const lastBlog = results[limit - 1];
+      expect(nextCursor).toBe(`${lastBlog.publishedAt}_${lastBlog._id}`);
+
+      // results count is same as limit
+      expect(results.length).toBe(limit);
+
+      // only published blog must be returned
+      results.forEach((blog: IBlog) => {
+        expect(publishedBlogIds.includes(blog.blogId)).toBe(true);
+        expect(blog.publishedAt).toBeDefined();
+        expect(blog.publishedAt).not.toBeNull();
       });
     });
 
