@@ -1090,6 +1090,7 @@ describe("/api/v1/blogs", () => {
       // only draft blog must be returned
       results.forEach((blog: IBlog) => {
         expect(draftBlogIds.includes(blog.blogId)).toBe(true);
+        expect(blog.updatedAt).toBeDefined();
       });
     });
 
@@ -1116,6 +1117,7 @@ describe("/api/v1/blogs", () => {
       // only draft blog must be returned
       results.forEach((blog: IBlog) => {
         expect(draftBlogIds.includes(blog.blogId)).toBe(true);
+        expect(blog.updatedAt).toBeDefined();
       });
     });
 
@@ -1135,6 +1137,7 @@ describe("/api/v1/blogs", () => {
       // blog with tag must be returned
       res.body.results.forEach((blog: IBlog) => {
         expect(blog.title).toContain(searchTerm);
+        expect(blog.updatedAt).toBeDefined();
       });
     });
   });

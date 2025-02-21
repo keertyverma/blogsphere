@@ -90,6 +90,7 @@ export interface IBlog {
   content: OutputData;
   createdAt?: string; //timestamp
   publishedAt?: string; //timestamp
+  updatedAt?: string; //timestamp
   activity?: {
     totalLikes: number;
     totalReads: number;

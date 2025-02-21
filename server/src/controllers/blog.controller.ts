@@ -575,9 +575,9 @@ const getAllDraftBlogs = async (req: Request, res: Response) => {
     ...searchQuery,
   })
     .select(
-      "blogId title description author coverImgURL tags activity createdAt -_id"
+      "blogId title description author coverImgURL tags activity updatedAt -_id"
     )
-    .sort({ createdAt: -1 })
+    .sort({ updatedAt: -1 })
     .skip(skip)
     .limit(maxLimit)
     .populate({

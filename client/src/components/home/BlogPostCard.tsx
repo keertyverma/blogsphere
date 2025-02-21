@@ -1,8 +1,8 @@
 import {
   formatDate,
   formateNumber,
-  handleProfileImgErr,
   getTimeAgo,
+  handleProfileImgErr,
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor, IBlog } from "@/types";
@@ -17,7 +17,6 @@ interface Props {
   showManageBlogButtons?: boolean;
   showReadCount?: boolean;
   showTimeAgo?: boolean;
-  isDraft?: boolean;
 }
 
 const BlogPostCard = ({
@@ -26,7 +25,6 @@ const BlogPostCard = ({
   showManageBlogButtons = false,
   showReadCount = false,
   showTimeAgo = false,
-  isDraft = false,
 }: Props) => {
   const {
     blogId: id,
@@ -34,7 +32,6 @@ const BlogPostCard = ({
     description,
     coverImgURL,
     tags,
-    createdAt,
     publishedAt,
     activity,
   } = content;
@@ -43,10 +40,10 @@ const BlogPostCard = ({
     personalInfo: { fullname, username, profileImage },
   } = author;
   const user = useAuthStore((s) => s.user);
-  const blogPageUrl = isDraft ? `/blogs/drafts/${id}` : `/blogs/${id}`;
+  const blogPageUrl = `/blogs/${id}`;
 
   return (
-    <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 pt-0 md:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
+    <article className="w-full md:max-w-2xl lg:max-w-3xl flex flex-col gap-4 pt-1 lg:pt-8 lg:p-6 lg:pb-5 mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
       <section className="p-0">
         <div className="flex justify-between">
           <Link to={`/user/${username}`}>
@@ -62,11 +59,7 @@ const BlogPostCard = ({
                   {fullname}
                 </p>
                 <p className="text-muted-foreground font-normal">
-                  {isDraft
-                    ? createdAt && showTimeAgo
-                      ? getTimeAgo(createdAt)
-                      : formatDate(createdAt)
-                    : publishedAt && showTimeAgo
+                  {publishedAt && showTimeAgo
                     ? getTimeAgo(publishedAt)
                     : formatDate(publishedAt)}
                 </p>
@@ -75,7 +68,7 @@ const BlogPostCard = ({
           </Link>
           {showManageBlogButtons && user.username === username && id && (
             <div className="mb-3">
-              <ManageBlog blogId={id} isDraft={isDraft} />
+              <ManageBlog blogId={id} isDraft={false} />
             </div>
           )}
         </div>
@@ -103,27 +96,23 @@ const BlogPostCard = ({
       </section>
       <section className="flex justify-between p-0 max-lg:mb-6">
         {/* Show blog stats - total likes and read count only for published blogs */}
-        {!isDraft && (
-          <div className="flex items-center justify-center gap-3 text-muted-foreground">
-            <div className="flex-center gap-1">
-              <FaRegHeart />
-              {activity && activity?.totalLikes > 0 && (
-                <p className="text-sm">{formateNumber(activity.totalLikes)}</p>
-              )}
-            </div>
-
-            {showReadCount && (
-              <div className="flex-center gap-1">
-                <IoEyeOutline className="text-lg" />
-                {activity && activity?.totalReads > 0 && (
-                  <p className="text-sm">
-                    {formateNumber(activity.totalReads)}
-                  </p>
-                )}
-              </div>
+        <div className="flex items-center justify-center gap-3 text-muted-foreground">
+          <div className="flex-center gap-1">
+            <FaRegHeart />
+            {activity && activity?.totalLikes > 0 && (
+              <p className="text-sm">{formateNumber(activity.totalLikes)}</p>
             )}
           </div>
-        )}
+
+          {showReadCount && (
+            <div className="flex-center gap-1">
+              <IoEyeOutline className="text-lg" />
+              {activity && activity?.totalReads > 0 && (
+                <p className="text-sm">{formateNumber(activity.totalReads)}</p>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="flex gap-2">
           {tags?.slice(0, 2).map((tag, i) => (
