@@ -37,6 +37,7 @@ const createUsers = async () => {
 };
 
 const createBlogs = async (userId: string) => {
+  const now = new Date();
   // draft blog
   const draftBlog1 = {
     blogId: "my-draft-1-blog-sub125bfjvj",
@@ -44,6 +45,7 @@ const createBlogs = async (userId: string) => {
     author: userId,
     isDraft: true,
     publishedAt: null,
+    lastEditedAt: now,
   };
   const draftBlog2 = {
     blogId: "my-draft-2-blog-random1234",
@@ -51,6 +53,7 @@ const createBlogs = async (userId: string) => {
     author: userId,
     isDraft: true,
     publishedAt: null,
+    lastEditedAt: now,
   };
 
   // published blogs
@@ -87,6 +90,7 @@ const createBlogs = async (userId: string) => {
       totalReads: 2,
     },
     publishedAt: new Date(new Date().getTime() + ms("1d")), // set published date 1 day after creation
+    lastEditedAt: now,
   };
   const publishedBlog2 = {
     isDraft: false,
@@ -112,6 +116,7 @@ const createBlogs = async (userId: string) => {
       totalReads: 5,
     },
     publishedAt: new Date(new Date().getTime() + ms("2d")), // set published date 2 days after creation
+    lastEditedAt: now,
   };
 
   const blogs = [draftBlog1, draftBlog2, publishedBlog1, publishedBlog2];
@@ -281,12 +286,13 @@ describe("/api/v1/blogs", () => {
 
       // check for draft blog -> publishedAt is not set and createdAt is set
       const createdBlog = await Blog.findOne({ blogId })
-        .select("createdAt publishedAt")
+        .select("createdAt publishedAt lastEditedAt")
         .lean();
       expect(createdBlog).toBeTruthy();
       expect(createdBlog!.publishedAt).toBeDefined();
       expect(createdBlog!.publishedAt).toBeNull();
       expect(createdBlog!.createdAt).toBeDefined();
+      expect(createdBlog!.lastEditedAt).toBeDefined();
 
       // check user
       const updatedUser = await User.findById(user.id);
@@ -346,7 +352,7 @@ describe("/api/v1/blogs", () => {
 
       // check for published blog -> publishedAt and createdAt both are set
       const createdBlog = await Blog.findOne({ blogId })
-        .select("createdAt publishedAt")
+        .select("createdAt publishedAt lastEditedAt")
         .lean();
       expect(createdBlog).toBeTruthy();
       expect(createdBlog!.publishedAt).toBeDefined();
@@ -354,6 +360,7 @@ describe("/api/v1/blogs", () => {
       const publishedTimestamp = new Date(createdBlog!.publishedAt!).getTime();
       expect(publishedTimestamp).not.toBeNaN();
       expect(createdBlog!.createdAt).toBeDefined();
+      expect(createdBlog!.lastEditedAt).toBeDefined();
 
       // check user
       const updatedUser = await User.findById(user.id);
@@ -741,11 +748,14 @@ describe("/api/v1/blogs", () => {
       const res = await exec(draftBlog.blogId, toUpdate);
 
       expect(res.statusCode).toBe(200);
-      const { blogId, title, isDraft, content, publishedAt } = res.body.result;
+      const { blogId, title, isDraft, content, publishedAt, lastEditedAt } =
+        res.body.result;
       expect(blogId).toBe(draftBlog.blogId);
       expect(title).toBe(toUpdate.title);
       expect(content.blocks).toHaveLength(1);
       expect(isDraft).toBe(toUpdate.isDraft);
+      expect(lastEditedAt).toBeDefined();
+      expect(lastEditedAt).not.toBeNull();
       expect(publishedAt).toBeDefined();
       expect(publishedAt).toBeNull();
 
@@ -779,13 +789,22 @@ describe("/api/v1/blogs", () => {
       const res = await exec(draftBlog.blogId, toUpdate);
 
       expect(res.statusCode).toBe(200);
-      const { blogId, content, description, tags, isDraft, publishedAt } =
-        res.body.result;
+      const {
+        blogId,
+        content,
+        description,
+        tags,
+        isDraft,
+        publishedAt,
+        lastEditedAt,
+      } = res.body.result;
       expect(blogId).toBe(draftBlog.blogId);
       expect(content.blocks).toHaveLength(1);
       expect(description).toBe(toUpdate.description);
       expect(tags).toEqual(toUpdate.tags);
       expect(isDraft).toBe(toUpdate.isDraft);
+      expect(lastEditedAt).toBeDefined();
+      expect(lastEditedAt).not.toBeNull();
 
       // verify that transitioning from draft to published sets a valid publishedAt timestamp.
       expect(publishedAt).toBeDefined();
@@ -1090,7 +1109,8 @@ describe("/api/v1/blogs", () => {
       // only draft blog must be returned
       results.forEach((blog: IBlog) => {
         expect(draftBlogIds.includes(blog.blogId)).toBe(true);
-        expect(blog.updatedAt).toBeDefined();
+        expect(blog.lastEditedAt).toBeDefined();
+        expect(blog.lastEditedAt).not.toBeNull();
       });
     });
 
@@ -1117,7 +1137,8 @@ describe("/api/v1/blogs", () => {
       // only draft blog must be returned
       results.forEach((blog: IBlog) => {
         expect(draftBlogIds.includes(blog.blogId)).toBe(true);
-        expect(blog.updatedAt).toBeDefined();
+        expect(blog.lastEditedAt).toBeDefined();
+        expect(blog.lastEditedAt).not.toBeNull();
       });
     });
 
@@ -1137,7 +1158,8 @@ describe("/api/v1/blogs", () => {
       // blog with tag must be returned
       res.body.results.forEach((blog: IBlog) => {
         expect(blog.title).toContain(searchTerm);
-        expect(blog.updatedAt).toBeDefined();
+        expect(blog.lastEditedAt).toBeDefined();
+        expect(blog.lastEditedAt).not.toBeNull();
       });
     });
   });

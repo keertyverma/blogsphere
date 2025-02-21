@@ -47,26 +47,30 @@ const UserDraftBlogList = ({ searchTerm }: Props) => {
     <>
       {data?.pages.map((page, pageIndex) => (
         <React.Fragment key={pageIndex}>
-          {page.results.map((blog: IBlog, index: number) => (
-            <AnimationWrapper
-              key={index}
-              transition={{ duration: 1, delay: index * 0.1 }}
-            >
-              <article className="w-full md:max-w-2xl lg:max-w-3xl flex justify-between gap-2 pt-0 lg:py-5 lg:px-6 mb-2 md:mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
-                <Link to={`/blogs/drafts/${blog.blogId}`} className="w-full">
-                  <h1 className="blog-title !font-medium">{blog.title}</h1>
-                  <div className="text-sm md:text-base text-muted-foreground max-lg:mb-4">
-                    {blog.updatedAt && (
-                      <>Last updated: {formatDate(blog.updatedAt)}</>
-                    )}
+          {page.results.map((blog: IBlog, index: number) => {
+            const { blogId, title, lastEditedAt } = blog;
+
+            return (
+              <AnimationWrapper
+                key={index}
+                transition={{ duration: 1, delay: index * 0.1 }}
+              >
+                <article className="w-full md:max-w-2xl lg:max-w-3xl flex justify-between gap-2 pt-0 lg:py-5 lg:px-6 mb-2 md:mb-6 max-lg:border-b border-border lg:border lg:shadow-sm lg:rounded-2xl">
+                  <Link to={`/blogs/drafts/${blogId}`} className="w-full">
+                    <h1 className="blog-title !font-medium">{title}</h1>
+                    <div className="text-sm md:text-base text-muted-foreground max-lg:mb-4">
+                      {lastEditedAt && (
+                        <>Last updated: {formatDate(lastEditedAt)}</>
+                      )}
+                    </div>
+                  </Link>
+                  <div>
+                    <ManageBlog blogId={blogId!} isDraft={true} />
                   </div>
-                </Link>
-                <div>
-                  <ManageBlog blogId={blog.blogId!} isDraft={true} />
-                </div>
-              </article>
-            </AnimationWrapper>
-          ))}
+                </article>
+              </AnimationWrapper>
+            );
+          })}
         </React.Fragment>
       ))}
 

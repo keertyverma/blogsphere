@@ -28,7 +28,7 @@ const UserProfile = () => {
 
   if (isLoading)
     return (
-      <section>
+      <section className="flex-center">
         <UserListSkeleton count={1} />
       </section>
     );
@@ -37,7 +37,7 @@ const UserProfile = () => {
 
   if (!user)
     return (
-      <section>
+      <section className="flex-center">
         <div className="w-[50%] text-center p-3 rounded-full bg-muted mt-10">
           <p>No user available</p>
         </div>

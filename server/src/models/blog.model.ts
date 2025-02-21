@@ -13,6 +13,7 @@ interface IBlog extends Document {
   author: string | IUser["_id"];
   isDraft: boolean;
   publishedAt: Date | null;
+  lastEditedAt: Date | null; // timestamp of the last user-initiated edit
   activity: {
     totalLikes: number;
     totalReads: number;
@@ -61,6 +62,7 @@ const blogSchema = new Schema(
       index: true,
     },
     publishedAt: { type: Date, default: null, index: true },
+    lastEditedAt: { type: Date, default: null },
     activity: {
       totalLikes: { type: Number, default: 0 },
       totalReads: { type: Number, default: 0 },

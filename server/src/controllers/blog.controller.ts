@@ -84,7 +84,8 @@ const createBlog = async (req: Request, res: Response) => {
     nanoid();
 
   tags = tags?.map((tag: string) => tag.toLowerCase());
-  const publishedAt = !isDraft ? new Date() : undefined;
+  const now = new Date();
+  const publishedAt = !isDraft ? now : undefined;
 
   //create blog
   let blog = new Blog({
@@ -97,6 +98,7 @@ const createBlog = async (req: Request, res: Response) => {
     author: authorId,
     isDraft,
     ...(publishedAt && { publishedAt }),
+    lastEditedAt: now,
   });
 
   // save blog
@@ -395,11 +397,12 @@ const updateBlogById = async (req: Request, res: Response) => {
       ...req.body,
       tags,
       ...(isDraftToPublished && { publishedAt: new Date() }), // set 'publishedAt' when transitioning from draft to published
+      lastEditedAt: new Date(), // set 'lastEditedAt' when update is initiated by author
     },
     {
       new: true,
       projection:
-        "blogId title description content author coverImgURL tags activity createdAt isDraft publishedAt -_id",
+        "blogId title description content author coverImgURL tags activity createdAt isDraft publishedAt lastEditedAt -_id",
       populate: {
         path: "authorDetails", //use the virtual 'authorDetails' to populates
         select:
@@ -575,9 +578,9 @@ const getAllDraftBlogs = async (req: Request, res: Response) => {
     ...searchQuery,
   })
     .select(
-      "blogId title description author coverImgURL tags activity updatedAt -_id"
+      "blogId title description author coverImgURL tags activity lastEditedAt -_id"
     )
-    .sort({ updatedAt: -1 })
+    .sort({ lastEditedAt: -1 })
     .skip(skip)
     .limit(maxLimit)
     .populate({

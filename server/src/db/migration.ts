@@ -10,7 +10,8 @@ connectDB();
 const db = mongoose.connection;
 db.once("open", async () => {
   try {
-    await addPublishedAtFieldToBlog();
+    // await addPublishedAtFieldToBlog();
+    await addLastEditedAtFieldToBlog();
     console.log("Migration completed successfully!");
   } catch (error) {
     console.error("Migration failed:", error);
@@ -18,6 +19,13 @@ db.once("open", async () => {
     db.close();
   }
 });
+
+const addLastEditedAtFieldToBlog = async () => {
+  // Find all blogs where 'lastEditedAt' field is missing and set it to 'createdAt' timestamp.
+  await Blog.updateMany({ lastEditedAt: { $exists: false } }, [
+    { $set: { lastEditedAt: "$createdAt" } },
+  ]);
+};
 
 const addPublishedAtFieldToBlog = async () => {
   // Locate blogs missing the 'publishedAt' field.
