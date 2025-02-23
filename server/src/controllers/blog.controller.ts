@@ -422,7 +422,7 @@ const updateBlogById = async (req: Request, res: Response) => {
 
     if (updatedUserResult.modifiedCount === 0) {
       throw new CustomAPIError(
-        "Failed to update author's total posts count.",
+        "Failed to update author's total posts count on blog update.",
         StatusCodes.INTERNAL_SERVER_ERROR
       );
     }
@@ -477,7 +477,19 @@ const updateLike = async (req: Request, res: Response) => {
 const deleteBlogByBlogId = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/:blogId`);
 
+  // find existing blog
   const { blogId } = req.params;
+  const blog = await Blog.findOne({ blogId }).select("author").lean();
+  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  // Ensure authenticated user is the author of the blog
+  const { id: userId } = req.user as JwtPayload;
+  if (userId !== blog.author.toString()) {
+    throw new CustomAPIError(
+      "You are not authorized to update this blog.",
+      StatusCodes.FORBIDDEN
+    );
+  }
 
   // delete blog
   const deletedBlog = await Blog.findOneAndDelete({ blogId })
@@ -488,31 +500,40 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
     })
     .select("blogId title isDraft author")
     .lean();
-
-  if (!deletedBlog)
-    throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+  if (!deletedBlog) {
+    throw new NotFoundError(
+      `Blog with blogId = ${blogId} was not found or has already been deleted.`
+    );
+  }
 
   const { _id: id, author, isDraft } = deletedBlog;
   // update author
   // - remove blog from author blogs list
   // - decrement total post count if published blog is deleted
-  const user = await User.findByIdAndUpdate(author, {
-    $inc: { "accountInfo.totalPosts": isDraft ? 0 : -1 },
-    $pull: {
-      blogs: id,
-    },
-  });
-  if (!user)
+  const updatedUserResult = await User.updateOne(
+    { _id: author },
+    {
+      $inc: { "accountInfo.totalPosts": isDraft ? 0 : -1 },
+      $pull: {
+        blogs: id,
+      },
+    }
+  );
+  if (updatedUserResult.modifiedCount === 0) {
     throw new CustomAPIError(
-      "Failed to update user blogs and total posts count",
+      "Failed to update author's total posts count on blog deletion.",
       StatusCodes.INTERNAL_SERVER_ERROR
     );
+  }
 
-  // delete all comments and replies associated with this blog
-  await Comment.deleteMany({ blogId: id });
-
-  // delete all bookmarks associated with this blog
-  await Bookmark.deleteMany({ blogId: id });
+  // Delete associated comments and bookmarks with published blog concurrently
+  if (!isDraft) {
+    await Promise.all([
+      Comment.deleteMany({ blogId: id }),
+      Bookmark.deleteMany({ blogId: id }),
+    ]);
+    logger.info(`Deleted comments and bookmarks for blogId: ${id}`);
+  }
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,

@@ -914,11 +914,12 @@ describe("/api/v1/blogs", () => {
 
   describe("DELETE /:blogId", () => {
     let blogs: IBlog[];
-    let user: IUserDocument;
+    let user1: IUserDocument;
+    let user2: IUserDocument;
 
     beforeAll(async () => {
-      [user] = await createUsers();
-      blogs = await createBlogs(user.id);
+      [user1, user2] = await createUsers();
+      blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
@@ -949,7 +950,7 @@ describe("/api/v1/blogs", () => {
     });
 
     it("should return 404-NotFound if blog with given blogId is not found", async () => {
-      token = user.generateAuthToken();
+      token = user1.generateAuthToken();
       const blogId = "invalid-blogId";
       const res = await exec(blogId);
 
@@ -961,28 +962,45 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should delete draft blog if blogId is valid", async () => {
-      // setup - get draft blog
-      token = user.generateAuthToken();
+    it("should return 403 Forbidden if user is unauthorized to delete the blog", async () => {
+      // user2 is not the author of the blog
+      token = user2.generateAuthToken();
       const draftBlogId = blogs.filter((blog) => blog.isDraft === true)[0]
         ?.blogId;
-      const draftBlog = await Blog.findOne({ blogId: draftBlogId });
+
+      const res = await exec(draftBlogId);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details: "You are not authorized to update this blog.",
+      });
+    });
+
+    it("should delete draft blog if blogId is valid", async () => {
+      // setup - get draft blog
+      token = user1.generateAuthToken();
+      const draftBlogId = blogs.filter((blog) => blog.isDraft === true)[0]
+        ?.blogId;
+      const draftBlog = await Blog.findOne({ blogId: draftBlogId })
+        .select("author _id blogId isDraft")
+        .lean();
+
       // add blog to user blogs list
       const blogAuthor = await User.findByIdAndUpdate(
         draftBlog?.author,
         {
           $push: {
-            blogs: draftBlog?.id,
+            blogs: draftBlog?._id,
           },
         },
         { new: true }
       );
       const totalPost = blogAuthor?.accountInfo.totalPosts;
 
-      // call api
       const res = await exec(draftBlogId);
 
-      // assertions
       expect(res.statusCode).toBe(200);
       const {
         blogId,
@@ -1006,7 +1024,7 @@ describe("/api/v1/blogs", () => {
 
     it("should delete published blog and decrement author total post count", async () => {
       // setup - get published blog
-      token = user.generateAuthToken();
+      token = user1.generateAuthToken();
       const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
         ?.blogId;
       const publishedBlog = await Blog.findOne({ blogId: publishedBlogId });
@@ -1023,10 +1041,8 @@ describe("/api/v1/blogs", () => {
       );
       const totalPost = blogAuthor?.accountInfo.totalPosts;
 
-      // call api
       const res = await exec(publishedBlogId);
 
-      // assertion
       expect(res.statusCode).toBe(200);
       const {
         blogId,
