@@ -501,34 +501,41 @@ export const useDeleteBlog = () => {
       apiClient.delete(`blogs/${blogId}`).then((res) => res.data.result),
     onSuccess: (data) => {
       const {
-        _id: authorId,
-        personalInfo: { username },
-      } = data.authorDetails;
+        isDraft,
+        authorDetails: {
+          _id: authorId,
+          personalInfo: { username },
+        },
+      } = data;
       const selectedTag = useEditorStore.getState().selectedTag;
 
-      // refetch user profile and all blogs
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
-      });
-
-      // refetch latest blog with or without tag filter
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
-      });
-      if (selectedTag !== "all") {
+      if (isDraft) {
+        // refetch user's draft list
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+          queryKey: [QUERY_KEYS.GET_USER_DRAFT_BLOGS, { username }],
+        });
+      } else {
+        // refetch user profile and published blog list
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_BY_ID, username],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_USER_PUBLISHED_BLOGS, { authorId }],
+        });
+
+        // refetch latest blog with or without tag filter
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, "all"],
+        });
+        if (selectedTag !== "all") {
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.GET_LATEST_BLOGS, selectedTag],
+          });
+        }
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
         });
       }
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
-      });
     },
   });
 };

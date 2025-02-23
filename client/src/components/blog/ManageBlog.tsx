@@ -2,13 +2,11 @@ import { useDeleteBlog } from "@/lib/react-query/queries";
 import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IBlog } from "@/types";
+import { useState } from "react";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -17,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
+import TextWithLoader from "../ui/text-with-loader";
 
 interface Props {
   blogId: string;
@@ -24,20 +23,23 @@ interface Props {
 }
 
 const ManageBlog = ({ blogId, isDraft }: Props) => {
-  const { mutateAsync: deleteBlog } = useDeleteBlog();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { mutateAsync: deleteBlog, isPending: isDeleting } = useDeleteBlog();
   const navigate = useNavigate();
 
   const handleDelete = async () => {
-    const loadingToast = toast.loading("Deleting ...");
     try {
-      const deletedBlog: IBlog = await deleteBlog(blogId);
-      const authorUsername = deletedBlog.authorDetails.personalInfo.username;
+      const {
+        authorDetails: {
+          personalInfo: { username },
+        },
+      }: IBlog = await deleteBlog(blogId);
 
-      toast.dismiss(loadingToast);
-      showSuccessToast("Blog Deleted.👍");
-      navigate(`/user/${authorUsername}`);
+      setIsDeleteDialogOpen(false);
+      showSuccessToast("Blog Deleted.");
+      navigate(`/user/${username}`);
     } catch (error) {
-      toast.dismiss(loadingToast);
+      setIsDeleteDialogOpen(false);
       if (!useAuthStore.getState().isTokenExpired) {
         showErrorToast("An error occurred. Please try again later.");
       }
@@ -46,6 +48,7 @@ const ManageBlog = ({ blogId, isDraft }: Props) => {
 
   return (
     <div className="flex items-center gap-2">
+      {/* Edit Button */}
       <Button
         variant="outline"
         size="icon"
@@ -55,29 +58,49 @@ const ManageBlog = ({ blogId, isDraft }: Props) => {
         <MdEdit className="text-lg text-secondary-foreground" />
       </Button>
 
-      <AlertDialog>
-        <AlertDialogTrigger>
-          <div className="w-8 h-8 rounded-full flex-center border border-muted-foreground/40 bg-background hover:bg-accent hover:text-accent-foreground">
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="w-8 h-8 rounded-full flex-center border border-muted-foreground/40 bg-background hover:bg-accent hover:text-accent-foreground"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
             <MdOutlineDelete className="text-lg text-destructive" />
-          </div>
+          </Button>
         </AlertDialogTrigger>
+
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Confirmation</AlertDialogTitle>
             <AlertDialogDescription className="text-secondary-foreground">
-              Are you absolutely sure? This will permanently delete your blog.
+              Are you absolutely sure? This action will permanently delete your
+              blog.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-secondary border border-muted-foreground/40">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
               Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
+            </Button>
+            <Button
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={handleDelete}
+              disabled={isDeleting}
             >
-              Delete
-            </AlertDialogAction>
+              <TextWithLoader
+                text="Delete"
+                isLoading={isDeleting}
+                loaderClassName="text-white"
+              />
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
