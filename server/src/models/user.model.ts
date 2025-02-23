@@ -19,7 +19,6 @@ interface IUser extends Document {
     totalPosts: number;
     totalReads: number;
   };
-  blogs: string[];
   updatedAt: Date;
   socialLinks: {
     youtube: string;
@@ -109,12 +108,6 @@ const userSchema = new Schema(
         default: 0,
       },
     },
-    blogs: [
-      {
-        type: Types.ObjectId,
-        ref: "Blog",
-      },
-    ],
     socialLinks: {
       youtube: {
         type: String,

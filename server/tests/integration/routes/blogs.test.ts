@@ -280,7 +280,6 @@ describe("/api/v1/blogs", () => {
 
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
-
       const { blogId } = res.body.result;
       expect(blogId).toBeDefined();
 
@@ -294,11 +293,8 @@ describe("/api/v1/blogs", () => {
       expect(createdBlog!.createdAt).toBeDefined();
       expect(createdBlog!.lastEditedAt).toBeDefined();
 
-      // check user
+      // Creating a draft blog does not affect the author's total post count
       const updatedUser = await User.findById(user.id);
-      // draft blog must be added to blogs
-      expect(updatedUser?.blogs).toHaveLength(1);
-      // total posts should not increase
       expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts);
     });
 
@@ -362,11 +358,8 @@ describe("/api/v1/blogs", () => {
       expect(createdBlog!.createdAt).toBeDefined();
       expect(createdBlog!.lastEditedAt).toBeDefined();
 
-      // check user
+      // Creating a published blog increases the author's total post count by 1.
       const updatedUser = await User.findById(user.id);
-      // draft blog must be added to blogs
-      expect(updatedUser?.blogs).toHaveLength(1);
-      // total posts should not increase
       expect(updatedUser?.accountInfo.totalPosts).toBe(totalPosts + 1);
     });
   });
@@ -1010,15 +1003,8 @@ describe("/api/v1/blogs", () => {
       expect(blogId).toBe(draftBlog?.blogId);
       expect(isDraft).toBe(draftBlog?.isDraft);
 
-      // blog must be removed from author blog list
+      // Deleting a draft blog does not affect the author's total post count.
       const author = await User.findById(_id);
-
-      // compare actual value of the ObjectId, not the object reference
-      expect(author?.blogs.map((id) => id.toString())).not.toContain(
-        draftBlog?._id.toString()
-      );
-
-      // when draft blog is deleted then user total post must not change
       expect(author?.accountInfo.totalPosts).toBe(totalPost);
     });
 
@@ -1052,14 +1038,8 @@ describe("/api/v1/blogs", () => {
       expect(blogId).toBe(publishedBlogId);
       expect(isDraft).toBe(publishedBlog?.isDraft);
 
-      // blog must be removed from author blog list
+      // Deleting a published blog decrements the author's total post count by 1.
       const author = await User.findById(_id);
-      // compare actual value of the ObjectId, not the object reference
-      expect(author?.blogs.map((id) => id.toString())).not.toContain(
-        publishedBlog?._id.toString()
-      );
-
-      // when published blog is deleted then user total post must be decrement by 1
       if (totalPost) {
         expect(author?.accountInfo.totalPosts).toBe(totalPost - 1);
       }

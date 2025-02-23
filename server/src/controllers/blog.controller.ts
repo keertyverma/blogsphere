@@ -87,7 +87,7 @@ const createBlog = async (req: Request, res: Response) => {
   const now = new Date();
   const publishedAt = !isDraft ? now : undefined;
 
-  //create blog
+  // create blog
   let blog = new Blog({
     blogId,
     title,
@@ -104,24 +104,20 @@ const createBlog = async (req: Request, res: Response) => {
   // save blog
   blog = await blog.save();
 
-  // -----  update user document -----
-  // 1. Increment total posts count when blog is published
-  // 2. Add blog id to blogs array
-  const user = await User.findOneAndUpdate(
-    { _id: authorId },
-    {
-      $inc: { "accountInfo.totalPosts": blog.isDraft ? 0 : 1 },
-      $push: {
-        blogs: blog.id,
-      },
-    }
-  );
-
-  if (!user)
-    throw new CustomAPIError(
-      "Failed to update total posts count",
-      StatusCodes.INTERNAL_SERVER_ERROR
+  // If a published blog is created, increment the author's total post count.
+  if (!blog.isDraft) {
+    const { modifiedCount } = await User.updateOne(
+      { _id: authorId },
+      { $inc: { "accountInfo.totalPosts": 1 } }
     );
+
+    if (!modifiedCount) {
+      throw new CustomAPIError(
+        "Failed to update author's total posts count on blog creation.",
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
@@ -411,16 +407,14 @@ const updateBlogById = async (req: Request, res: Response) => {
     }
   ).lean();
 
-  // increment user total post count if transitioning from draft to published blog
+  // If a blog transitions from draft to published, increment the user's total post count.
   if (isDraftToPublished) {
-    const updatedUserResult = await User.updateOne(
+    const { modifiedCount } = await User.updateOne(
       { _id: blog.author },
-      {
-        $inc: { "accountInfo.totalPosts": 1 },
-      }
+      { $inc: { "accountInfo.totalPosts": 1 } }
     );
 
-    if (updatedUserResult.modifiedCount === 0) {
+    if (!modifiedCount) {
       throw new CustomAPIError(
         "Failed to update author's total posts count on blog update.",
         StatusCodes.INTERNAL_SERVER_ERROR
@@ -506,32 +500,26 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
     );
   }
 
+  // If a published blog is deleted, decrement the author's total post count and delete associated comments and bookmarks concurrently.
   const { _id: id, author, isDraft } = deletedBlog;
-  // update author
-  // - remove blog from author blogs list
-  // - decrement total post count if published blog is deleted
-  const updatedUserResult = await User.updateOne(
-    { _id: author },
-    {
-      $inc: { "accountInfo.totalPosts": isDraft ? 0 : -1 },
-      $pull: {
-        blogs: id,
-      },
-    }
-  );
-  if (updatedUserResult.modifiedCount === 0) {
-    throw new CustomAPIError(
-      "Failed to update author's total posts count on blog deletion.",
-      StatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
-
-  // Delete associated comments and bookmarks with published blog concurrently
   if (!isDraft) {
-    await Promise.all([
-      Comment.deleteMany({ blogId: id }),
-      Bookmark.deleteMany({ blogId: id }),
+    const [{ modifiedCount }, _] = await Promise.all([
+      User.updateOne(
+        { _id: author },
+        { $inc: { "accountInfo.totalPosts": -1 } }
+      ),
+      Promise.all([
+        Comment.deleteMany({ blogId: id }),
+        Bookmark.deleteMany({ blogId: id }),
+      ]),
     ]);
+
+    if (!modifiedCount) {
+      throw new CustomAPIError(
+        "Failed to update author's total posts count on blog deletion.",
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
     logger.info(`Deleted comments and bookmarks for blogId: ${id}`);
   }
 

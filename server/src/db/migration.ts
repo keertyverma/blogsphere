@@ -11,7 +11,8 @@ const db = mongoose.connection;
 db.once("open", async () => {
   try {
     // await addPublishedAtFieldToBlog();
-    await addLastEditedAtFieldToBlog();
+    // await addLastEditedAtFieldToBlog();
+    await removeBlogsFieldFromUser();
     console.log("Migration completed successfully!");
   } catch (error) {
     console.error("Migration failed:", error);
@@ -19,6 +20,14 @@ db.once("open", async () => {
     db.close();
   }
 });
+
+const removeBlogsFieldFromUser = async () => {
+  // Remove 'blogs' field from all users
+  const result = await User.updateMany({}, { $unset: { blogs: 1 } });
+  console.log(
+    `Modified ${result.modifiedCount} user(s): Removed 'blogs' field.`
+  );
+};
 
 const addLastEditedAtFieldToBlog = async () => {
   // Find all blogs where 'lastEditedAt' field is missing and set it to 'createdAt' timestamp.
