@@ -257,7 +257,6 @@ describe("/api/v1/users", () => {
       const [existingUser] = users.filter(
         (u) => u.personalInfo.username === username
       );
-      expect(email).toBe(existingUser.personalInfo.email);
       expect(password).toBeUndefined;
       expect(googleAuth).toBeUndefined;
       expect(blogs).toBeUndefined;

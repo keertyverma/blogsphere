@@ -134,7 +134,7 @@ export const getUserById = async (req: Request, res: Response) => {
   const { id: username } = req.params;
 
   const user = await User.findOne({ "personalInfo.username": username }).select(
-    "-personalInfo.password -googleAuth -blogs -updatedAt -__v"
+    "-personalInfo.password -personalInfo.email -googleAuth -blogs -updatedAt -__v"
   );
   if (!user)
     throw new NotFoundError(
