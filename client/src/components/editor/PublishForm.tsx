@@ -1,5 +1,5 @@
 import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
-import { showErrorToast, showSuccessToast } from "@/lib/utils";
+import { showConfetti, showErrorToast, showSuccessToast } from "@/lib/utils";
 import { BlogValidation } from "@/lib/validation";
 import { useAuthStore, useEditorStore } from "@/store";
 import { IBlog, ICreatePublishedBlog } from "@/types";
@@ -85,22 +85,27 @@ const PublishForm = () => {
     try {
       let message = "";
       let blogUrl = "";
+      let isPublished = false;
       if (blogId) {
-        // edit mode - publish updated blog
+        // edit mode - update a published blog or publish a draft
+        const isPublishingDraft = isDraft ? true : false;
         const updatedBlog = await updatePublishedBlog({
           blogId,
           blog: publishedBlog,
-          isPublishingDraft: isDraft ? true : false,
+          isPublishingDraft,
         });
         message = isDraft ? "Blog Published 🥳" : "Blog Updated";
         blogUrl = `/blogs/${updatedBlog.blogId}`;
+        isPublished = isPublishingDraft;
       } else {
         // create mode - publish new blog
         const newBlog: IBlog = await createBlog(publishedBlog);
         message = "Blog Published 🥳";
         blogUrl = `/blogs/${newBlog.blogId}`;
+        isPublished = true;
       }
       showSuccessToast(message);
+      if (isPublished) showConfetti();
       form.reset();
       setIsPublish(false);
       navigate(blogUrl);

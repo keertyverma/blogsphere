@@ -1,4 +1,5 @@
 import { OutputBlockData } from "@editorjs/editorjs";
+import confetti from "canvas-confetti";
 import { clsx, type ClassValue } from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -224,5 +225,13 @@ export const clearBlogReadTimestamps = () => {
     if (key.startsWith(READKEYPREFIX)) {
       localStorage.removeItem(key);
     }
+  });
+};
+
+export const showConfetti = () => {
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
   });
 };
