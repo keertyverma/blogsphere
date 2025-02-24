@@ -84,7 +84,7 @@ const ManageBlog = ({ blogId, isDraft }: Props) => {
               cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row justify-end gap-2">
+          <AlertDialogFooter className="flex-row justify-end gap-3 md:gap-2">
             <Button
               variant="secondary"
               onClick={() => setIsDeleteDialogOpen(false)}
@@ -93,7 +93,7 @@ const ManageBlog = ({ blogId, isDraft }: Props) => {
               Cancel
             </Button>
             <Button
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
             >

@@ -14,14 +14,21 @@ import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { useMediaQuery } from "@react-hook/media-query";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoMdSave } from "react-icons/io";
-import { IoClose, IoImageOutline } from "react-icons/io5";
+import { IoArrowBack, IoClose, IoImageOutline } from "react-icons/io5";
 import { MdOutlinePreview } from "react-icons/md";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { editorJSTools } from "../../lib/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import DarkThemeToggler from "../shared/DarkThemeToggler";
 import FileUploader from "../shared/FileUploader";
-import Logo from "../shared/Logo";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import IconWithLoader from "../ui/icon-with-loader";
 import TextWithLoader from "../ui/text-with-loader";
@@ -30,6 +37,7 @@ import BlogEditorSkeleton from "./BlogEditorSkeleton";
 const BlogEditor = () => {
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const {
     blog,
     blog: { title, coverImgURL },
@@ -205,6 +213,7 @@ const BlogEditor = () => {
       showSuccessToast("Draft saved.");
       // If the blog is newly created, navigate to the editor in `edit` mode, allowing the user to continue making modifications.
       if (!blogId) {
+        isReady.current = false; // Ensures the text editor initializes with blog data in edit mode.
         navigate(`/editor/${savedBlogId}?isDraft=true`);
       }
     } catch (error) {
@@ -229,7 +238,7 @@ const BlogEditor = () => {
 
   const handleDraftPreview = async () => {
     try {
-      // Retrieve the latest editor content and update the blog state if content exists.
+      // Retrieve the latest content from the text editor and update the blog state if content exists to ensure the latest changes are considered
       const content = await getEditorContent();
       if (content) {
         setBlog({ ...blog, content });
@@ -267,13 +276,73 @@ const BlogEditor = () => {
     }
   };
 
+  const handleExitEditor = async () => {
+    // Retrieve the latest content from the text editor and update the blog state if content exists to ensure the latest changes are considered
+    const content = await getEditorContent();
+    if (content) {
+      setBlog({ ...blog, content });
+    }
+
+    // Check if there are unsaved changes before exiting
+    if (hasUnsavedChanges()) {
+      setIsConfirmDialogOpen(true); // Show confirmation dialog to prevent accidental data loss.
+    } else {
+      navigate("/"); // navigate back to feed page
+    }
+  };
+
   // show loading skeleton while fetching blog data on edit mode
   if (blogId && isLoading) return <BlogEditorSkeleton />;
 
   return (
     <>
       <nav className="navbar">
-        <Logo />
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-center gap-2 opacity-80 rounded-md"
+          onClick={handleExitEditor}
+        >
+          <IoArrowBack className="text-lg" />
+          <span className="max-sm:hidden">Back to home</span>
+        </Button>
+        <AlertDialog
+          open={isConfirmDialogOpen}
+          onOpenChange={setIsConfirmDialogOpen}
+        >
+          <AlertDialogContent className="!rounded-2xl">
+            <AlertDialogHeader className="text-left">
+              <AlertDialogTitle className="text-base">
+                ⚠️ Unsaved Changes Detected
+              </AlertDialogTitle>
+              <AlertDialogDescription className="flex flex-col gap-0.5">
+                <span>
+                  You have unsaved changes. If you exit, you might lose them.
+                </span>
+                <span>Do you want to exit?</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row justify-end gap-3 md:gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setIsConfirmDialogOpen(false)}
+                aria-label="Stay on the editor"
+              >
+                No
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setIsConfirmDialogOpen(false);
+                  navigate("/"); // navigate back to feed page
+                }}
+                aria-label="Exit editor without saving"
+              >
+                Yes
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <div className="flex-center gap-2 md:gap-2 ml-auto">
           <DarkThemeToggler classname="md:mr-2" />
 
