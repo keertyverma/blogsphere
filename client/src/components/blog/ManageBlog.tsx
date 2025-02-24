@@ -74,17 +74,19 @@ const ManageBlog = ({ blogId, isDraft }: Props) => {
           </Button>
         </AlertDialogTrigger>
 
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Confirmation</AlertDialogTitle>
-            <AlertDialogDescription className="text-secondary-foreground">
-              Are you absolutely sure? This action will permanently delete your
-              blog.
+        <AlertDialogContent className="!rounded-2xl">
+          <AlertDialogHeader className="text-left">
+            <AlertDialogTitle className="text-base">
+              Delete Confirmation
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to permanently delete this blog? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-row justify-end gap-2">
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isDeleting}
             >
