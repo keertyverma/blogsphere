@@ -42,7 +42,7 @@ const SideNavbar = () => {
   return (
     <section className="relative flex max-md:flex-col gap-10 py-0 pt-20 m-0">
       {/* Side Navigation Bar */}
-      <div className="sticky top-[70px] z-40">
+      <div className="sticky top-[var(--header-height)] z-40">
         {/* Mobile screens side nav buttons*/}
         <div className="md:hidden py-1 border-b border-border flex flex-nowrap overflow-x-auto bg-background">
           <Button
@@ -73,7 +73,7 @@ const SideNavbar = () => {
         </div>
         <div
           className={
-            "min-w-[200px] h-[calc(100vh-70px-60px)] md:h-cover absolute md:sticky top-24 max-md:top-12 overflow-y-auto max-md:p-6 md:border-border md:border-r max-md:w-[calc(100%+80px)] max-md:px-14 max-md:-ml-7 duration-400 bg-background " +
+            "min-w-[200px] h-[calc(100vh-var(--header-height)-60px)] md:h-cover absolute md:sticky top-24 max-md:top-12 overflow-y-auto max-md:p-6 md:border-border md:border-r max-md:w-[calc(100%+80px)] max-md:px-14 max-md:-ml-7 duration-400 bg-background " +
             (showSideNav
               ? "opacity-100 pointer-events-auto"
               : "max-md:opacity-0 max-md:pointer-events-none")

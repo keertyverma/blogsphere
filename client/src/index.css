@@ -27,6 +27,7 @@
     --ring: 262.1 83.3% 57.8%;
     --radius: 0.5rem;
     --header: 210 20% 98%;
+    --header-height: 4.375rem;
   }
 
   .dark {
@@ -78,7 +79,7 @@
   }
 
   .navbar {
-    @apply w-full h-[70px] fixed top-0 z-50 flex items-center px-[5vw] py-4 border-b border-border bg-header;
+    @apply w-full h-[var(--header-height)] fixed top-0 z-50 flex items-center px-[5vw] py-4 border-b border-border bg-header;
   }
 
   /* SHADCN COMPONENTS */
@@ -98,59 +99,59 @@
 @layer utilities {
   /* TYPOGRAPHY */
   .h1-bold {
-    @apply text-[30px] md:text-[36px] font-bold leading-[140%] tracking-tighter;
+    @apply text-[1.875rem] md:text-[2.25rem] font-bold leading-[140%] tracking-tight; /* 30px -> 1.875rem, 36px -> 2.25rem */
   }
 
   .h1-semibold {
-    @apply text-[30px] md:text-[36px] font-semibold leading-[140%] tracking-tighter;
+    @apply text-[1.875rem] md:text-[2.25rem] font-semibold leading-[140%] tracking-tight;
   }
 
   .h1-medium {
-    @apply text-[30px] md:text-[36px] font-medium leading-tight tracking-tighter;
+    @apply text-[1.875rem] md:text-[2.25rem] font-medium leading-[140%] tracking-tight;
   }
 
   .h2-bold {
-    @apply text-[28px] md:text-[30px] font-bold leading-[140%] tracking-tighter;
+    @apply text-[1.75rem] md:text-[1.875rem] font-bold leading-[140%] tracking-tight; /* 28px -> 1.75rem, 30px -> 1.875rem */
   }
 
   .h2-semibold {
-    @apply text-[28px] md:text-[30px] font-semibold leading-[140%] tracking-tighter;
+    @apply text-[1.75rem] md:text-[1.875rem] font-semibold leading-[140%] tracking-normal;
   }
 
   .h3-bold {
-    @apply text-[24px] font-bold leading-[140%] tracking-tighter;
+    @apply text-[1.5rem] font-bold leading-snug tracking-tight; /* 24px -> 1.5rem */
   }
 
   .base-semibold {
-    @apply text-[16px] font-semibold leading-[140%] tracking-tighter;
+    @apply text-[1rem] font-semibold leading-[140%] tracking-tight; /* 16px -> 1rem */
   }
 
   .base-medium {
-    @apply text-[16px] font-medium leading-[140%];
+    @apply text-[1rem] font-medium leading-[140%];
   }
 
   .base-regular {
-    @apply text-[16px] font-normal leading-[140%];
+    @apply text-[1rem] font-normal leading-[140%];
   }
 
   .body-bold {
-    @apply text-[18px] font-bold leading-[140%];
+    @apply text-[1.125rem] font-bold leading-[140%]; /* 18px -> 1.125rem */
   }
 
   .body-medium {
-    @apply text-[18px] font-medium leading-[140%];
+    @apply text-[1.125rem] font-medium leading-[140%];
   }
 
   .small-semibold {
-    @apply text-[14px] font-semibold leading-[140%] tracking-tighter;
+    @apply text-[0.875rem] font-semibold leading-[140%] tracking-tight; /* 14px -> 0.875rem */
   }
 
   .small-medium {
-    @apply text-[14px] font-medium leading-[140%];
+    @apply text-[0.875rem] font-medium leading-[140%];
   }
 
   .small-regular {
-    @apply text-[14px] font-normal leading-[140%];
+    @apply text-[0.875rem] font-normal leading-[140%];
   }
 
   .flex-center {
@@ -170,7 +171,7 @@
   }
 
   .h-cover {
-    @apply min-h-[calc(100vh-70px)];
+    @apply min-h-[calc(100vh-var(--header-height))];
   }
 
   .input-icon {

@@ -72,7 +72,9 @@ const BlogEditor = () => {
         holder: "text-editor",
         data: content,
         tools: editorJSTools,
-        placeholder: "Type '/' for commands.",
+        placeholder: isMobile
+          ? "Start writing... Use '+' toolbar for more options."
+          : "Start writing... Use '+' toolbar for more options or type '/' for commands.",
       })
     );
   };
@@ -440,7 +442,7 @@ const BlogEditor = () => {
               ref={textareaRef}
               value={title}
               placeholder="Title ..."
-              className="w-full h-11 h2-semibold mt-5 outline-none resize-none leading-tight bg-background"
+              className="w-full h-11 mt-5 outline-none resize-none h1-semibold !tracking-normal bg-background overflow-hidden"
               onKeyDown={handleTitleKeyDown}
               onChange={handleTitleChange}
             ></textarea>
