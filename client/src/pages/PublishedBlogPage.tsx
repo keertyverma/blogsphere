@@ -64,8 +64,11 @@ const PublishedBlogPage = () => {
         },
       } = blog;
 
-      document.title = `${title} | by ${capitalize(authorName)} | BlogSphere`;
       // Set blog page title
+      document.title = `${title} | by ${capitalize(authorName)} | BlogSphere`;
+      return () => {
+        document.title = "BlogSphere"; // Reset title on unmount
+      };
     }
   }, [blog]);
 

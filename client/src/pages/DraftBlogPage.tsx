@@ -36,6 +36,9 @@ const DraftBlogPage = () => {
   useEffect(() => {
     if (blog && blog.title) {
       document.title = blog.title; // Set blog page title
+      return () => {
+        document.title = "BlogSphere"; // Reset title on unmount
+      };
     }
   }, [blog]);
 

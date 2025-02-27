@@ -24,13 +24,21 @@ const Editor = () => {
       // Edit mode: Load existing blog data for editing
       setBlog(data);
       setLastSavedBlog(data);
+      document.title = data.title
+        ? `Editor "${data.title}" - BlogSphere`
+        : "Editor - BlogSphere";
     } else {
-      // Create mode: Initialize the blog with default values (no data yet)
+      // Create mode: Initialize the blog with default values
       setBlog(INITIAL_BLOG);
       setLastSavedBlog(INITIAL_BLOG);
+      document.title = "Editor - BlogSphere";
     }
 
     setIsPublish(false);
+
+    return () => {
+      document.title = "BlogSphere"; // Reset title on unmount
+    };
   }, [blogId, data]);
 
   useEffect(() => {

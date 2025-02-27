@@ -60,7 +60,7 @@
   }
 
   ::selection {
-    @apply !bg-primary/30 dark:!bg-primary/50;
+    @apply !bg-primary/30 dark:!bg-primary/40;
   }
 
   body {

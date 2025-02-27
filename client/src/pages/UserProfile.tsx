@@ -7,6 +7,7 @@ import UserDraftBlogList from "@/components/user-profile/UserDraftBlogList";
 import UserInfo from "@/components/user-profile/UserInfo";
 import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogList";
 import { useGetUser } from "@/lib/react-query/queries";
+import { capitalize } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
@@ -19,6 +20,16 @@ const UserProfile = () => {
   const authUser = useAuthStore((s) => s.user);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    if (user && user?.personalInfo?.fullname) {
+      document.title = `${capitalize(user.personalInfo.fullname)} - BlogSphere`;
+
+      return () => {
+        document.title = "BlogSphere"; // Reset title on unmount
+      };
+    }
+  }, [user]);
 
   useEffect(() => {
     // Clear search input and term when user changes to prevent using outdated queries.
