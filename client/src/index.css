@@ -274,6 +274,9 @@
 .ce-toolbar__content {
   max-width: 900px;
 }
+.ce-popover {
+  width: 14rem;
+}
 
 .cdx-list {
   padding: 0;
