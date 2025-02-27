@@ -84,23 +84,23 @@ const BlogEditor = () => {
   }, []);
 
   // Initialize text editor
-  const isReady = useRef(false);
+  const isTextEditorReady = useRef(false);
   useEffect(() => {
+    if (isTextEditorReady.current) return; // Prevent text editor re-initialization
+
     if (blogId) {
       // edit mode
-      if (!isReady.current && !isLoading && data) {
+      if (!isLoading && data) {
         const blogContent = isPublishClose ? blog.content : data.content;
         initializeEditor(blogContent);
-        isReady.current = true;
+        isTextEditorReady.current = true;
       }
     } else {
       // write mode
-      if (!isReady.current) {
-        const blogContent =
-          isPublishClose && blog.content ? blog.content : ({} as OutputData);
-        initializeEditor(blogContent);
-        isReady.current = true;
-      }
+      const blogContent =
+        isPublishClose && blog.content ? blog.content : ({} as OutputData);
+      initializeEditor(blogContent);
+      isTextEditorReady.current = true;
     }
   }, [blogId, data, isLoading]);
 
@@ -219,7 +219,7 @@ const BlogEditor = () => {
       showSuccessToast("Draft saved.");
       // If the blog is newly created, navigate to the editor in `edit` mode, allowing the user to continue making modifications.
       if (!blogId) {
-        isReady.current = false; // Ensures the text editor initializes with blog data in edit mode.
+        isTextEditorReady.current = false; // Ensures the text editor initializes with blog data in edit mode.
         navigate(`/editor/${savedBlogId}?isDraft=true`);
       }
     } catch (error) {

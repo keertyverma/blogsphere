@@ -361,6 +361,23 @@
   opacity: 60%;
 }
 
+/* 
+   Ensures the placeholder text appears inside empty header blocks 
+   while maintaining EditorJS's default styling.
+*/
+.ce-header[data-placeholder]:empty::after {
+  display: block;
+  content: attr(data-placeholder);
+  opacity: 0.4;
+  font-weight: initial;
+  pointer-events: none;
+}
+
+/* Hides any default placeholder behavior added by EditorJS to avoid duplication. */
+.ce-header[data-placeholder]:empty::before {
+  display: none !important;
+}
+
 @keyframes heart-bounce {
   40% {
     transform: scale(1.1);

@@ -60,7 +60,7 @@ export const editorJSTools = {
   header: {
     class: Header,
     config: {
-      placeholder: "Type Heading...",
+      placeholder: "Heading...",
       levels: [1, 2, 3, 4, 5, 6],
       defaultLevel: 2,
     },
