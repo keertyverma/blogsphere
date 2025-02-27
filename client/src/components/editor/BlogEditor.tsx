@@ -106,14 +106,18 @@ const BlogEditor = () => {
 
   // Handle textarea auto-resize
   useEffect(() => {
-    if (title && textareaRef.current) {
-      autoResizeTextarea(textareaRef.current);
+    if (textareaRef.current) {
+      if (title) {
+        autoResizeTextarea(textareaRef.current);
+      } else {
+        textareaRef.current.style.height = "2.75rem"; // Reset to default Tailwind `h-11`
+      }
     }
   }, [title]);
 
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
-    textarea.style.height = "auto"; // Reset height to auto
-    textarea.style.height = `${textarea.scrollHeight}px`; // Set height to scroll height
+    textarea.style.height = "auto"; // Reset height first (important for shrinking)
+    textarea.style.height = `${textarea.scrollHeight}px`; // Expand to fit content
   };
 
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
