@@ -1,3 +1,4 @@
+import useHidePopoverItems from "@/hooks/useHidePopoverItems";
 import {
   useCreateBlog,
   useGetBlog,
@@ -35,9 +36,13 @@ import TextWithLoader from "../ui/text-with-loader";
 import BlogEditorSkeleton from "./BlogEditorSkeleton";
 
 const BlogEditor = () => {
+  // Local States
   const [toggleFileUploader, setToggleFileUploader] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Zustand Global Store
   const {
     blog,
     blog: { title, coverImgURL },
@@ -52,32 +57,19 @@ const BlogEditor = () => {
     setLastSavedBlog,
   } = useEditorStore();
 
+  // URL & Navigation
+  const { blogId } = useParams();
+  const [searchParams] = useSearchParams();
+  const isDraft = searchParams.get("isDraft") === "true";
+  const navigate = useNavigate();
+  const isMobile = useMediaQuery("(max-width:640px)");
+
+  // API calls
+  const { data, isLoading } = useGetBlog({ isDraft, blogId });
   const { mutateAsync: createDraftBlog, isPending: isSaving } = useCreateBlog();
   const { mutateAsync: updateDraftBlog, isPending: isUpdating } =
     useUpdateBlog();
   const isSavingDraft = (isSaving || isUpdating) && !isAutoSaving;
-
-  const { blogId } = useParams();
-  const [searchParams] = useSearchParams();
-  const isDraft = searchParams.get("isDraft") === "true";
-  const { data, isLoading } = useGetBlog({ isDraft, blogId });
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width:640px)");
-
-  const initializeEditor = (content = {} as OutputData) => {
-    setTextEditor(
-      new EditorJS({
-        holder: "text-editor",
-        data: content,
-        tools: editorJSTools,
-        placeholder: isMobile
-          ? "Start writing... Use '+' toolbar for more options."
-          : "Start writing... Use '+' toolbar for more options or type '/' for commands.",
-      })
-    );
-  };
 
   useEffect(() => {
     setIsPublishClose(false);
@@ -114,6 +106,21 @@ const BlogEditor = () => {
       }
     }
   }, [title]);
+
+  useHidePopoverItems();
+
+  const initializeEditor = (content = {} as OutputData) => {
+    setTextEditor(
+      new EditorJS({
+        holder: "text-editor",
+        data: content,
+        tools: editorJSTools,
+        placeholder: isMobile
+          ? "Start writing... Use '+' toolbar for more options."
+          : "Start writing... Use '+' toolbar for more options or type '/' for commands.",
+      })
+    );
+  };
 
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto"; // Reset height first (important for shrinking)

@@ -2,7 +2,7 @@ import Embed from "@editorjs/embed";
 import Header from "@editorjs/header";
 import Image from "@editorjs/image";
 import InlineCode from "@editorjs/inline-code";
-import List from "@editorjs/list";
+import EditorjsList from "@editorjs/list";
 import Marker from "@editorjs/marker";
 import Quote from "@editorjs/quote";
 import Code from "@editorjs/code";
@@ -66,7 +66,7 @@ export const editorJSTools = {
     },
   },
   list: {
-    class: List,
+    class: EditorjsList,
     inlineToolbar: true,
   },
   image: {
