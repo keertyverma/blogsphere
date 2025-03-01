@@ -2,7 +2,6 @@ import DOMPurify from "dompurify";
 
 interface ListItem {
   content: string;
-  meta: Record<string, unknown>;
   items: ListItem[];
 }
 
@@ -12,12 +11,21 @@ interface Props {
 }
 
 const BlockList = ({ style, items }: Props) => {
-  const renderListItems = (listItems: ListItem[]) =>
+  const renderListItems = (
+    listItems: ListItem[],
+    parentIndex = "",
+    level = 0
+  ) =>
     listItems.map((item, i) => {
-      // sanitize the HTML content to prevent XSS attacks.
+      // Compute hierarchical index for ordered lists
+      const index = parentIndex ? `${parentIndex}.${i + 1}` : `${i + 1}`;
+
+      // Sanitize HTML content to prevent XSS attacks
       const safeHTML = DOMPurify.sanitize(item.content);
+
       return (
-        <li key={i} className="my-2">
+        <li key={index} className="my-2">
+          {style === "ordered" && <span className="mr-2">{index}.</span>}
           <span
             dangerouslySetInnerHTML={{
               __html: safeHTML,
@@ -26,29 +34,35 @@ const BlockList = ({ style, items }: Props) => {
 
           {/* Recursively render nested lists if items exist */}
           {item.items.length > 0 && (
-            <ListTag style={style}>{renderListItems(item.items)}</ListTag>
+            <ListTag style={style} level={level + 1}>
+              {renderListItems(item.items, index, level + 1)}
+            </ListTag>
           )}
         </li>
       );
     });
 
-  return <ListTag style={style}>{renderListItems(items)}</ListTag>;
+  return (
+    <ListTag style={style} level={0}>
+      {renderListItems(items)}
+    </ListTag>
+  );
 };
 
 // Helper component to dynamically choose list type
 const ListTag = ({
   style,
   children,
+  level,
 }: {
   style: "ordered" | "unordered";
   children: React.ReactNode;
+  level: number;
 }) => {
-  const className =
-    style === "ordered" ? "pl-5 list-decimal" : "pl-5 list-disc";
   return style === "ordered" ? (
-    <ol className={className}>{children}</ol>
+    <ol className={`${level > 0 ? "pl-5" : ""}`}>{children}</ol>
   ) : (
-    <ul className={className}>{children}</ul>
+    <ul className="pl-5 list-disc">{children}</ul>
   );
 };
 
