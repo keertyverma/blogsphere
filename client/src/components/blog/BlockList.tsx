@@ -1,4 +1,4 @@
-import DOMPurify from "dompurify";
+import he from "he";
 
 interface ListItem {
   content: string;
@@ -19,18 +19,12 @@ const BlockList = ({ style, items }: Props) => {
     listItems.map((item, i) => {
       // Compute hierarchical index for ordered lists
       const index = parentIndex ? `${parentIndex}.${i + 1}` : `${i + 1}`;
-
-      // Sanitize HTML content to prevent XSS attacks
-      const safeHTML = DOMPurify.sanitize(item.content);
+      const decodedContent = he.decode(item.content);
 
       return (
         <li key={index} className="my-2">
           {style === "ordered" && <span className="mr-2">{index}.</span>}
-          <span
-            dangerouslySetInnerHTML={{
-              __html: safeHTML,
-            }}
-          ></span>
+          {decodedContent}
 
           {/* Recursively render nested lists if items exist */}
           {item.items.length > 0 && (

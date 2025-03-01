@@ -3,6 +3,8 @@ import confetti from "canvas-confetti";
 import { clsx, type ClassValue } from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import DOMPurify from "dompurify";
+import he from "he";
 import { toast, ToastContainerProps, ToastOptions } from "react-toastify";
 import { twMerge } from "tailwind-merge";
 
@@ -234,4 +236,17 @@ export const showConfetti = () => {
     spread: 70,
     origin: { y: 0.6 },
   });
+};
+
+/**
+ * Decodes escaped HTML entities and sanitizes the content to prevent XSS attacks.
+ *
+ * @param {string} htmlContent - The HTML content to decode and sanitize.
+ * @returns {string} The sanitized HTML content.
+ */
+export const decodeAndSanitize = (htmlContent: string): string => {
+  if (!htmlContent) return "";
+
+  const decodedContent = he.decode(htmlContent);
+  return DOMPurify.sanitize(decodedContent);
 };

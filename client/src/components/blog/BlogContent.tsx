@@ -1,9 +1,9 @@
+import { decodeAndSanitize } from "@/lib/utils";
 import { OutputBlockData } from "@editorjs/editorjs";
-import DOMPurify from "dompurify";
+import BlockCode from "./BlockCode";
 import BlockImage from "./BlockImage";
 import BlockList from "./BlockList";
 import BlockQuote from "./BlockQuote";
-import BlockCode from "./BlockCode";
 
 interface Props {
   block: OutputBlockData;
@@ -12,8 +12,8 @@ interface Props {
 const BlogContent = ({ block }: Props) => {
   const { type, data } = block;
 
-  // sanitize the HTML content to prevent XSS attacks.
-  const safeHTML = DOMPurify.sanitize(data.text);
+  // Decode HTML entities and sanitize EditorJS content to prevent XSS attack
+  const safeHTML = decodeAndSanitize(data.text);
 
   if (type === "header") {
     const HeadingTag = `h${data.level}` as keyof JSX.IntrinsicElements;
@@ -29,7 +29,7 @@ const BlogContent = ({ block }: Props) => {
     return <BlockImage url={data.file.url} caption={data.caption} />;
 
   if (type === "quote")
-    return <BlockQuote quote={safeHTML} caption={data.caption} />;
+    return <BlockQuote quote={data.text} caption={data.caption} />;
 
   if (type === "list")
     return <BlockList style={data.style} items={data.items} />;

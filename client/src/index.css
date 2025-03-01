@@ -213,38 +213,34 @@
     @apply text-base lg:text-xl leading-6 lg:leading-8;
   }
 
-  .quote-caption a {
-    @apply !text-sm md:!text-base;
-  }
-
   #text-editor h1,
   .blog-page-content h1 {
-    @apply text-3xl font-semibold;
+    @apply text-3xl font-semibold [&_*]:!text-3xl [&_*]:!font-semibold;
   }
 
   #text-editor h2,
   .blog-page-content h2 {
-    @apply text-2xl font-semibold;
+    @apply text-2xl font-semibold [&_*]:!text-2xl [&_*]:!font-semibold;
   }
 
   #text-editor h3,
   .blog-page-content h3 {
-    @apply text-xl font-semibold;
+    @apply text-xl font-semibold [&_*]:!text-xl [&_*]:!font-semibold;
   }
 
   #text-editor h4,
   .blog-page-content h4 {
-    @apply text-lg font-semibold;
+    @apply text-lg font-semibold [&_*]:!text-lg [&_*]:!font-semibold;
   }
 
   #text-editor h5,
   .blog-page-content h5 {
-    @apply text-base font-semibold;
+    @apply text-base font-semibold [&_*]:!text-base [&_*]:!font-semibold;
   }
 
   #text-editor h6,
   .blog-page-content h6 {
-    @apply text-base font-semibold;
+    @apply text-sm font-semibold [&_*]:!text-sm [&_*]:!font-semibold;
   }
 
   #text-editor a,
