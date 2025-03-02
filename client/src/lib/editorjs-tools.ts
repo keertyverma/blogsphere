@@ -71,6 +71,7 @@ export const editorJSTools = {
   },
   image: {
     class: Image,
+    inlineToolbar: true,
     config: {
       uploader: {
         uploadByUrl: uploadImageByURL,
