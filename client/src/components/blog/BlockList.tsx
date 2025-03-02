@@ -1,4 +1,4 @@
-import he from "he";
+import { sanitizeContent } from "@/lib/utils";
 
 interface ListItem {
   content: string;
@@ -19,12 +19,12 @@ const BlockList = ({ style, items }: Props) => {
     listItems.map((item, i) => {
       // Compute hierarchical index for ordered lists
       const index = parentIndex ? `${parentIndex}.${i + 1}` : `${i + 1}`;
-      const decodedContent = he.decode(item.content);
+      const safeHTML = sanitizeContent(item.content);
 
       return (
         <li key={index} className="my-2">
           {style === "ordered" && <span className="mr-2">{index}.</span>}
-          {decodedContent}
+          <span dangerouslySetInnerHTML={{ __html: safeHTML }}></span>
 
           {/* Recursively render nested lists if items exist */}
           {item.items.length > 0 && (

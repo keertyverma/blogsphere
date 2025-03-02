@@ -68,6 +68,9 @@ export const editorJSTools = {
   list: {
     class: EditorjsList,
     inlineToolbar: true,
+    config: {
+      counterTypes: ["numeric"],
+    },
   },
   image: {
     class: Image,
