@@ -1,4 +1,4 @@
-import { decodeAndSanitize } from "@/lib/utils";
+import { sanitizeContent } from "@/lib/utils";
 
 interface Props {
   quote: string;
@@ -7,8 +7,8 @@ interface Props {
 
 const BlockQuote = ({ quote, caption = "" }: Props) => {
   if (!quote) return null;
-  const safeQuote = decodeAndSanitize(quote);
-  const safeCaption = decodeAndSanitize(caption);
+  const safeQuote = sanitizeContent(quote);
+  const safeCaption = sanitizeContent(caption);
 
   return (
     <div className="bg-primary/20 p-3 pl-5 border-l-4 border-primary rounded-md">

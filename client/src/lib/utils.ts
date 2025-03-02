@@ -4,7 +4,6 @@ import { clsx, type ClassValue } from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import DOMPurify from "dompurify";
-import he from "he";
 import { toast, ToastContainerProps, ToastOptions } from "react-toastify";
 import { twMerge } from "tailwind-merge";
 
@@ -239,14 +238,15 @@ export const showConfetti = () => {
 };
 
 /**
- * Decodes escaped HTML entities and sanitizes the content to prevent XSS attacks.
+ * Sanitizes user-generated HTML content to remove potential security threats like XSS attacks.
  *
- * @param {string} htmlContent - The HTML content to decode and sanitize.
- * @returns {string} The sanitized HTML content.
+ * This function uses DOMPurify to clean the input HTML string, ensuring that only
+ * safe HTML elements and attributes are retained. It is particularly useful
+ * for rendering user-generated content in a secure manner.
+ *
+ * @param {string} htmlContent - The HTML content to be sanitized.
+ * @returns {string} - A sanitized HTML string with unsafe elements removed.
  */
-export const decodeAndSanitize = (htmlContent: string): string => {
-  if (!htmlContent) return "";
-
-  const decodedContent = he.decode(htmlContent);
-  return DOMPurify.sanitize(decodedContent);
+export const sanitizeContent = (htmlContent: string): string => {
+  return DOMPurify.sanitize(htmlContent);
 };

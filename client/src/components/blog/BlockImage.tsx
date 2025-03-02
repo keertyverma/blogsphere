@@ -1,11 +1,11 @@
-import { decodeAndSanitize } from "@/lib/utils";
+import { sanitizeContent } from "@/lib/utils";
 
 interface Props {
   url: string;
   caption?: string;
 }
 const BlockImage = ({ url, caption = "" }: Props) => {
-  const safeCaption = decodeAndSanitize(caption);
+  const safeCaption = sanitizeContent(caption);
 
   return (
     <div className="my-4 md:my-6">

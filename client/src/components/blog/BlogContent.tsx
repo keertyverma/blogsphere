@@ -1,4 +1,4 @@
-import { decodeAndSanitize } from "@/lib/utils";
+import { sanitizeContent } from "@/lib/utils";
 import { OutputBlockData } from "@editorjs/editorjs";
 import BlockCode from "./BlockCode";
 import BlockImage from "./BlockImage";
@@ -13,7 +13,7 @@ const BlogContent = ({ block }: Props) => {
   const { type, data } = block;
 
   // Decode HTML entities and sanitize EditorJS content to prevent XSS attack
-  const safeHTML = decodeAndSanitize(data.text);
+  const safeHTML = sanitizeContent(data.text);
 
   if (type === "header") {
     const HeadingTag = `h${data.level}` as keyof JSX.IntrinsicElements;
