@@ -14,7 +14,7 @@
     "@editorjs/editorjs": "^2.29.1",
     "@editorjs/embed": "^2.7.1",
     "@editorjs/header": "^2.8.1",
-    "@editorjs/image": "^2.9.0",
+    "@editorjs/image": "^2.10.2",
     "@editorjs/inline-code": "^1.5.0",
     "@editorjs/link": "^2.6.2",
     "@editorjs/list": "^2.0.5",
@@ -57,8 +57,8 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/canvas-confetti": "^1.9.0",
-    "@types/ms": "^0.7.34",
     "@types/dompurify": "^3.0.5",
+    "@types/ms": "^0.7.34",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

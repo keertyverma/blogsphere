@@ -26,7 +26,14 @@ const BlogContent = ({ block }: Props) => {
     return <p dangerouslySetInnerHTML={{ __html: safeHTML }}></p>;
 
   if (type === "image")
-    return <BlockImage url={data.file.url} caption={data.caption} />;
+    return (
+      <BlockImage
+        url={data.file.url}
+        caption={data.caption}
+        withBackground={data.withBackground}
+        stretched={data.stretched}
+      />
+    );
 
   if (type === "quote")
     return <BlockQuote quote={data.text} caption={data.caption} />;
