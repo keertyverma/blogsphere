@@ -157,7 +157,7 @@ const LoginForm = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleLogin)}
-            className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
+            className="w-[90%] max-w-[400px] flex flex-col gap-2 md:gap-3"
           >
             <div className="text-center mb-4">
               <h2 className="h3-bold md:h2-bold capitalize">welcome back</h2>
@@ -175,7 +175,7 @@ const LoginForm = () => {
                       <Input
                         type="email"
                         placeholder="Email"
-                        className="shad-input pl-11"
+                        className="shad-input pl-11 max-sm:placeholder:text-sm"
                         {...field}
                       />
                       <IoMailOutline className="input-icon left-4" />
@@ -197,7 +197,7 @@ const LoginForm = () => {
                         type={passwordVisible ? "text" : "password"}
                         placeholder="Password"
                         autoComplete="on"
-                        className="shad-input pl-11"
+                        className="shad-input pl-11 max-sm:placeholder:text-sm"
                         {...field}
                       />
                       <IoKeyOutline className="input-icon left-4" />

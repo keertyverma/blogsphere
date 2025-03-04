@@ -142,7 +142,7 @@ const SignupForm = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignup)}
-            className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
+            className="w-[90%] max-w-[400px] flex flex-col gap-2 md:gap-3"
           >
             <div className="text-center">
               <h2 className="h3-bold md:h2-bold capitalize">join us today</h2>
@@ -176,7 +176,7 @@ const SignupForm = () => {
                       <Input
                         type="text"
                         placeholder="Full Name"
-                        className="shad-input pl-11"
+                        className="shad-input pl-11 max-sm:placeholder:text-sm"
                         {...field}
                       />
                       <BiUser className="input-icon left-4" />
@@ -197,7 +197,7 @@ const SignupForm = () => {
                       <Input
                         type="email"
                         placeholder="Email"
-                        className="shad-input pl-11"
+                        className="shad-input pl-11 max-sm:placeholder:text-sm"
                         {...field}
                       />
                       <IoMailOutline className="input-icon left-4" />
@@ -219,7 +219,7 @@ const SignupForm = () => {
                         type={passwordVisible ? "text" : "password"}
                         placeholder="Password"
                         autoComplete="on"
-                        className="shad-input pl-11"
+                        className="shad-input pl-11 max-sm:placeholder:text-sm"
                         {...field}
                       />
                       <IoKeyOutline className="input-icon left-4" />
