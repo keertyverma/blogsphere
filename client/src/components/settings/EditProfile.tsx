@@ -180,7 +180,7 @@ const EditProfile = () => {
                         <Input
                           type="text"
                           placeholder="Enter your full name"
-                          className="shad-input md:text-base"
+                          className="shad-input"
                           {...field}
                         />
                       </FormControl>
@@ -199,7 +199,7 @@ const EditProfile = () => {
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          className="shad-textarea custom-scrollbar md:text-base placeholder:text-sm"
+                          className="shad-textarea max-sm:placeholder:text-sm"
                           placeholder="Tell us your story"
                           {...field}
                           onChange={(e) => {
@@ -239,7 +239,7 @@ const EditProfile = () => {
                       <FormControl>
                         <Input
                           placeholder="https://x.com/username"
-                          className="shad-input md:text-base"
+                          className="shad-input"
                           {...field}
                         />
                       </FormControl>
@@ -258,7 +258,7 @@ const EditProfile = () => {
                       <FormControl>
                         <Input
                           placeholder="https://instagram.com/username"
-                          className="shad-input md:text-base"
+                          className="shad-input"
                           {...field}
                         />
                       </FormControl>
@@ -277,7 +277,7 @@ const EditProfile = () => {
                       <FormControl>
                         <Input
                           placeholder="https://github.com/username"
-                          className="shad-input md:text-base"
+                          className="shad-input"
                           {...field}
                         />
                       </FormControl>
@@ -296,7 +296,7 @@ const EditProfile = () => {
                       <FormControl>
                         <Input
                           placeholder="https://facebook.com/username"
-                          className="shad-input md:text-base"
+                          className="shad-input"
                           {...field}
                         />
                       </FormControl>
@@ -315,7 +315,7 @@ const EditProfile = () => {
                       <FormControl>
                         <Input
                           placeholder="https://youtube.com/username"
-                          className="shad-input md:text-base"
+                          className="shad-input"
                           {...field}
                         />
                       </FormControl>
@@ -334,7 +334,7 @@ const EditProfile = () => {
                       <FormControl>
                         <Input
                           placeholder="https://username.com"
-                          className="shad-input md:text-base"
+                          className="shad-input"
                           {...field}
                         />
                       </FormControl>

@@ -226,7 +226,7 @@ const PublishForm = () => {
                     <Input
                       type="text"
                       placeholder="Title"
-                      className="shad-input text-base placeholder:text-sm"
+                      className="shad-input max-sm:placeholder:text-sm"
                       {...field}
                     />
                   </FormControl>
@@ -249,7 +249,7 @@ const PublishForm = () => {
                   </FormDescription>
                   <FormControl>
                     <Textarea
-                      className="shad-textarea custom-scrollbar text-base placeholder:text-sm"
+                      className="shad-textarea max-sm:placeholder:text-sm"
                       placeholder="Summarize your blog in a few words"
                       {...field}
                       onChange={(e) => {
@@ -288,7 +288,7 @@ const PublishForm = () => {
                       <Input
                         type="text"
                         placeholder="Type a tag and press enter or comma to add"
-                        className="mt-1 bg-muted sticky top-0 left-0 mb-3 md:text-base placeholder:text-sm"
+                        className="mt-1 bg-muted sticky top-0 left-0 mb-3 max-sm:placeholder:text-sm"
                         {...field}
                         onChange={(e) => {
                           field.onChange(e);
