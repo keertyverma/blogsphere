@@ -31,7 +31,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Setup Production Environment
-      run: echo "${{secrets.ENV_PRODUCTION}}" > .env.production
+      # openssl base64 -A -in .env.production -out .env.production.vault
+      run: echo ${{secrets.ENV_PRODUCTION}} | base64 --decode > .env.production
     - name: Install and Build
       run: |
         npm install
@@ -45,7 +46,7 @@ jobs:
       name: Google App Engine
       uses: google-github-actions/deploy-appengine@v2
       with:
-        working-directory: ./server
+        working_directory: ./server
         project_id: ${{secrets.GOOGLE_PROJECT_ID}}
         version: v1
         flags: --no-cache
