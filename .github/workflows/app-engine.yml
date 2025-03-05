@@ -32,7 +32,7 @@ jobs:
         cache: 'npm'
     - name: Setup Production Environment
       # openssl base64 -A -in .env.production -out .env.production.vault
-      run: echo "${{secrets.ENV_PRODUCTION}}" | base64 --decode > .env.production
+      run: echo "${{secrets.ENV_PRODUCTION}}" | openssl base64 -A -d > .env.production
     - name: Install and Build
       run: |
         npm install
