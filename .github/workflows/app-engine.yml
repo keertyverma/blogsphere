@@ -32,8 +32,10 @@ jobs:
       run: |
         touch .env.production
         echo "${{secrets.ENV_PRODUCTION}}" > .env.production
-    - name: Build
-      run: npm run build --if-present
+    - name: Install and Build
+      run: |
+        npm install
+        npm run build
     - id: 'deploy'
       name: Google App Engine
       uses: google-github-actions/deploy-appengine@v2
