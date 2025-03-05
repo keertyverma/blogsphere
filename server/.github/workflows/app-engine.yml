@@ -1,0 +1,45 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Google App Engine CI/CD
+
+on:
+  push:
+    branches: [ "main", "gcloud" ]
+
+defaults:
+  run:
+    working-directory: ./server
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: Setup Production Environment
+      run: |
+        touch .env.production
+        echo "${{secrets.ENV_PRODUCTION}}" > .env.production
+    - name: Build
+      run: npm run build --if-present
+    - id: 'deploy'
+      name: Google App Engine
+      uses: google-github-actions/deploy-appengine@v2
+      with:
+        project_id: ${{secrets.GOOGLE_PROJECT_ID}}
+        version: v1
+        credentials: ${{secrets.GCLOUD_SERVICE_KEY_JSON}}
+        flags: --no-cache
+        deliverables: app.yaml
