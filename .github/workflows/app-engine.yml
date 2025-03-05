@@ -7,10 +7,6 @@ on:
   push:
     branches: [ "main", "gcloud" ]
 
-defaults:
-  run:
-    working-directory: ./server
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,9 +28,10 @@ jobs:
         cache: 'npm'
     - name: Setup Production Environment
       # openssl base64 -A -in .env.production -out .env.production.vault
-      run: echo "${{secrets.ENV_PRODUCTION}}" | openssl base64 -A -d > .env.production
+      run: echo "${{secrets.ENV_PRODUCTION}}" | openssl base64 -A -d > server/.env.production
     - name: Install and Build
       run: |
+        cd server
         npm install
         npm run build
     - id: 'auth'
@@ -45,6 +42,7 @@ jobs:
     - id: 'deploy'
       name: Google App Engine
       uses: google-github-actions/deploy-appengine@v2
+      if: ${{ hashFiles('server/.env.production') != '' }}
       with:
         working_directory: ./server
         project_id: ${{secrets.GOOGLE_PROJECT_ID}}
