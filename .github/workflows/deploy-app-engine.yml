@@ -1,0 +1,55 @@
+# This workflow automates CI/CD process for a Node.js Express backend.
+# It performs a clean installation of node dependencies, cache/restore them, build the application and deploying to Google App Engine.
+
+name: Google App Engine CI/CD
+
+on:
+  push:
+    branches: ["main", "gcloud"]
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install and Build
+        run: |
+          cd server
+          npm ci
+          npm run build
+
+      - name: Setup Production Environment
+        # openssl base64 -A -in .env.production -out .env.production.vault
+        run: echo "${{secrets.PRODUCTION_ENV_BASE64}}" | openssl base64 -A -d > server/.env.production
+
+      - name: Authenticate with Google Cloud
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: ${{secrets.GCP_SA_KEY}}
+
+      - name: Deploy to Google App Engine
+        uses: google-github-actions/deploy-appengine@v2
+        if: ${{ hashFiles('server/.env.production') != '' }}
+        with:
+          working_directory: ./server
+          project_id: ${{secrets.GCP_PROJECT_ID}}
+          version: v1
+          flags: --no-cache
+          deliverables: app.yaml
