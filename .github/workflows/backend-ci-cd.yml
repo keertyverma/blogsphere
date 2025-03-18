@@ -33,7 +33,8 @@ jobs:
       - name: Run Integration Tests
         run: |
           cd server
-          npm run test:integration
+          echo "CI=$CI"
+          npm run test:integration -- --ci
 
       - name: Upload HTML Test Report
         if: always() # Runs even if tests fail
