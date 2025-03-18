@@ -8,7 +8,7 @@
     "copy-templates": "copyfiles src/utils/mailer/templates/* dist",
     "start": "node --env-file=.env.production dist/src/index.js",
     "dev": "nodemon src/index.ts",
-    "test": "jest --verbose --coverage",
+    "test": "jest --verbose --coverage --detectOpenHandles",
     "test:unit": "jest --testPathPattern=tests/unit --verbose --detectOpenHandles",
     "test:integration": "jest --testPathPattern=tests/integration --verbose --detectOpenHandles",
     "migrate-data": "ts-node src/db/migration.ts",

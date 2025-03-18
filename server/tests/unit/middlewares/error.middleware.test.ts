@@ -16,7 +16,7 @@ describe("Error Handler Middleware Test Suite", () => {
     req = {} as Request;
     res = {
       status: jest.fn(() => res),
-      send: jest.fn(),
+      json: jest.fn(),
     } as unknown as Response;
     next = jest.fn();
   });
@@ -38,7 +38,7 @@ describe("Error Handler Middleware Test Suite", () => {
     errorHandler(error, req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(statusCode);
-    expect(res.send).toHaveBeenCalledWith(expectedResponse);
+    expect(res.json).toHaveBeenCalledWith(expectedResponse);
   });
 
   test("should set response status to 404 in case of not found error", () => {
@@ -58,7 +58,7 @@ describe("Error Handler Middleware Test Suite", () => {
     errorHandler(error, req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(statusCode);
-    expect(res.send).toHaveBeenCalledWith(expectedResponse);
+    expect(res.json).toHaveBeenCalledWith(expectedResponse);
   });
 
   test("should set response status to 400 in case of mongoose validation error", () => {
@@ -85,7 +85,7 @@ describe("Error Handler Middleware Test Suite", () => {
     errorHandler(mongooseValidationError, req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(statusCode);
-    expect(res.send).toHaveBeenCalledWith(expectedResponse);
+    expect(res.json).toHaveBeenCalledWith(expectedResponse);
   });
 
   test("should set response status to 400 in case of mongoose duplicate key error", () => {
@@ -110,7 +110,7 @@ describe("Error Handler Middleware Test Suite", () => {
     errorHandler(duplicateKeyError, req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(statusCode);
-    expect(res.send).toHaveBeenCalledWith(expectedResponse);
+    expect(res.json).toHaveBeenCalledWith(expectedResponse);
   });
 
   test("should set response status to 500 in case of any other issue with api", () => {
@@ -130,7 +130,7 @@ describe("Error Handler Middleware Test Suite", () => {
     errorHandler(error, req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(statusCode);
-    expect(res.send).toHaveBeenCalledWith(expectedResponse);
+    expect(res.json).toHaveBeenCalledWith(expectedResponse);
   });
 
   test("should set response status to 403 in case of forbidden request", () => {
@@ -151,6 +151,6 @@ describe("Error Handler Middleware Test Suite", () => {
     errorHandler(error, req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(statusCode);
-    expect(res.send).toHaveBeenCalledWith(expectedResponse);
+    expect(res.json).toHaveBeenCalledWith(expectedResponse);
   });
 });
