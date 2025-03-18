@@ -11,6 +11,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write # Allows publishing test results in GitHub UI
+
     strategy:
       matrix:
         node-version: [22.x]
@@ -62,8 +65,6 @@ jobs:
     needs: test # Ensures deployment only runs if tests pass!
     runs-on: ubuntu-latest
     permissions:
-      actions: "write" # Required for manual triggers
-      contents: "read" # Required for accessing the repo
       id-token: "write" # Required for OIDC authentication with Google Cloud
 
     strategy:

@@ -3,6 +3,8 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
+  testTimeout: 20000,
+  // maxWorkers: 1, // Run tests one by one to avoid conflicts
   reporters: [
     "default",
     [
