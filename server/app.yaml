@@ -4,7 +4,7 @@ automatic_scaling:
   min_idle_instances: 1
   max_instances: 1
   min_instances: 1
-entrypoint: node --env-file=.env.production dist/src/index.js
+# entrypoint: node --env-file=.env.production dist/src/index.js
 env_variables:
   NODE_ENV: "production"
 handlers:

@@ -12,8 +12,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: "read"
-      id-token: "write"
+      actions: "write" # Required for manual triggers
+      contents: "read" # Required for accessing the repo
+      id-token: "write" # Required for OIDC authentication with Google Cloud
 
     strategy:
       matrix:
