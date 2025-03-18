@@ -6,11 +6,15 @@ module.exports = {
   reporters: [
     "default",
     [
+      "jest-junit", // XML report for automation
+      { outputDirectory: "./test-reports", outputName: "junit.xml" },
+    ],
+    [
       "jest-html-reporter",
       {
         pageTitle: "Test Report",
         includeFailureMsg: true,
-        outputPath: "./test-report/index.html",
+        outputPath: "./test-reports/index.html",
       },
     ],
   ],

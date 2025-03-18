@@ -5,11 +5,60 @@ name: Google App Engine CI/CD
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "continuous-testing"]
   workflow_dispatch: # Allows manual trigger
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: |
+          cd server
+          npm ci
+
+      - name: Run Integration Tests
+        run: |
+          cd server
+          npm run test:integration
+
+      - name: Upload HTML Test Report
+        if: always() # Runs even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-test-report
+          path: server/test-report/index.html
+          retention-days: 7 # Store report for 7 days
+
+      - name: Upload XML Test Report (JUnit)
+        if: always() # Runs even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-test-report
+          path: server/test-reports/junit.xml
+          retention-days: 7
+
+      - name: Publish Test Results in GitHub UI
+        if: always() # Ensures test results appear even if tests fail
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: "server/test-reports/junit.xml"
+
   build-and-deploy:
+    needs: test # Ensures deployment only runs if tests pass!
     runs-on: ubuntu-latest
     permissions:
       actions: "write" # Required for manual triggers
