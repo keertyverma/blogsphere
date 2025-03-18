@@ -18,9 +18,6 @@ const server = app.listen(PORT, () => {
   logger.info(`App is listening on PORT - ${PORT}`);
   logger.debug(`Node Env = ${process.env.NODE_ENV}`);
   logger.debug(`App name = ${config.get("appName")}`);
-  logger.debug(
-    `verification link url = ${process.env.EMAIL_VERIFICATION_LINK_BASE_URL}`
-  );
 
   // configure google auth
   initializeFirebaseAuth();
