@@ -1,0 +1,7 @@
+# This file specifies files that are _not_ uploaded to Google Cloud using gcloud
+
+#!include:.gitignore
+
+.gcloudignore
+.git
+.gitignore

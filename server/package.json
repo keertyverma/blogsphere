@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && npm run copy-templates",
     "copy-templates": "copyfiles src/utils/mailer/templates/* dist",
-    "start": "node dist/src/index.js",
+    "start": "node --env-file=.env.production dist/src/index.js",
     "dev": "nodemon src/index.ts",
     "test": "jest --verbose --coverage",
     "test:unit": "jest --testPathPattern=tests/unit --verbose --detectOpenHandles",
