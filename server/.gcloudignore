@@ -1,7 +1,7 @@
 # This file specifies files that are _not_ uploaded to Google Cloud using gcloud
 
 #!include:.gitignore
-!server/.env.production
+!.env.production
 
 .gcloudignore
 .git
