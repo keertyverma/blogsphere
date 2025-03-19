@@ -2,6 +2,7 @@
 
 #!include:.gitignore
 !.env.production
+!.env.test
 
 .gcloudignore
 .git

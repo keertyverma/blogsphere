@@ -1,7 +1,7 @@
 node_modules/
 .env
 .env.production*
+.env.test*
 logs/
 coverage
-test-report
-test-report.html
+test-reports*

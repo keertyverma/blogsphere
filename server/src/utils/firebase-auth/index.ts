@@ -24,6 +24,12 @@ const getFirebaseConfig = (): admin.ServiceAccount => {
 };
 
 export const initializeFirebaseAuth = () => {
+  // Skip Firebase initialization in test environments
+  if (process.env.NODE_ENV === "test") {
+    console.log("Skipping Firebase initialization in test environment.");
+    return;
+  }
+
   const firebaseConfig = getFirebaseConfig();
 
   return admin.initializeApp({
