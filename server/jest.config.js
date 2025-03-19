@@ -3,12 +3,12 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
-  testTimeout: 20000,
-  // maxWorkers: 1, // Run tests one by one to avoid conflicts
+  // testTimeout: 10000,
+  setupFiles: ["./tests/setupTests.ts"],
   reporters: [
     "default",
     [
-      "jest-junit", // XML report for automation
+      "jest-junit",
       { outputDirectory: "./test-reports", outputName: "junit.xml" },
     ],
     [

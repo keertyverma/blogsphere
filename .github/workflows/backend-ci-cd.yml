@@ -33,19 +33,15 @@ jobs:
           cd server
           npm ci
 
+      - name: Setup Test Environment
+        # openssl base64 -A -in .env.test -out .env.test.vault
+        run: echo "${{secrets.TEST_ENV_BASE64}}" | base64 -A -d > server/.env.test || { echo "Failed to decode .env.test"; exit 1; }
+
       - name: Run Integration Tests
+        if: ${{ hashFiles('server/.env.test') != '' }}
         run: |
           cd server
-          echo "CI=$CI"
-          npm run test:integration -- --ci
-
-      - name: Upload HTML Test Report
-        if: always() # Runs even if tests fail
-        uses: actions/upload-artifact@v4
-        with:
-          name: jest-test-report
-          path: server/test-report/index.html
-          retention-days: 7 # Store report for 7 days
+          npm run test:integration
 
       - name: Upload XML Test Report (JUnit)
         if: always() # Runs even if tests fail
@@ -89,7 +85,7 @@ jobs:
 
       - name: Setup Production Environment
         # openssl base64 -A -in .env.production -out .env.production.vault
-        run: echo "${{secrets.PRODUCTION_ENV_BASE64}}" | openssl base64 -A -d > server/.env.production
+        run: echo "${{secrets.PRODUCTION_ENV_BASE64}}" | openssl base64 -A -d > server/.env.production || { echo "Failed to decode .env.production"; exit 1; }
 
       - name: Authenticate with Google Cloud
         uses: "google-github-actions/auth@v2"
