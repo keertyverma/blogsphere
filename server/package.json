@@ -4,9 +4,11 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "build": "tsc && npm run copy-templates",
+    "build": "tsc",
+    "postbuild": "npm run copy-templates",
     "copy-templates": "copyfiles src/utils/mailer/templates/* dist",
     "start": "node --env-file=.env.production dist/src/index.js",
+    "start:local": "node dist/src/index.js",
     "dev": "nodemon src/index.ts",
     "test": "jest --verbose --coverage --detectOpenHandles",
     "test:unit": "jest --testPathPattern=tests/unit --verbose --coverage --detectOpenHandles",

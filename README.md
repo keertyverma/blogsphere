@@ -1,5 +1,7 @@
 # Blogsphere
 
+[![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/keertyverma/blogsphere/backend-ci-cd.yml?label=Backend%20CI/CD%20Pipeline)](https://github.com/keertyverma/blogsphere/actions/workflows/backend-ci-cd.yml)
+
 Welcome to Blogsphere, the ultimate fullstack web application for bloggers and readers alike. <br>This platform allows users to create, manage, and interact with blogs while offering an intuitive user interface and robust backend functionalities.
 <br >With a modern and responsive design, Blogsphere ensures that your content looks great on any device.
 
