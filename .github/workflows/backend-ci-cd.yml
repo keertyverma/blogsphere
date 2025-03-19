@@ -99,7 +99,7 @@ jobs:
           working_directory: ./server
           project_id: ${{secrets.GCP_PROJECT_ID}}
           # version: v1
-          # flags: --no-cache
+          flags: --no-cache --stop-previous-version
           deliverables: app.yaml
 
       - name: Post Deployment Health Check
