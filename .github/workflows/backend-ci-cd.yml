@@ -5,7 +5,7 @@ name: Google App Engine CI/CD
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "post-deployment"]
   workflow_dispatch: # Allows manual trigger
 
 jobs:

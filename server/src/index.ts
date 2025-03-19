@@ -1,11 +1,11 @@
-import "express-async-errors";
 import "dotenv/config";
 import config from "config";
+import "express-async-errors";
 
-import logger from "./utils/logger";
 import app from "./app";
-import connectDB from "./db";
+import { connectDB } from "./db";
 import { initializeFirebaseAuth } from "./utils/firebase-auth";
+import logger from "./utils/logger";
 
 const PORT = process.env.PORT || 3001;
 
