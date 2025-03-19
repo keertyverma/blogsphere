@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup Test Environment
         # openssl base64 -A -in .env.test -out .env.test.vault
-        run: echo "${{secrets.TEST_ENV_BASE64}}" | base64 -A -d > server/.env.test || { echo "Failed to decode .env.test"; exit 1; }
+        run: echo "${{secrets.TEST_ENV_BASE64}}" | openssl base64 -A -d > server/.env.test || { echo "Failed to decode .env.test"; exit 1; }
 
       - name: Run Integration Tests
         if: ${{ hashFiles('server/.env.test') != '' }}
