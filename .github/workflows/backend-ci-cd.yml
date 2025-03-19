@@ -101,3 +101,34 @@ jobs:
           version: v1
           flags: --no-cache
           deliverables: app.yaml
+
+      - name: Post-Deployment Health Check
+        run: |
+          URL="${{ vars.HEALTHCHECK_URL }}"
+          echo "Checking health at $URL"
+
+          for i in {1..5}; do
+            RESPONSE=$(curl -s -w "\n%{http_code}" $URL)
+            BODY=$(echo "$RESPONSE" | head -n -1)
+            STATUS=$(echo "$RESPONSE" | tail -n 1)
+
+            if [ "$STATUS" -ne 200 ]; then
+              echo "Health check failed (HTTP $STATUS). Retrying in 10s..."
+              sleep 10
+              continue
+            fi
+
+            API_STATUS=$(echo "$BODY" | jq -r '.status')
+            DATABASE_STATUS=$(echo "$BODY" | jq -r '.database')
+
+            if [[ "$API_STATUS" == "error" || "$DATABASE_STATUS" == "disconnected" ]]; then
+              echo "Health check failed: API status = $API_STATUS, Database = $DATABASE_STATUS"
+              exit 1
+            fi
+
+            echo "Health check passed!"
+            exit 0
+          done
+
+          echo "Service did not become healthy in time. Failing deployment."
+          exit 1
