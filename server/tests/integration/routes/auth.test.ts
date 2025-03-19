@@ -35,10 +35,8 @@ type DecodedIdToken = {
 
 describe("/api/v1/auth", () => {
   afterAll(async () => {
-    if (server) {
-      await new Promise((resolve) => server.close(resolve)); // Ensure server closes properly
-    }
-    await disconnect(); // Ensure MongoDB disconnects
+    // close the MongoDB connection
+    await disconnect();
   });
 
   beforeEach(() => {
@@ -46,6 +44,7 @@ describe("/api/v1/auth", () => {
   });
 
   afterEach(async () => {
+    server.close();
     // db cleanup
     await User.deleteMany({});
   });
