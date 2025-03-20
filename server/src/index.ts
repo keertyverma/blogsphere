@@ -14,6 +14,9 @@ if (!config.get("secretAccessKey")) {
   process.exit(1);
 }
 
+// connect to db
+connectDB();
+
 const server = app.listen(PORT, () => {
   logger.info(`App is listening on PORT - ${PORT}`);
   logger.debug(`Node Env = ${process.env.NODE_ENV}`);
@@ -21,9 +24,6 @@ const server = app.listen(PORT, () => {
 
   // configure google auth
   initializeFirebaseAuth();
-
-  // connect to db
-  connectDB();
 });
 
 export default server;
