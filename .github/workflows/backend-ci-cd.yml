@@ -5,7 +5,7 @@ name: Google App Engine CI/CD
 
 on:
   push:
-    branches: ["main", "post-deployment"]
+    branches: ["main"]
   workflow_dispatch: # Allows manual trigger
 
 jobs:
@@ -121,7 +121,6 @@ jobs:
         with:
           working_directory: ./server
           project_id: ${{secrets.GCP_PROJECT_ID}}
-          # version: v1
           flags: --no-cache --no-promote # Don't promote immediately
           deliverables: app.yaml
 
