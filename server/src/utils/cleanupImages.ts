@@ -1,7 +1,7 @@
 import { OutputData } from "@editorjs/editorjs";
 import "dotenv/config";
 import mongoose from "mongoose";
-import connectDB from "../db";
+import { connectDB } from "../db";
 import { Blog } from "../models/blog.model";
 import { User } from "../models/user.model";
 import {

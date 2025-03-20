@@ -1,5 +1,5 @@
 import config from "config";
-import { connect } from "mongoose";
+import { connect, connection } from "mongoose";
 import logger from "../utils/logger";
 
 const MONGODB_URI = `mongodb+srv://${config.get("database.user")}:${config.get(
@@ -13,8 +13,16 @@ const connectDB = async () => {
     await connect(MONGODB_URI, { autoIndex: true });
     logger.info("MongoDB connected");
   } catch (err) {
-    logger.error(`MongoDB connection FAILED !! ${err}`);
+    throw new Error(`MongoDB connection FAILED !! ${err}`);
   }
 };
 
-export default connectDB;
+const checkDatabaseConnection = () => {
+  const states = ["disconnected", "connected", "connecting", "disconnecting"];
+  return {
+    status: connection.readyState === 1 ? "ok" : "error",
+    connectionState: states[connection.readyState] || "unknown",
+  };
+};
+
+export { checkDatabaseConnection, connectDB };

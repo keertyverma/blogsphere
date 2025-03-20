@@ -1,14 +1,16 @@
 import "dotenv/config";
-import http from "http";
+import { Server } from "http";
 import mongoose, { disconnect } from "mongoose";
 import request from "supertest";
+import { Application } from "express";
 
-import appServer from "../../../src";
+import { startServer } from "../../../src/start";
 import { Blog, IBlog } from "../../../src/models/blog.model";
 import { Bookmark, IBookmark } from "../../../src/models/bookmark.model";
 import { IUser, User } from "../../../src/models/user.model";
 
-let server: http.Server;
+let server: Server;
+let app: Application; // Express instance
 let endpoint: string = `/api/v1/bookmarks`;
 
 const createUsers = async () => {
@@ -119,17 +121,18 @@ const createBookmarks = async (
 };
 
 describe("/api/v1/bookmarks", () => {
+  beforeAll(async () => {
+    try {
+      ({ server, app } = await startServer());
+    } catch (error) {
+      console.error("🚨 Server startup failed in tests:", error);
+      throw new Error("Failed to start the test server");
+    }
+  });
+
   afterAll(async () => {
-    // close the MongoDB connection
+    if (server) server.close();
     await disconnect();
-  });
-
-  beforeEach(() => {
-    server = appServer;
-  });
-
-  afterEach(() => {
-    server.close();
   });
 
   describe("POST /:blogId", () => {
@@ -140,6 +143,7 @@ describe("/api/v1/bookmarks", () => {
     let token: string;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
       const blogAuthor = users[0].id;
       authenticatedUser = users[1];
@@ -147,22 +151,24 @@ describe("/api/v1/bookmarks", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
-      server.close();
     });
 
     beforeEach(async () => {
+      if (!server) return;
       token = authenticatedUser.generateAuthToken();
     });
 
     afterEach(async () => {
+      if (!server) return;
       await Bookmark.deleteMany({});
     });
 
     const exec = async (blogId: string = "") => {
-      return await request(server)
+      return await request(app)
         .post(`${endpoint}/${blogId}`)
         .set("Cookie", `authToken=${token}`);
     };
@@ -259,6 +265,7 @@ describe("/api/v1/bookmarks", () => {
     let token: string;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
       const blogAuthor = users[0].id;
       authenticatedUser = users[1];
@@ -266,22 +273,24 @@ describe("/api/v1/bookmarks", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
-      server.close();
     });
 
     beforeEach(async () => {
+      if (!server) return;
       token = authenticatedUser.generateAuthToken();
     });
 
     afterEach(async () => {
+      if (!server) return;
       await Bookmark.deleteMany({});
     });
 
     const exec = async (blogId: string = "") => {
-      return await request(server)
+      return await request(app)
         .delete(`${endpoint}/${blogId}`)
         .set("Cookie", `authToken=${token}`);
     };
@@ -368,6 +377,7 @@ describe("/api/v1/bookmarks", () => {
     let authenticatedUser: any;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
 
       const blogAuthor = users[0].id;
@@ -382,18 +392,18 @@ describe("/api/v1/bookmarks", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
       await Bookmark.deleteMany({});
-      server.close();
     });
 
     it("should return BadRequest-400 if userId is invalid", async () => {
       // userId must be a valid mongoDB object Id format
       const userId = "invalid-userId";
 
-      const res = await request(server).get(`${endpoint}/users/${userId}`);
+      const res = await request(app).get(`${endpoint}/users/${userId}`);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -408,7 +418,7 @@ describe("/api/v1/bookmarks", () => {
       const userId = authenticatedUser.id;
       const blogId = "invalid-blogId";
 
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}/users/${userId}?blogId=${blogId}`
       );
 
@@ -425,7 +435,7 @@ describe("/api/v1/bookmarks", () => {
       const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
       const blogId = userBookmarks[0].blogId;
 
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}/users/${user_Id}?blogId=${blogId}`
       );
 
@@ -445,7 +455,7 @@ describe("/api/v1/bookmarks", () => {
       const user_Id = authenticatedUser.id;
       const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
 
-      const res = await request(server).get(`${endpoint}/users/${user_Id}`);
+      const res = await request(app).get(`${endpoint}/users/${user_Id}`);
 
       expect(res.statusCode).toBe(200);
 
@@ -461,7 +471,7 @@ describe("/api/v1/bookmarks", () => {
       const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
       const pageSize = 1;
 
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}/users/${user_Id}?page=2&pageSize=${pageSize}`
       );
 

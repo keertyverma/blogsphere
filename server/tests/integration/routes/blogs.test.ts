@@ -1,14 +1,16 @@
 import "dotenv/config";
-import http from "http";
+import { Server } from "http";
 import { disconnect } from "mongoose";
 import request from "supertest";
-
+import { Application } from "express";
 import ms from "ms";
-import appServer from "../../../src";
+
+import { startServer } from "../../../src/start";
 import { Blog, IBlog } from "../../../src/models/blog.model";
 import { IUserDocument, User } from "../../../src/models/user.model";
 
-let server: http.Server;
+let server: Server;
+let app: Application; // Express instance
 let endpoint: string = `/api/v1/blogs`;
 
 const createUsers = async () => {
@@ -125,36 +127,38 @@ const createBlogs = async (userId: string) => {
 };
 
 describe("/api/v1/blogs", () => {
+  beforeAll(async () => {
+    try {
+      ({ server, app } = await startServer());
+    } catch (error) {
+      console.error("🚨 Server startup failed in tests:", error);
+      throw new Error("Failed to start the test server");
+    }
+  });
+
   afterAll(async () => {
-    // close the MongoDB connection
+    if (server) server.close();
     await disconnect();
-  });
-
-  beforeEach(() => {
-    server = appServer;
-  });
-
-  afterEach(() => {
-    server.close();
   });
 
   describe("POST /", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
-      server.close();
     });
 
     let token: string;
     const exec = async (payload: any) => {
-      return await request(server)
+      return await request(app)
         .post(endpoint)
         .set("Cookie", `authToken=${token}`)
         .send(payload);
     };
 
     beforeEach(async () => {
+      if (!server) return;
       const user = new User();
       token = user.generateAuthToken();
     });
@@ -368,11 +372,13 @@ describe("/api/v1/blogs", () => {
     let blogs: IBlog[];
 
     beforeAll(async () => {
+      if (!server) return;
       const [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -383,7 +389,7 @@ describe("/api/v1/blogs", () => {
         .filter((blog) => blog.isDraft === false)
         .map((blog) => blog.blogId);
       const limit = 1;
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}?&limit=${limit}&nextCursor=invalid-cursor`
       );
 
@@ -401,7 +407,7 @@ describe("/api/v1/blogs", () => {
         .map((blog) => blog.blogId);
       const limit = 1;
 
-      const res = await request(server).get(`${endpoint}?limit=${limit}`);
+      const res = await request(app).get(`${endpoint}?limit=${limit}`);
 
       expect(res.statusCode).toBe(200);
       const { nextCursor, results } = res.body;
@@ -427,7 +433,7 @@ describe("/api/v1/blogs", () => {
         .map((blog) => blog.blogId);
       const limit = publishedBlogIds.length / 2;
       // Fetch data from page-1 by passing `limit` and get `nextCursor` which is required to fetch data from page-2
-      const firstPageResponse = await request(server).get(
+      const firstPageResponse = await request(app).get(
         `${endpoint}?limit=${limit}`
       );
       expect(firstPageResponse.statusCode).toBe(200);
@@ -435,7 +441,7 @@ describe("/api/v1/blogs", () => {
       expect(nextCursor).not.toBeNull();
 
       // Fetch data from page-2 by passing `limit` and `nextCursor`
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}?limit=${limit}&nextCursor=${nextCursor}`
       );
 
@@ -459,7 +465,7 @@ describe("/api/v1/blogs", () => {
     it("should return filtered blogs when tag query parameter is set", async () => {
       // filter by tag
       const tag = "art";
-      const res = await request(server).get(`${endpoint}?tag=${tag}`);
+      const res = await request(app).get(`${endpoint}?tag=${tag}`);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.results.length).toBeGreaterThan(0);
@@ -472,7 +478,7 @@ describe("/api/v1/blogs", () => {
 
     it("should return latest trending blogs when ordering and limit query parameters are set", async () => {
       const limit = 2;
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}?ordering=trending&limit=${limit}`
       );
 
@@ -491,7 +497,7 @@ describe("/api/v1/blogs", () => {
     it("should return searched blogs when search query parameter is set", async () => {
       // search blog
       const searchTerm = "react";
-      const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
+      const res = await request(app).get(`${endpoint}?search=${searchTerm}`);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.results.length).toBeGreaterThan(0);
@@ -509,11 +515,13 @@ describe("/api/v1/blogs", () => {
     let blogs: IBlog[];
 
     beforeAll(async () => {
+      if (!server) return;
       const [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -521,7 +529,7 @@ describe("/api/v1/blogs", () => {
 
     it("should return 404-NotFound if published blog with given blogId is not found", async () => {
       const blogId = "invalid-blog-id";
-      const res = await request(server).get(`${endpoint}/${blogId}`);
+      const res = await request(app).get(`${endpoint}/${blogId}`);
 
       expect(res.statusCode).toBe(404);
       expect(res.body.error).toMatchObject({
@@ -535,7 +543,7 @@ describe("/api/v1/blogs", () => {
       const publishedBlog = blogs.filter((blog) => !blog.isDraft)[0];
       const blogId = publishedBlog.blogId;
 
-      const res = await request(server).get(`${endpoint}/${blogId}`);
+      const res = await request(app).get(`${endpoint}/${blogId}`);
 
       expect(res.statusCode).toBe(200);
       const { title, blogId: id, publishedAt } = res.body.result;
@@ -548,7 +556,7 @@ describe("/api/v1/blogs", () => {
     it("should not return draft blog", async () => {
       const draftBlog = blogs.filter((blog) => blog.isDraft)[0];
       const blogId = draftBlog.blogId;
-      const res = await request(server).get(`${endpoint}/${blogId}`);
+      const res = await request(app).get(`${endpoint}/${blogId}`);
 
       expect(res.statusCode).toBe(404);
     });
@@ -559,11 +567,13 @@ describe("/api/v1/blogs", () => {
     let user: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -571,7 +581,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (blogId: string) => {
-      return await request(server)
+      return await request(app)
         .patch(`${endpoint}/${blogId}/readCount`)
         .set("Cookie", `authToken=${token}`);
     };
@@ -638,11 +648,13 @@ describe("/api/v1/blogs", () => {
     let user2: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user1, user2] = await createUsers();
       blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -650,7 +662,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (blogId: string, payload: object = {}) => {
-      return await request(server)
+      return await request(app)
         .patch(`${endpoint}/${blogId}`)
         .send(payload)
         .set("Cookie", `authToken=${token}`);
@@ -815,11 +827,13 @@ describe("/api/v1/blogs", () => {
     let user: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -827,7 +841,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (blogId: string) => {
-      return await request(server)
+      return await request(app)
         .patch(`${endpoint}/${blogId}/like`)
         .set("Cookie", `authToken=${token}`);
     };
@@ -911,11 +925,13 @@ describe("/api/v1/blogs", () => {
     let user2: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user1, user2] = await createUsers();
       blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -923,7 +939,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (blogId: string, payload: object = {}) => {
-      return await request(server)
+      return await request(app)
         .delete(`${endpoint}/${blogId}`)
         .set("Cookie", `authToken=${token}`);
     };
@@ -1051,11 +1067,13 @@ describe("/api/v1/blogs", () => {
     let user: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -1063,7 +1081,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (queryParams?: string) => {
-      return await request(server)
+      return await request(app)
         .get(
           queryParams
             ? `${endpoint}/drafts?${queryParams}`
@@ -1166,11 +1184,13 @@ describe("/api/v1/blogs", () => {
     let user2: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user1, user2] = await createUsers();
       blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -1178,7 +1198,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (blogId: string) => {
-      return await request(server)
+      return await request(app)
         .get(`${endpoint}/drafts/${blogId}`)
         .set("Cookie", `authToken=${token}`);
     };

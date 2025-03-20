@@ -13,10 +13,11 @@ import {
 import {
   authRouter,
   blogRouter,
+  bookmarkRouter,
   commentRouter,
+  healthRouter,
   uploadRouter,
   userRouter,
-  bookmarkRouter,
 } from "./routes";
 
 const app = express();
@@ -41,6 +42,7 @@ const BASE_URL = `/api/v1`;
 app.get(BASE_URL, (req: Request, res: Response) => {
   res.send("Welcome to BlogSphere API");
 });
+app.use(`${BASE_URL}/health`, healthRouter);
 app.use(`${BASE_URL}/users`, userRouter);
 app.use(`${BASE_URL}/auth`, authRouter);
 app.use(`${BASE_URL}/upload`, uploadRouter);

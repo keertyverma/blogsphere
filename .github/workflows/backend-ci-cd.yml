@@ -35,13 +35,24 @@ jobs:
 
       - name: Setup Test Environment
         # openssl base64 -A -in .env.test -out .env.test.vault
-        run: echo "${{secrets.TEST_ENV_BASE64}}" | openssl base64 -A -d > server/.env.test || { echo "Failed to decode .env.test"; exit 1; }
+        run: |
+          if [ -z "${{ secrets.TEST_ENV_BASE64 }}" ]; then
+            echo "TEST_ENV_BASE64 secret is missing"
+            exit 1
+          fi
+
+          echo "${{secrets.TEST_ENV_BASE64}}" | openssl base64 -A -d > server/.env.test
+
+          if [ $? -ne 0 ]; then
+            echo "Failed to decode!. Ensure \'TEST_ENV_BASE64\' contains valid base64-encoded data."
+            exit 1
+          fi
 
       - name: Run Integration Tests
         if: ${{ hashFiles('server/.env.test') != '' }}
         run: |
           cd server
-          npm run test:integration
+          npm run test:integration -- --ci
 
       - name: Upload XML Test Report (JUnit)
         if: always() # Runs even if tests fail
@@ -85,7 +96,18 @@ jobs:
 
       - name: Setup Production Environment
         # openssl base64 -A -in .env.production -out .env.production.vault
-        run: echo "${{secrets.PRODUCTION_ENV_BASE64}}" | openssl base64 -A -d > server/.env.production || { echo "Failed to decode .env.production"; exit 1; }
+        run: |
+          if [ -z "${{ secrets.PRODUCTION_ENV_BASE64 }}" ]; then
+            echo "PRODUCTION_ENV_BASE64 secret is missing"
+            exit 1
+          fi
+
+          echo "${{secrets.PRODUCTION_ENV_BASE64}}" | openssl base64 -A -d > server/.env.production
+
+          if [ $? -ne 0 ]; then
+            echo "Failed to decode!. Ensure \'PRODUCTION_ENV_BASE64\' contains valid base64-encoded data."
+            exit 1
+          fi
 
       - name: Authenticate with Google Cloud
         uses: "google-github-actions/auth@v2"
@@ -93,11 +115,51 @@ jobs:
           credentials_json: ${{secrets.GCP_SA_KEY}}
 
       - name: Deploy to Google App Engine
+        id: deploy
         uses: google-github-actions/deploy-appengine@v2
         if: ${{ hashFiles('server/.env.production') != '' }}
         with:
           working_directory: ./server
           project_id: ${{secrets.GCP_PROJECT_ID}}
-          version: v1
-          flags: --no-cache
+          flags: --no-cache --no-promote # Don't promote immediately
           deliverables: app.yaml
+
+      - name: Post Deployment Health Check
+        run: |
+          URL="${{ steps.deploy.outputs.version_url }}/api/v1/health"
+          echo "Checking health at $URL"
+
+          for i in {1..5}; do
+            RESPONSE=$(curl -s -w "\n%{http_code}" $URL)
+            BODY=$(echo "$RESPONSE" | head -n -1)
+            STATUS=$(echo "$RESPONSE" | tail -n 1)
+
+            if [ "$STATUS" -ne 200 ]; then
+              echo "❌ Health check failed (HTTP $STATUS). Retrying in 10s..."
+              sleep 10
+              continue
+            fi
+
+            API_STATUS=$(echo "$BODY" | jq -r '.status')
+            DATABASE_STATUS=$(echo "$BODY" | jq -r '.database')
+
+            if [[ "$API_STATUS" == "error" || "$DATABASE_STATUS" == "disconnected" ]]; then
+              echo "❌ Health check failed: API status = $API_STATUS, Database = $DATABASE_STATUS"
+              exit 1
+            fi
+
+            echo "✅ Health check passed!"
+            exit 0
+          done
+
+          echo "Service did not become healthy in time. Deleting broken version..."
+          gcloud app versions delete "${{ steps.deploy.outputs.version_id }}" --quiet
+          exit 1
+
+      - name: Promote New Version (Only if Healthy)
+        run: |
+          gcloud app services set-traffic default --splits ${{ steps.deploy.outputs.version_id }}=1
+
+      - name: Cleanup Old Versions
+        run: |
+          gcloud app versions list --format="value(id)" --sort-by "~version.createTime" --limit=10 | tail -n +6 | xargs -I {} gcloud app versions delete {} --quiet
