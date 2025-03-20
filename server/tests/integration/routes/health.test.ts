@@ -20,7 +20,8 @@ describe("/health route", () => {
   });
 
   afterAll(async () => {
-    if (server) server.close();
+    if (!server) return;
+    server.close();
     await disconnect();
   });
 

@@ -143,6 +143,7 @@ describe("/api/v1/bookmarks", () => {
     let token: string;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
       const blogAuthor = users[0].id;
       authenticatedUser = users[1];
@@ -150,17 +151,19 @@ describe("/api/v1/bookmarks", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
-      server.close();
     });
 
     beforeEach(async () => {
+      if (!server) return;
       token = authenticatedUser.generateAuthToken();
     });
 
     afterEach(async () => {
+      if (!server) return;
       await Bookmark.deleteMany({});
     });
 
@@ -262,6 +265,7 @@ describe("/api/v1/bookmarks", () => {
     let token: string;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
       const blogAuthor = users[0].id;
       authenticatedUser = users[1];
@@ -269,17 +273,19 @@ describe("/api/v1/bookmarks", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
-      server.close();
     });
 
     beforeEach(async () => {
+      if (!server) return;
       token = authenticatedUser.generateAuthToken();
     });
 
     afterEach(async () => {
+      if (!server) return;
       await Bookmark.deleteMany({});
     });
 
@@ -371,6 +377,7 @@ describe("/api/v1/bookmarks", () => {
     let authenticatedUser: any;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
 
       const blogAuthor = users[0].id;
@@ -385,11 +392,11 @@ describe("/api/v1/bookmarks", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
       await Bookmark.deleteMany({});
-      server.close();
     });
 
     it("should return BadRequest-400 if userId is invalid", async () => {

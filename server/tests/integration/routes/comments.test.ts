@@ -167,6 +167,7 @@ describe("/api/v1/blogs", () => {
     let commentedByUser: any;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
       blogAuthor = users[0].id;
       commentedByUser = users[1];
@@ -174,6 +175,7 @@ describe("/api/v1/blogs", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -288,6 +290,7 @@ describe("/api/v1/blogs", () => {
     let comments: IComment[];
 
     beforeAll(async () => {
+      if (!server) return;
       const users = await createUsers();
       const blogAuthor = users[0].id;
       blogs = await createBlogs(blogAuthor);
@@ -301,6 +304,7 @@ describe("/api/v1/blogs", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -380,6 +384,7 @@ describe("/api/v1/blogs", () => {
     let repliedByUser: any;
 
     beforeAll(async () => {
+      if (!server) return;
       const users = await createUsers();
       const blogAuthor = users[0].id;
       repliedByUser = users[0];
@@ -394,6 +399,7 @@ describe("/api/v1/blogs", () => {
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -566,6 +572,7 @@ describe("/api/v1/blogs", () => {
     let commentedByUser: any;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
       blogAuthor = users[0].id;
       blogs = await createBlogs(blogAuthor);
@@ -574,6 +581,7 @@ describe("/api/v1/blogs", () => {
     });
 
     beforeEach(async () => {
+      if (!server) return;
       comments = await createComments(
         blogs[0].id,
         blogAuthor,
@@ -582,10 +590,12 @@ describe("/api/v1/blogs", () => {
     });
 
     afterEach(async () => {
+      if (!server) return;
       await Comment.deleteMany({});
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -896,6 +906,7 @@ describe("/api/v1/blogs", () => {
     let commentedByUser: any;
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUsers();
       blogAuthor = users[0].id;
       blogs = await createBlogs(blogAuthor);
@@ -903,6 +914,7 @@ describe("/api/v1/blogs", () => {
     });
 
     beforeEach(async () => {
+      if (!server) return;
       comments = await createComments(
         blogs[0].id,
         blogAuthor,
@@ -911,10 +923,12 @@ describe("/api/v1/blogs", () => {
     });
 
     afterEach(async () => {
+      if (!server) return;
       await Comment.deleteMany({});
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});

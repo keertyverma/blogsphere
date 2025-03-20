@@ -26,16 +26,19 @@ describe("/api/v1/upload", () => {
   });
 
   afterAll(async () => {
-    if (server) server.close();
+    if (!server) return;
+    server.close();
     await disconnect();
   });
 
   beforeEach(() => {
+    if (!server) return;
     const user = new User();
     token = user.generateAuthToken();
   });
 
   afterEach(async () => {
+    if (!server) return;
     // db cleanup
     await User.deleteMany({});
   });

@@ -143,6 +143,7 @@ describe("/api/v1/blogs", () => {
 
   describe("POST /", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -157,6 +158,7 @@ describe("/api/v1/blogs", () => {
     };
 
     beforeEach(async () => {
+      if (!server) return;
       const user = new User();
       token = user.generateAuthToken();
     });
@@ -370,11 +372,13 @@ describe("/api/v1/blogs", () => {
     let blogs: IBlog[];
 
     beforeAll(async () => {
+      if (!server) return;
       const [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -511,11 +515,13 @@ describe("/api/v1/blogs", () => {
     let blogs: IBlog[];
 
     beforeAll(async () => {
+      if (!server) return;
       const [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -561,11 +567,13 @@ describe("/api/v1/blogs", () => {
     let user: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -640,11 +648,13 @@ describe("/api/v1/blogs", () => {
     let user2: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user1, user2] = await createUsers();
       blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -817,11 +827,13 @@ describe("/api/v1/blogs", () => {
     let user: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -913,11 +925,13 @@ describe("/api/v1/blogs", () => {
     let user2: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user1, user2] = await createUsers();
       blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -1053,11 +1067,13 @@ describe("/api/v1/blogs", () => {
     let user: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user] = await createUsers();
       blogs = await createBlogs(user.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});
@@ -1168,11 +1184,13 @@ describe("/api/v1/blogs", () => {
     let user2: IUserDocument;
 
     beforeAll(async () => {
+      if (!server) return;
       [user1, user2] = await createUsers();
       blogs = await createBlogs(user1.id);
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
       await Blog.deleteMany({});

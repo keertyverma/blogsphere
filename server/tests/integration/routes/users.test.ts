@@ -49,12 +49,14 @@ describe("/api/v1/users", () => {
   });
 
   afterAll(async () => {
-    if (server) server.close();
+    if (!server) return;
+    server.close();
     await disconnect();
   });
 
   describe("POST /register", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
@@ -180,10 +182,12 @@ describe("/api/v1/users", () => {
     let users: IUser[];
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUser();
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
@@ -226,10 +230,12 @@ describe("/api/v1/users", () => {
     let users: IUser[];
 
     beforeAll(async () => {
+      if (!server) return;
       users = await createUser();
     });
 
     afterAll(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
@@ -268,6 +274,7 @@ describe("/api/v1/users", () => {
 
   describe("POST /changePassword", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
@@ -427,6 +434,7 @@ describe("/api/v1/users", () => {
 
   describe("PATCH /users", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });

@@ -46,11 +46,13 @@ describe("/api/v1/auth", () => {
   });
 
   afterAll(async () => {
-    if (server) server.close();
+    if (!server) return;
+    server.close();
     await disconnect();
   });
 
   afterEach(async () => {
+    if (!server) return;
     await User.deleteMany({});
   });
 
@@ -413,6 +415,7 @@ describe("/api/v1/auth", () => {
 
   describe("POST /verify-email", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
@@ -544,6 +547,7 @@ describe("/api/v1/auth", () => {
 
   describe("POST /resend-verification", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
@@ -650,6 +654,7 @@ describe("/api/v1/auth", () => {
 
   describe("POST /forgot-password", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
@@ -727,6 +732,7 @@ describe("/api/v1/auth", () => {
 
   describe("POST /reset-password", () => {
     afterEach(async () => {
+      if (!server) return;
       // db cleanup
       await User.deleteMany({});
     });
