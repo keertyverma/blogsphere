@@ -1,41 +1,15 @@
-import "dotenv/config";
-import config from "config";
-import "express-async-errors";
-import { Server } from "http";
-
-import app from "./app";
-import { connectDB } from "./db";
-import { initializeFirebaseAuth } from "./utils/firebase-auth";
+import { startServer } from "./start";
 import logger from "./utils/logger";
 
-const PORT = process.env.PORT || 3001;
-
-if (!config.get("secretAccessKey")) {
-  logger.error("FATAL ERROR! SECRET_ACCESS_KEY is not defined");
-  process.exit(1);
-}
-
-const startServer = async (): Promise<Server> => {
-  await connectDB(); // Ensure DB connection before starting the server
-  initializeFirebaseAuth(); // configure google auth
-
-  const server = app.listen(PORT, () => {
-    logger.info(`App is listening on PORT - ${PORT}`);
-    logger.debug(`Node Env = ${process.env.NODE_ENV}`);
-    logger.debug(`App name = ${config.get("appName")}`);
-  });
-
-  return server;
-};
-
-// Ensure CI/CD fails if server startup fails
 (async () => {
   try {
     await startServer();
   } catch (error) {
-    logger.error("Fatal error: Server startup failed!! \n", error);
-    process.exit(1);
+    if (process.env.NODE_ENV === "production") {
+      logger.error("Fatal error: Server startup failed!! \n", error);
+      process.exit(1);
+    } else {
+      throw error;
+    }
   }
 })();
-
-export default startServer;

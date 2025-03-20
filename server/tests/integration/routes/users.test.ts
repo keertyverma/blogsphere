@@ -1,14 +1,16 @@
 import cookie from "cookie";
 import "dotenv/config";
-import http from "http";
+import { Server } from "http";
 import { disconnect } from "mongoose";
 import request from "supertest";
-
 import bcrypt from "bcrypt";
-import appServer from "../../../src";
+import { Application } from "express";
+
+import { startServer } from "../../../src/start";
 import { IUser, User } from "../../../src/models/user.model";
 
-let server: http.Server;
+let server: Server;
+let app: Application; // Express instance
 let endpoint: string = `/api/v1/users`;
 
 const createUser = async () => {
@@ -37,17 +39,18 @@ const createUser = async () => {
 };
 
 describe("/api/v1/users", () => {
+  beforeAll(async () => {
+    try {
+      ({ server, app } = await startServer());
+    } catch (error) {
+      console.error("🚨 Server startup failed in tests:", error);
+      throw new Error("Failed to start the test server");
+    }
+  });
+
   afterAll(async () => {
-    // close the MongoDB connection
+    if (server) server.close();
     await disconnect();
-  });
-
-  beforeEach(() => {
-    server = appServer;
-  });
-
-  afterEach(async () => {
-    server.close();
   });
 
   describe("POST /register", () => {
@@ -62,7 +65,7 @@ describe("/api/v1/users", () => {
         fullname: "Mickey Mouse",
         password: "clubhouse",
       };
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/register`)
         .send(userData);
       expect(res.statusCode).toBe(400);
@@ -80,7 +83,7 @@ describe("/api/v1/users", () => {
         password: "plutonic",
         email: "test@test.com",
       };
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/register`)
         .send(userData);
       expect(res.statusCode).toBe(400);
@@ -105,7 +108,7 @@ describe("/api/v1/users", () => {
         password: "Clubhouse12",
         email: "test@test.com",
       };
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/register`)
         .send(userData);
       expect(res.statusCode).toBe(400);
@@ -122,7 +125,7 @@ describe("/api/v1/users", () => {
         password: "Pluto123",
         email: "test@test.com",
       };
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/register`)
         .send(userData);
       expect(res.statusCode).toBe(201);
@@ -157,7 +160,7 @@ describe("/api/v1/users", () => {
         email: "test@test2.com",
       };
 
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/register`)
         .send(userData);
 
@@ -186,7 +189,7 @@ describe("/api/v1/users", () => {
     });
 
     it("should return all users", async () => {
-      const res = await request(server).get(`${endpoint}`);
+      const res = await request(app).get(`${endpoint}`);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.results.length).toBe(2);
@@ -201,7 +204,7 @@ describe("/api/v1/users", () => {
     it("should return searched users when search query parameter is set", async () => {
       // search blog
       const searchTerm = "mickey";
-      const res = await request(server).get(`${endpoint}?search=${searchTerm}`);
+      const res = await request(app).get(`${endpoint}?search=${searchTerm}`);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.results.length).toBe(1);
@@ -233,7 +236,7 @@ describe("/api/v1/users", () => {
 
     it("should return BadRequest-400 if user with given username does not exists", async () => {
       const username = "invalid-user";
-      const res = await request(server).get(`${endpoint}/${username}`);
+      const res = await request(app).get(`${endpoint}/${username}`);
 
       expect(res.statusCode).toBe(404);
       expect(res.body.error).toMatchObject({
@@ -245,7 +248,7 @@ describe("/api/v1/users", () => {
 
     it("should return user with given username", async () => {
       const username = "mickey";
-      const res = await request(server).get(`${endpoint}/${username}`);
+      const res = await request(app).get(`${endpoint}/${username}`);
 
       expect(res.statusCode).toBe(200);
       const {
@@ -271,7 +274,7 @@ describe("/api/v1/users", () => {
 
     let token: string;
     const exec = async (payload: any = {}) => {
-      return await request(server)
+      return await request(app)
         .post(`${endpoint}/changePassword`)
         .set("Cookie", `authToken=${token}`)
         .send(payload);
@@ -364,7 +367,7 @@ describe("/api/v1/users", () => {
         },
         isVerified: true,
       });
-      const loginRes = await request(server).post(`/api/v1/auth`).send({
+      const loginRes = await request(app).post(`/api/v1/auth`).send({
         email: user.personalInfo.email,
         password: password,
       });
@@ -401,7 +404,7 @@ describe("/api/v1/users", () => {
         },
         isVerified: true,
       });
-      const loginRes = await request(server).post(`/api/v1/auth`).send({
+      const loginRes = await request(app).post(`/api/v1/auth`).send({
         email: user.personalInfo.email,
         password: password,
       });
@@ -430,7 +433,7 @@ describe("/api/v1/users", () => {
 
     let token: string;
     const exec = async (payload: any = {}) => {
-      return await request(server)
+      return await request(app)
         .patch(`${endpoint}`)
         .set("Cookie", `authToken=${token}`)
         .send(payload);

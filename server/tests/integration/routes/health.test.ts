@@ -1,37 +1,31 @@
-import http from "http";
+import { Application } from "express";
+import { Server } from "http";
 import { disconnect } from "mongoose";
 import request from "supertest";
-import appServer from "../../../src";
-import { connectDB } from "../../../src/db";
 
-let server: http.Server;
+import { startServer } from "../../../src/start";
+
+let server: Server;
+let app: Application; // Express instance
 let endpoint: string = `/api/v1/health/`;
 
 describe("/health route", () => {
   beforeAll(async () => {
     try {
-      await connectDB();
+      ({ server, app } = await startServer());
     } catch (error) {
-      console.error("Skipping tests due to database connection failure.");
-      return;
+      console.error("🚨 Server startup failed in tests:", error);
+      throw new Error("Failed to start the test server");
     }
   });
 
-  beforeEach(() => {
-    server = appServer;
-  });
-
-  afterEach(async () => {
-    server.close();
-  });
-
   afterAll(async () => {
-    // close the MongoDB connection
+    if (server) server.close();
     await disconnect();
   });
 
   it("should return 200 and a status message", async () => {
-    const response = await request(server).get(endpoint);
+    const response = await request(app).get(endpoint);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("status", "ok");
   });

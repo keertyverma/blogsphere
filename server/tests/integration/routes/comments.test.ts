@@ -1,14 +1,16 @@
 import "dotenv/config";
-import http from "http";
+import { Server } from "http";
 import mongoose, { disconnect } from "mongoose";
 import request from "supertest";
+import { Application } from "express";
 
-import appServer from "../../../src";
+import { startServer } from "../../../src/start";
 import { Blog, IBlog } from "../../../src/models/blog.model";
+import { Comment, IComment } from "../../../src/models/comment.model";
 import { IUser, User } from "../../../src/models/user.model";
-import { IComment, Comment } from "../../../src/models/comment.model";
 
-let server: http.Server;
+let server: Server;
+let app: Application; // Express instance
 let endpoint: string = `/api/v1/comments`;
 
 const createUsers = async () => {
@@ -144,17 +146,18 @@ const createComments = async (
 };
 
 describe("/api/v1/blogs", () => {
+  beforeAll(async () => {
+    try {
+      ({ server, app } = await startServer());
+    } catch (error) {
+      console.error("🚨 Server startup failed in tests:", error);
+      throw new Error("Failed to start the test server");
+    }
+  });
+
   afterAll(async () => {
-    // close the MongoDB connection
+    if (server) server.close();
     await disconnect();
-  });
-
-  beforeEach(() => {
-    server = appServer;
-  });
-
-  afterEach(() => {
-    server.close();
   });
 
   describe("POST /", () => {
@@ -179,7 +182,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (payload: any) => {
-      return await request(server)
+      return await request(app)
         .post(endpoint)
         .set("Cookie", `authToken=${token}`)
         .send(payload);
@@ -308,7 +311,7 @@ describe("/api/v1/blogs", () => {
       // 'blogId' must be a valid mongodb Object id
       const blogId = "invalid-blogid";
 
-      const res = await request(server).get(`${endpoint}?blogId=${blogId}`);
+      const res = await request(app).get(`${endpoint}?blogId=${blogId}`);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -323,7 +326,7 @@ describe("/api/v1/blogs", () => {
       const page = "two";
       const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}?blogId=${blogId}&page=${page}`
       );
 
@@ -339,7 +342,7 @@ describe("/api/v1/blogs", () => {
       const blogId = blogs[0].id;
       const pageSize = comments.length;
 
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}?blogId=${blogId}&pageSize=${pageSize}`
       );
 
@@ -357,7 +360,7 @@ describe("/api/v1/blogs", () => {
       const page = 2;
       const pageSize = comments.length / 2;
 
-      const res = await request(server).get(
+      const res = await request(app).get(
         `${endpoint}?blogId=${blogId}&page=${page}&pageSize=${pageSize}`
       );
 
@@ -399,7 +402,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (payload: any) => {
-      return await request(server)
+      return await request(app)
         .post(`${endpoint}/replies`)
         .set("Cookie", `authToken=${token}`)
         .send(payload);
@@ -590,7 +593,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (id: any) => {
-      return await request(server)
+      return await request(app)
         .delete(`${endpoint}/${id}`)
         .set("Cookie", `authToken=${token}`);
     };
@@ -919,7 +922,7 @@ describe("/api/v1/blogs", () => {
 
     let token: string;
     const exec = async (id: any, payload: { content: string }) => {
-      return await request(server)
+      return await request(app)
         .patch(`${endpoint}/${id}`)
         .set("Cookie", `authToken=${token}`)
         .send(payload);

@@ -1,40 +1,48 @@
 import "dotenv/config";
-import config from "config";
-import http from "http";
+import { Server } from "http";
 import { disconnect } from "mongoose";
 import request from "supertest";
+import { Application } from "express";
 
-import appServer from "../../../src";
+import { startServer } from "../../../src/start";
+import { User } from "../../../src/models/user.model";
 import * as cloudinary from "../../../src/utils/cloudinary";
 import BadRequestError from "../../../src/utils/errors/bad-request";
-import { User } from "../../../src/models/user.model";
 
-let server: http.Server;
+let server: Server;
+let app: Application; // Express instance
 let endpoint: string = `/api/v1/upload/`;
 
 describe("/api/v1/upload", () => {
   let token: string;
 
+  beforeAll(async () => {
+    try {
+      ({ server, app } = await startServer());
+    } catch (error) {
+      console.error("🚨 Server startup failed in tests:", error);
+      throw new Error("Failed to start the test server");
+    }
+  });
+
+  afterAll(async () => {
+    if (server) server.close();
+    await disconnect();
+  });
+
   beforeEach(() => {
-    server = appServer;
     const user = new User();
     token = user.generateAuthToken();
   });
 
   afterEach(async () => {
-    server.close();
     // db cleanup
     await User.deleteMany({});
   });
 
-  afterAll(async () => {
-    // close the MongoDB connection
-    await disconnect();
-  });
-
   describe("POST /", () => {
     const exec = async (payload: any = {}) => {
-      return await request(server)
+      return await request(app)
         .post(endpoint)
         .set("Cookie", `authToken=${token}`)
         .send(payload);

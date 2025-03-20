@@ -1,17 +1,19 @@
 import bcrypt from "bcrypt";
 import cookie from "cookie";
 import "dotenv/config";
-import http from "http";
+import { Server } from "http";
+import { Application } from "express";
 import { disconnect } from "mongoose";
+import ms from "ms";
 import request from "supertest";
 
-import ms from "ms";
-import appServer from "../../../src";
 import { IUser, User } from "../../../src/models/user.model";
 import FirebaseAuthError from "../../../src/utils/errors/firebase-error";
 import * as firebaseAuth from "../../../src/utils/firebase-auth";
+import { startServer } from "../../../src/start";
 
-let server: http.Server;
+let server: Server;
+let app: Application;
 let endpoint: string = `/api/v1/auth`;
 
 type DecodedIdToken = {
@@ -34,18 +36,21 @@ type DecodedIdToken = {
 };
 
 describe("/api/v1/auth", () => {
+  beforeAll(async () => {
+    try {
+      ({ server, app } = await startServer());
+    } catch (error) {
+      console.error("🚨 Server startup failed in tests:", error);
+      throw new Error("Failed to start the test server");
+    }
+  });
+
   afterAll(async () => {
-    // close the MongoDB connection
+    if (server) server.close();
     await disconnect();
   });
 
-  beforeEach(() => {
-    server = appServer;
-  });
-
   afterEach(async () => {
-    server.close();
-    // db cleanup
     await User.deleteMany({});
   });
 
@@ -55,7 +60,7 @@ describe("/api/v1/auth", () => {
       const userData = {
         password: "clubhouse",
       };
-      const res = await request(server).post(endpoint).send(userData);
+      const res = await request(app).post(endpoint).send(userData);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -71,7 +76,7 @@ describe("/api/v1/auth", () => {
         email: "test@test.com",
         password: "clubhouse",
       };
-      const res = await request(server).post(endpoint).send(userData);
+      const res = await request(app).post(endpoint).send(userData);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -95,7 +100,7 @@ describe("/api/v1/auth", () => {
         email: "test@test.com",
         password: "Pluto123",
       };
-      const res = await request(server).post(endpoint).send(userData);
+      const res = await request(app).post(endpoint).send(userData);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -121,7 +126,7 @@ describe("/api/v1/auth", () => {
         email: "test@test.com",
         password: "Clubhouse123",
       };
-      const res = await request(server).post(endpoint).send(userData);
+      const res = await request(app).post(endpoint).send(userData);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -148,7 +153,7 @@ describe("/api/v1/auth", () => {
         email: "test@gmail.com",
         password: "Clubhouse123",
       };
-      const res = await request(server).post(endpoint).send(userData);
+      const res = await request(app).post(endpoint).send(userData);
 
       expect(res.statusCode).toBe(403);
 
@@ -162,7 +167,7 @@ describe("/api/v1/auth", () => {
 
     it("should authenticate user if request is valid", async () => {
       // call /register route so it can create user and store hash password
-      const registerRes = await request(server)
+      const registerRes = await request(app)
         .post(`/api/v1/users/register`)
         .send({
           fullname: "Mickey Mouse",
@@ -184,7 +189,7 @@ describe("/api/v1/auth", () => {
         email: "test@test.com",
         password: "Pluto123",
       };
-      const res = await request(server).post(endpoint).send(userData);
+      const res = await request(app).post(endpoint).send(userData);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.status).toBe("success");
@@ -205,7 +210,7 @@ describe("/api/v1/auth", () => {
 
   describe("POST /google-auth", () => {
     const exec = async (accessToken: string) => {
-      return await request(server).post(`${endpoint}/google-auth`).send({
+      return await request(app).post(`${endpoint}/google-auth`).send({
         accessToken,
       });
     };
@@ -220,7 +225,7 @@ describe("/api/v1/auth", () => {
       const userData = {
         token: "",
       };
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/google-auth`)
         .send(userData);
       expect(res.statusCode).toBe(400);
@@ -369,7 +374,7 @@ describe("/api/v1/auth", () => {
     let token: string;
 
     const exec = async () => {
-      return await request(server)
+      return await request(app)
         .post(`${endpoint}/logout`)
         .set("Cookie", `authToken=${token}`);
     };
@@ -415,7 +420,7 @@ describe("/api/v1/auth", () => {
     it("should return BadRequest-400 if token is not passed", async () => {
       // email and token are the required parameter for token verification.
       const email = "test@test.com";
-      const res = await request(server).post(`${endpoint}/verify-email`).send({
+      const res = await request(app).post(`${endpoint}/verify-email`).send({
         email,
       });
 
@@ -431,7 +436,7 @@ describe("/api/v1/auth", () => {
       // token is invalid
       const email = "test@test.com";
       const token = "invalid-token";
-      const res = await request(server).post(`${endpoint}/verify-email`).send({
+      const res = await request(app).post(`${endpoint}/verify-email`).send({
         email,
         token,
       });
@@ -463,7 +468,7 @@ describe("/api/v1/auth", () => {
       await user.save();
 
       const email = user.personalInfo.email;
-      const res = await request(server).post(`${endpoint}/verify-email`).send({
+      const res = await request(app).post(`${endpoint}/verify-email`).send({
         email,
         token,
       });
@@ -489,7 +494,7 @@ describe("/api/v1/auth", () => {
 
       const token = "some-random-token";
       const email = user.personalInfo.email;
-      const res = await request(server).post(`${endpoint}/verify-email`).send({
+      const res = await request(app).post(`${endpoint}/verify-email`).send({
         email,
         token,
       });
@@ -517,7 +522,7 @@ describe("/api/v1/auth", () => {
       expect(user.isVerified).toBeFalsy();
 
       const email = user.personalInfo.email;
-      const res = await request(server).post(`${endpoint}/verify-email`).send({
+      const res = await request(app).post(`${endpoint}/verify-email`).send({
         email,
         token,
       });
@@ -545,7 +550,7 @@ describe("/api/v1/auth", () => {
 
     it("should avoid explicitly indicating if the email is unregistered", async () => {
       const email = "randomuser@test.com";
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/resend-verification`)
         .send({ email });
 
@@ -566,7 +571,7 @@ describe("/api/v1/auth", () => {
         isVerified: true,
       });
 
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/resend-verification`)
         .send({
           email: user.personalInfo.email,
@@ -598,7 +603,7 @@ describe("/api/v1/auth", () => {
       };
       await user.save();
 
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/resend-verification`)
         .send({
           email: user.personalInfo.email,
@@ -630,7 +635,7 @@ describe("/api/v1/auth", () => {
       };
       await user.save();
 
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/resend-verification`)
         .send({
           email: user.personalInfo.email,
@@ -651,7 +656,7 @@ describe("/api/v1/auth", () => {
 
     it("should avoid explicitly indicating if the email is unregistered", async () => {
       const email = "randomuser@test.com";
-      const res = await request(server)
+      const res = await request(app)
         .post(`${endpoint}/forgot-password`)
         .send({ email });
 
@@ -679,11 +684,9 @@ describe("/api/v1/auth", () => {
       };
       await user.save();
 
-      const res = await request(server)
-        .post(`${endpoint}/forgot-password`)
-        .send({
-          email: user.personalInfo.email,
-        });
+      const res = await request(app).post(`${endpoint}/forgot-password`).send({
+        email: user.personalInfo.email,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -711,11 +714,9 @@ describe("/api/v1/auth", () => {
       };
       await user.save();
 
-      const res = await request(server)
-        .post(`${endpoint}/forgot-password`)
-        .send({
-          email: user.personalInfo.email,
-        });
+      const res = await request(app).post(`${endpoint}/forgot-password`).send({
+        email: user.personalInfo.email,
+      });
 
       expect(res.statusCode).toBe(200);
       expect(res.body.message).toMatch(
@@ -733,11 +734,9 @@ describe("/api/v1/auth", () => {
     it("should return BadRequest-400 if token is not passed", async () => {
       // token is the required parameter for token verification.
       const email = "test@test.com";
-      const res = await request(server)
-        .post(`${endpoint}/reset-password`)
-        .send({
-          email,
-        });
+      const res = await request(app).post(`${endpoint}/reset-password`).send({
+        email,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -752,13 +751,11 @@ describe("/api/v1/auth", () => {
       const email = "test@test.com";
       const token = "random-token";
       const newPassword = "invalid-password";
-      const res = await request(server)
-        .post(`${endpoint}/reset-password`)
-        .send({
-          email,
-          token,
-          password: newPassword,
-        });
+      const res = await request(app).post(`${endpoint}/reset-password`).send({
+        email,
+        token,
+        password: newPassword,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -774,13 +771,11 @@ describe("/api/v1/auth", () => {
       const email = "test@test.com";
       const token = "invalid-token";
       const newPassword = "Clubhouse123";
-      const res = await request(server)
-        .post(`${endpoint}/reset-password`)
-        .send({
-          email,
-          token,
-          password: newPassword,
-        });
+      const res = await request(app).post(`${endpoint}/reset-password`).send({
+        email,
+        token,
+        password: newPassword,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -809,13 +804,11 @@ describe("/api/v1/auth", () => {
       await user.save();
 
       const newPassword = "Pluto123";
-      const res = await request(server)
-        .post(`${endpoint}/reset-password`)
-        .send({
-          email: user.personalInfo.email,
-          token,
-          password: newPassword,
-        });
+      const res = await request(app).post(`${endpoint}/reset-password`).send({
+        email: user.personalInfo.email,
+        token,
+        password: newPassword,
+      });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -843,13 +836,11 @@ describe("/api/v1/auth", () => {
       await user.save();
       const newPassword = "Pluto123";
 
-      const res = await request(server)
-        .post(`${endpoint}/reset-password`)
-        .send({
-          email: user.personalInfo.email,
-          token,
-          password: newPassword,
-        });
+      const res = await request(app).post(`${endpoint}/reset-password`).send({
+        email: user.personalInfo.email,
+        token,
+        password: newPassword,
+      });
 
       expect(res.statusCode).toBe(200);
       expect(res.body.message).toBe("Password reset completed successfully.");
