@@ -1,6 +1,7 @@
 import "dotenv/config";
 import config from "config";
 import "express-async-errors";
+import { Server } from "http";
 
 import app from "./app";
 import { connectDB } from "./db";
@@ -14,16 +15,27 @@ if (!config.get("secretAccessKey")) {
   process.exit(1);
 }
 
-// connect to db
-connectDB();
+const startServer = async (): Promise<Server> => {
+  await connectDB(); // Ensure DB connection before starting the server
+  initializeFirebaseAuth(); // configure google auth
 
-const server = app.listen(PORT, () => {
-  logger.info(`App is listening on PORT - ${PORT}`);
-  logger.debug(`Node Env = ${process.env.NODE_ENV}`);
-  logger.debug(`App name = ${config.get("appName")}`);
+  const server = app.listen(PORT, () => {
+    logger.info(`App is listening on PORT - ${PORT}`);
+    logger.debug(`Node Env = ${process.env.NODE_ENV}`);
+    logger.debug(`App name = ${config.get("appName")}`);
+  });
 
-  // configure google auth
-  initializeFirebaseAuth();
-});
+  return server;
+};
 
-export default server;
+// Ensure CI/CD fails if server startup fails
+(async () => {
+  try {
+    await startServer();
+  } catch (error) {
+    logger.error("Fatal error: Server startup failed!! \n", error);
+    process.exit(1);
+  }
+})();
+
+export default startServer;

@@ -13,8 +13,7 @@ const connectDB = async () => {
     await connect(MONGODB_URI, { autoIndex: true });
     logger.info("MongoDB connected");
   } catch (err) {
-    logger.error(`MongoDB connection FAILED !! ${err}`);
-    process.exit(1);
+    throw new Error(`MongoDB connection FAILED !! ${err}`);
   }
 };
 
