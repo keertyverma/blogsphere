@@ -10,12 +10,14 @@ handlers:
     secure: always
     redirect_http_response_code: 301
 readiness_check:
+  path: "/api/v1/health"
   check_interval_sec: 2
   timeout_sec: 2
   failure_threshold: 2
   success_threshold: 2
   app_start_timeout_sec: 10
 liveness_check:
+  path: "/api/v1/health"
   check_interval_sec: 30
   timeout_sec: 4
   failure_threshold: 2

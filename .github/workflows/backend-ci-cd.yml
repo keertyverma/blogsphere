@@ -93,18 +93,19 @@ jobs:
           credentials_json: ${{secrets.GCP_SA_KEY}}
 
       - name: Deploy to Google App Engine
+        id: deploy
         uses: google-github-actions/deploy-appengine@v2
         if: ${{ hashFiles('server/.env.production') != '' }}
         with:
           working_directory: ./server
           project_id: ${{secrets.GCP_PROJECT_ID}}
-          version: v1
-          flags: --no-cache
+          # version: v1
+          flags: --no-cache --no-promote # Don't promote immediately
           deliverables: app.yaml
 
       - name: Post Deployment Health Check
         run: |
-          URL="${{ vars.HEALTHCHECK_URL }}"
+          URL="${{ steps.deploy.outputs.version_url }}/api/v1/health"
           echo "Checking health at $URL"
 
           for i in {1..5}; do
@@ -113,7 +114,7 @@ jobs:
             STATUS=$(echo "$RESPONSE" | tail -n 1)
 
             if [ "$STATUS" -ne 200 ]; then
-              echo "Health check failed (HTTP $STATUS). Retrying in 10s..."
+              echo "❌ Health check failed (HTTP $STATUS). Retrying in 10s..."
               sleep 10
               continue
             fi
@@ -122,13 +123,22 @@ jobs:
             DATABASE_STATUS=$(echo "$BODY" | jq -r '.database')
 
             if [[ "$API_STATUS" == "error" || "$DATABASE_STATUS" == "disconnected" ]]; then
-              echo "Health check failed: API status = $API_STATUS, Database = $DATABASE_STATUS"
+              echo "❌ Health check failed: API status = $API_STATUS, Database = $DATABASE_STATUS"
               exit 1
             fi
 
-            echo "Health check passed!"
+            echo "✅ Health check passed!"
             exit 0
           done
 
-          echo "Service did not become healthy in time. Failing deployment."
+          echo "Service did not become healthy in time. Deleting broken version..."
+          gcloud app versions delete "${{ steps.deploy.outputs.version_id }}" --quiet
           exit 1
+
+      - name: Promote New Version (Only if Healthy)
+        run: |
+          gcloud app services set-traffic default --splits ${{ steps.deploy.outputs.version_id }}=1
+
+      - name: Cleanup Old Versions
+        run: |
+          gcloud app versions list --format="value(id)" --sort-by "~version.createTime" --limit=10 | tail -n +6 | xargs -I {} gcloud app versions delete {} --quiet
