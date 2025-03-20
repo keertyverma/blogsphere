@@ -41,7 +41,7 @@ jobs:
         if: ${{ hashFiles('server/.env.test') != '' }}
         run: |
           cd server
-          npm run test:integration
+          npm run test:integration -- --ci
 
       - name: Upload XML Test Report (JUnit)
         if: always() # Runs even if tests fail
