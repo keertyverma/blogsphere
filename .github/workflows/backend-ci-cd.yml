@@ -35,7 +35,18 @@ jobs:
 
       - name: Setup Test Environment
         # openssl base64 -A -in .env.test -out .env.test.vault
-        run: echo "${{secrets.TEST_ENV_BASE64}}" | openssl base64 -A -d > server/.env.test || { echo "Failed to decode .env.test"; exit 1; }
+        run: |
+          if [ -z "${{ secrets.TEST_ENV_BASE64 }}" ]; then
+            echo "TEST_ENV_BASE64 secret is missing"
+            exit 1
+          fi
+
+          echo "${{secrets.TEST_ENV_BASE64}}" | openssl base64 -A -d > server/.env.test
+
+          if [ $? -ne 0 ]; then
+            echo "Failed to decode!. Ensure \'TEST_ENV_BASE64\' contains valid base64-encoded data."
+            exit 1
+          fi
 
       - name: Run Integration Tests
         if: ${{ hashFiles('server/.env.test') != '' }}
@@ -85,7 +96,18 @@ jobs:
 
       - name: Setup Production Environment
         # openssl base64 -A -in .env.production -out .env.production.vault
-        run: echo "${{secrets.PRODUCTION_ENV_BASE64}}" | openssl base64 -A -d > server/.env.production || { echo "Failed to decode .env.production"; exit 1; }
+        run: |
+          if [ -z "${{ secrets.PRODUCTION_ENV_BASE64 }}" ]; then
+            echo "PRODUCTION_ENV_BASE64 secret is missing"
+            exit 1
+          fi
+
+          echo "${{secrets.PRODUCTION_ENV_BASE64}}" | openssl base64 -A -d > server/.env.production
+
+          if [ $? -ne 0 ]; then
+            echo "Failed to decode!. Ensure \'PRODUCTION_ENV_BASE64\' contains valid base64-encoded data."
+            exit 1
+          fi
 
       - name: Authenticate with Google Cloud
         uses: "google-github-actions/auth@v2"
