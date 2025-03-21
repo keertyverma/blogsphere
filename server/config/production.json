@@ -1,8 +1,5 @@
 {
   "appName": "blogsphere",
-  "database": {
-    "name": "blogsphere_prod"
-  },
   "expiresIn": {
     "authToken": "7d",
     "verificationToken": "1d",

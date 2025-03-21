@@ -1,7 +1,5 @@
 {
-  "database": {
-    "name": "blogsphere_test"
-  },
+  "appName": "blogsphere-test",
   "secretAccessKey": "test-secret-access-key",
   "expiresIn": {
     "authToken": "2s",

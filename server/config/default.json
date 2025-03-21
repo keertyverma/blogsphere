@@ -1,9 +1,5 @@
 {
   "appName": "blogsphere",
-  "database": {
-    "user": "",
-    "password": ""
-  },
   "secretAccessKey": "",
   "firebaseGoogleAuth": {
     "projectId": "",

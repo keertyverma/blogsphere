@@ -43,8 +43,11 @@ describe("/api/v1/users", () => {
     try {
       ({ server, app } = await startServer());
     } catch (error) {
-      console.error("🚨 Server startup failed in tests:", error);
-      throw new Error("Failed to start the test server");
+      console.error(
+        "🚨 Test server startup failed!\n",
+        error instanceof Error ? error.message : String(error)
+      );
+      throw new Error(error instanceof Error ? error.message : String(error));
     }
   });
 

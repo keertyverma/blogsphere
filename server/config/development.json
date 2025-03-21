@@ -1,8 +1,5 @@
 {
   "appName": "blogsphere-dev",
-  "database": {
-    "name": "blogsphere_dev"
-  },
   "rateLimiter": {
     "globalMaxRequestsPerHour": 10000,
     "resendEmailMaxRequestsPerHour": 100

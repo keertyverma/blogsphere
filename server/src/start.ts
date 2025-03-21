@@ -1,4 +1,13 @@
-import "dotenv/config";
+// Load environment variables
+import dotenv from "dotenv";
+const result = dotenv.config({
+  path: `.env.${process.env.NODE_ENV || "development"}`,
+});
+if (result.error) {
+  console.error(`❌ Failed to load env file: ${result.error}`);
+}
+
+// Ensure dotenv is loaded before other modules
 import config from "config";
 import "express-async-errors";
 import { Server } from "http";
