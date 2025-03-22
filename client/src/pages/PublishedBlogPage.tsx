@@ -15,7 +15,7 @@ import { AxiosError } from "axios";
 import ms from "ms";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import BlogNotFound from "./BlogNotFound";
+import NotFoundMessage from "../components/shared/NotFoundMessage";
 
 const PublishedBlogPage = () => {
   const { blogId } = useParams();
@@ -78,7 +78,9 @@ const PublishedBlogPage = () => {
 
   if (error) {
     if (error instanceof AxiosError && error.response?.status === 404) {
-      return <BlogNotFound />;
+      return (
+        <NotFoundMessage message="This blog no longer exist or has been removed." />
+      );
     }
 
     console.error("Error fetching blog data", {

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-const BlogNotFound = () => {
+const NotFoundMessage = ({ message }: { message: string }) => {
   const navigate = useNavigate();
 
   return (
@@ -16,9 +16,7 @@ const BlogNotFound = () => {
           404
         </h1>
         <div>
-          <p className="text-lg md:text-xl">
-            This blog no longer exists or has been removed.
-          </p>
+          <p className="text-lg md:text-xl">{message}</p>
           <p className="text-sm md:text-base text-muted-foreground mt-2">
             Go back to home and continue exploring.
           </p>
@@ -37,4 +35,4 @@ const BlogNotFound = () => {
   );
 };
 
-export default BlogNotFound;
+export default NotFoundMessage;

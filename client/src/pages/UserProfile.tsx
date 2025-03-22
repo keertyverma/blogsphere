@@ -9,10 +9,12 @@ import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogLi
 import { useGetUser } from "@/lib/react-query/queries";
 import { capitalize } from "@/lib/utils";
 import { useAuthStore } from "@/store";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
 import { useParams } from "react-router-dom";
+import NotFoundMessage from "../components/shared/NotFoundMessage";
 
 const UserProfile = () => {
   const { username: profileId } = useParams();
@@ -44,16 +46,15 @@ const UserProfile = () => {
       </section>
     );
 
-  if (error) console.error(error);
+  if (error) {
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      return (
+        <NotFoundMessage message="The user you are looking for does not exist." />
+      );
+    }
+  }
 
-  if (!user)
-    return (
-      <section className="flex-center">
-        <div className="w-[50%] text-center p-3 rounded-full bg-muted mt-10">
-          <p>No user available</p>
-        </div>
-      </section>
-    );
+  if (!user) return null;
 
   const routes = ["Published Blogs"];
   if (authUser.username === user.personalInfo.username) routes.push("Drafts");
