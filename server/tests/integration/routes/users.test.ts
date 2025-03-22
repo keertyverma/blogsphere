@@ -22,6 +22,7 @@ const createUser = async () => {
       username: "mickey",
       profileImage: "http://example-img1.png",
     },
+    isVerified: true,
   };
   const user2 = {
     personalInfo: {
@@ -31,9 +32,21 @@ const createUser = async () => {
       username: "donald",
       profileImage: "http://example-img2.png",
     },
+    isVerified: true,
   };
 
-  const users = [user1, user2];
+  const user3 = {
+    personalInfo: {
+      fullname: "Pete",
+      password: "Villain1234",
+      email: "pete@test.com",
+      username: "pete_villain",
+      profileImage: "http://example-img-pete.png",
+    },
+    isVerified: false,
+  };
+
+  const users = [user1, user2, user3];
   await User.create(users);
   return users as IUser[];
 };
@@ -195,22 +208,26 @@ describe("/api/v1/users", () => {
       await User.deleteMany({});
     });
 
-    it("should return all users", async () => {
-      const res = await request(app).get(`${endpoint}`);
+    it("should return all verified users", async () => {
+      const verifiedUsernames = users
+        .filter((user) => user.isVerified)
+        .map((user) => user.personalInfo.username);
+
+      const res = await request(app).get(endpoint);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.results.length).toBe(2);
+      expect(res.body.results).toHaveLength(verifiedUsernames.length);
+      const responseUsernames = res.body.results.map(
+        (user: IUser) => user.personalInfo.username
+      );
 
-      const usernames = users.map((user) => user.personalInfo.username);
-
-      res.body.results.forEach((user: IUser) => {
-        expect(usernames.includes(user.personalInfo.username)).toBe(true);
-      });
+      expect(new Set(responseUsernames)).toEqual(new Set(verifiedUsernames));
     });
 
     it("should return searched users when search query parameter is set", async () => {
       // search blog
       const searchTerm = "mickey";
+
       const res = await request(app).get(`${endpoint}?search=${searchTerm}`);
 
       expect(res.statusCode).toBe(200);
@@ -219,7 +236,6 @@ describe("/api/v1/users", () => {
       const [existingUser] = users.filter(
         (user) => user.personalInfo.username === "mickey"
       );
-
       expect(user.personalInfo.fullname).toBe(
         existingUser.personalInfo.fullname.toLowerCase()
       );
@@ -243,7 +259,7 @@ describe("/api/v1/users", () => {
       await User.deleteMany({});
     });
 
-    it("should return BadRequest-400 if user with given username does not exists", async () => {
+    it("should return 404 Not Found if user with given username does not exists", async () => {
       const username = "invalid-user";
       const res = await request(app).get(`${endpoint}/${username}`);
 
@@ -251,7 +267,20 @@ describe("/api/v1/users", () => {
       expect(res.body.error).toMatchObject({
         code: "RESOURCE_NOT_FOUND",
         message: "The requested resource was not found.",
-        details: `User with username = ${username} does not exists!`,
+        details: `User with username = ${username} does not exist!`,
+      });
+    });
+
+    it("should return 404 Not Found if user is not verified", async () => {
+      const username = "pete_villain"; // User registered but not verified
+
+      const res = await request(app).get(`${endpoint}/${username}`);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toEqual({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `User with username = ${username} does not exist!`,
       });
     });
 

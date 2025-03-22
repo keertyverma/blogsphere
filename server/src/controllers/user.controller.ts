@@ -105,6 +105,7 @@ export const getUsers = async (req: Request, res: Response) => {
   const regexQuery = { $regex: `${safeSearchString}`, $options: "i" };
 
   const findQuery = {
+    isVerified: true,
     ...(safeSearchString && {
       $or: [
         { "personalInfo.username": regexQuery },
@@ -133,13 +134,14 @@ export const getUserById = async (req: Request, res: Response) => {
 
   const { id: username } = req.params;
 
-  const user = await User.findOne({ "personalInfo.username": username }).select(
+  const user = await User.findOne({
+    "personalInfo.username": username,
+    isVerified: true,
+  }).select(
     "-personalInfo.password -personalInfo.email -googleAuth -blogs -updatedAt -__v"
   );
   if (!user)
-    throw new NotFoundError(
-      `User with username = ${username} does not exists!`
-    );
+    throw new NotFoundError(`User with username = ${username} does not exist!`);
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
