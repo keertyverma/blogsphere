@@ -25,6 +25,9 @@
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 262.1 83.3% 57.8%;
+    --scrollbar-track: 220 14% 95%;
+    --scrollbar-thumb: 220 10% 80%;
+    --scrollbar-thumb-hover: 220 15% 70%;
     --radius: 0.5rem;
     --header: 210 20% 98%;
     --header-height: 4.375rem;
@@ -49,6 +52,9 @@
     --destructive-foreground: 210 20% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
+    --scrollbar-track: 215 25% 12%;
+    --scrollbar-thumb: 220 15% 35%;
+    --scrollbar-thumb-hover: 220 20% 45%;
     --ring: 263.4 70% 50.4%;
     --header: 222 49.4% 12.2%;
   }
@@ -429,16 +435,22 @@
 
 /* WebKit Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--header));
+  background: hsl(var(--scrollbar-track));
+  border: 1px solid hsl(var(--popover));
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--input));
-  border-radius: 10px;
+  background-color: hsl(var(--scrollbar-thumb));
   border: 1px solid hsl(var(--popover));
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--scrollbar-thumb-hover));
 }

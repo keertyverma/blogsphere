@@ -6,7 +6,7 @@ import {
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IoBookmarksOutline, IoSettingsOutline } from "react-icons/io5";
-import { LuUserCircle } from "react-icons/lu";
+import { FaRegCircleUser } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -91,7 +91,7 @@ const UserNavigationPanel = () => {
               className="text-muted-foreground"
             >
               <MenubarItem>
-                <LuUserCircle className="text-lg mr-2" /> Profile
+                <FaRegCircleUser className="text-lg mr-2" /> Profile
               </MenubarItem>
             </Link>
             <MenubarSeparator />
