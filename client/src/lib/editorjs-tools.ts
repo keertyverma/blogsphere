@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/store";
-import Code from "@editorjs/code";
+import editorJsCodeCup from "@calumk/editorjs-codecup";
 import Embed from "@editorjs/embed";
 import Header from "@editorjs/header";
 import Image from "@editorjs/image";
@@ -96,7 +96,20 @@ export const editorJSTools = {
     class: Quote,
     inlineToolbar: true,
   },
-  code: Code,
+  code: {
+    class: editorJsCodeCup,
+    config: {
+      languages: {
+        javascript: "JavaScript",
+        python: "Python",
+        java: "Java",
+        cpp: "C++",
+        csharp: "C#",
+        go: "Go",
+        none: "Plain Text",
+      },
+    },
+  },
   marker: Marker,
   inlineCode: InlineCode,
   embed: Embed,

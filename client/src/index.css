@@ -321,8 +321,7 @@
   background-color: hsl(var(--destructive)) !important;
 }
 
-.inline-code,
-.ce-code__textarea {
+.inline-code {
   background-color: hsl(var(--input)) !important;
   color: hsl(var(--foreground)) !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
@@ -331,8 +330,80 @@
   border: none !important;
 }
 
-.ce-code__textarea {
-  border-radius: 10px !important;
+.editorjs-codeCup_Wrapper,
+.editorjs-codeCup_Editor,
+.codecup__textarea,
+.codecup__pre,
+.codecup__code,
+.codecup__code *,
+.editorjs-codeCup_LangDisplay,
+.codecup__lines__line,
+.codecup__copyMessage {
+  font-size: 1rem !important;
+}
+
+.editorjs-codeCup_Wrapper {
+  background-color: hsl(var(--input)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  overflow: hidden !important;
+}
+
+.codecup {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+.codecup__textarea {
+  color: hsl(var(--foreground)) !important;
+  caret-color: hsl(var(--foreground)) !important;
+}
+
+.codecup__code {
+  white-space: pre !important;
+}
+
+.codecup,
+.codecup__textarea,
+.codecup__code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace !important;
+}
+
+.codecup__lines {
+  background-color: hsl(var(--scrollbar-track)) !important;
+  color: hsl(var(--scrollbar-thumb-hover)) !important;
+  border: 0.8px solid hsl(var(--border)) !important;
+  z-index: 10 !important;
+}
+
+.codecup.codecup--has-line-numbers:before {
+  background-color: hsl(var(--scrollbar-track)) !important;
+}
+
+.editorjs-codeCup_LangDisplay {
+  background-color: hsl(var(--header)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 1rem !important;
+  z-index: 5 !important;
+  height: 2rem !important;
+  padding: 5px !important;
+  margin-right: 1rem !important;
+  border: 1px solid hsl(var(--muted-foreground) / 0.2) !important;
+}
+
+.codecup__copyButton {
+  background-color: hsl(var(--scrollbar-track)) !important;
+  color: hsl(var(--scrollbar-thumb-hover)) !important;
+}
+
+.codecup__copyMessage {
+  top: 30px !important;
+  background-color: hsl(var(--scrollbar-track)) !important;
+  color: hsl(var(--foreground)) !important;
+  font-size: 0.9rem !important;
 }
 
 .cdx-marker {
