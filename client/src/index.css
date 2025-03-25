@@ -270,6 +270,11 @@
   .draft-badge {
     @apply px-2 py-0.5 text-sm md:text-base font-medium bg-yellow-200 text-yellow-800 rounded-md dark:bg-yellow-800 dark:text-yellow-50;
   }
+
+  .code-block pre,
+  .code-block code {
+    @apply small-regular !leading-6;
+  }
 }
 
 .ce-block__content,
@@ -277,11 +282,18 @@
   max-width: 900px;
 }
 .ce-popover {
-  width: 14rem;
+  overflow-y: auto !important;
 }
 
-.cdx-list {
-  padding: 0;
+.ce-popover *,
+.ce-conversion-toolbar * {
+  font-size: 1rem !important;
+  line-height: 24px !important;
+  font-weight: 500 !important;
+}
+
+.ce-conversion-toolbar {
+  min-width: 200px !important;
 }
 
 .ce-inline-toolbar__dropdown:hover,
@@ -306,11 +318,11 @@
 }
 
 .ce-inline-toolbar {
-  padding: 5px 5px;
+  padding: 2px 5px !important;
 }
 
 .ce-inline-toolbar__buttons button {
-  margin-left: 5px;
+  margin-left: 5px !important;
 }
 
 .ce-popover-item {
@@ -340,6 +352,7 @@
 .codecup__lines__line,
 .codecup__copyMessage {
   font-size: 1rem !important;
+  line-height: 24px !important;
 }
 
 .editorjs-codeCup_Wrapper {
@@ -365,6 +378,7 @@
 
 .codecup,
 .codecup__textarea,
+.codecup__pre,
 .codecup__code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace !important;
@@ -382,16 +396,30 @@
 }
 
 .editorjs-codeCup_LangDisplay {
-  background-color: hsl(var(--header)) !important;
-  color: hsl(var(--muted-foreground)) !important;
+  background-color: hsla(var(--header) / 0.8) !important;
+  color: hsl(var(--foreground)) !important;
   position: absolute !important;
-  top: 0 !important;
+  top: 0.1rem !important;
   right: 1rem !important;
   z-index: 5 !important;
-  height: 2rem !important;
+  height: 1.5rem !important;
   padding: 5px !important;
   margin-right: 1rem !important;
   border: 1px solid hsl(var(--muted-foreground) / 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 768px) {
+  .editorjs-codeCup_LangDisplay {
+    top: auto !important;
+    bottom: 0 !important;
+    right: 0.5rem !important;
+    padding: 2px !important;
+    margin-right: 0 !important;
+    font-size: 0.875rem !important;
+  }
 }
 
 .codecup__copyButton {
@@ -400,10 +428,38 @@
 }
 
 .codecup__copyMessage {
-  top: 30px !important;
+  top: 2rem !important;
   background-color: hsl(var(--scrollbar-track)) !important;
   color: hsl(var(--foreground)) !important;
   font-size: 0.9rem !important;
+}
+
+@media (max-width: 768px) {
+  .codecup__copyMessage {
+    top: 5px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+.editorjs-codeCup_languageSelectContainer .ce-popover-item__icon svg * {
+  stroke: hsl(var(--foreground)) !important;
+}
+
+.editorjs-codeCup_languageDropdown {
+  background-color: hsl(var(--header)) !important;
+  color: hsl(var(--foreground)) !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+}
+
+.editorjs-codeCup_languageOption {
+  border-bottom: none !important;
+  padding: 4px 3px !important;
+}
+
+.editorjs-codeCup_languageOption:hover {
+  background-color: hsl(var(--input)) !important;
 }
 
 .cdx-marker {
@@ -419,6 +475,14 @@
   background-color: hsl(var(--header)) !important;
   color: hsl(var(--foreground)) !important;
   border: 1px solid hsl(var(--muted-foreground));
+}
+
+@media (max-width: 768px) {
+  .ce-toolbar__plus,
+  .ce-toolbar__settings-btn {
+    width: 1.845rem !important;
+    height: 1.845rem !important;
+  }
 }
 
 .ce-block--selected .ce-block__content {

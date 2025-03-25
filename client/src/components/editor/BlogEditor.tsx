@@ -18,7 +18,8 @@ import { IoMdSave } from "react-icons/io";
 import { IoArrowBack, IoClose, IoImageOutline } from "react-icons/io5";
 import { MdOutlinePreview } from "react-icons/md";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { editorJSTools } from "../../lib/editorjs-tools";
+
+import { editorJSTools } from "@/lib/editorjs/editorjs-tools";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import DarkThemeToggler from "../shared/DarkThemeToggler";
 import FileUploader from "../shared/FileUploader";
