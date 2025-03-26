@@ -272,8 +272,8 @@
   }
 
   .code-block pre,
-  .code-block code {
-    @apply small-regular !leading-6;
+  .code-block * {
+    @apply text-sm md:text-base leading-5 md:leading-6;
   }
 }
 
