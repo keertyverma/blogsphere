@@ -173,6 +173,6 @@ jobs:
           gcloud app versions list --format="value(id)" --sort-by "~version.createTime" --limit=10 | tail -n +6 | xargs -I {} gcloud app versions delete {} --quiet
 
       - name: Cleanup Artifact Registry
-        needs: [deploy]
+        if: always()
         run: |
           gcloud artifacts versions list --repository=${{secrets.GCP_ARTIFACT_REPOSITORY}} --location=${{secrets.GCP_ARTIFACT_LOCATION}} --package=${{secrets.GCP_ARTIFACT_PACKAGE}} --format='get(VERSION)' | tail -n +2 | xargs -r -I {} gcloud artifacts versions delete {} --repository=${{secrets.GCP_ARTIFACT_REPOSITORY}} --location=${{secrets.GCP_ARTIFACT_LOCATION}} --package=${{secrets.GCP_ARTIFACT_PACKAGE}} --delete-tags --quiet
