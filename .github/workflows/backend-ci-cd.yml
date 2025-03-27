@@ -175,4 +175,4 @@ jobs:
       - name: Cleanup Artifact Registry
         if: always()
         run: |
-          gcloud artifacts versions list --repository=${{secrets.GCP_ARTIFACT_REPOSITORY}} --location=${{secrets.GCP_ARTIFACT_LOCATION}} --package=${{secrets.GCP_ARTIFACT_PACKAGE}} --format='get(VERSION)' | tail -n +2 | xargs -r -I {} gcloud artifacts versions delete {} --repository=${{secrets.GCP_ARTIFACT_REPOSITORY}} --location=${{secrets.GCP_ARTIFACT_LOCATION}} --package=${{secrets.GCP_ARTIFACT_PACKAGE}} --delete-tags --quiet
+          gcloud artifacts versions list --repository=${{secrets.GCP_ARTIFACT_REPOSITORY}} --location=${{secrets.GCP_ARTIFACT_LOCATION}} --package=${{secrets.GCP_ARTIFACT_PACKAGE}} --format='get(VERSION)' | tail -n +2 | xargs -r -I {} gcloud artifacts versions delete {} --repository=${{secrets.GCP_ARTIFACT_REPOSITORY}} --location=${{secrets.GCP_ARTIFACT_LOCATION}} --package=${{secrets.GCP_ARTIFACT_PACKAGE}} --delete-tags --quiet
