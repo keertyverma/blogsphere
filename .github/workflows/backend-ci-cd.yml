@@ -154,12 +154,29 @@ jobs:
 
           echo "Service did not become healthy in time. Deleting broken version..."
           gcloud app versions delete "${{ steps.deploy.outputs.version_id }}" --quiet
+
+          echo "Deleting the artifact related to the failed deployment..."
+          gcloud artifacts versions delete \
+              --repository=${{ secrets.GCP_ARTIFACT_REPOSITORY }} \
+              --location=${{ secrets.GCP_ARTIFACT_LOCATION }} \
+              --package=app/default \
+              --version="${{ steps.deploy.outputs.version_id }}" \
+              --quiet
           exit 1
 
       - name: Promote New Version (Only if Healthy)
         run: |
           gcloud app services set-traffic default --splits ${{ steps.deploy.outputs.version_id }}=1
 
-      - name: Cleanup Old Versions
+      - name: Cleanup Old Deployed Versions
         run: |
           gcloud app versions list --format="value(id)" --sort-by "~version.createTime" --limit=10 | tail -n +6 | xargs -I {} gcloud app versions delete {} --quiet
+
+      - name: Cleanup Artifact Registry - app/default
+        run: |
+          if gcloud artifacts versions list --repository=${{ secrets.GCP_ARTIFACT_REPOSITORY }} --location=${{ secrets.GCP_ARTIFACT_LOCATION }} --package=app/default --format="value(version)" | grep -q .; then
+            echo "Deleting all versions from Artifact Registry app/default..."
+            gcloud artifacts versions delete --repository=${{ secrets.GCP_ARTIFACT_REPOSITORY }} --location=${{ secrets.GCP_ARTIFACT_LOCATION }} --package=app/default --delete-all-versions --quiet
+          else
+            echo "Artifact Registry app/default is empty. Skipping cleanup."
+          fi
