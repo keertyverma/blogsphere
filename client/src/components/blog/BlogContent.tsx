@@ -42,7 +42,7 @@ const BlogContent = ({ block }: Props) => {
     return <BlockList style={data.style} items={data.items} />;
 
   if (type === "code")
-    return <BlockCode code={data.code} language={data.language} />;
+    return <BlockCode code={data.code} language={data.language || "plain"} />;
 
   // Fallback for missing or incorrect data
   return <div>Invalid block data</div>;
