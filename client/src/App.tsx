@@ -19,6 +19,7 @@ import { getToastOptions } from "./lib/utils";
 import Bookmarks from "./pages/Bookmarks";
 import DraftBlogPage from "./pages/DraftBlogPage";
 import Editor from "./pages/Editor";
+import EditorGuide from "./pages/EditorGuide";
 import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -49,6 +50,7 @@ const App = () => {
             <Route path="edit-profile" element={<EditProfile />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
+          <Route path="editor-guide" element={<EditorGuide />} />
           <Route path="bookmarks" element={<Bookmarks />} />
 
           {/* Explicitly handle the /blogs/drafts route to prevent any conflicts with the dynamic /blogs/:blogId route. */}

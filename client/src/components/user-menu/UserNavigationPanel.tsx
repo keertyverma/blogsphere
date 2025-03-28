@@ -5,8 +5,12 @@ import {
   showErrorToast,
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
-import { IoBookmarksOutline, IoSettingsOutline } from "react-icons/io5";
 import { FaRegCircleUser } from "react-icons/fa6";
+import {
+  IoBookmarksOutline,
+  IoReaderOutline,
+  IoSettingsOutline,
+} from "react-icons/io5";
 import { MdLogout } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -104,6 +108,12 @@ const UserNavigationPanel = () => {
             <Link to="/settings/edit-profile" className="text-muted-foreground">
               <MenubarItem>
                 <IoSettingsOutline className="text-lg mr-2" /> Account Settings
+              </MenubarItem>
+            </Link>
+            <MenubarSeparator />
+            <Link to="/editor-guide" className="text-muted-foreground">
+              <MenubarItem>
+                <IoReaderOutline className="text-lg mr-2" /> Editor Guide
               </MenubarItem>
             </Link>
             <MenubarSeparator />

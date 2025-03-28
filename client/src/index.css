@@ -36,6 +36,7 @@
   .dark {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
+    /* --foreground: 240 5% 84%; */
     --card: 224 71.4% 4.1%;
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
@@ -275,6 +276,42 @@
   .code-block * {
     @apply text-sm md:text-base leading-5 md:leading-6;
   }
+
+  /* editor guide page */
+  .documentation {
+    @apply text-base lg:text-lg leading-6 lg:leading-7 dark:text-[rgb(212_212_216)];
+  }
+
+  .documentation code {
+    @apply font-mono bg-header/70 border-border border-[1px] px-1.5 py-0.5 rounded text-sm;
+  }
+
+  .documentation ul {
+    @apply list-disc pl-4 md:pl-6 my-1;
+  }
+
+  .documentation ul li {
+    @apply mt-2;
+  }
+
+  .documentation ol {
+    @apply list-decimal pl-6;
+  }
+  .documentation hr {
+    @apply my-1 border-[0.8px] border-border;
+  }
+
+  .documentation .checklist {
+    @apply list-none pl-0;
+  }
+
+  .documentation .checklist li::before {
+    content: "⬜️";
+    @apply mr-2;
+  }
+  .documentation .checklist li.checked::before {
+    content: "✅";
+  }
 }
 
 .ce-block__content,
@@ -335,7 +372,7 @@
 
 .inline-code {
   background-color: hsl(var(--input)) !important;
-  color: hsl(var(--foreground)) !important;
+  /* color: hsl(var(--foreground)) !important; */
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace !important;
   font-size: medium !important;
