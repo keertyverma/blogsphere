@@ -264,6 +264,10 @@
     @apply aspect-video rounded-lg object-cover;
   }
 
+  #text-editor ol {
+    @apply [&>li::before]:tabular-nums;
+  }
+
   .blog-title {
     @apply font-semibold text-base md:text-lg 2xl:text-xl line-clamp-3 my-2 text-foreground;
   }
