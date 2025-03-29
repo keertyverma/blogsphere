@@ -57,6 +57,7 @@ const UserBookmarks = () => {
           <BlogPostCard
             content={bookmark.blog as IBlog}
             author={(bookmark.blog as IBlog).authorDetails}
+            showLikeCount={false}
           />
         </AnimationWrapper>
       ))}

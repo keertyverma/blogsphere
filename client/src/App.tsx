@@ -14,7 +14,6 @@ import SideNavbar from "./components/settings/SideNavbar";
 import ScrollToTopOnNavigate from "./components/shared/ScrollToTopOnNavigate";
 import CustomCloseButton from "./components/ui/custom-toastify-close-button";
 import { useAxiosInterceptors } from "./lib/api-client";
-import { usePingServer } from "./lib/react-query/queries";
 import { getToastOptions } from "./lib/utils";
 import Bookmarks from "./pages/Bookmarks";
 import DraftBlogPage from "./pages/DraftBlogPage";
@@ -30,8 +29,6 @@ import ResetPassword from "./pages/ResetPassword";
 import UserProfile from "./pages/UserProfile";
 
 const App = () => {
-  // to prevent the server from going into sleep mode due to inactivity.
-  usePingServer();
   // to intercept response and handle token expiration
   useAxiosInterceptors();
   const isMobile = useMediaQuery("(max-width:640px)");

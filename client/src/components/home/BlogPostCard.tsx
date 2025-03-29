@@ -17,6 +17,7 @@ interface Props {
   showManageBlogButtons?: boolean;
   showReadCount?: boolean;
   showTimeAgo?: boolean;
+  showLikeCount?: boolean;
 }
 
 const BlogPostCard = ({
@@ -25,6 +26,7 @@ const BlogPostCard = ({
   showManageBlogButtons = false,
   showReadCount = false,
   showTimeAgo = false,
+  showLikeCount = true,
 }: Props) => {
   const {
     blogId: id,
@@ -97,12 +99,14 @@ const BlogPostCard = ({
       <section className="flex justify-between p-0 max-lg:mb-6">
         {/* Show blog stats - total likes and read count only for published blogs */}
         <div className="flex items-center justify-center gap-3 text-muted-foreground">
-          <div className="flex-center gap-1">
-            <FaRegHeart />
-            {activity && activity?.totalLikes > 0 && (
-              <p className="text-sm">{formateNumber(activity.totalLikes)}</p>
-            )}
-          </div>
+          {showLikeCount && (
+            <div className="flex-center gap-1">
+              <FaRegHeart />
+              {activity && activity?.totalLikes > 0 && (
+                <p className="text-sm">{formateNumber(activity.totalLikes)}</p>
+              )}
+            </div>
+          )}
 
           {showReadCount && (
             <div className="flex-center gap-1">

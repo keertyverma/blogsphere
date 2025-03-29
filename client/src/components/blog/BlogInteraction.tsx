@@ -12,7 +12,7 @@ import {
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +45,9 @@ const BlogInteraction = ({
   isDraft = false,
   description,
 }: Props) => {
-  const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>({});
+  const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>(
+    likes || {}
+  );
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
@@ -61,12 +63,6 @@ const BlogInteraction = ({
       (total, page) => total + page.results.length,
       0
     ) || 0) === 1;
-
-  useEffect(() => {
-    if (likes) {
-      setBlogLikes(likes);
-    }
-  }, [likes]);
 
   const handlePostLikeUnlike = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>

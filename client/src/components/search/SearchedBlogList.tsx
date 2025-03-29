@@ -43,7 +43,11 @@ const SearchedBlogList = ({ searchTerm }: Props) => {
               key={index}
               transition={{ duration: 1, delay: index * 0.1 }}
             >
-              <BlogPostCard content={blog} author={blog.authorDetails} />
+              <BlogPostCard
+                content={blog}
+                author={blog.authorDetails}
+                showLikeCount={false}
+              />
             </AnimationWrapper>
           ))}
         </React.Fragment>
