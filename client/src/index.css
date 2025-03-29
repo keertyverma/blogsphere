@@ -312,6 +312,23 @@
   .documentation .checklist li.checked::before {
     content: "✅";
   }
+
+  .documentation img {
+    @apply object-cover border-[0.8px] border-border rounded-md;
+  }
+}
+
+.blog-page-content ol {
+  counter-reset: list-counter;
+}
+
+.blog-page-content ol li {
+  counter-increment: list-counter;
+}
+
+.blog-page-content ol li::before {
+  content: counters(list-counter, ".") ". ";
+  font-variant-numeric: tabular-nums;
 }
 
 .ce-block__content,
@@ -368,6 +385,13 @@
 
 .ce-popover-item--confirmation:hover {
   background-color: hsl(var(--destructive)) !important;
+}
+
+.cdx-list {
+  padding-left: 0 !important;
+}
+.cdx-list__item-children {
+  padding-left: 0.625rem !important;
 }
 
 .inline-code {

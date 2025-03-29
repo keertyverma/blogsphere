@@ -40,7 +40,6 @@ const EditorJsUserGuide = () => {
                   src="/docs/toolbar-options.png"
                   alt="Toolbar options"
                   loading="lazy"
-                  className="object-cover border-[0.8px] border-border rounded-md"
                 ></img>
               </div>
               <ul>
@@ -101,7 +100,6 @@ const EditorJsUserGuide = () => {
               src="/docs/inline-tools.png"
               alt="Inline tool options"
               loading="lazy"
-              className="object-cover border-[0.8px] border-border rounded-md"
             ></img>
           </div>
           <ul>
@@ -210,6 +208,20 @@ const EditorJsUserGuide = () => {
             </li>
             <li>
               Supports <strong>nested lists</strong> for better organization.
+              <div className="my-2 flex flex-col md:flex-row gap-4 md:gap-10">
+                <img
+                  src="/docs/nested-unordered-list.png"
+                  alt="Documentation Screenshot"
+                  loading="lazy"
+                  className="w-44 md:w-1/3 "
+                ></img>
+                <img
+                  src="/docs/nested-ordered-list.png"
+                  alt="Documentation Screenshot"
+                  loading="lazy"
+                  className="w-44 md:w-1/3 "
+                ></img>
+              </div>
             </li>
             <li>
               Use Tune Settings {"  "}
@@ -325,7 +337,6 @@ const EditorJsUserGuide = () => {
                   src="/docs/code-block.png"
                   alt="Code block with example"
                   loading="lazy"
-                  className="object-cover border-[0.8px] border-border rounded-md"
                 ></img>
               </div>
             </li>
@@ -343,7 +354,6 @@ const EditorJsUserGuide = () => {
                     src="/docs/code-block-options.png"
                     alt="Code block tune setting"
                     loading="lazy"
-                    className="object-cover border-[0.8px] border-border rounded-md"
                   ></img>
                 </div>
               </ul>

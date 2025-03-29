@@ -1,4 +1,5 @@
 import { sanitizeContent } from "@/lib/utils";
+import { useMediaQuery } from "@react-hook/media-query";
 import { MdCheckBoxOutlineBlank } from "react-icons/md";
 
 interface Meta {
@@ -17,6 +18,8 @@ interface Props {
 }
 
 const BlockList = ({ style, items }: Props) => {
+  const isMobile = useMediaQuery("(max-width:640px)");
+
   const renderListItems = (
     listItems: ListItem[],
     parentIndex = "",
@@ -29,25 +32,29 @@ const BlockList = ({ style, items }: Props) => {
       const isChecked = item.meta?.checked || false;
 
       return (
-        <li key={index} className="my-2">
-          {style === "ordered" && level > 0 && (
-            <span className="mr-1 md:mr-2">{`${index}.`}</span>
+        <li key={index} className="my-1.5">
+          {style === "ordered" && (
+            <span dangerouslySetInnerHTML={{ __html: safeHTML }} />
+          )}
+          {style === "unordered" && (
+            <span dangerouslySetInnerHTML={{ __html: safeHTML }} />
           )}
           {style === "checklist" && (
-            <span className={"mr-1 md:mr-2"}>
-              {isChecked ? (
-                "✅"
-              ) : (
-                <MdCheckBoxOutlineBlank className="inline text-muted-foreground h-5 w-5 md:h-6 md:w-6" />
-              )}
-            </span>
+            <div className="flex gap-1 md:gap-2">
+              <span className={`${isChecked ? "mx-0.5  md:mx-0.8" : ""}`}>
+                {isChecked ? (
+                  "✅"
+                ) : (
+                  <MdCheckBoxOutlineBlank className="inline text-muted-foreground h-5 w-5 md:h-6 md:w-6" />
+                )}
+              </span>
+              <span dangerouslySetInnerHTML={{ __html: safeHTML }} />
+            </div>
           )}
-
-          <span dangerouslySetInnerHTML={{ __html: safeHTML }}></span>
 
           {/* Recursively render nested lists if items exist */}
           {item.items.length > 0 && (
-            <ListTag style={style} level={level + 1}>
+            <ListTag style={style} level={level + 1} isMobile={isMobile}>
               {renderListItems(item.items, index, level + 1)}
             </ListTag>
           )}
@@ -56,7 +63,7 @@ const BlockList = ({ style, items }: Props) => {
     });
 
   return (
-    <ListTag style={style} level={0}>
+    <ListTag style={style} level={0} isMobile={isMobile}>
       {renderListItems(items)}
     </ListTag>
   );
@@ -66,14 +73,16 @@ const ListTag = ({
   style,
   children,
   level,
+  isMobile,
 }: {
   style: "ordered" | "unordered" | "checklist";
   children: React.ReactNode;
   level: number;
+  isMobile: boolean;
 }) => {
   if (style === "ordered") {
     return (
-      <ol className={`${level === 0 ? "pl-5 list-decimal" : ""}`}>
+      <ol style={{ paddingLeft: `${level * (isMobile ? 1 : 1.3)}rem` }}>
         {children}
       </ol>
     );
