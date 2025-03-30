@@ -10,4 +10,4 @@ export const bookmarkRouter = Router();
 
 bookmarkRouter.post("/:blogId", verifyToken, addBookmark);
 bookmarkRouter.delete("/:blogId", verifyToken, removeBookmark);
-bookmarkRouter.get("/users/:userId", getBookmarksForUser);
+bookmarkRouter.get("/user", verifyToken, getBookmarksForUser);

@@ -719,8 +719,10 @@ export const useDeleteBookmark = () => {
   });
 };
 
-export const useGetUserBookmarks = (userId: string, blogId?: string) =>
-  useInfiniteQuery({
+export const useGetUserBookmarks = (blogId?: string) => {
+  const { id: userId } = useAuthStore.getState().user;
+
+  return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
     queryFn: async ({ pageParam = 1 }) => {
       const params: IBookmarkGetQuery = {
@@ -732,9 +734,8 @@ export const useGetUserBookmarks = (userId: string, blogId?: string) =>
       }
 
       return await apiClient
-        .get(`bookmarks/users/${userId}`, {
+        .get(`bookmarks/user`, {
           params,
-          withCredentials: false,
         })
         .then((res) => res.data);
     },
@@ -745,7 +746,7 @@ export const useGetUserBookmarks = (userId: string, blogId?: string) =>
     initialPageParam: 1,
     staleTime: ms("30m"),
     gcTime: ms("40m"),
-    enabled: !!userId, // Query only runs if userId is truthy
     refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
     refetchOnReconnect: true, // Refetch on network reconnect
   });
+};

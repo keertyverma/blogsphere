@@ -372,12 +372,13 @@ describe("/api/v1/bookmarks", () => {
     });
   });
 
-  describe("GET /users/:userId", () => {
-    // Get all bookmarked blogs for given user
+  describe("GET /user", () => {
+    // Get all bookmarked blogs for given authenticated user
     let blogs: IBlog[];
     let users: IUser[];
     let bookmarks: IBookmark[];
     let authenticatedUser: any;
+    let token: string;
 
     beforeAll(async () => {
       if (!server) return;
@@ -402,28 +403,35 @@ describe("/api/v1/bookmarks", () => {
       await Bookmark.deleteMany({});
     });
 
-    it("should return BadRequest-400 if userId is invalid", async () => {
-      // userId must be a valid mongoDB object Id format
-      const userId = "invalid-userId";
+    beforeEach(async () => {
+      if (!server) return;
+      token = authenticatedUser.generateAuthToken();
+    });
 
-      const res = await request(app).get(`${endpoint}/users/${userId}`);
+    const exec = async (blogId: string = "") => {
+      return await request(app)
+        .get(blogId ? `${endpoint}/user?blogId=${blogId}` : `${endpoint}/user`)
+        .set("Cookie", `authToken=${token}`);
+    };
 
-      expect(res.statusCode).toBe(400);
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      token = ""; // token cookie is not set
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(401);
       expect(res.body.error).toMatchObject({
-        code: "BAD_REQUEST",
-        message: "Invalid input data",
-        details: '"userId" must be a valid MongoDB ObjectId',
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
       });
     });
 
     it("should return BadRequest-400 if blogId is invalid", async () => {
       // blogId must be a valid mongoDB object Id format
-      const userId = authenticatedUser.id;
       const blogId = "invalid-blogId";
 
-      const res = await request(app).get(
-        `${endpoint}/users/${userId}?blogId=${blogId}`
-      );
+      const res = await exec(blogId);
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -438,12 +446,9 @@ describe("/api/v1/bookmarks", () => {
       const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
       const blogId = userBookmarks[0].blogId;
 
-      const res = await request(app).get(
-        `${endpoint}/users/${user_Id}?blogId=${blogId}`
-      );
+      const res = await exec(blogId);
 
       expect(res.statusCode).toBe(200);
-
       const { count, previous, next, results } = res.body;
       expect(count).toBe(1);
       expect(previous).toBeNull();
@@ -455,10 +460,11 @@ describe("/api/v1/bookmarks", () => {
     });
 
     it("should return all bookmarks for given user", async () => {
-      const user_Id = authenticatedUser.id;
-      const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
+      const userBookmarks = bookmarks.filter(
+        (b) => b.userId.toString() === authenticatedUser.id
+      );
 
-      const res = await request(app).get(`${endpoint}/users/${user_Id}`);
+      const res = await exec();
 
       expect(res.statusCode).toBe(200);
 
@@ -470,16 +476,16 @@ describe("/api/v1/bookmarks", () => {
     });
 
     it("should return bookmarks for user from page 2", async () => {
-      const user_Id = authenticatedUser.id;
-      const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
+      const userBookmarks = bookmarks.filter(
+        (b) => b.userId.toString() === authenticatedUser.id
+      );
       const pageSize = 1;
 
-      const res = await request(app).get(
-        `${endpoint}/users/${user_Id}?page=2&pageSize=${pageSize}`
-      );
+      const res = await request(app)
+        .get(`${endpoint}/user?page=2&pageSize=${pageSize}`)
+        .set("Cookie", `authToken=${token}`);
 
       expect(res.statusCode).toBe(200);
-
       const { count, previous, next, results } = res.body;
       expect(count).toBe(userBookmarks.length);
       expect(previous).toMatch(/page=1/i);

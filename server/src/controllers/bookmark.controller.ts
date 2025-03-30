@@ -95,14 +95,9 @@ const validateGetBookmarksQueryParams = (query: any) => {
 };
 
 export const getBookmarksForUser = async (req: Request, res: Response) => {
-  logger.debug(
-    `${req.method} Request on Route -> ${req.baseUrl}/users/:userId`
-  );
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/user`);
 
-  // validate 'userId' request params
-  const { userId } = req.params;
-  if (!isValidObjectId(userId))
-    throw new BadRequestError(`"userId" must be a valid MongoDB ObjectId`);
+  const userId = (req.user as JwtPayload).id;
 
   // validate request query params
   const {
@@ -127,7 +122,8 @@ export const getBookmarksForUser = async (req: Request, res: Response) => {
   const bookmarks = await Bookmark.find(matchQuery)
     .populate({
       path: "blog", // populate 'blogs' virtual field
-      select: "-_id -content -likes -updatedAt -__v",
+      select:
+        "-_id -content -likes -updatedAt -__v -activity -lastEditedAt -createdAt -isDraft",
       populate: {
         path: "authorDetails",
         select:

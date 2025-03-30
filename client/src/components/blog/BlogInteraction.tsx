@@ -56,7 +56,7 @@ const BlogInteraction = ({
   const { mutateAsync: likePost } = useLikePost();
   const { mutateAsync: createBookmark } = useCreateBookmark();
   const { mutateAsync: deleteBookmark } = useDeleteBookmark();
-  const { data: userBookmarks } = useGetUserBookmarks(user.id, id);
+  const { data: userBookmarks } = useGetUserBookmarks(id);
 
   const isBookmarked =
     (userBookmarks?.pages.reduce(

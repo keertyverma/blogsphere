@@ -1,5 +1,4 @@
 import { useGetUserBookmarks } from "@/lib/react-query/queries";
-import { useAuthStore } from "@/store";
 import { IBlog, IBookmark } from "@/types";
 import { useNavigate } from "react-router-dom";
 import BlogPostCard from "../home/BlogPostCard";
@@ -9,7 +8,6 @@ import { Button } from "../ui/button";
 
 const UserBookmarks = () => {
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
   const {
     data,
     isLoading,
@@ -17,7 +15,7 @@ const UserBookmarks = () => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useGetUserBookmarks(user.id);
+  } = useGetUserBookmarks();
 
   if (isLoading) return <BlogPostCardSkeleton />;
   if (error) console.error(error);
