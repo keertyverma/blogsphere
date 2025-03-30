@@ -690,10 +690,7 @@ export const useCreateBookmark = () => {
     mutationFn: (blogId: string) =>
       apiClient.post(`/bookmarks/${blogId}`).then((res) => res.data.result),
     onSuccess: (data: IBookmark) => {
-      const { userId, blogId } = data;
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
-      });
+      const { userId } = data;
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId }],
       });

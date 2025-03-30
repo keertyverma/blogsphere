@@ -13,17 +13,17 @@ const bookmarkSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Blog",
       required: true,
-      index: true, // Index on blogId field
     },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true, // Index on userId field
     },
   },
   { timestamps: true }
 );
+
+bookmarkSchema.index({ userId: 1, blogId: 1, createdAt: -1 }); // compound index to optimize bookmark lookups
 
 // Virtual field to populate the 'blog' associated with a bookmark
 bookmarkSchema.virtual("blog", {

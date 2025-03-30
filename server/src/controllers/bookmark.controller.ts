@@ -22,10 +22,12 @@ export const addBookmark = async (req: Request, res: Response) => {
   const userId = (req.user as JwtPayload).id;
 
   // get blog
-  const blog = await Blog.findById(blogId);
+  const blog = await Blog.findById(blogId).select("_id").lean();
   if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
 
-  const existingBookmark = await Bookmark.findOne({ userId, blogId });
+  const existingBookmark = await Bookmark.findOne({ userId, blogId })
+    .select("_id")
+    .lean();
   if (existingBookmark) {
     throw new BadRequestError("Blog already bookmarked");
   }
