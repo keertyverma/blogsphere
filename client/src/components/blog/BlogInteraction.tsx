@@ -117,7 +117,19 @@ const BlogInteraction = ({
         // add bookmark
         setIsBookmarked(true);
         await createBookmark(id as string);
-        showSuccessToast("Blog saved");
+        showSuccessToast(
+          <div className="flex-center space-x-2">
+            <span>Blog saved</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-input text-popover-foreground rounded-md border-[1px] border-muted-foreground p-1 text-base capitalize hover:no-underline"
+              onClick={() => navigate("/bookmarks")}
+            >
+              view
+            </Button>
+          </div>
+        );
       }
     } catch (error) {
       setIsBookmarked((prev: boolean) => !prev); // Revert state on failure
