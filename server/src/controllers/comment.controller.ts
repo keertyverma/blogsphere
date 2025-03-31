@@ -284,8 +284,7 @@ export const deleteCommentById = async (req: Request, res: Response) => {
 
   const { id } = req.params;
   // check id format
-  if (!isValidObjectId(id))
-    throw new BadRequestError(`"Id" must be a valid MongoDB ObjectId`);
+  if (!isValidObjectId(id)) throw new BadRequestError("Invalid comment ID");
 
   // find comment
   const comment = await Comment.findById(id);
@@ -369,8 +368,7 @@ export const updateCommentById = async (req: Request, res: Response) => {
 
   // check id format
   const { id } = req.params;
-  if (!isValidObjectId(id))
-    throw new BadRequestError(`"Id" must be a valid MongoDB ObjectId`);
+  if (!isValidObjectId(id)) throw new BadRequestError("Invalid comment ID");
 
   // find comment
   const comment = await Comment.findById(id);

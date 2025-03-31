@@ -237,7 +237,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"blogId" must be a valid MongoDB ObjectId',
+        details: '"blogId" must be a valid ID',
       });
     });
 
@@ -324,7 +324,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"blogId" must be a valid MongoDB ObjectId',
+        details: '"blogId" must be a valid ID',
       });
     });
 
@@ -460,7 +460,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"commentId" must be a valid MongoDB ObjectId',
+        details: '"commentId" must be a valid ID',
       });
     });
 
@@ -637,7 +637,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"Id" must be a valid MongoDB ObjectId',
+        details: "Invalid comment ID",
       });
     });
 
@@ -973,7 +973,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"Id" must be a valid MongoDB ObjectId',
+        details: "Invalid comment ID",
       });
     });
 

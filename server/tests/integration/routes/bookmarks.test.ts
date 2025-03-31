@@ -212,7 +212,7 @@ describe("/api/v1/bookmarks", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"blogId" must be a valid MongoDB ObjectId',
+        details: "Invalid blog ID",
       });
     });
 
@@ -337,7 +337,7 @@ describe("/api/v1/bookmarks", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"blogId" must be a valid MongoDB ObjectId',
+        details: "Invalid blog ID",
       });
     });
 
@@ -437,7 +437,7 @@ describe("/api/v1/bookmarks", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"blogId" must be a valid MongoDB ObjectId',
+        details: '"blogId" must be a valid ID',
       });
     });
 
@@ -496,7 +496,7 @@ describe("/api/v1/bookmarks", () => {
     });
   });
 
-  describe.only("GET /user/blog/:blogId/exists", () => {
+  describe("GET /user/blog/:blogId/exists", () => {
     // Check if user has bookmarked the blog
     let blogs: IBlog[];
     let users: IUser[];
@@ -562,7 +562,7 @@ describe("/api/v1/bookmarks", () => {
       expect(res.body.error).toMatchObject({
         code: "BAD_REQUEST",
         message: "Invalid input data",
-        details: '"blogId" must be a valid MongoDB ObjectId',
+        details: "Invalid blog ID",
       });
     });
 

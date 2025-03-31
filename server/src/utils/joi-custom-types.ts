@@ -6,7 +6,7 @@ const mongoIdValidator = Joi.extend((joi) => ({
   type: "objectId",
   base: joi.string(),
   messages: {
-    "objectId.invalid": "{{#label}} must be a valid MongoDB ObjectId",
+    "objectId.invalid": "{{#label}} must be a valid ID",
   },
   validate(value, helper) {
     if (!isValidObjectId(value)) {

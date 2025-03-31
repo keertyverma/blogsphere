@@ -16,8 +16,7 @@ export const addBookmark = async (req: Request, res: Response) => {
 
   // validate 'blogId' request params
   const { blogId } = req.params;
-  if (!isValidObjectId(blogId))
-    throw new BadRequestError(`"blogId" must be a valid MongoDB ObjectId`);
+  if (!isValidObjectId(blogId)) throw new BadRequestError("Invalid blog ID");
 
   const userId = (req.user as JwtPayload).id;
 
@@ -54,12 +53,16 @@ export const removeBookmark = async (req: Request, res: Response) => {
 
   // validate 'blogId' request params
   const { blogId } = req.params;
-  if (!isValidObjectId(blogId))
-    throw new BadRequestError(`"blogId" must be a valid MongoDB ObjectId`);
+  if (!isValidObjectId(blogId)) throw new BadRequestError("Invalid blog ID");
 
   const userId = (req.user as JwtPayload).id;
 
-  const deletedBookmark = await Bookmark.findOneAndDelete({ userId, blogId });
+  const deletedBookmark = await Bookmark.findOneAndDelete({
+    userId,
+    blogId,
+  })
+    .select("_id")
+    .lean();
   if (!deletedBookmark) {
     throw new NotFoundError(
       "No bookmark found for the specified user and blog"
@@ -71,8 +74,8 @@ export const removeBookmark = async (req: Request, res: Response) => {
     statusCode: StatusCodes.OK,
     result: {
       _id: deletedBookmark._id,
-      blogId: deletedBookmark.blogId,
-      userId: deletedBookmark.userId,
+      blogId: blogId,
+      userId: userId,
     },
   };
 
@@ -180,8 +183,7 @@ export const checkIfBookmarked = async (req: Request, res: Response) => {
 
   // validate `blogId` request params
   const { blogId } = req.params;
-  if (!isValidObjectId(blogId))
-    throw new BadRequestError(`"blogId" must be a valid MongoDB ObjectId`);
+  if (!isValidObjectId(blogId)) throw new BadRequestError("Invalid blog ID");
 
   const userId = (req.user as JwtPayload).id;
   const bookmarkExists = await Bookmark.exists({ userId, blogId });
