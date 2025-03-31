@@ -41,16 +41,35 @@ const ShareBlog = ({ title, description, tags = [] }: Props) => {
   };
 
   const handleLinkedinShare = () => {
-    const text = encodeURIComponent(
-      `${title}\n${description}\n\nCheck it out at BlogSphere!\n${location.href}`
-    );
-    const linkedInShareUrl = `https://www.linkedin.com/shareArticle?mini=true&text=${text}`;
+    const maxLength = 3000; // LinkedIn's character limit for posts
+    const fixedText = "🚀 Read now on BlogSphere!";
+    const blogURL = location.href; // LinkedIn doesn't shorten URLs
+
+    // Calculate max allowed length for title + hashtags
+    const reservedSpace = fixedText.length + blogURL.length;
+    const maxBlogDataLength = maxLength - reservedSpace;
+
+    // Convert tags to hashtags (remove spaces, lowercase, limit to 5 hashtags)
+    const hashtags = tags
+      .slice(0, 5)
+      .map((tag) => `#${tag.replace(/\s+/g, "").toLowerCase()}`)
+      .join(" ");
+    let blogData = `${title}\n${description}\n${hashtags}\n`;
+    if (blogData.length > maxBlogDataLength) {
+      blogData = blogData.substring(0, maxBlogDataLength - 3) + "..."; // -3 for "..."
+    }
+
+    const shareText = `${blogData}\n${fixedText}\n${blogURL}`;
+    const linkedInShareUrl = `https://www.linkedin.com/shareArticle?mini=true&text=${encodeURIComponent(
+      shareText
+    )}`;
     window.open(linkedInShareUrl, "_blank");
   };
 
   const handleXShare = () => {
     const maxLength = 280;
     const fixedText = "🚀 Read now on BlogSphere!";
+    const blogURL = location.href;
     const urlLength = 23; // X shortens URLs to 23 characters
     const newLines = "\n\n"; // Used between sections (counts as 2 characters)
 
@@ -73,7 +92,7 @@ const ShareBlog = ({ title, description, tags = [] }: Props) => {
     const shareText = `${titleHashtags}\n\n${fixedText}`;
     const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
       shareText
-    )}&url=${encodeURIComponent(location.href)}`;
+    )}&url=${encodeURIComponent(blogURL)}`;
     window.open(xShareUrl, "_blank");
   };
 
