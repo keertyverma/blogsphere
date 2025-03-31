@@ -443,7 +443,9 @@ describe("/api/v1/bookmarks", () => {
 
     it("should return bookmark for specified user and blog", async () => {
       const user_Id = authenticatedUser.id;
-      const userBookmarks = bookmarks.filter((b) => (b.userId = user_Id));
+      const userBookmarks = bookmarks.filter(
+        (b) => b.userId.toString() === user_Id
+      );
       const blogId = userBookmarks[0].blogId;
 
       const res = await exec(blogId);
@@ -491,6 +493,98 @@ describe("/api/v1/bookmarks", () => {
       expect(previous).toMatch(/page=1/i);
       expect(next).toBeNull();
       expect(results).toHaveLength(pageSize);
+    });
+  });
+
+  describe.only("GET /user/blog/:blogId/exists", () => {
+    // Check if user has bookmarked the blog
+    let blogs: IBlog[];
+    let users: IUser[];
+    let bookmarks: IBookmark[];
+    let authenticatedUser: any;
+    let token: string;
+
+    beforeAll(async () => {
+      if (!server) return;
+      users = await createUsers();
+
+      const blogAuthor = users[0].id;
+      blogs = await createBlogs(blogAuthor);
+
+      authenticatedUser = users[1];
+      bookmarks = await createBookmarks(
+        authenticatedUser.id,
+        blogs[0].id,
+        blogs[1].id
+      );
+    });
+
+    afterAll(async () => {
+      if (!server) return;
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      await Bookmark.deleteMany({});
+    });
+
+    beforeEach(async () => {
+      if (!server) return;
+      token = authenticatedUser.generateAuthToken();
+    });
+
+    const exec = async (blogId: string = "") => {
+      return await request(app)
+        .get(`${endpoint}/user/blog/${blogId}/exists`)
+        .set("Cookie", `authToken=${token}`);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      token = ""; // token cookie is not set
+      const blogId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
+    });
+
+    it("should return BadRequest-400 if blogId is invalid", async () => {
+      // blogId must be a valid mongoDB object Id format
+      const blogId = "invalid-blogId";
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"blogId" must be a valid MongoDB ObjectId',
+      });
+    });
+
+    it("should confirm blog is bookmarked by the user", async () => {
+      const userBookmarks = bookmarks.filter(
+        (b) => b.userId.toString() === authenticatedUser.id
+      );
+      const blogId = userBookmarks[0].blogId;
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.result.exists).toBe(true);
+    });
+
+    it("should confirm blog is not bookmarked by the user", async () => {
+      const blogId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.result.exists).toBe(false);
     });
   });
 });

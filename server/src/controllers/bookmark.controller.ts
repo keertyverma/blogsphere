@@ -171,3 +171,28 @@ export const getBookmarksForUser = async (req: Request, res: Response) => {
 
   return res.status(data.statusCode).json(data);
 };
+
+export const checkIfBookmarked = async (req: Request, res: Response) => {
+  // Check if the authenticated user has bookmarked the given blog
+  logger.debug(
+    `${req.method} Request on Route -> ${req.baseUrl}/user/blog/:blogId/exists`
+  );
+
+  // validate `blogId` request params
+  const { blogId } = req.params;
+  if (!isValidObjectId(blogId))
+    throw new BadRequestError(`"blogId" must be a valid MongoDB ObjectId`);
+
+  const userId = (req.user as JwtPayload).id;
+  const bookmarkExists = await Bookmark.exists({ userId, blogId });
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    result: {
+      exists: Boolean(bookmarkExists),
+    },
+  };
+
+  return res.status(data.statusCode).json(data);
+};
