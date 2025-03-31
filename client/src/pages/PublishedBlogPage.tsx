@@ -106,6 +106,7 @@ const PublishedBlogPage = () => {
     publishedAt,
     isDraft,
     description,
+    tags,
   } = blog;
 
   return (
@@ -155,6 +156,7 @@ const PublishedBlogPage = () => {
           activity={activity}
           isDraft={isDraft}
           description={description}
+          tags={tags}
         />
 
         {/* blog content */}

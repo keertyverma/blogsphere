@@ -15,9 +15,10 @@ import {
 interface Props {
   title: string;
   description: string;
+  tags?: string[];
 }
 
-const ShareBlog = ({ title, description }: Props) => {
+const ShareBlog = ({ title, description, tags = [] }: Props) => {
   const copyToClipboard = () => {
     const currentURL = location.href;
     navigator.clipboard
@@ -26,7 +27,7 @@ const ShareBlog = ({ title, description }: Props) => {
         showSuccessToast(
           <div className="flex items-center space-x-2">
             <IoIosLink className="text-muted-foreground text-xl" />
-            <span>Link copied successfully!</span>
+            <span>Link copied to clipboard</span>
           </div>,
           {
             icon: false,
@@ -35,7 +36,7 @@ const ShareBlog = ({ title, description }: Props) => {
       })
       .catch((err) => {
         console.error(err);
-        showErrorToast("Failed to copy link.");
+        showErrorToast("Failed to copy the link. Please try again.");
       });
   };
 
@@ -48,8 +49,30 @@ const ShareBlog = ({ title, description }: Props) => {
   };
 
   const handleXShare = () => {
+    const maxLength = 280;
+    const fixedText = "🚀 Read now on BlogSphere!";
+    const urlLength = 23; // X shortens URLs to 23 characters
+    const newLines = "\n\n"; // Used between sections (counts as 2 characters)
+
+    // Convert tags to hashtags (remove spaces, lowercase, limit to 3 hashtags)
+    const hashtags = tags
+      .slice(0, 3)
+      .map((tag) => `#${tag.replace(/\s+/g, "").toLowerCase()}`)
+      .join(" ");
+
+    // Calculate max allowed length for title + hashtags
+    const reservedSpace = fixedText.length + newLines.length + urlLength;
+    const maxTitleHashtagsLength = maxLength - reservedSpace;
+
+    let titleHashtags = `${title}\n${hashtags}`;
+    if (titleHashtags.length > maxTitleHashtagsLength) {
+      titleHashtags =
+        titleHashtags.substring(0, maxTitleHashtagsLength - 3) + "..."; // -3 for "..."
+    }
+
+    const shareText = `${titleHashtags}\n\n${fixedText}`;
     const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
-      `${title}.\n\nCheck it out at BlogSphere!`
+      shareText
     )}&url=${encodeURIComponent(location.href)}`;
     window.open(xShareUrl, "_blank");
   };

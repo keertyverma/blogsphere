@@ -33,6 +33,7 @@ interface Props {
   };
   isDraft?: boolean;
   description: string;
+  tags?: string[];
 }
 
 const BlogInteraction = ({
@@ -44,6 +45,7 @@ const BlogInteraction = ({
   activity,
   isDraft = false,
   description,
+  tags = [],
 }: Props) => {
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>(
     likes || {}
@@ -211,7 +213,7 @@ const BlogInteraction = ({
                   <FaRegBookmark className="text-secondary-foreground text-lg" />
                 )}
               </Button>
-              <ShareBlog title={title} description={description} />
+              <ShareBlog title={title} description={description} tags={tags} />
             </>
           )}
 
