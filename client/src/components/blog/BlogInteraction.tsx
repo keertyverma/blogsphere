@@ -1,7 +1,7 @@
 import {
+  useBookmarkStatus,
   useCreateBookmark,
   useDeleteBookmark,
-  useGetUserBookmarks,
   useLikePost,
 } from "@/lib/react-query/queries";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -48,6 +48,8 @@ const BlogInteraction = ({
   const [blogLikes, setBlogLikes] = useState<{ [key: string]: boolean }>(
     likes || {}
   );
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
@@ -56,13 +58,15 @@ const BlogInteraction = ({
   const { mutateAsync: likePost } = useLikePost();
   const { mutateAsync: createBookmark } = useCreateBookmark();
   const { mutateAsync: deleteBookmark } = useDeleteBookmark();
-  const { data: userBookmarks } = useGetUserBookmarks(id);
+  const { data: bookmarkStatus, isLoading: isCheckingBookmarkStatus } =
+    useBookmarkStatus(user.id, id);
 
-  const isBookmarked =
-    (userBookmarks?.pages.reduce(
-      (total, page) => total + page.results.length,
-      0
-    ) || 0) === 1;
+  useEffect(() => {
+    // Sync state with API result (Only when fetching completes)
+    if (!isCheckingBookmarkStatus && bookmarkStatus) {
+      setIsBookmarked(bookmarkStatus?.exists ?? false);
+    }
+  }, [isCheckingBookmarkStatus, bookmarkStatus]);
 
   const handlePostLikeUnlike = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -106,14 +110,17 @@ const BlogInteraction = ({
     try {
       if (isBookmarked) {
         // remove bookmark
+        setIsBookmarked(false);
         await deleteBookmark(id as string);
         showSuccessToast("Blog unsaved");
       } else {
         // add bookmark
+        setIsBookmarked(true);
         await createBookmark(id as string);
         showSuccessToast("Blog saved");
       }
     } catch (error) {
+      setIsBookmarked((prev: boolean) => !prev); // Revert state on failure
       if (!useAuthStore.getState().isTokenExpired) {
         showErrorToast("An error occurred. Please try again later.");
       }

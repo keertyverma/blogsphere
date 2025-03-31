@@ -9,6 +9,7 @@ export enum QUERY_KEYS {
   GET_DRAFT_BLOG_BY_ID = "getDraftBlogById",
   GET_BLOG_COMMENTS = "getBlogComments",
   GET_USER_BOOKMARKS = "getUserBookmarks",
+  GET_BOOKMARK_STATUS = "getBookmarkStatus",
 
   // User Keys
   GET_SEARCHED_USERS = "getSearchedUsers",

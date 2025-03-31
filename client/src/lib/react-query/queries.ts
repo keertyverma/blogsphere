@@ -690,9 +690,12 @@ export const useCreateBookmark = () => {
     mutationFn: (blogId: string) =>
       apiClient.post(`/bookmarks/${blogId}`).then((res) => res.data.result),
     onSuccess: (data: IBookmark) => {
-      const { userId } = data;
+      const { userId, blogId } = data;
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_BOOKMARK_STATUS, { userId, blogId }],
       });
     },
   });
@@ -707,28 +710,25 @@ export const useDeleteBookmark = () => {
     onSuccess: (data: IBookmark) => {
       const { userId, blogId } = data;
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
+        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId }],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId }],
+        queryKey: [QUERY_KEYS.GET_BOOKMARK_STATUS, { userId, blogId }],
       });
     },
   });
 };
 
-export const useGetUserBookmarks = (blogId?: string) => {
+export const useGetUserBookmarks = () => {
   const { id: userId } = useAuthStore.getState().user;
 
   return useInfiniteQuery({
-    queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId, blogId }],
+    queryKey: [QUERY_KEYS.GET_USER_BOOKMARKS, { userId }],
     queryFn: async ({ pageParam = 1 }) => {
       const params: IBookmarkGetQuery = {
         // pageSize: 2,
         page: pageParam,
       };
-      if (blogId) {
-        params["blogId"] = blogId;
-      }
 
       return await apiClient
         .get(`bookmarks/user`, {
@@ -747,3 +747,17 @@ export const useGetUserBookmarks = (blogId?: string) => {
     refetchOnReconnect: true, // Refetch on network reconnect
   });
 };
+
+export const useBookmarkStatus = (userId?: string, blogId?: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_BOOKMARK_STATUS, { userId, blogId }],
+    queryFn: () =>
+      apiClient
+        .get(`/bookmarks/user/blog/${blogId}/exists`)
+        .then((res) => (res.data as unknown as IFetchResponse).result),
+    staleTime: Infinity, // Never becomes stale (only refetches on invalidation)
+    gcTime: ms("3h"), // Cache remains for 3 hours before being garbage collected
+    enabled: !!userId && !!blogId, // Fetch only if user is authenticated and blogId exists
+    refetchOnMount: true, // Refetch on component mount to ensure fresh data when component re-renders
+    refetchOnReconnect: true, // Refetch on network reconnect
+  });
