@@ -15,6 +15,7 @@ import {
   IUpdateUserProfile,
 } from "@/types";
 import {
+  InfiniteData,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -506,6 +507,7 @@ export const useDeleteBlog = () => {
           _id: authorId,
           personalInfo: { username },
         },
+        _id,
       } = data;
       const selectedTag = useEditorStore.getState().selectedTag;
 
@@ -535,6 +537,26 @@ export const useDeleteBlog = () => {
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.GET_TRENDING_BLOGS],
         });
+
+        // refetch user's bookmarks if the deleted blog was previously bookmarked
+        const userBookmarksQueryKey = [
+          QUERY_KEYS.GET_USER_BOOKMARKS,
+          { userId: authorId },
+        ];
+        const cachedBookmarks = queryClient.getQueryData<
+          InfiniteData<IFetchAllResponse>
+        >(userBookmarksQueryKey); // Retrieve the cached bookmarks data
+        if (cachedBookmarks) {
+          const isBlogBookmarked = cachedBookmarks.pages.some((page) =>
+            page.results.some((bookmark) => bookmark.blogId === _id)
+          );
+
+          if (isBlogBookmarked) {
+            queryClient.invalidateQueries({
+              queryKey: userBookmarksQueryKey,
+            });
+          }
+        }
       }
     },
   });

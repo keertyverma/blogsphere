@@ -492,7 +492,7 @@ const deleteBlogByBlogId = async (req: Request, res: Response) => {
       select:
         "personalInfo.fullname personalInfo.username personalInfo.profileImage",
     })
-    .select("blogId title isDraft author")
+    .select("_id blogId title isDraft author")
     .lean();
   if (!deletedBlog) {
     throw new NotFoundError(
