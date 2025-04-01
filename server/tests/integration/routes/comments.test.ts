@@ -436,10 +436,7 @@ describe("/api/v1/blogs", () => {
       // 'commentId' must be a valid mongodb Object id
       const commentId = "invalid-commentId";
 
-      const res = await exec({
-        commentId,
-        content: "some thoughtful comment",
-      });
+      const res = await exec({ commentId, content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -463,14 +460,16 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "RESOURCE_NOT_FOUND",
         message: "The requested resource was not found.",
-        details: `comment with id = ${commentId} does not exists.`,
+        details: `Comment with ID = ${commentId} does not exists.`,
       });
     });
 
     it("should create reply and update comment and blog accordingly", async () => {
       token = repliedByUser.generateAuthToken();
       const comment = comments.filter((c) => c.isReply === false)[0];
-      const blog = await Blog.findById(comment.blogId);
+      const blog = await Blog.findById(comment.blogId)
+        .select("activity")
+        .lean();
       const totalComment = blog?.activity.totalComments;
       const totalParentComments = blog?.activity.totalParentComments;
       const replyData = {
@@ -494,11 +493,16 @@ describe("/api/v1/blogs", () => {
       expect(content).toBe(replyData.content);
       expect(commentedBy).toBe(repliedByUser.id);
 
-      const parentComment = await Comment.findById(comment.id);
-      expect(parentComment?.totalReplies).toBe(1);
+      // parent comment `totalReplies` must be incremented by 1
+      const parentComment = await Comment.findById(comment.id)
+        .select("totalReplies")
+        .lean();
+      expect(parentComment?.totalReplies).toBe(comment.totalReplies + 1);
 
       // check blog - 'totalComments' is increment by 1 and `totalParentComments` must be the same count as before.
-      const updatedBlog = await Blog.findById(blogId);
+      const updatedBlog = await Blog.findById(blogId)
+        .select("activity.totalComments activity.totalParentComments")
+        .lean();
       expect(updatedBlog?.activity.totalComments).toBe(
         (totalComment as number) + 1
       );
@@ -510,8 +514,8 @@ describe("/api/v1/blogs", () => {
     it("should update totalReplies count for all ancestor comment for a given reply", async () => {
       // create comment
       const comment: IComment = comments.filter((c) => c.isReply === false)[0];
-      const user1 = comment.commentedBy;
-
+      const repliedBy = await User.findById(comment.commentedBy).select("_id");
+      token = repliedBy?.generateAuthToken() as string;
       // create reply to above comment
       const reply = await Comment.create({
         blogId: comment.blogId,
@@ -525,13 +529,10 @@ describe("/api/v1/blogs", () => {
       await comment.save();
 
       // create reply by calling api
-      const repliedBy = await User.findById(user1);
-      token = repliedBy?.generateAuthToken() as string;
       const replyData = {
         commentId: reply.id,
         content: `Reply to ${reply.content}`,
       };
-
       const res = await exec(replyData);
 
       expect(res.statusCode).toBe(201);
@@ -543,11 +544,17 @@ describe("/api/v1/blogs", () => {
       expect(content).toBe(replyData.content);
       expect(commentedBy).toBe(repliedBy?.id);
 
-      const parentComment = await Comment.findById(reply.id);
-      expect(parentComment?.totalReplies).toBe(1);
+      // parent comment `totalReplies` must be incremented by 1
+      const parentComment = await Comment.findById(reply.id)
+        .select("totalReplies")
+        .lean();
+      expect(parentComment?.totalReplies).toBe(reply.totalReplies + 1);
 
-      const greatParentComment = await Comment.findById(comment.id);
-      expect(greatParentComment?.totalReplies).toBe(2);
+      // All ancestor comment `totalReplies` must be incremented by 1
+      const greatParentComment = await Comment.findById(comment.id)
+        .select("totalReplies")
+        .lean();
+      expect(greatParentComment?.totalReplies).toBe(comment.totalReplies + 1);
     });
   });
 

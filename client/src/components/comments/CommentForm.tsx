@@ -34,11 +34,7 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
   const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
   const navigate = useNavigate();
 
-  const {
-    data: user,
-    isLoading,
-    error: getUserError,
-  } = useGetUser(authUser.username);
+  const { data: user, error: getUserError } = useGetUser(authUser.username);
   const {
     mutateAsync: createComment,
     isPending: isCreatingComment,
@@ -57,7 +53,6 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
     setIsTextareaDisabled(false);
   }, []);
 
-  if (isLoading) return <LoadingSpinner />;
   const error = getUserError || creatingCommentError || updatingCommentError;
   if (error) console.error(error);
 
@@ -147,11 +142,14 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
           <Button
             type="submit"
             size="sm"
-            className="rounded-full text-sm capitalize"
+            className="rounded-full text-sm capitalize flex-center gap-1"
             disabled={!comment || isCreatingComment || isUpdatingComment}
             aria-label={existingComment ? "update comment" : "create comment"}
           >
             {existingComment ? "save" : "comment"}
+            {(isCreatingComment || isUpdatingComment) && (
+              <LoadingSpinner className="h-6 md:w-6 text-white" />
+            )}
           </Button>
         </div>
       </form>

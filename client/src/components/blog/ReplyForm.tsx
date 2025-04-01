@@ -21,14 +21,13 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
   const navigate = useNavigate();
 
-  const { data: user, isLoading, error } = useGetUser(authUser.username);
+  const { data: user, error } = useGetUser(authUser.username);
   const {
     mutateAsync: createReply,
     isPending: isCreatingReply,
     error: creatingReplyError,
   } = useCreateReply();
 
-  if (isLoading) return <LoadingSpinner />;
   if (error || creatingReplyError) console.error(error || creatingReplyError);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -101,10 +100,13 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
           <Button
             type="submit"
             size="sm"
-            className="rounded-full text-sm capitalize"
+            className="rounded-full text-sm capitalize flex-center gap-1"
             disabled={!reply || isCreatingReply}
           >
             reply
+            {isCreatingReply && (
+              <LoadingSpinner className="h-6 md:w-6 text-white" />
+            )}
           </Button>
         </div>
       </form>

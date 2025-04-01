@@ -186,11 +186,11 @@ const validateCreateReply = (data: { commentId: string; content: string }) => {
 };
 
 const _incrementalTotalReplies = async (commentId: string) => {
-  const parentComment = await Comment.findByIdAndUpdate(
-    commentId,
-    { $inc: { totalReplies: 1 } },
-    { new: true }
-  );
+  const parentComment = await Comment.findByIdAndUpdate(commentId, {
+    $inc: { totalReplies: 1 },
+  })
+    .select("parent")
+    .lean();
 
   if (parentComment?.parent) {
     await _incrementalTotalReplies(parentComment.parent);
@@ -205,15 +205,15 @@ export const createReply = async (req: Request, res: Response) => {
   const userId = (req.user as JwtPayload).id;
 
   // find parent comment by id
-  const comment = await Comment.findById(commentId).select(
-    "blogId blogAuthor "
-  );
+  const comment = await Comment.findById(commentId)
+    .select("blogId blogAuthor")
+    .lean();
   if (!comment)
-    throw new NotFoundError(`comment with id = ${commentId} does not exists.`);
-
-  // create reply
+    throw new NotFoundError(`Comment with ID = ${commentId} does not exists.`);
   const { blogId, blogAuthor } = comment;
-  let reply = new Comment({
+
+  // create and save reply
+  const reply = await Comment.create({
     blogId,
     blogAuthor,
     content,
@@ -222,21 +222,15 @@ export const createReply = async (req: Request, res: Response) => {
     parent: commentId,
   });
 
-  // save reply
-  reply = await reply.save();
-
   // update `totalReplies` of all ancestor comments recursively
   await _incrementalTotalReplies(commentId);
 
-  // update blog
-  // - increment 'totalComments' count by 1
-  const updatedBlog = await Blog.findByIdAndUpdate(
-    blogId,
-    {
-      $inc: { "activity.totalComments": 1 },
-    },
-    { new: true }
-  ).select("_id blogId author");
+  // update blog - increment 'totalComments' count by 1
+  const existingBlog = await Blog.findByIdAndUpdate(blogId, {
+    $inc: { "activity.totalComments": 1 },
+  })
+    .select("blogId")
+    .lean();
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
@@ -247,9 +241,8 @@ export const createReply = async (req: Request, res: Response) => {
       commentedBy: reply.commentedBy,
       content: reply.content,
       blog: {
-        id: updatedBlog?._id,
-        blogId: updatedBlog?.blogId,
-        author: updatedBlog?.author,
+        id: existingBlog?._id,
+        blogId: existingBlog?.blogId,
       },
     },
   };
