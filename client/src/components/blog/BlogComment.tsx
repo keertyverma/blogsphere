@@ -1,22 +1,20 @@
 import { FaRegCommentDots } from "react-icons/fa";
+import CommentForm from "../comments/CommentForm";
+import CommentList from "../comments/CommentList";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import CommentForm from "../comments/CommentForm";
-import CommentList from "../comments/CommentList";
 
 interface Props {
   blogId?: string; // blog _id
-  authorId: string;
   totalComments?: number;
 }
 
-const BlogComment = ({ blogId, authorId, totalComments = 0 }: Props) => {
+const BlogComment = ({ blogId, totalComments = 0 }: Props) => {
   return (
     <Dialog>
       <DialogTrigger className="outline-none">
@@ -29,9 +27,8 @@ const BlogComment = ({ blogId, authorId, totalComments = 0 }: Props) => {
           <DialogTitle className="font-semibold">
             Comments {`${totalComments > 0 ? `(${totalComments})` : ""}`}
           </DialogTitle>
-          <DialogDescription />
         </DialogHeader>
-        <CommentForm blogId={blogId} authorId={authorId} />
+        <CommentForm blogId={blogId} />
         <hr className="my-2" />
         <CommentList blogId={blogId} />
       </DialogContent>

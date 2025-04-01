@@ -16,7 +16,6 @@ import { Button } from "../ui/button";
 
 interface Props {
   blogId?: string;
-  authorId?: string;
   existingComment?: {
     id: string;
     content: string;
@@ -24,12 +23,7 @@ interface Props {
   closeEditForm?: () => void; // Callback to handle successful edit
 }
 
-const CommentForm = ({
-  blogId,
-  authorId,
-  existingComment,
-  closeEditForm,
-}: Props) => {
+const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isTextareaDisabled, setIsTextareaDisabled] = useState(true);
   const [comment, setComment] = useState(
@@ -75,13 +69,6 @@ const CommentForm = ({
       return navigate("/login");
     }
 
-    if (!comment.trim()) {
-      showErrorToast("Comment can not be empty.");
-      textareaRef?.current && resetTextareaSize(textareaRef.current);
-      setComment("");
-      return;
-    }
-
     try {
       if (existingComment) {
         // update comment
@@ -92,7 +79,6 @@ const CommentForm = ({
         // create comment
         const commentData = {
           blogId: blogId as string,
-          blogAuthor: authorId as string,
           content: comment,
         };
         await createComment(commentData);

@@ -166,13 +166,12 @@ describe("/api/v1/blogs", () => {
   describe("POST /", () => {
     let blogs: IBlog[];
     let users: IUser[];
-    let blogAuthor: string;
     let commentedByUser: any;
 
     beforeAll(async () => {
       if (!server) return;
       users = await createUsers();
-      blogAuthor = users[0].id;
+      const blogAuthor = users[0].id;
       commentedByUser = users[1];
       blogs = await createBlogs(blogAuthor);
     });
@@ -227,11 +226,7 @@ describe("/api/v1/blogs", () => {
       // 'blogId' must be a valid mongodb Object id
       const blogId = "invalid-blogid";
 
-      const res = await exec({
-        blogId,
-        content: "some thoughtful comment",
-        blogAuthor: blogAuthor,
-      });
+      const res = await exec({ blogId, content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatchObject({
@@ -246,11 +241,7 @@ describe("/api/v1/blogs", () => {
       // blog with this id does not exists
       const blogId = new mongoose.Types.ObjectId().toString();
 
-      const res = await exec({
-        blogId,
-        content: "some thoughtful comment",
-        blogAuthor: blogAuthor,
-      });
+      const res = await exec({ blogId, content: "some thoughtful comment" });
 
       expect(res.statusCode).toBe(404);
       expect(res.body.error).toMatchObject({
@@ -263,26 +254,20 @@ describe("/api/v1/blogs", () => {
     it("should create comment and update blog's comment", async () => {
       token = commentedByUser.generateAuthToken();
       const blogId = blogs[0].id;
-      const commentData = {
-        blogId,
-        content: "some thoughtful comment",
-        blogAuthor: blogAuthor,
-      };
+      const commentData = { blogId, content: "some thoughtful comment" };
 
       const res = await exec(commentData);
 
       expect(res.statusCode).toBe(201);
       expect(res.body.status).toBe("success");
-
       const { id, blog, commentedBy, content } = res.body.result;
       expect(id).toBeDefined();
       expect(blog.id).toBe(blogId);
-      expect(blog.author).toBe(commentData.blogAuthor);
       expect(content).toBe(commentData.content);
       expect(commentedBy).toBe(commentedByUser.id);
 
       // check blog - 'totalComments' and 'totalParentComments' is increment by 1
-      const updatedBlog = await Blog.findById(blogId);
+      const updatedBlog = await Blog.findById(blogId).select("activity").lean();
       expect(updatedBlog?.activity.totalComments).toBe(1);
       expect(updatedBlog?.activity.totalParentComments).toBe(1);
     });

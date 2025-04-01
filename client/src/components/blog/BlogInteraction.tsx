@@ -142,7 +142,6 @@ const BlogInteraction = ({
   };
 
   const {
-    _id: authorId,
     personalInfo: { username: authorUsername },
   } = author;
 
@@ -177,7 +176,6 @@ const BlogInteraction = ({
               <div className="flex-center">
                 <BlogComment
                   blogId={id}
-                  authorId={authorId}
                   totalComments={activity?.totalComments}
                 />
                 {activity && activity.totalComments !== 0 ? (

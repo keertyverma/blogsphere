@@ -12,14 +12,9 @@ import NotFoundError from "../utils/errors/not-found";
 import { mongoIdValidator } from "../utils/joi-custom-types";
 import logger from "../utils/logger";
 
-const validateCreateComment = (data: {
-  blogId: string;
-  blogAuthor: string;
-  content: string;
-}) => {
+const validateCreateComment = (data: { blogId: string; content: string }) => {
   const schema = Joi.object({
     blogId: mongoIdValidator.objectId().trim().required(),
-    blogAuthor: mongoIdValidator.objectId().trim().required(),
     content: Joi.string().trim().required(),
   });
 
@@ -37,46 +32,43 @@ export const createComment = async (req: Request, res: Response) => {
   logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/`);
 
   // validate request body
-  const { blogId, blogAuthor, content } = validateCreateComment(req.body);
+  const { blogId, content } = validateCreateComment(req.body);
   const userId = (req.user as JwtPayload).id;
 
-  //   check if blog exists
-  const blog = await Blog.findById(blogId);
+  // check if blog exists
+  const blog = await Blog.findById(blogId).select("blogId author").lean();
   if (!blog) {
     throw new NotFoundError(`Blog with id = ${blogId} not found.`);
   }
 
-  // create comment
-  let comment = new Comment({
+  // Create and save comment
+  const comment = await Comment.create({
     blogId,
-    blogAuthor,
+    blogAuthor: blog.author,
     content,
     commentedBy: userId,
   });
 
-  // save comment
-  comment = await comment.save();
-
-  // update blog
-  // - increment 'totalComments' and 'totalParentComments' count by 1
-  const updatedBlog = await Blog.findByIdAndUpdate(
-    blogId,
+  // update blog - increment 'totalComments' and 'totalParentComments' count by 1
+  const { modifiedCount } = await Blog.updateOne(
+    { _id: blogId },
     {
       $inc: { "activity.totalComments": 1, "activity.totalParentComments": 1 },
-    },
-    { new: true }
-  ).select("_id blogId author");
+    }
+  );
+  if (!modifiedCount) {
+    throw new CustomAPIError(
+      "Unable to update the blog's total comment count after creating the comment.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.CREATED,
     result: {
       id: comment.id,
-      blog: {
-        id: updatedBlog?._id,
-        blogId: updatedBlog?.blogId,
-        author: updatedBlog?.author,
-      },
+      blog: { id: blog._id, blogId: blog.blogId },
       commentedBy: comment.commentedBy,
       content: comment.content,
     },

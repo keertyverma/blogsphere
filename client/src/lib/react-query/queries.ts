@@ -567,11 +567,8 @@ export const useCreateComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (comment: {
-      blogId: string;
-      blogAuthor: string;
-      content: string;
-    }) => apiClient.post(`/comments`, comment).then((res) => res.data.result),
+    mutationFn: (comment: { blogId: string; content: string }) =>
+      apiClient.post(`/comments`, comment).then((res) => res.data.result),
     onSuccess: (data) => {
       const {
         blog: { id, blogId },

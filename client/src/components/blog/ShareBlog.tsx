@@ -54,7 +54,7 @@ const ShareBlog = ({ title, description, tags = [] }: Props) => {
       .slice(0, 5)
       .map((tag) => `#${tag.replace(/\s+/g, "").toLowerCase()}`)
       .join(" ");
-    let blogData = `${title}\n${description}\n${hashtags}\n`;
+    let blogData = `${title}\n\n${description}\n${hashtags}\n`;
     if (blogData.length > maxBlogDataLength) {
       blogData = blogData.substring(0, maxBlogDataLength - 3) + "..."; // -3 for "..."
     }
