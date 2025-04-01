@@ -60,9 +60,9 @@ const ShareBlog = ({ title, description, tags = [] }: Props) => {
     }
 
     const shareText = `${blogData}\n${fixedText}\n${blogURL}`;
-    const linkedInShareUrl = `https://www.linkedin.com/shareArticle?mini=true&text=${encodeURIComponent(
-      shareText
-    )}`;
+    const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+      blogURL
+    )}&text=${encodeURIComponent(shareText)}`;
     window.open(linkedInShareUrl, "_blank");
   };
 
