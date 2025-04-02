@@ -47,7 +47,11 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
     // This is done to prevent textrea from auto-focusing and opening keyboard on mobile
     // Enable the textarea after the component mounts
     setIsTextareaDisabled(false);
-  }, []);
+
+    if (existingComment && textareaRef.current) {
+      autoResizeTextarea(textareaRef.current);
+    }
+  }, [existingComment]);
 
   const error = getUserError || creatingCommentError || updatingCommentError;
   if (error) console.error(error);
