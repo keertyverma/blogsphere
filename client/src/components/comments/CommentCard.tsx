@@ -1,8 +1,7 @@
 import { getTimeAgo, handleProfileImgErr, truncateText } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IComment } from "@/types";
-import DOMPurify from "dompurify";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import CommentInteraction from "./CommentInteraction";
@@ -40,10 +39,29 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
     setIsExpanded((prev) => !prev);
   };
 
-  const formatContent = (content: string) => {
-    // sanitize the HTML content to prevent XSS attacks.
-    const safeContent = DOMPurify.sanitize(content).replace(/\n/g, "<br>");
-    return safeContent;
+  const renderComment = (text: string) => {
+    // Preserve new lines in comments and handle link display
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.split("\n").map((line, lineIndex) => (
+      <Fragment key={lineIndex}>
+        {line.split(urlRegex).map((part, index) =>
+          part.match(urlRegex) ? (
+            <a
+              key={index}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline-link"
+            >
+              {part}
+            </a>
+          ) : (
+            part
+          )
+        )}
+        <br />
+      </Fragment>
+    ));
   };
 
   return (
@@ -87,10 +105,10 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
           )}
       </div>
       <div className="my-2">
-        <span
-          className="text-base leading-6 text-accent-foreground"
-          dangerouslySetInnerHTML={{ __html: formatContent(truncatedContent) }}
-        ></span>
+        <span className="text-base leading-6 text-accent-foreground">
+          {renderComment(truncatedContent)}
+        </span>
+
         {content.length > CONTENT_CHAR_LIMIT && (
           <Button
             variant="link"

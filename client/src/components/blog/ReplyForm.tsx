@@ -33,7 +33,7 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showErrorToast("Please log in to add a reply.");
+      showErrorToast("Please log in to reply to this comment.");
       setRedirectedUrl(location.pathname);
       return navigate("/login");
     }

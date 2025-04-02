@@ -59,7 +59,7 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showErrorToast("Please log in to add a comment.");
+      showErrorToast("Please log in to post a comment.");
       setRedirectedUrl(location.pathname);
       return navigate("/login");
     }

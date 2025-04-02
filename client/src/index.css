@@ -201,6 +201,10 @@
     @apply border-r-2 max-md:border-none border-muted-foreground bg-header px-6 -ml-6 md:rounded-tl-lg md:rounded-bl-lg;
   }
 
+  .underline-link {
+    @apply text-blue-500 underline;
+  }
+
   /* File uploader */
   .cover-img {
     @apply aspect-video w-full h-full rounded-lg object-cover border-[1px] border-border;
@@ -252,12 +256,7 @@
 
   #text-editor a,
   .blog-page-content a {
-    @apply text-primary underline hover:opacity-50;
-  }
-
-  #text-editor a:hover,
-  .blog-page-content a:hover {
-    @apply text-primary underline hover:opacity-100;
+    @apply underline-link;
   }
 
   #text-editor img {
