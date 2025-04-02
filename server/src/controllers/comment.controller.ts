@@ -38,7 +38,7 @@ export const createComment = async (req: Request, res: Response) => {
   // check if blog exists
   const blog = await Blog.findById(blogId).select("blogId author").lean();
   if (!blog) {
-    throw new NotFoundError(`Blog with id = ${blogId} not found.`);
+    throw new NotFoundError(`Blog with ID = ${blogId} not found.`);
   }
 
   // Create and save comment
@@ -274,7 +274,7 @@ export const deleteCommentById = async (req: Request, res: Response) => {
 
   // find comment
   const comment = await Comment.findById(id);
-  if (!comment) throw new NotFoundError(`Comment with id = ${id} not found.`);
+  if (!comment) throw new NotFoundError(`Comment with ID = ${id} not found.`);
 
   // check user permission - comment can only be deleted by comment creator or blog author
   const userId = (req.user as JwtPayload).id;
@@ -357,14 +357,14 @@ export const updateCommentById = async (req: Request, res: Response) => {
   if (!isValidObjectId(id)) throw new BadRequestError("Invalid comment ID");
 
   // find comment
-  const comment = await Comment.findById(id);
-  if (!comment) throw new NotFoundError(`Comment with id = ${id} not found.`);
+  const comment = await Comment.findById(id).select("commentedBy").lean();
+  if (!comment) throw new NotFoundError(`Comment with ID = ${id} not found.`);
 
   // check user permission - comment can only be updated by it's creator
   const userId = (req.user as JwtPayload).id;
   if (String(userId) !== String(comment.commentedBy))
     throw new CustomAPIError(
-      "You can not update this comment",
+      "Unauthorized to update this comment",
       StatusCodes.FORBIDDEN
     );
 
@@ -377,12 +377,12 @@ export const updateCommentById = async (req: Request, res: Response) => {
     {
       $set: { content: updatedContent, isEdited: true },
     },
-    { new: true }
+    { new: true, lean: true }
   );
 
   if (!updatedComment) {
     throw new CustomAPIError(
-      `There is some issue with updating comment = ${id}`,
+      `There was an issue updating comment = ${id}`,
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
@@ -391,7 +391,7 @@ export const updateCommentById = async (req: Request, res: Response) => {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
     result: {
-      id: updatedComment.id,
+      id: updatedComment._id,
       parent: updatedComment.parent,
       commentedBy: updatedComment.commentedBy,
       content: updatedComment.content,

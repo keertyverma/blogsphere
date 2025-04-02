@@ -114,9 +114,9 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
             variant="link"
             size="sm"
             onClick={toggleContentExpansion}
-            className="p-0 ml-2 h-1"
+            className={`text-base p-0 ${!isExpanded ? "ml-1" : ""}`}
           >
-            {isExpanded ? "show less" : "...show more"}
+            {isExpanded ? "show less" : "... show more"}
           </Button>
         )}
       </div>

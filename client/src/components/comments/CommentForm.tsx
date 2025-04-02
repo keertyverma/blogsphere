@@ -3,11 +3,7 @@ import {
   useGetUser,
   useUpdateComment,
 } from "@/lib/react-query/queries";
-import {
-  handleProfileImgErr,
-  showErrorToast,
-  showSuccessToast,
-} from "@/lib/utils";
+import { handleProfileImgErr, showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -68,7 +64,6 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
       if (existingComment) {
         // update comment
         await updateComment({ id: existingComment.id, content: comment });
-        showSuccessToast("Comment updated 👍");
         if (closeEditForm) closeEditForm();
       } else {
         // create comment
