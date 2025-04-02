@@ -1,3 +1,4 @@
+import { DialogDescription } from "@radix-ui/react-dialog";
 import { FaRegCommentDots } from "react-icons/fa";
 import CommentForm from "../comments/CommentForm";
 import CommentList from "../comments/CommentList";
@@ -27,6 +28,7 @@ const BlogComment = ({ blogId, totalComments = 0 }: Props) => {
           <DialogTitle className="font-semibold">
             Comments {`${totalComments > 0 ? `(${totalComments})` : ""}`}
           </DialogTitle>
+          <DialogDescription />
         </DialogHeader>
         <CommentForm blogId={blogId} />
         <hr className="my-2" />

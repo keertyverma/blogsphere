@@ -258,7 +258,9 @@ const _decrementTotalReplies = async (
   // recursively update 'totalReplies' count of given comment and it's all parent comments
   const parentComment = await Comment.findByIdAndUpdate(commentId, {
     $inc: { totalReplies: decrementCount },
-  });
+  })
+    .select("parent")
+    .lean();
 
   if (parentComment?.parent) {
     await _decrementTotalReplies(parentComment.parent, decrementCount);
@@ -273,7 +275,11 @@ export const deleteCommentById = async (req: Request, res: Response) => {
   if (!isValidObjectId(id)) throw new BadRequestError("Invalid comment ID");
 
   // find comment
-  const comment = await Comment.findById(id);
+  const comment = await Comment.findById(id)
+    .select(
+      "_id commentedBy blogId blogAuthor content isReply parent totalReplies"
+    )
+    .lean();
   if (!comment) throw new NotFoundError(`Comment with ID = ${id} not found.`);
 
   // check user permission - comment can only be deleted by comment creator or blog author
@@ -283,15 +289,15 @@ export const deleteCommentById = async (req: Request, res: Response) => {
     String(userId) !== String(comment.blogAuthor)
   )
     throw new CustomAPIError(
-      "You can not delete this comment",
+      "Unauthorized to delete this comment.",
       StatusCodes.FORBIDDEN
     );
 
   // delete comment
-  const deletedComment = await Comment.findOneAndDelete({ _id: id });
-  if (!deletedComment) {
+  const { deletedCount } = await Comment.deleteOne({ _id: id });
+  if (!deletedCount) {
     throw new CustomAPIError(
-      `There is some issue with deleting comment = ${id}`,
+      `There was an issue with deleting comment = ${id}.`,
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
@@ -299,34 +305,31 @@ export const deleteCommentById = async (req: Request, res: Response) => {
   const isReply = comment?.isReply && comment.parent;
   const decrementBy = -(1 + comment.totalReplies);
   if (isReply) {
-    // if comment is a reply then update 'totalReplies` count on all ancestor comments recursively
+    // If the comment is a reply, recursively update the totalReplies count for all ancestor comments
     await _decrementTotalReplies(comment?.parent as string, decrementBy);
   }
 
   // update blog - decrement 'totalComments' and 'totalParentComments'
-  const updatedBlog = await Blog.findByIdAndUpdate(
-    comment?.blogId,
-    {
-      $inc: {
-        "activity.totalComments": decrementBy,
-        "activity.totalParentComments": isReply ? 0 : -1,
-      },
+  const existingBlog = await Blog.findByIdAndUpdate(comment?.blogId, {
+    $inc: {
+      "activity.totalComments": decrementBy,
+      "activity.totalParentComments": isReply ? 0 : -1,
     },
-    { new: true }
-  ).select("_id blogId author");
+  })
+    .select("_id blogId")
+    .lean();
 
   const data: APIResponse = {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
     result: {
-      id: comment.id,
+      id: comment._id,
       parent: comment.parent,
       commentedBy: comment.commentedBy,
       content: comment.content,
       blog: {
-        id: updatedBlog?._id,
-        blogId: updatedBlog?.blogId,
-        author: updatedBlog?.author,
+        id: existingBlog?._id,
+        blogId: existingBlog?.blogId,
       },
     },
   };
@@ -364,7 +367,7 @@ export const updateCommentById = async (req: Request, res: Response) => {
   const userId = (req.user as JwtPayload).id;
   if (String(userId) !== String(comment.commentedBy))
     throw new CustomAPIError(
-      "Unauthorized to update this comment",
+      "Unauthorized to update this comment.",
       StatusCodes.FORBIDDEN
     );
 
@@ -382,7 +385,7 @@ export const updateCommentById = async (req: Request, res: Response) => {
 
   if (!updatedComment) {
     throw new CustomAPIError(
-      `There was an issue updating comment = ${id}`,
+      `There was an issue updating comment = ${id}.`,
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }

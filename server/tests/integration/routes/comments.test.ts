@@ -664,7 +664,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "FORBIDDEN",
         message: "You do not have permission to access this resource.",
-        details: "You can not delete this comment",
+        details: "Unauthorized to delete this comment.",
       });
     });
 
@@ -1000,7 +1000,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "FORBIDDEN",
         message: "You do not have permission to access this resource.",
-        details: "Unauthorized to update this comment",
+        details: "Unauthorized to update this comment.",
       });
     });
 

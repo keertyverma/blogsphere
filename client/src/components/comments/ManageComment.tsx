@@ -1,10 +1,9 @@
 import { useDeleteComment } from "@/lib/react-query/queries";
-import { showErrorToast, showSuccessToast } from "@/lib/utils";
+import { showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
-import { toast } from "react-toastify";
 import ConfirmationModal from "../shared/ConfirmationModal";
 import { Button } from "../ui/button";
 import {
@@ -34,14 +33,10 @@ const ManageComment = ({
   };
 
   const handleConfirmDelete = async () => {
-    setIsModalOpen(false);
-    const loadingToast = toast.loading("Deleting ...");
     try {
       await deleteBlog(commentId);
-      toast.dismiss(loadingToast);
-      showSuccessToast("Comment Deleted.");
+      setIsModalOpen(false);
     } catch (error) {
-      toast.dismiss(loadingToast);
       if (!useAuthStore.getState().isTokenExpired) {
         showErrorToast("An error occurred. Please try again later.");
       }
@@ -80,7 +75,6 @@ const ManageComment = ({
               variant="secondary"
               onClick={handleDelete}
               className="flex gap-2 bg-transparent text-inherit hover:text-foreground w-full justify-start"
-              disabled={isDeleting}
             >
               <MdOutlineDelete className="text-lg text-destructive" />
               Delete
@@ -90,6 +84,7 @@ const ManageComment = ({
       </DropdownMenu>
       <ConfirmationModal
         isOpen={isModalOpen}
+        isDeleting={isDeleting}
         onClose={handleCloseModal}
         onConfirm={handleConfirmDelete}
       />

@@ -1,12 +1,19 @@
 import { Button } from "../ui/button";
+import TextWithLoader from "../ui/text-with-loader";
 
 interface Props {
   isOpen: boolean;
+  isDeleting: boolean;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm }: Props) => {
+const ConfirmationModal = ({
+  isOpen,
+  isDeleting,
+  onClose,
+  onConfirm,
+}: Props) => {
   if (!isOpen) return null;
 
   return (
@@ -19,6 +26,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: Props) => {
             size="sm"
             onClick={onClose}
             className="border border-muted-foreground/40"
+            disabled={isDeleting}
           >
             Cancel
           </Button>
@@ -26,9 +34,14 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: Props) => {
             variant="destructive"
             size="sm"
             onClick={onConfirm}
-            className="ml-2"
+            className="ml-2 flex gap-1"
+            disabled={isDeleting}
           >
-            Delete
+            <TextWithLoader
+              text="Delete"
+              isLoading={isDeleting}
+              loaderClassName="text-white"
+            />
           </Button>
         </div>
       </div>
