@@ -14,6 +14,7 @@ interface Props {
 
 const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
   const [reply, setReply] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -42,6 +43,7 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
       await createReply({ commentId, content: reply });
       onSubmit();
       setReply("");
+      setIsExpanded(false);
       onClose();
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
@@ -59,56 +61,62 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
     const input = e.target;
     autoResizeTextarea(input);
     setReply(input.value);
+    setIsExpanded(!!input.value);
+  };
+
+  const handleCancel = () => {
+    setReply("");
+    setIsExpanded(false);
+    onClose();
   };
 
   return (
-    <div className="">
+    <div className="flex gap-2 items-start mt-2">
       {isAuthenticated && (
-        <div className="flex gap-3 items-center mb-2">
-          <img
-            src={user?.personalInfo.profileImage}
-            alt="user profile image"
-            className="w-10 h-10 object-cover rounded-full border-[1px] border-border shadow-lg"
-            onError={handleProfileImgErr}
-          />
-          <p className="font-semibold capitalize">
-            {user?.personalInfo.fullname}
-          </p>
-        </div>
+        <img
+          src={user?.personalInfo.profileImage}
+          alt="user profile image"
+          className="w-10 h-10 object-cover rounded-full border-[1px] border-border shadow-lg"
+          onError={handleProfileImgErr}
+        />
       )}
 
-      <form className="flex flex-col gap-1" onSubmit={handleSubmit}>
+      <form
+        className="flex flex-col w-full rounded-2xl border border-border p-2"
+        onSubmit={handleSubmit}
+      >
         <textarea
           ref={textareaRef}
           value={reply}
-          placeholder="Reply to this comment..."
-          className="w-full min-h-[70px] resize-none outline-none py-2 !leading-6 bg-background"
+          placeholder="Add a reply..."
+          className="w-full min-h-[40px] resize-none outline-none !leading-6 bg-background"
           onChange={handleReplyChange}
         />
-        <div className="flex justify-end gap-2 ">
-          <Button
-            type="reset"
-            variant="secondary"
-            size="sm"
-            className="rounded-full text-sm capitalize bg-transparent"
-            onClick={() => {
-              onClose();
-            }}
-          >
-            cancel
-          </Button>
-          <Button
-            type="submit"
-            size="sm"
-            className="rounded-full text-sm capitalize flex-center gap-1"
-            disabled={!reply || isCreatingReply}
-          >
-            reply
-            {isCreatingReply && (
-              <LoadingSpinner className="h-6 md:w-6 text-white" />
-            )}
-          </Button>
-        </div>
+
+        {isExpanded && (
+          <div className="flex justify-end gap-2 mt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="rounded-full text-sm bg-transparent"
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              className="rounded-full text-sm flex-center gap-1"
+              disabled={!reply.trim() || isCreatingReply}
+            >
+              Reply
+              {isCreatingReply && (
+                <LoadingSpinner className="h-6 md:w-6 text-white" />
+              )}
+            </Button>
+          </div>
+        )}
       </form>
     </div>
   );
