@@ -62,6 +62,8 @@ const commentSchema = new Schema(
   }
 );
 
+commentSchema.index({ commentedAt: -1 });
+
 const Comment = model<IComment>("Comment", commentSchema);
 
 export { Comment, IComment };

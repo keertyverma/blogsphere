@@ -125,6 +125,7 @@ export const getAllComments = async (req: Request, res: Response) => {
     comments = [];
   } else {
     comments = await Comment.find(matchQuery)
+      .select("-__v")
       .populate(
         "commentedBy",
         "personalInfo.fullname personalInfo.username personalInfo.profileImage _id"
@@ -132,7 +133,7 @@ export const getAllComments = async (req: Request, res: Response) => {
       .sort({ commentedAt: -1 })
       .skip(skip)
       .limit(max_limit)
-      .select("-__v");
+      .lean();
 
     // set previous and next url for pagination
     const queryParams = new URLSearchParams(req.query as any);

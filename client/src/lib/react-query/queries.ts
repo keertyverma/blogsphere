@@ -579,15 +579,15 @@ export const useCreateComment = () => {
         });
       }
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { blogId: id }],
       });
     },
   });
 };
 
-export const useGetComments = (blogId: string = "", commentId: string = "") =>
+export const useGetComments = (blogId?: string, commentId?: string) =>
   useInfiniteQuery({
-    queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, blogId, commentId],
+    queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { blogId, commentId }],
     queryFn: async ({ pageParam = 1 }) => {
       const params: ICommentQuery = {
         pageSize: 10,
@@ -633,12 +633,12 @@ export const useCreateReply = () => {
 
       // refresh reply list for given comment
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { commentId: parent }],
       });
 
       // refresh top-level comment list for given blog
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { blogId: id }],
       });
     },
   });
@@ -662,12 +662,12 @@ export const useDeleteComment = () => {
 
       // refresh reply list for given comment
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { commentId: parent }],
       });
 
       // refresh top-level comment list for given blog
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
+        queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { blogId: id }],
       });
     },
   });
@@ -689,12 +689,12 @@ export const useUpdateComment = () => {
       if (parent) {
         // refresh reply list
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, "", parent],
+          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { commentId: parent }],
         });
       } else {
         // refresh top level comment list
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, id, ""],
+          queryKey: [QUERY_KEYS.GET_BLOG_COMMENTS, { blogId: id }],
         });
       }
     },

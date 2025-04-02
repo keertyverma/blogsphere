@@ -60,15 +60,14 @@ const CommentList = ({ blogId, commentId }: Props) => {
           <Button
             variant={`${commentId ? "ghost" : "secondary"}`}
             size="sm"
-            className={`rounded-full bg-transparent hover:bg-secondary underline hover:no-underline`}
+            className={`rounded-full bg-transparent hover:bg-secondary underline hover:no-underline flex-center gap-1`}
             disabled={isFetchingNextPage}
             onClick={() => fetchNextPage()}
           >
-            {isFetchingNextPage
-              ? "loading..."
-              : commentId
-              ? "Load more replies"
-              : "Load more comments"}
+            {commentId ? "Load more replies" : "Load more comments"}
+            {isFetchingNextPage && (
+              <LoadingSpinner className="h-6 md:w-6 text-muted-foreground" />
+            )}
           </Button>
         </div>
       )}
