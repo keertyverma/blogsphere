@@ -24,6 +24,7 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
     totalReplies,
     blogAuthor,
     isEdited,
+    isReply,
   } = comment;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
@@ -100,6 +101,7 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
             <ManageComment
               commentId={_id}
               commentedByUserId={commentedByUserId}
+              isReply={isReply}
               onEdit={onEdit}
             />
           )}

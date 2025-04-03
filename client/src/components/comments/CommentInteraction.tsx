@@ -59,7 +59,10 @@ const CommentInteraction = ({ commentId, totalReplies }: Props) => {
             </p>
           ) : (
             replyCount > 0 && (
-              <p className="text-sm">{formateNumber(replyCount)}</p>
+              <p className="text-sm">
+                {formateNumber(replyCount)}{" "}
+                {replyCount === 1 ? "reply" : "replies"}
+              </p>
             )
           )}
         </div>

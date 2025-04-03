@@ -142,6 +142,7 @@ export interface IComment {
   commentedAt: string;
   totalReplies: number;
   isEdited: boolean;
+  isReply: boolean;
 }
 
 export interface ICommentQuery {

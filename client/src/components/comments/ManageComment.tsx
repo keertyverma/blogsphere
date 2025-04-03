@@ -2,7 +2,7 @@ import { useDeleteComment } from "@/lib/react-query/queries";
 import { showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { useState } from "react";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { BsThreeDots } from "react-icons/bs";
 import { MdEdit, MdOutlineDelete } from "react-icons/md";
 import ConfirmationModal from "../shared/ConfirmationModal";
 import { Button } from "../ui/button";
@@ -17,11 +17,13 @@ import {
 interface Props {
   commentId: string;
   commentedByUserId: string;
+  isReply: boolean;
   onEdit: () => void;
 }
 const ManageComment = ({
   commentId,
   commentedByUserId: commetedByUserId,
+  isReply,
   onEdit,
 }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,7 +53,7 @@ const ManageComment = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <BsThreeDotsVertical className="text-xl text-muted-foreground" />
+          <BsThreeDots className="text-xl text-muted-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mr-8 text-muted-foreground p-0">
           {user.id === commetedByUserId && (
@@ -85,6 +87,9 @@ const ManageComment = ({
       <ConfirmationModal
         isOpen={isModalOpen}
         isDeleting={isDeleting}
+        message={`Are you sure you want to delete this ${
+          isReply ? "reply" : "comment"
+        }?`}
         onClose={handleCloseModal}
         onConfirm={handleConfirmDelete}
       />

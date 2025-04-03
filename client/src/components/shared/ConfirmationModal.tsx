@@ -4,6 +4,7 @@ import TextWithLoader from "../ui/text-with-loader";
 interface Props {
   isOpen: boolean;
   isDeleting: boolean;
+  message: string;
   onClose: () => void;
   onConfirm: () => void;
 }
@@ -11,6 +12,7 @@ interface Props {
 const ConfirmationModal = ({
   isOpen,
   isDeleting,
+  message,
   onClose,
   onConfirm,
 }: Props) => {
@@ -19,7 +21,7 @@ const ConfirmationModal = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-background p-8 rounded-md shadow-lg border border-muted-foreground/40">
-        <p>Are you sure you want to delete this comment?</p>
+        <p>{message}</p>
         <div className="mt-4 flex justify-end">
           <Button
             variant="secondary"
