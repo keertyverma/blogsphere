@@ -22,6 +22,7 @@ import EditorGuide from "./pages/EditorGuide";
 import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPassword from "./pages/ForgotPassword";
+import GooglePrivacyPolicy from "./pages/GooglePrivacyPolicy";
 import Home from "./pages/Home";
 import PublishedBlogPage from "./pages/PublishedBlogPage";
 import ResendVerification from "./pages/ResendVerification";
@@ -72,6 +73,7 @@ const App = () => {
           path="/resend-verification-link"
           element={<ResendVerification />}
         />
+        <Route path="/privacy-policy" element={<GooglePrivacyPolicy />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 
