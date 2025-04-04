@@ -121,10 +121,7 @@ const PublishedBlogPage = () => {
           />
         )}
         <div className="flex flex-col gap-2 mb-2">
-          <h1
-            className="text-[32px] md:text-[42px] leading-9 md:leading-tight -tracking-wide font-bold"
-            role="heading"
-          >
+          <h1 className="text-[1.875rem] md:text-[2.625rem] leading-snug md:leading-tight tracking-normal font-bold">
             {title}
           </h1>
           <Link
