@@ -92,7 +92,7 @@ const UserProfile = () => {
           <div className="relative w-full mx-auto md:p-0">
             <BsSearch className="absolute left-[5%] md:left-5 top-1/2 md:pointer-events-none -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="bg-accent pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
+              className="bg-secondary pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
               placeholder="Search"
               value={searchInput}
               onChange={handleChange}

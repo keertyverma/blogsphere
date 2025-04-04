@@ -30,7 +30,7 @@ const SearchedUserList = ({ searchTerm }: Props) => {
     >
       <Link
         to={`/user/${user.personalInfo.username}`}
-        className="flex gap-3 items-center max-lg:border-b border-border p-4 hover:bg-muted/50"
+        className="flex gap-3 items-center border-b border-border p-4 hover:bg-muted/50"
       >
         <div className="min-w-9">
           <img

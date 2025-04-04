@@ -68,8 +68,8 @@ const UserNavigationPanel = () => {
               />
             </div>
           </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
+          <MenubarContent className="px-0">
+            <MenubarItem className="pointer-events-none focus:bg-background  hover:dark:bg-background">
               <div className="flex gap-3 p-1">
                 <div className="w-10 h-10 rounded-full shadow-lg">
                   <img
@@ -94,36 +94,40 @@ const UserNavigationPanel = () => {
               to={`/user/${authUser.username}`}
               className="text-muted-foreground"
             >
-              <MenubarItem>
+              <MenubarItem className="focus:dark:bg-background hover:dark:bg-background">
                 <FaRegCircleUser className="text-lg mr-2" /> Profile
               </MenubarItem>
             </Link>
             <MenubarSeparator />
             <Link to="/bookmarks" className="text-muted-foreground">
-              <MenubarItem>
+              <MenubarItem className="focus:dark:bg-background hover:dark:bg-background">
                 <IoBookmarksOutline className="text-lg mr-2" /> Bookmarks
               </MenubarItem>
             </Link>
             <MenubarSeparator />
             <Link to="/settings/edit-profile" className="text-muted-foreground">
-              <MenubarItem>
+              <MenubarItem className="focus:dark:bg-background hover:dark:bg-background">
                 <IoSettingsOutline className="text-lg mr-2" /> Account Settings
               </MenubarItem>
             </Link>
             <MenubarSeparator />
             <Link to="/editor-guide" className="text-muted-foreground">
-              <MenubarItem>
+              <MenubarItem className="focus:dark:bg-background hover:dark:bg-background">
                 <IoReaderOutline className="text-lg mr-2" /> Editor Guide
               </MenubarItem>
             </Link>
             <MenubarSeparator />
-            <MenubarItem className="py-0" onClick={() => logoutUser()}>
+            <MenubarItem
+              className="py-0 focus:dark:bg-background hover:dark:bg-background"
+              onClick={() => logoutUser()}
+            >
               <Button
                 variant="secondary"
                 size="sm"
-                className="text-orange-800 p-0 bg-transparent font-medium"
+                className="text-orange-800 dark:text-destructive/90 p-0 bg-transparent hover:bg-transparent font-medium"
               >
-                <MdLogout className="text-lg mr-2 text-orange-800/90" /> Log out
+                <MdLogout className="text-lg mr-2 text-orange-800/90 dark:text-destructive/90" />{" "}
+                Log out
               </Button>
             </MenubarItem>
           </MenubarContent>

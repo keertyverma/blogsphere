@@ -102,33 +102,33 @@ const ShareBlog = ({ title, description, tags = [] }: Props) => {
         <MdIosShare className="text-xl text-secondary-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mt-2 mr-8 text-muted-foreground p-0">
-        <DropdownMenuItem className="p-1">
+        <DropdownMenuItem className="p-1 hover:dark:bg-background">
           <Button
             variant="secondary"
             onClick={copyToClipboard}
-            className="bg-transparent text-inherit hover:text-foreground w-full justify-start p-2"
+            className="bg-transparent text-inherit hover:text-foreground hover:dark:bg-background w-full justify-start p-2"
           >
             <IoIosLink className="text-lg mr-3" />
             Copy link
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="my-0" />
-        <DropdownMenuItem className="p-1">
+        <DropdownMenuItem className="p-1 hover:dark:bg-background">
           <Button
             variant="secondary"
             onClick={handleXShare}
-            className="bg-transparent text-inherit hover:text-foreground w-full justify-start p-2"
+            className="bg-transparent text-inherit hover:text-foreground hover:dark:bg-background w-full justify-start p-2"
           >
             <RiTwitterXFill className="text-lg mr-3" />
             Share to X
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="my-0" />
-        <DropdownMenuItem className="p-1">
+        <DropdownMenuItem className="p-1 hover:dark:bg-background">
           <Button
             variant="secondary"
             onClick={handleLinkedinShare}
-            className="bg-transparent text-inherit hover:text-foreground w-full justify-start p-2"
+            className="bg-transparent text-inherit hover:text-foreground hover:dark:bg-background w-full justify-start p-2"
           >
             <BsLinkedin className="text-lg mr-3" />
             Share to Linkedin
