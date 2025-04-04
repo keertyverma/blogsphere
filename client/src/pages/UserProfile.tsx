@@ -87,7 +87,6 @@ const UserProfile = () => {
         <section className="px-6 mx-auto md:max-w-[728px] flex flex-col gap-5 py-24">
           {/* user info */}
           {profileId && <UserInfo profileId={profileId} user={user} />}
-          <hr />
 
           {/* search input box */}
           <div className="relative w-full mx-auto md:p-0">
