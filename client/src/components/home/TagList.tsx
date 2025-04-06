@@ -106,7 +106,7 @@ const TagList = () => {
               }
             }}
           >
-            {category === "all" ? "home" : category}
+            {category}
           </Button>
         ))}
       </div>

@@ -31,6 +31,7 @@
     --radius: 0.5rem;
     --header: 210 20% 98%;
     --header-height: 4.375rem;
+    --text-highlight: 54 100% 60%;
   }
 
   .dark {
@@ -59,6 +60,7 @@
     --scrollbar-thumb-hover: 220 20% 45%;
     --ring: 263.4 70% 50.4%;
     --header: 222 49.4% 12.2%;
+    --text-highlight: 48 97% 59%;
   }
 }
 
@@ -534,7 +536,7 @@
 }
 
 .cdx-marker {
-  background-color: rgb(255, 255, 0) !important;
+  background-color: hsl(var(--text-highlight)) !important;
 }
 
 .ce-toolbar__actions {
