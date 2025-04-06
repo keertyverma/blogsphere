@@ -39,7 +39,7 @@ const UserNavigationPanel = () => {
       clearUserAuth();
       clearBlogReadTimestamps(); // clear blog read tracking timestamp
       setRedirectedUrl(null);
-      return navigate("/login");
+      return navigate("/");
     } catch (error) {
       if (!useAuthStore.getState().isTokenExpired) {
         showErrorToast("An error occurred. Please try again later.");

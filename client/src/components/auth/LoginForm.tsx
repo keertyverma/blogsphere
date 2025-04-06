@@ -58,7 +58,7 @@ const LoginForm = () => {
         navigate(redirectedUrl);
         clearRedirectedUrl();
       } else {
-        navigate("/");
+        navigate("/feed");
       }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again later.";
@@ -121,7 +121,7 @@ const LoginForm = () => {
           navigate(redirectedUrl);
           clearRedirectedUrl();
         } else {
-          navigate("/");
+          navigate("/feed");
         }
       }
     } catch (error) {

@@ -8,6 +8,7 @@ import { useMediaQuery } from "@react-hook/media-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AuthRedirect from "./components/auth/AuthRedirect";
 import ChangePassword from "./components/settings/ChangePassword";
 import EditProfile from "./components/settings/EditProfile";
 import SideNavbar from "./components/settings/SideNavbar";
@@ -23,8 +24,7 @@ import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import GooglePrivacyPolicy from "./pages/GooglePrivacyPolicy";
-import Home from "./pages/Home";
-import LandingPage from "./pages/LandingPage";
+import HomePage from "./pages/HomePage";
 import PublishedBlogPage from "./pages/PublishedBlogPage";
 import ResendVerification from "./pages/ResendVerification";
 import ResetPassword from "./pages/ResetPassword";
@@ -39,19 +39,38 @@ const App = () => {
     <main className="w-full h-screen">
       <ScrollToTopOnNavigate />
       <Routes>
-        <Route path="/landing" element={<LandingPage />} />
+        {/* Root path redirects based on auth status */}
+        <Route path="/" element={<AuthRedirect />} />
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          {/* Public Routes */}
+          <Route path="feed" element={<HomePage />} />
           <Route path="signup" element={<SignupForm />} />
           <Route path="login" element={<LoginForm />} />
           <Route path="search" element={<Search />} />
           <Route path="user/:username" element={<UserProfile />} />
-          <Route path="settings" element={<SideNavbar />}>
+          <Route path="editor-guide" element={<EditorGuide />} />
+          <Route path="privacy-policy" element={<GooglePrivacyPolicy />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="settings"
+            element={
+              <ProtectedRoute>
+                <SideNavbar />
+              </ProtectedRoute>
+            }
+          >
             <Route path="edit-profile" element={<EditProfile />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
-          <Route path="editor-guide" element={<EditorGuide />} />
-          <Route path="bookmarks" element={<Bookmarks />} />
+          <Route
+            path="bookmarks"
+            element={
+              <ProtectedRoute>
+                <Bookmarks />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Explicitly handle the /blogs/drafts route to prevent any conflicts with the dynamic /blogs/:blogId route. */}
           <Route path="blogs/drafts" element={<ErrorPage />} />
@@ -66,8 +85,25 @@ const App = () => {
           <Route path="blogs/:blogId" element={<PublishedBlogPage />} />
         </Route>
 
-        <Route path="/editor" element={<Editor />} />
-        <Route path="/editor/:blogId" element={<Editor />} />
+        {/* Editor (outside layout, protected) */}
+        <Route
+          path="/editor"
+          element={
+            <ProtectedRoute>
+              <Editor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/editor/:blogId"
+          element={
+            <ProtectedRoute>
+              <Editor />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Auth-related Public Pages (outside layout) */}
         <Route path="/verify-email" element={<EmailVerify />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
@@ -75,7 +111,7 @@ const App = () => {
           path="/resend-verification-link"
           element={<ResendVerification />}
         />
-        <Route path="/privacy-policy" element={<GooglePrivacyPolicy />} />
+        {/* Catch-all for unknown routes */}
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 

@@ -1,13 +1,7 @@
 import UserBookmarks from "@/components/blog/UserBookmarks";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
-import { useAuthStore } from "@/store";
-import { Navigate } from "react-router-dom";
 
 const Bookmarks = () => {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-
-  if (!isAuthenticated) return <Navigate to="/login" />;
-
   return (
     <AnimationWrapper>
       <div className="h-cover px-0 md:px-10">

@@ -106,7 +106,7 @@ const SignupForm = () => {
           navigate(redirectedUrl);
           clearRedirectedUrl();
         } else {
-          navigate("/");
+          navigate("/feed");
         }
       }
     } catch (error) {

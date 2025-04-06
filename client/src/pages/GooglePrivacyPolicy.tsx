@@ -1,6 +1,6 @@
 const GooglePrivacyPolicy = () => {
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="max-w-3xl mx-auto p-6 space-y-6 h-cover py-20">
       <div>
         <h1 className="text-center text-3xl font-bold">Privacy Policy</h1>
         <p className="text-center">Last updated: April 3, 2025</p>

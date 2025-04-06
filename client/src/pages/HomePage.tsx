@@ -3,15 +3,11 @@ import GetTrendingBlog from "@/components/home/GetTrendingBlog";
 import TagList from "@/components/home/TagList";
 import AnimationWrapper from "@/components/shared/AnimationWrapper";
 import InPageNavigation from "@/components/shared/InPageNavigation";
-import { useAuthStore } from "@/store";
 import { useMediaQuery } from "@react-hook/media-query";
 import { IoTrendingUpSharp } from "react-icons/io5";
-import { Navigate } from "react-router-dom";
 
-const Home = () => {
+const HomePage = () => {
   const isTabletOrLargerScreen = useMediaQuery("(min-width: 768px)");
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  if (!isAuthenticated) return <Navigate to="/login" />;
 
   return (
     <AnimationWrapper>
@@ -60,4 +56,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

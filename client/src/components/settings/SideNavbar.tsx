@@ -3,11 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 import { FaRegUserCircle } from "react-icons/fa";
 import { MdOutlineLock } from "react-icons/md";
-import { NavLink, Navigate, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { Button } from "../ui/button";
 
 const SideNavbar = () => {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { googleAuth } = useAuthStore((s) => s.user);
 
   const page = location.pathname.split("/")[2];
@@ -36,8 +35,6 @@ const SideNavbar = () => {
     setShowSideNav(false);
     pageStateRef?.current?.click();
   }, [pageUrl]);
-
-  if (!isAuthenticated) return <Navigate to="/login" />;
 
   return (
     <section className="relative flex max-md:flex-col gap-10 py-0 pt-20 m-0">

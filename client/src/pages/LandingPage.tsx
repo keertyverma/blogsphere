@@ -92,12 +92,19 @@ const LandingPage = () => {
             </p>
             {/* Where ideas meet curious minds. */}
           </div>
-          <div>
+          <div className="flex gap-4 max-sm:justify-center items-center">
             <Button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/signup")}
               className="text-base md:text-lg font-normal rounded-full"
             >
               Get Started
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/feed")}
+              className="text-base md:text-lg font-normal rounded-full text-primary hover:text-primary"
+            >
+              Discover Blogs
             </Button>
           </div>
         </div>
@@ -169,7 +176,7 @@ const LandingPage = () => {
           <div>
             <Button
               variant="outline"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/signup")}
               className="text-base md:text-lg font-normal text-primary dark:text-primary-foreground hover:text-primary max-sm:mt-2 rounded-full"
             >
               Get Started
