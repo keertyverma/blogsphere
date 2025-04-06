@@ -24,6 +24,7 @@ import ErrorPage from "./pages/ErrorPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import GooglePrivacyPolicy from "./pages/GooglePrivacyPolicy";
 import Home from "./pages/Home";
+import LandingPage from "./pages/LandingPage";
 import PublishedBlogPage from "./pages/PublishedBlogPage";
 import ResendVerification from "./pages/ResendVerification";
 import ResetPassword from "./pages/ResetPassword";
@@ -38,6 +39,7 @@ const App = () => {
     <main className="w-full h-screen">
       <ScrollToTopOnNavigate />
       <Routes>
+        <Route path="/landing" element={<LandingPage />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="signup" element={<SignupForm />} />
