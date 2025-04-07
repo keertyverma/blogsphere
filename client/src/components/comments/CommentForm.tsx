@@ -1,3 +1,4 @@
+import { useLoginPrompt } from "@/hooks/useLoginPrompt";
 import {
   useCreateComment,
   useGetUser,
@@ -6,7 +7,7 @@ import {
 import { handleProfileImgErr, showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import LoginPromptModal from "../shared/LoginPromptModal";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 
@@ -25,23 +26,28 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
   const [comment, setComment] = useState(
     existingComment ? existingComment.content : ""
   );
+
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
-  const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
-  const navigate = useNavigate();
-
   const { data: user, error: getUserError } = useGetUser(authUser.username);
   const {
     mutateAsync: createComment,
     isPending: isCreatingComment,
     error: creatingCommentError,
   } = useCreateComment();
-
   const {
     mutateAsync: updateComment,
     isPending: isUpdatingComment,
     error: updatingCommentError,
   } = useUpdateComment();
+  const {
+    showLoginPrompt,
+    loginPromptTitle,
+    loginPromptMessage,
+    promptLoginFor,
+    handlePromptConfirm,
+    handlePromptCancel,
+  } = useLoginPrompt();
 
   useEffect(() => {
     // This is done to prevent textrea from auto-focusing and opening keyboard on mobile
@@ -59,9 +65,7 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showErrorToast("Please log in to post a comment.");
-      setRedirectedUrl(location.pathname);
-      return navigate("/login");
+      return promptLoginFor("comment");
     }
 
     try {
@@ -152,6 +156,13 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
           </Button>
         </div>
       </form>
+      <LoginPromptModal
+        open={showLoginPrompt}
+        title={loginPromptTitle}
+        message={loginPromptMessage}
+        onConfirm={handlePromptConfirm}
+        onCancel={handlePromptCancel}
+      />
     </div>
   );
 };

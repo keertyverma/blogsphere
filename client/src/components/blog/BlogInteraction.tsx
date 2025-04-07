@@ -1,3 +1,4 @@
+import { useLoginPrompt } from "@/hooks/useLoginPrompt";
 import {
   useBookmarkStatus,
   useCreateBookmark,
@@ -16,6 +17,7 @@ import { useEffect, useState } from "react";
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import LoginPromptModal from "../shared/LoginPromptModal";
 import { Button } from "../ui/button";
 import BlogComment from "./BlogComment";
 import ManageBlog from "./ManageBlog";
@@ -51,10 +53,8 @@ const BlogInteraction = ({
     likes || {}
   );
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
-
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
   const navigate = useNavigate();
 
   const { mutateAsync: likePost } = useLikePost();
@@ -62,6 +62,14 @@ const BlogInteraction = ({
   const { mutateAsync: deleteBookmark } = useDeleteBookmark();
   const { data: bookmarkStatus, isLoading: isCheckingBookmarkStatus } =
     useBookmarkStatus(user.id, id);
+  const {
+    showLoginPrompt,
+    loginPromptTitle,
+    loginPromptMessage,
+    promptLoginFor,
+    handlePromptConfirm,
+    handlePromptCancel,
+  } = useLoginPrompt();
 
   useEffect(() => {
     // Sync state with API result (Only when fetching completes)
@@ -76,9 +84,7 @@ const BlogInteraction = ({
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      showErrorToast("Please login to like this blog");
-      setRedirectedUrl(location.pathname);
-      return navigate("/login");
+      return promptLoginFor("like");
     }
 
     // update like count in UI
@@ -104,9 +110,7 @@ const BlogInteraction = ({
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      showErrorToast("Please login to bookmark this blog");
-      setRedirectedUrl(location.pathname);
-      return navigate("/login");
+      return promptLoginFor("bookmark");
     }
 
     try {
@@ -220,6 +224,13 @@ const BlogInteraction = ({
           )}
         </div>
       </div>
+      <LoginPromptModal
+        open={showLoginPrompt}
+        title={loginPromptTitle}
+        message={loginPromptMessage}
+        onConfirm={handlePromptConfirm}
+        onCancel={handlePromptCancel}
+      />
       <hr className="border-border my-1" />
     </>
   );

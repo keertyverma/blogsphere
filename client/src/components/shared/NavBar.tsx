@@ -1,15 +1,32 @@
 import { Button } from "@/components/ui/button";
+import { useLoginPrompt } from "@/hooks/useLoginPrompt";
 import { useAuthStore } from "@/store";
 import { BsPencilSquare } from "react-icons/bs";
 import { IoSearch } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import UserNavigationPanel from "../user-menu/UserNavigationPanel";
 import DarkThemeToggler from "./DarkThemeToggler";
+import LoginPromptModal from "./LoginPromptModal";
 import Logo from "./Logo";
 
 const NavBar = () => {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const {
+    showLoginPrompt,
+    loginPromptTitle,
+    loginPromptMessage,
+    promptLoginFor,
+    handlePromptConfirm,
+    handlePromptCancel,
+  } = useLoginPrompt();
+
+  const handleWriteAction = () => {
+    if (!isAuthenticated) {
+      return promptLoginFor("write");
+    }
+    navigate("/editor");
+  };
 
   return (
     <nav className="navbar">
@@ -25,7 +42,7 @@ const NavBar = () => {
         </Button>
         <DarkThemeToggler />
         <Button
-          onClick={() => navigate("/editor")}
+          onClick={handleWriteAction}
           className="sm:flex-center max-sm:hidden rounded-full gap-2 ml-2"
         >
           <BsPencilSquare />
@@ -34,7 +51,7 @@ const NavBar = () => {
 
         {/* Mobile Screens */}
         <Button
-          onClick={() => navigate("/editor")}
+          onClick={handleWriteAction}
           variant="link"
           size="sm"
           className="max-sm:flex sm:hidden rounded-full gap-2"
@@ -62,6 +79,13 @@ const NavBar = () => {
           </>
         )}
       </div>
+      <LoginPromptModal
+        open={showLoginPrompt}
+        title={loginPromptTitle}
+        message={loginPromptMessage}
+        onConfirm={handlePromptConfirm}
+        onCancel={handlePromptCancel}
+      />
     </nav>
   );
 };

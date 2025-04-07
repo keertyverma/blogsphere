@@ -50,6 +50,7 @@ const LandingPage = () => {
               width={60}
               height={60}
               className="object-contain"
+              loading="lazy"
             />
             <h1 className="text-xl font-bold">BlogSphere</h1>
           </Link>
@@ -144,6 +145,7 @@ const LandingPage = () => {
                     src={icon}
                     alt={title}
                     className="w-24 h-24 md:w-36 md:h-36 mx-auto"
+                    loading="lazy"
                   />
                 </div>
 
@@ -194,6 +196,7 @@ const LandingPage = () => {
             width={50}
             height={50}
             className="object-contain"
+            loading="lazy"
           />
         </Link>
         <div>

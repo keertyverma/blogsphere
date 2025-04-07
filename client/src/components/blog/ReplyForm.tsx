@@ -1,8 +1,9 @@
+import { useLoginPrompt } from "@/hooks/useLoginPrompt";
 import { useCreateReply, useGetUser } from "@/lib/react-query/queries";
 import { handleProfileImgErr, showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import LoginPromptModal from "../shared/LoginPromptModal";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { Button } from "../ui/button";
 
@@ -19,24 +20,27 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authUser = useAuthStore((s) => s.user);
-  const setRedirectedUrl = useAuthStore((s) => s.setRedirectedUrl);
-  const navigate = useNavigate();
-
   const { data: user, error } = useGetUser(authUser.username);
   const {
     mutateAsync: createReply,
     isPending: isCreatingReply,
     error: creatingReplyError,
   } = useCreateReply();
+  const {
+    showLoginPrompt,
+    loginPromptTitle,
+    loginPromptMessage,
+    promptLoginFor,
+    handlePromptConfirm,
+    handlePromptCancel,
+  } = useLoginPrompt();
 
   if (error || creatingReplyError) console.error(error || creatingReplyError);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showErrorToast("Please log in to reply to this comment.");
-      setRedirectedUrl(location.pathname);
-      return navigate("/login");
+      return promptLoginFor("reply");
     }
     try {
       // create reply
@@ -118,6 +122,13 @@ const ReplyForm = ({ commentId, onClose, onSubmit }: Props) => {
           </div>
         )}
       </form>
+      <LoginPromptModal
+        open={showLoginPrompt}
+        title={loginPromptTitle}
+        message={loginPromptMessage}
+        onConfirm={handlePromptConfirm}
+        onCancel={handlePromptCancel}
+      />
     </div>
   );
 };
