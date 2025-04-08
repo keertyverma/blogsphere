@@ -10,6 +10,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { IoEyeOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import ManageBlog from "../blog/ManageBlog";
+import LazyImageWithBlur from "../shared/LazyImageWithBlur";
 
 interface Props {
   content: IBlog;
@@ -50,7 +51,7 @@ const BlogPostCard = ({
         <div className="flex justify-between">
           <Link to={`/user/${username}`}>
             <div className="flex flex-row gap-3 items-center">
-              <img
+              <LazyImageWithBlur
                 src={profileImage}
                 alt="user profile image"
                 className="w-9 h-9 object-cover rounded-full border-[1px] border-border"
@@ -85,11 +86,10 @@ const BlogPostCard = ({
             </div>
             {coverImgURL && (
               <div className="w-32 h-15 md:w-40 md:h-30">
-                <img
+                <LazyImageWithBlur
                   src={coverImgURL}
                   alt="blog cover image"
                   className="aspect-video object-cover rounded-md"
-                  loading="lazy"
                 />
               </div>
             )}
