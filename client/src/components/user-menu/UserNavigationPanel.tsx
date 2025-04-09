@@ -68,7 +68,7 @@ const UserNavigationPanel = () => {
               />
             </div>
           </MenubarTrigger>
-          <MenubarContent className="px-0">
+          <MenubarContent className="px-0 max-w-[250px]">
             <MenubarItem className="pointer-events-none focus:bg-background  hover:dark:bg-background">
               <div className="flex gap-3 p-1">
                 <div className="w-10 h-10 rounded-full shadow-lg">
@@ -80,7 +80,7 @@ const UserNavigationPanel = () => {
                   />
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="font-bold capitalize">
+                  <h2 className="font-bold capitalize max-w-[200px]">
                     {user?.personalInfo.fullname}
                   </h2>
                   <p className="font-medium text-muted-foreground">

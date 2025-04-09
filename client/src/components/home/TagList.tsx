@@ -14,10 +14,10 @@ const TagList = () => {
   const categories = [
     "all",
     "creativity",
+    "web dev",
     "programming",
     "technology",
     "artificial intelligence",
-    "web dev",
     "art",
     "science",
     "research",
