@@ -13,17 +13,14 @@ const TagList = () => {
   // TODO: Fetch popular tags from server
   const categories = [
     "all",
+    "creativity",
+    "programming",
+    "technology",
+    "artificial intelligence",
+    "web dev",
+    "art",
     "science",
     "research",
-    "photography",
-    "creativity",
-    "art",
-    "inspiration",
-    "artificial intelligence",
-    "react js",
-    "javascript",
-    "typescript",
-    "next js",
   ];
 
   // Reset selected tag on component mount
