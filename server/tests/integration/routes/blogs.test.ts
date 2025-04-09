@@ -612,7 +612,7 @@ describe("/api/v1/blogs", () => {
       expect(res.body.error).toMatchObject({
         code: "RESOURCE_NOT_FOUND",
         message: "The requested resource was not found.",
-        details: `No blog found with blogId = ${blogId}`,
+        details: `No blog found with blogId = ${blogId}.`,
       });
     });
 
@@ -624,24 +624,18 @@ describe("/api/v1/blogs", () => {
         blogId,
         activity: { totalReads: BlogTotalReads },
       } = publishedBlog;
-      const UserTotalReads = user.accountInfo.totalReads;
 
       const res = await exec(blogId);
 
       expect(res.statusCode).toBe(200);
-      const { blogId: updatedBlogId, author: authorId } = res.body.result;
+      const { blogId: updatedBlogId } = res.body.result;
       expect(updatedBlogId).toBe(blogId);
-      expect(authorId).toBeDefined();
-
       // check blog total read increment by 1
-      const blog = await Blog.findOne({ blogId });
+      const blog = await Blog.findOne({ blogId })
+        .select("activity.totalReads")
+        .lean();
       expect(blog).not.toBeNull();
       expect(blog?.activity.totalReads).toBe(BlogTotalReads + 1);
-
-      // check user total read increment by 1
-      const author = await User.findById(authorId);
-      expect(author).not.toBeNull();
-      expect(author?.accountInfo.totalReads).toBe(UserTotalReads + 1);
     });
   });
 

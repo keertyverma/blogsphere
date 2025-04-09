@@ -17,7 +17,6 @@ interface IUser extends Document {
   googleAuth: boolean;
   accountInfo: {
     totalPosts: number;
-    totalReads: number;
   };
   updatedAt: Date;
   socialLinks: {
@@ -100,10 +99,6 @@ const userSchema = new Schema(
     },
     accountInfo: {
       totalPosts: {
-        type: Number,
-        default: 0,
-      },
-      totalReads: {
         type: Number,
         default: 0,
       },

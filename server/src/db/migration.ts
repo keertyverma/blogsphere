@@ -1,9 +1,17 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import mongoose from "mongoose";
-import { Blog } from "../models/blog.model";
 import { connectDB } from ".";
-import { User } from "../models/user.model";
+import { Blog } from "../models/blog.model";
 import { Comment } from "../models/comment.model";
+import { User } from "../models/user.model";
+
+// Load environment variables
+const result = dotenv.config({
+  path: `.env.${process.env.NODE_ENV || "development"}`,
+});
+if (result.error) {
+  console.error(`❌ Failed to load env file: ${result.error}`);
+}
 
 connectDB();
 
@@ -12,7 +20,7 @@ db.once("open", async () => {
   try {
     // await addPublishedAtFieldToBlog();
     // await addLastEditedAtFieldToBlog();
-    await removeBlogsFieldFromUser();
+    // await removeBlogsFieldFromUser();
     console.log("Migration completed successfully!");
   } catch (error) {
     console.error("Migration failed:", error);

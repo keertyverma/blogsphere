@@ -13,7 +13,7 @@
     "test": "jest --verbose --coverage --detectOpenHandles",
     "test:unit": "jest --testPathPattern=tests/unit --verbose --coverage --detectOpenHandles",
     "test:integration": "jest --testPathPattern=tests/integration --verbose --detectOpenHandles",
-    "migrate-data": "ts-node src/db/migration.ts",
+    "migrate-data": "NODE_ENV=development ts-node src/db/migration.ts",
     "cleanup-unused-images": "ts-node src/utils/cleanupImages.ts",
     "send-email": "ts-node src/utils/mailer/run.ts"
   },

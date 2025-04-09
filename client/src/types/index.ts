@@ -72,7 +72,6 @@ export interface IAuthor {
   };
   accountInfo: {
     totalPosts: number;
-    totalReads: number;
   };
   socialLinks: SocialLink;
   createdAt: string;

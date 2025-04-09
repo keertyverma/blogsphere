@@ -16,7 +16,7 @@ const UserInfo = ({ profileId, user }: Props) => {
 
   const {
     personalInfo: { fullname, profileImage, bio },
-    accountInfo: { totalPosts, totalReads },
+    accountInfo: { totalPosts },
     createdAt,
     socialLinks,
   } = user;
@@ -43,17 +43,6 @@ const UserInfo = ({ profileId, user }: Props) => {
                 </span>
                 Blogs
               </p>
-              {totalReads > 0 && (
-                <>
-                  <span>|</span>
-                  <p>
-                    <span className="font-semibold mr-1">
-                      {formateNumber(totalReads)}
-                    </span>
-                    Views
-                  </p>
-                </>
-              )}
             </div>
           )}
         </div>

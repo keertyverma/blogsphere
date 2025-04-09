@@ -321,29 +321,22 @@ const updateReadCount = async (req: Request, res: Response) => {
   logger.debug(
     `${req.method} Request on Route -> ${req.baseUrl}/:blogId/readCount`
   );
-
   const { blogId } = req.params;
 
   // Increment the blog's total read count by 1
-  const blog = await Blog.findOneAndUpdate(
+  const { matchedCount, modifiedCount } = await Blog.updateOne(
     { blogId },
-    { $inc: { "activity.totalReads": 1 } },
-    { new: true }
-  )
-    .select("blogId author -_id")
-    .lean();
-
-  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
-
-  // Increment author's total read count by 1
-  const updatedUserResult = await User.updateOne(
-    { _id: blog.author },
-    { $inc: { "accountInfo.totalReads": 1 } }
+    { $inc: { "activity.totalReads": 1 } }
   );
 
-  if (updatedUserResult.modifiedCount === 0) {
+  if (!matchedCount) {
+    logger.warn(`No blog found with blogId = ${blogId}.`);
+    throw new NotFoundError(`No blog found with blogId = ${blogId}.`);
+  }
+  if (!modifiedCount) {
+    logger.error(`Failed to update read count for blogId = ${blogId}`);
     throw new CustomAPIError(
-      "Failed to update the author's total read count.",
+      "Failed to update blog read count.",
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
@@ -352,8 +345,7 @@ const updateReadCount = async (req: Request, res: Response) => {
     status: APIStatus.SUCCESS,
     statusCode: StatusCodes.OK,
     result: {
-      blogId: blog.blogId,
-      author: blog.author,
+      blogId,
     },
   };
 
