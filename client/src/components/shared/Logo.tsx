@@ -1,16 +1,24 @@
 import { Link } from "react-router-dom";
 
-const Logo = () => {
+interface LogoProps {
+  withText?: boolean;
+  className?: string;
+}
+
+const Logo = ({ className, withText = true }: LogoProps) => {
   return (
-    <Link to="/" className="flex items-center md:mr-12">
+    <Link to="/" className="flex items-center">
       <img
-        src="/assets/images/logo.png"
+        src={"/assets/images/logo.svg"}
         alt="logo"
-        width={60}
-        height={60}
-        className="object-contain"
+        width={45}
+        height={45}
+        className={`object-contain ${className}`}
+        loading="lazy"
       />
-      <h1 className="text-xl font-bold max-sm:hidden">BlogSphere</h1>
+      {withText && (
+        <h1 className="text-xl font-bold max-sm:hidden ml-1">BlogSphere</h1>
+      )}
     </Link>
   );
 };

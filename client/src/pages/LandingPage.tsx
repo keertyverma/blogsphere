@@ -1,4 +1,5 @@
 import DarkThemeToggler from "@/components/shared/DarkThemeToggler";
+import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -43,17 +44,7 @@ const LandingPage = () => {
     <div>
       <header>
         <nav className="navbar">
-          <Link to="/" className="flex items-center md:mr-12">
-            <img
-              src="/assets/images/logo.png"
-              alt="logo"
-              width={60}
-              height={60}
-              className="object-contain"
-              loading="lazy"
-            />
-            <h1 className="text-xl font-bold">BlogSphere</h1>
-          </Link>
+          <Logo />
           <div className="flex items-center gap-1 md:gap-4 ml-auto">
             <DarkThemeToggler />
             <Button
@@ -189,16 +180,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="py-6 md:py-8 px-14 text-sm bg-secondary text-secondary-foreground text-center flex items-center justify-center flex-col md:flex-row gap-2">
-        <Link to="/">
-          <img
-            src="/assets/images/logo.png"
-            alt="logo"
-            width={50}
-            height={50}
-            className="object-contain"
-            loading="lazy"
-          />
-        </Link>
+        <Logo withText={false} className="w-10 h-10" />
         <div>
           <p>
             &copy; {new Date().getFullYear()} Blogsphere{" "}
