@@ -265,7 +265,7 @@
 
   #text-editor a,
   .blog-page-content a {
-    @apply underline-link;
+    @apply underline font-medium;
   }
 
   #text-editor img {
