@@ -22,8 +22,16 @@ const BlogContent = ({ block }: Props) => {
     );
   }
 
-  if (type === "paragraph")
-    return <p dangerouslySetInnerHTML={{ __html: safeHTML }}></p>;
+  if (type === "paragraph") {
+    // Preserve empty lines in paragraph
+    return (
+      <p
+        dangerouslySetInnerHTML={{
+          __html: safeHTML?.trim() ? safeHTML : "&nbsp;",
+        }}
+      ></p>
+    );
+  }
 
   if (type === "image")
     return (

@@ -9,9 +9,9 @@ import {
   showErrorToast,
   showSuccessToast,
 } from "@/lib/utils";
-import { INITIAL_BLOG, useAuthStore, useEditorStore } from "@/store";
+import { useAuthStore, useEditorStore } from "@/store";
 import { ICreateDraftBlog } from "@/types";
-import EditorJS, { OutputData } from "@editorjs/editorjs";
+import EditorJS, { OutputBlockData, OutputData } from "@editorjs/editorjs";
 import { useMediaQuery } from "@react-hook/media-query";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IoMdSave } from "react-icons/io";
@@ -237,15 +237,42 @@ const BlogEditor = () => {
     }
   };
 
+  const isMeaningfulBlock = (block: OutputBlockData): boolean => {
+    if (!block || !block.type) return false;
+    if (block.type === "paragraph") {
+      // Remove all &nbsp; and whitespace to determine if any meaningful content exists
+      const rawText = block.data?.text || "";
+      const cleanedText = rawText.replace(/&nbsp;/g, "").trim();
+      return cleanedText !== "";
+    }
+
+    return true; // assume other blocks are meaningful by default
+  };
+
   const hasUnsavedChanges = (): boolean => {
     // compare current editor blog and last saved blog for any unsaved changes
     const { blog: currentBlog, lastSavedBlog } = useEditorStore.getState();
+
     const isTitleChanged = currentBlog.title !== lastSavedBlog.title;
     const isCoverImageChanged =
       currentBlog.coverImgURL !== lastSavedBlog.coverImgURL;
-    const isContentChanged =
-      JSON.stringify(currentBlog.content.blocks) !==
-      JSON.stringify(lastSavedBlog.content.blocks);
+    // compare blog content
+    const currentContentBlocks = currentBlog.content.blocks;
+    const lastSavedContentBlocks = lastSavedBlog.content.blocks;
+    let isContentChanged;
+    if (blogId) {
+      // Edit mode - Compare full block content including empty paragraphs
+      // because even changes in spacing (empty blocks) are meaningful here
+      isContentChanged =
+        JSON.stringify(currentContentBlocks) !==
+        JSON.stringify(lastSavedContentBlocks);
+    } else {
+      // Create mode — only mark as unsaved if there's meaningful (non-empty) content
+      // Prevents false "unsaved changes" when the editor contains only placeholder text
+      isContentChanged = currentContentBlocks.some((block) =>
+        isMeaningfulBlock(block)
+      );
+    }
 
     return isTitleChanged || isCoverImageChanged || isContentChanged;
   };
@@ -258,12 +285,12 @@ const BlogEditor = () => {
         setBlog({ ...blog, content });
       }
 
-      // Prevent preview if the draft is empty
+      // Prevent preview if the draft is empty in create mode (i.e., no meaningful content)
       const { blog: currentBlog } = useEditorStore.getState();
-      if (
-        !blogId &&
-        JSON.stringify(currentBlog) === JSON.stringify(INITIAL_BLOG)
-      ) {
+      const hasMeaningfulContent = currentBlog.content.blocks.some((block) =>
+        isMeaningfulBlock(block)
+      );
+      if (!blogId && !hasMeaningfulContent) {
         return showErrorToast(
           "Your draft is empty. Make changes to preview it."
         );
@@ -339,13 +366,6 @@ const BlogEditor = () => {
             <AlertDialogFooter className="flex-row justify-end gap-3 md:gap-2">
               <Button
                 variant="secondary"
-                onClick={() => setIsConfirmDialogOpen(false)}
-                aria-label="Stay on the editor"
-              >
-                No
-              </Button>
-              <Button
-                variant="destructive"
                 onClick={() => {
                   setIsConfirmDialogOpen(false);
                   navigate("/"); // navigate back to feed page
@@ -353,6 +373,12 @@ const BlogEditor = () => {
                 aria-label="Exit editor without saving"
               >
                 Yes
+              </Button>
+              <Button
+                onClick={() => setIsConfirmDialogOpen(false)}
+                aria-label="Stay on the editor"
+              >
+                No
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

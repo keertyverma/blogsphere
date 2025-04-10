@@ -4,6 +4,7 @@ import Image from "@editorjs/image";
 import InlineCode from "@editorjs/inline-code";
 import EditorjsList from "@editorjs/list";
 import Marker from "@editorjs/marker";
+import Paragraph from "@editorjs/paragraph";
 import Quote from "@editorjs/quote";
 
 import {
@@ -19,6 +20,13 @@ export const editorJSTools = {
       placeholder: "Heading...",
       levels: [1, 2, 3, 4, 5, 6],
       defaultLevel: 2,
+    },
+  },
+  paragraph: {
+    class: Paragraph,
+    inlineToolbar: true,
+    config: {
+      preserveBlank: true,
     },
   },
   list: {

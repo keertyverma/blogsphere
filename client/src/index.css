@@ -599,6 +599,11 @@
   padding: 8px !important;
 }
 
+.ce-paragraph[data-placeholder-active]::before {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.7;
+}
+
 .image-tool--uploading .image-tool__image {
   width: 21.87rem;
   margin-left: auto;
