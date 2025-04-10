@@ -445,7 +445,7 @@
 }
 
 .codecup__textarea {
-  color: hsl(var(--foreground)) !important;
+  color: transparent !important;
   caret-color: hsl(var(--foreground)) !important;
 }
 
