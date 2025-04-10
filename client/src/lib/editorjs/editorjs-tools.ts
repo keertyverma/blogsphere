@@ -6,6 +6,7 @@ import EditorjsList from "@editorjs/list";
 import Marker from "@editorjs/marker";
 import Paragraph from "@editorjs/paragraph";
 import Quote from "@editorjs/quote";
+import { Divider } from "./editorjs-divider";
 
 import {
   CustomEditorJsCodeBlock,
@@ -66,4 +67,5 @@ export const editorJSTools = {
   marker: Marker,
   inlineCode: InlineCode,
   embed: Embed,
+  divider: Divider,
 };

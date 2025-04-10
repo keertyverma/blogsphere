@@ -289,6 +289,10 @@
     @apply text-base md:text-lg leading-6 md:leading-7;
   }
 
+  .divider {
+    @apply my-1 md:my-3 border border-border;
+  }
+
   /* editor guide page */
   .documentation {
     @apply text-base lg:text-lg leading-6 lg:leading-7 dark:text-[rgb(212_212_216)];

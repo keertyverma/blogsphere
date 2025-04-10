@@ -52,6 +52,8 @@ const BlogContent = ({ block }: Props) => {
   if (type === "code")
     return <BlockCode code={data.code} language={data.language || "plain"} />;
 
+  if (type === "divider") return <hr className="divider" />;
+
   // Fallback for missing or incorrect data
   return <div>Invalid block data</div>;
 };
