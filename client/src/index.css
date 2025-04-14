@@ -334,6 +334,10 @@
   }
 }
 
+.ce-paragraph span[style*="background-color"] {
+  background-color: hsla(var(--primary) / 0.3) !important;
+}
+
 .blog-page-content ol {
   counter-reset: list-counter;
 }

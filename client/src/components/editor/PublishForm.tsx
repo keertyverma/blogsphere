@@ -260,13 +260,20 @@ const PublishForm = () => {
                     />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
-                  {descriptionValue.length > 0 &&
-                    descriptionValue.length < DESCRIPTION_CHAR_LIMIT && (
-                      <FormDescription className="text-sm text-muted-foreground text-right">
-                        {DESCRIPTION_CHAR_LIMIT - descriptionValue.length}{" "}
-                        characters left
-                      </FormDescription>
-                    )}
+                  {descriptionValue.length > 0 && (
+                    <FormDescription className="text-sm text-muted-foreground text-right">
+                      <span
+                        className={
+                          DESCRIPTION_CHAR_LIMIT - descriptionValue.length < 0
+                            ? "text-destructive"
+                            : ""
+                        }
+                      >
+                        {DESCRIPTION_CHAR_LIMIT - descriptionValue.length}
+                      </span>{" "}
+                      characters left
+                    </FormDescription>
+                  )}
                 </FormItem>
               )}
             />
