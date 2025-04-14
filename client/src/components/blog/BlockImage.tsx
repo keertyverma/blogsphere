@@ -18,16 +18,18 @@ const BlockImage = ({
   return (
     <div
       className={`w-full flex justify-center my-4 md:my-6 ${
-        withBackground ? "bg-muted p-4 rounded-lg" : ""
+        withBackground
+          ? "bg-input p-4 rounded-lg border border-border overflow-hidden"
+          : ""
       }`}
     >
       {/* ensures caption stays centered relative to image */}
       <div className={`${stretched ? "w-full" : "inline-block"}`}>
         <img
           src={url}
-          className={`rounded-lg object-cover aspect-video ${
+          className={`rounded-lg object-cover ${
             stretched ? "w-full" : "mx-auto"
-          }`}
+          } ${withBackground ? "max-w-[60%] mx-auto" : ""}`}
         />
         {safeCaption && (
           <p

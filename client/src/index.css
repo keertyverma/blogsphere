@@ -269,7 +269,7 @@
   }
 
   #text-editor img {
-    @apply aspect-video rounded-lg object-cover;
+    @apply rounded-lg object-cover;
   }
 
   #text-editor ol {
@@ -621,6 +621,7 @@
 
 .image-tool--withBackground .image-tool__image {
   border: 1px solid hsl(var(--border)) !important;
+  border-radius: 8px !important;
 }
 
 .image-tool__caption {
