@@ -116,6 +116,7 @@ const BlogEditor = () => {
       holder: "text-editor",
       data: content,
       tools: editorJSTools,
+      inlineToolbar: ["bold", "italic", "link", "marker", "inlineCode"],
       placeholder: isMobile
         ? "Start writing... Use '+' toolbar for more options."
         : "Start writing... Use '+' toolbar for more options or type '/' for commands.",

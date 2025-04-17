@@ -71,7 +71,7 @@ const EditorJsUserGuide = () => {
             </li>
             <li>
               <p>
-                The Tune Settings icon{"  "}
+                The Block Tune Setting icon{"  "}
                 <PiDotsSixVerticalBold className="inline bg-input border-border border-[0.8px] rounded-md text-2xl p-0.5" />
                 {"  "}appears on each block and allows modifications such as
               </p>
@@ -79,7 +79,7 @@ const EditorJsUserGuide = () => {
               <ul>
                 <li>Moving the block Up or Down</li>
                 <li>Deleting the block</li>
-                <li>Changing specific settings based on the block type</li>
+                <li>Changing specific setting based on the block type</li>
               </ul>
             </li>
           </ul>
@@ -149,7 +149,7 @@ const EditorJsUserGuide = () => {
             <li>Use headings to structure your content hierarchically.</li>
             <li>From H1 (main title) to H6 (sub-sub-sub-sections).</li>
             <li>
-              Use Tune Settings{"  "}
+              Use block tune setting{"  "}
               <PiDotsSixVerticalBold className="inline bg-input border-border border-[0.8px] rounded-md text-2xl p-0.5" />
               {"  "}to adjust the heading level from H1 to H6.
             </li>
@@ -224,7 +224,7 @@ const EditorJsUserGuide = () => {
               </div>
             </li>
             <li>
-              Use Tune Settings {"  "}
+              Use block tune setting {"  "}
               <PiDotsSixVerticalBold className="inline bg-input border-border border-[0.8px] rounded-md text-2xl p-0.5" />
               {"  "} to switch between unordered, ordered, and checklist styles.
             </li>
@@ -291,7 +291,8 @@ const EditorJsUserGuide = () => {
             <li>
               <strong>Image Customization</strong>
               <p className="mt-1">
-                Use Tune Settings to modify images with the following options:
+                Use block tune setting to modify images with the following
+                options:
               </p>
               <ul>
                 <li>
@@ -344,7 +345,7 @@ const EditorJsUserGuide = () => {
               <strong>Syntax Highlighting:</strong>
               <ul>
                 <li>
-                  Select the programming language from the tune settings.{" "}
+                  Select the programming language from the block tune setting.{" "}
                 </li>
                 <li>
                   The code will be formatted with appropriate colors and styles.

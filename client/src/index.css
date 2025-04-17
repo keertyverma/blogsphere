@@ -334,6 +334,10 @@
   }
 }
 
+.ce-block b {
+  font-weight: 600 !important;
+}
+
 .ce-paragraph span[style*="background-color"] {
   background-color: hsla(var(--primary) / 0.3) !important;
 }
@@ -382,25 +386,51 @@
 .ce-conversion-toolbar,
 .ce-conversion-tool,
 .ce-conversion-tool__icon,
-.ce-popover-item__icon,
+.ce-settings .ce-popover-item__icon,
+.ce-toolbar .ce-popover-item__icon,
 .ce-inline-tool-input,
 .cdx-search-field,
 .ce-popover,
-.image-tool .cdx-button,
-.ce-inline-toolbar {
+.ce-popover__container,
+.image-tool .cdx-button {
   background-color: hsl(var(--header)) !important;
 }
 
+.ce-settings .ce-popover-item__icon,
+.ce-toolbar .ce-popover-item__icon {
+  border-radius: 5px !important;
+  margin-right: 10px !important;
+  box-shadow: 0 0 0 1px rgba(201, 201, 204, 0.48) !important;
+}
+
+.ce-popover-item-separator__line {
+  background-color: hsl(var(--border)) !important;
+}
+
+/* Inline tool bar */
 .ce-inline-toolbar {
   padding: 2px 5px !important;
 }
-
-.ce-inline-toolbar__buttons button {
-  margin-left: 5px !important;
+.ce-inline-toolbar .ce-popover--inline {
+  position: initial !important;
+}
+.ce-inline-toolbar .ce-popover__items {
+  gap: 5px !important;
+}
+.ce-inline-toolbar .ce-popover-item--active,
+.ce-inline-toolbar .ce-inline-tool--active {
+  border: 1px solid hsl(var(--border));
+}
+.ce-popover-item,
+.ce-inline-tool {
+  color: hsl(var(--foreground)) !important;
 }
 
-.ce-popover-item {
-  color: hsl(var(--foreground)) !important;
+.ce-popover-item--confirmation {
+  background-color: hsl(var(--destructive));
+}
+.ce-popover-item--confirmation[data-item-name="delete"] path {
+  stroke: hsl(var(--destructive));
 }
 
 .ce-popover-item--confirmation:hover {
