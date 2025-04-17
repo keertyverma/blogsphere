@@ -20,6 +20,7 @@ import { MdOutlinePreview } from "react-icons/md";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { editorJSTools } from "@/lib/editorjs/editorjs-tools";
+import { handleOrphanedListPaste } from "@/lib/editorjs/pasteHandler";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import DarkThemeToggler from "../shared/DarkThemeToggler";
 import FileUploader from "../shared/FileUploader";
@@ -111,15 +112,24 @@ const BlogEditor = () => {
   useHidePopoverItems();
 
   const initializeEditor = (content = {} as OutputData) => {
-    setTextEditor(
-      new EditorJS({
-        holder: "text-editor",
-        data: content,
-        tools: editorJSTools,
-        placeholder: isMobile
-          ? "Start writing... Use '+' toolbar for more options."
-          : "Start writing... Use '+' toolbar for more options or type '/' for commands.",
-      })
+    const editor = new EditorJS({
+      holder: "text-editor",
+      data: content,
+      tools: editorJSTools,
+      placeholder: isMobile
+        ? "Start writing... Use '+' toolbar for more options."
+        : "Start writing... Use '+' toolbar for more options or type '/' for commands.",
+    });
+
+    setTextEditor(editor);
+
+    // Intercepting the paste event on editor to handle orphaned <li> elements (list items without a parent <ul>/<ol>)
+    // before EditorJS processes them, preventing EditorJS from creating empty list blocks for each <li> element.
+    const editorContainer = document.getElementById("text-editor");
+    editorContainer?.addEventListener(
+      "paste",
+      (e: ClipboardEvent) => handleOrphanedListPaste(e, editor),
+      { capture: true }
     );
   };
 
