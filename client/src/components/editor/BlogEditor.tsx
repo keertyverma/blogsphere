@@ -20,7 +20,7 @@ import { MdOutlinePreview } from "react-icons/md";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { editorJSTools } from "@/lib/editorjs/editorjs-tools";
-import { handleOrphanedListPaste } from "@/lib/editorjs/pasteHandler";
+import { onEditorPaste } from "@/lib/editorjs/pasteHandler";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import DarkThemeToggler from "../shared/DarkThemeToggler";
 import FileUploader from "../shared/FileUploader";
@@ -124,12 +124,11 @@ const BlogEditor = () => {
 
     setTextEditor(editor);
 
-    // Intercepting the paste event on editor to handle orphaned <li> elements (list items without a parent <ul>/<ol>)
-    // before EditorJS processes them, preventing EditorJS from creating empty list blocks for each <li> element.
+    // Intercept paste event on editor before EditorJS handles it to support custom list handling.
     const editorContainer = document.getElementById("text-editor");
     editorContainer?.addEventListener(
       "paste",
-      (e: ClipboardEvent) => handleOrphanedListPaste(e, editor),
+      (e: ClipboardEvent) => onEditorPaste(e, editor),
       { capture: true }
     );
   };

@@ -2,38 +2,36 @@ import EditorJS from "@editorjs/editorjs";
 import DOMPurify from "dompurify";
 
 /**
- * Handles the paste event with a custom workflow for orphaned <li> elements (list items without a parent <ul>/<ol>)
+ * Handles paste events inside the editor.
+ *
+ * Why this is needed:
+ * EditorJS has inconsistent behavior when pasting list content:
+ * - If the HTML contains orphaned <li> elements (no <ul>/<ol> parent), EditorJS creates separate empty list blocks.
+ * - If the HTML contains a structured <ul>/<ol>, EditorJS parses it correctly,
+ *   but the resulting list block becomes non-editable (e.g., list type switching is broken) until re-rendered.
  *
  * Workflow:
- * 1. Extract HTML content from clipboard.
- * 2. Sanitize the content to prevent XSS or invalid HTML.
- * 3. Check if the content contains only orphaned <li> elements (without <ul>/<ol>).
- *    - This handles a known limitation in EditorJS where such content creates multiple empty list blocks.
- * 4. If matched, bypass EditorJS's default paste handling.
- * 5. Manually insert a well-structured list block into the editor.
- * 6. If not matched, let EditorJS handle the paste normally.
+ * - Extract and sanitize HTML content from clipboard.
+ * - Detects if pasted content is a structured list or orphaned list items.
+ * - Delegates handling accordingly:
+ *   - Structured list: Let EditorJS parse and then re-render to fix list type behavior.
+ *   - Orphaned list items: Prevent default behavior and insert a clean list block manually.
  *
- * @param event - The ClipboardEvent triggered by paste.
- * @param editor - The EditorJS instance used to insert blocks.
+ * @param event - The paste event triggered by user action.
+ * @param editor - The EditorJS instance to interact with.
  */
-export const handleOrphanedListPaste = (
-  event: ClipboardEvent,
-  editor: EditorJS
-) => {
-  const htmlContent = event.clipboardData?.getData("text/html");
-  if (!htmlContent) return;
+export const onEditorPaste = (event: ClipboardEvent, editor: EditorJS) => {
+  const html = event.clipboardData?.getData("text/html");
+  if (!html) return;
 
-  const sanitizedHTMLContent = sanitizeHTMLContent(htmlContent);
+  const sanitizedHTML = sanitizeHTMLContent(html);
 
-  // Check if pasted content contains unwrapped <li> elements (list items without <ul>/<ol> wrapper)
-  const liElements = extractLiElementsIfUnwrapped(sanitizedHTMLContent);
-  if (!liElements?.length) return;
-
-  // Bypasses EditorJS's default paste handling
-  event.preventDefault();
-  event.stopImmediatePropagation();
-
-  handleListPaste(liElements, editor);
+  if (isStructuredListPaste(sanitizedHTML)) {
+    // Let EditorJS do its default block generation then re-render to enable list type conversion
+    scheduleEditorRerender(editor);
+  } else if (containsOrphanedListItems(sanitizedHTML)) {
+    handleOrphanedListPaste(event, sanitizedHTML, editor);
+  }
 };
 
 /**
@@ -47,6 +45,53 @@ const sanitizeHTMLContent = (htmlContent: string): string => {
   return DOMPurify.sanitize(htmlContent, {
     USE_PROFILES: { html: true },
   });
+};
+
+/**
+ * Forces the editor to save and immediately re-render its content.
+ * - Useful in cases where EditorJS creates a correct structure but doesn't allow some interactions (like changing list type).
+ * - Called after pasting structured content to ensure list blocks behave correctly.
+ * @param editor - The EditorJS instance whose content needs re-rendering.
+ */
+const scheduleEditorRerender = (editor: EditorJS) => {
+  setTimeout(async () => {
+    const content = await editor.save();
+    await editor.render(content);
+  }, 50); // Delay to allow default block parsing
+};
+
+const isStructuredListPaste = (html: string): boolean => {
+  // Checks if the HTML content contains a valid structured list (<ul> or <ol>).
+  return /<(ul|ol)(\s[^>]*)?>/.test(html);
+};
+
+const containsOrphanedListItems = (html: string): boolean => {
+  // Checks if HTML contains orphaned <li> tags that are not wrapped in <ul> or <ol>.
+  return /<li(\s[^>]*)?>/.test(html) && !isStructuredListPaste(html);
+};
+
+/**
+ * Handles the paste of orphaned <li> elements (list items not wrapped inside <ul>/<ol>)
+ * by preventing EditorJS's default behavior, which creates multiple empty list blocks,
+ * and manually inserts a properly structured list block instead.
+ * @param event - The ClipboardEvent triggered by paste.
+ * @param sanitizedHTML - Already sanitized HTML string from clipboard.
+ * @param editor - The EditorJS instance used to insert blocks.
+ */
+export const handleOrphanedListPaste = (
+  event: ClipboardEvent,
+  sanitizedHTML: string,
+  editor: EditorJS
+) => {
+  // Check if pasted content contains unwrapped <li> elements (list items without <ul>/<ol> wrapper)
+  const liElements = extractLiElementsIfUnwrapped(sanitizedHTML);
+  if (!liElements?.length) return;
+
+  // Bypasses EditorJS's default paste handling
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  handleListPaste(liElements, editor);
 };
 
 /**
