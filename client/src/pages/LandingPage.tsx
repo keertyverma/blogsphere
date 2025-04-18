@@ -28,10 +28,10 @@ const features = [
     icon: "/assets/images/feature-blog-interaction.svg",
     title: "Engage and Connect",
     points: [
-      "Likes and join conversations with threaded comments.",
+      "Like posts and join conversations with threaded comments.",
       "Bookmark favorite blogs for quick access.",
       "Share to X, LinkedIn, or copy links.",
-      "Explore trending blogs highlights.",
+      "Discover What’s Trending: Top Blogs.",
       "Infinite feed scroll for seamless browsing.",
     ],
   },
@@ -44,7 +44,10 @@ const LandingPage = () => {
     <div>
       <header>
         <nav className="navbar">
-          <Logo />
+          <div className="flex items-center">
+            <Logo />
+            <h1 className="md:hidden text-lg font-bold ml-1">BlogSphere</h1>
+          </div>
           <div className="flex items-center gap-1 md:gap-4 ml-auto">
             <DarkThemeToggler />
             <Button
@@ -135,7 +138,7 @@ const LandingPage = () => {
                   <img
                     src={icon}
                     alt={title}
-                    className="w-24 h-24 md:w-36 md:h-36 mx-auto"
+                    className="w-32 h-32 md:w-36 md:h-36 mx-auto"
                     loading="lazy"
                   />
                 </div>
@@ -179,31 +182,46 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-6 md:py-8 px-14 text-sm bg-secondary text-secondary-foreground text-center flex items-center justify-center flex-col md:flex-row gap-2">
-        <Logo withText={false} className="w-10 h-10" />
-        <div>
-          <p>
-            &copy; {new Date().getFullYear()} Blogsphere{" "}
+      <footer className="py-6 md:py-8 px-14 text-sm bg-secondary text-secondary-foreground text-center flex items-center justify-center md:justify-around flex-col md:flex-row">
+        <div className="flex-center gap-1">
+          <Logo withText={false} className="w-10 h-10" />{" "}
+          <p className="text-muted-foreground flex max-sm:flex-col">
             <span>
-              | Built by{" "}
-              <a
-                href="https://github.com/keertyverma"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline"
-              >
-                Keerty 👩🏻‍💻
-              </a>
-            </span>
-            <span className="text-muted-foreground"></span>
-          </p>
-          <p className="mt-1 text-muted-foreground">
-            <Link to="/privacy-policy" className="hover:underline">
               {" "}
-              Privacy Policy{" "}
-            </Link>
+              Copyright &copy; {new Date().getFullYear()} BlogSphere.&nbsp;
+            </span>
+            <span>
+              All right reserved.{" "}
+              <Link
+                to="/privacy-policy"
+                className="hover:underline text-muted-foreground md:hidden"
+              >
+                {" "}
+                Privacy Policy{" "}
+              </Link>
+            </span>
           </p>
         </div>
+
+        <Link
+          to="/privacy-policy"
+          className="hover:underline text-muted-foreground max-sm:hidden"
+        >
+          {" "}
+          Privacy Policy{" "}
+        </Link>
+
+        <p className="mt-3 md:mt-0">
+          Built by{" "}
+          <a
+            href="https://github.com/keertyverma"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline text-primary"
+          >
+            Keerty 👩🏻‍💻
+          </a>
+        </p>
       </footer>
     </div>
   );

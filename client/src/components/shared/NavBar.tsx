@@ -66,7 +66,7 @@ const NavBar = () => {
             <Button
               onClick={() => navigate("/login")}
               variant="outline"
-              className="max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
+              className="max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:text-primary-foreground max-sm:active:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
             >
               Log in
             </Button>

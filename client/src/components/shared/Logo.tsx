@@ -17,7 +17,9 @@ const Logo = ({ className, withText = true }: LogoProps) => {
         loading="lazy"
       />
       {withText && (
-        <h1 className="text-xl font-bold max-sm:hidden ml-1">BlogSphere</h1>
+        <h1 className="max-sm:hidden text-lg md:text-xl font-bold ml-1">
+          BlogSphere
+        </h1>
       )}
     </Link>
   );
