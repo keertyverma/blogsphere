@@ -240,13 +240,20 @@ export const showConfetti = () => {
 /**
  * Sanitizes user-generated HTML content to remove potential security threats like XSS attacks.
  *
- * This function uses DOMPurify to clean the input HTML string, ensuring that only
- * safe HTML elements and attributes are retained. It is particularly useful
- * for rendering user-generated content in a secure manner.
+ * This function first replaces newline characters (`\n`) with HTML line break tags (`<br>`) to preserve formatting when rendered in the browser.
+ * It then uses DOMPurify to clean the input HTML string, ensuring that only safe HTML elements and attributes are retained.
+ * This is especially useful for safely displaying user-generated content without exposing the application to malicious code or unexpected HTML behavior.
  *
  * @param {string} htmlContent - The HTML content to be sanitized.
  * @returns {string} - A sanitized HTML string with unsafe elements removed.
  */
 export const sanitizeContent = (htmlContent: string): string => {
-  return DOMPurify.sanitize(htmlContent);
+  if (!htmlContent?.trim()) return "";
+
+  // Convert both real newlines and literal `\n`
+  const withLineBreaks = htmlContent
+    .replace(/\\n/g, "<br>")
+    .replace(/\n/g, "<br>");
+
+  return DOMPurify.sanitize(withLineBreaks);
 };

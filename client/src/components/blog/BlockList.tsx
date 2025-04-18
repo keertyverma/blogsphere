@@ -34,7 +34,11 @@ const BlockList = ({ style, items }: Props) => {
       return (
         <li key={index} className="my-1.5">
           {style === "ordered" && (
-            <span dangerouslySetInnerHTML={{ __html: safeHTML }} />
+            <span
+              className="content"
+              style={{ paddingLeft: `${level * (isMobile ? 1 : 1.2)}rem` }}
+              dangerouslySetInnerHTML={{ __html: safeHTML }}
+            />
           )}
           {style === "unordered" && (
             <span dangerouslySetInnerHTML={{ __html: safeHTML }} />
@@ -54,7 +58,7 @@ const BlockList = ({ style, items }: Props) => {
 
           {/* Recursively render nested lists if items exist */}
           {item.items.length > 0 && (
-            <ListTag style={style} level={level + 1} isMobile={isMobile}>
+            <ListTag style={style} level={level + 1}>
               {renderListItems(item.items, index, level + 1)}
             </ListTag>
           )}
@@ -63,7 +67,7 @@ const BlockList = ({ style, items }: Props) => {
     });
 
   return (
-    <ListTag style={style} level={0} isMobile={isMobile}>
+    <ListTag style={style} level={0}>
       {renderListItems(items)}
     </ListTag>
   );
@@ -73,19 +77,13 @@ const ListTag = ({
   style,
   children,
   level,
-  isMobile,
 }: {
   style: "ordered" | "unordered" | "checklist";
   children: React.ReactNode;
   level: number;
-  isMobile: boolean;
 }) => {
   if (style === "ordered") {
-    return (
-      <ol style={{ paddingLeft: `${level * (isMobile ? 1 : 1.3)}rem` }}>
-        {children}
-      </ol>
-    );
+    return <ol style={{ paddingLeft: `${level * 1.3}rem` }}>{children}</ol>;
   } else if (style === "unordered") {
     return <ul className="pl-4 md:pl-5 list-disc">{children}</ul>;
   } else {
