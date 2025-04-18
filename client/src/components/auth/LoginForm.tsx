@@ -21,7 +21,7 @@ import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import AnimationWrapper from "../shared/AnimationWrapper";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import FullScreenLoader from "../shared/FullScreenLoader";
 import { Input } from "../ui/input";
 
 const LoginForm = () => {
@@ -153,6 +153,10 @@ const LoginForm = () => {
 
   return (
     <AnimationWrapper>
+      {(isLoginUser || isGoogleLoginUser) && (
+        <FullScreenLoader message="Logging you in..." />
+      )}
+
       <section className="h-cover flex-center py-[20vh]">
         <Form {...form}>
           <form
@@ -229,13 +233,10 @@ const LoginForm = () => {
 
             <Button
               type="submit"
-              className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
+              className="h-12 rounded-full mt-2 text-sm md:text-base"
               disabled={isLoginUser}
             >
               Log in
-              {isLoginUser && (
-                <LoadingSpinner className="h-6 md:w-6 text-white" />
-              )}
             </Button>
 
             {verificationMsg && (
@@ -273,9 +274,6 @@ const LoginForm = () => {
             >
               <FcGoogle size={20} />
               Continue with Google
-              {isGoogleLoginUser && (
-                <LoadingSpinner className="h-6 md:w-6 text-muted-foreground" />
-              )}
             </Button>
           </form>
         </Form>

@@ -28,7 +28,7 @@ import { Input } from "../ui/input";
 import { googleAuth } from "@/lib/firebase/Firebase";
 import { showErrorToast, showSuccessToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import FullScreenLoader from "../shared/FullScreenLoader";
 
 const SignupForm = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -138,6 +138,15 @@ const SignupForm = () => {
 
   return (
     <AnimationWrapper>
+      {(isCreatingUser || isGoogleLoginUser) && (
+        <FullScreenLoader
+          message={
+            isGoogleLoginUser
+              ? "Signing you in with Google..."
+              : "Creating your account..."
+          }
+        />
+      )}
       <section className="h-cover flex-center py-[20vh]">
         <Form {...form}>
           <form
@@ -243,13 +252,10 @@ const SignupForm = () => {
 
             <Button
               type="submit"
-              className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
+              className="h-12 rounded-full mt-2 text-sm md:text-base"
               disabled={isCreatingUser}
             >
               Sign Up
-              {isCreatingUser && (
-                <LoadingSpinner className="h-6 md:w-6 text-white" />
-              )}
             </Button>
 
             <p className="text-sm md:text-base text-center text-secondary-foreground">
@@ -273,9 +279,6 @@ const SignupForm = () => {
             >
               <FcGoogle size={20} />
               Continue with Google
-              {isGoogleLoginUser && (
-                <LoadingSpinner className="h-6 md:w-6 text-muted-foreground" />
-              )}
             </Button>
           </form>
         </Form>
