@@ -1,4 +1,3 @@
-import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForgotPassword } from "@/lib/react-query/queries";
@@ -69,10 +68,6 @@ const ForgotPassword = () => {
 
   return (
     <div className="w-full h-full">
-      <nav className="navbar">
-        <Logo />
-      </nav>
-
       <section className="h-cover flex-center flex-col py-[20vh]">
         <div className="max-w-[450px] flex-center flex-col">
           <h2 className="text-xl md:text-2xl font-semibold capitalize text-center">

@@ -1,14 +1,15 @@
 import { Route, Routes } from "react-router-dom";
 import LoginForm from "./components/auth/LoginForm";
 import SignupForm from "./components/auth/SignupForm";
-import Layout from "./pages/Layout";
+import HomeLayout from "./components/layout/HomeLayout";
 import Search from "./pages/Search";
 
 import { useMediaQuery } from "@react-hook/media-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthRedirect from "./components/auth/AuthRedirect";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import LandingLayout from "./components/layout/LandingLayout";
 import ChangePassword from "./components/settings/ChangePassword";
 import EditProfile from "./components/settings/EditProfile";
 import SideNavbar from "./components/settings/SideNavbar";
@@ -41,15 +42,28 @@ const App = () => {
       <Routes>
         {/* Root path redirects based on auth status */}
         <Route path="/" element={<AuthRedirect />} />
-        <Route path="/" element={<Layout />}>
-          {/* Public Routes */}
-          <Route path="feed" element={<HomePage />} />
+        {/* Public Routes */}
+        <Route path="/" element={<LandingLayout />}>
           <Route path="signup" element={<SignupForm />} />
           <Route path="login" element={<LoginForm />} />
+          <Route path="verify-email" element={<EmailVerify />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+          <Route
+            path="resend-verification-link"
+            element={<ResendVerification />}
+          />
+          <Route path="privacy-policy" element={<GooglePrivacyPolicy />} />
+          {/* Catch-all for unknown routes */}
+          <Route path="*" element={<ErrorPage />} />
+        </Route>
+
+        <Route path="/" element={<HomeLayout />}>
+          {/* Public Routes */}
+          <Route path="feed" element={<HomePage />} />
           <Route path="search" element={<Search />} />
           <Route path="user/:username" element={<UserProfile />} />
           <Route path="editor-guide" element={<EditorGuide />} />
-          <Route path="privacy-policy" element={<GooglePrivacyPolicy />} />
 
           {/* Protected Routes */}
           <Route
@@ -102,17 +116,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* Auth-related Public Pages (outside layout) */}
-        <Route path="/verify-email" element={<EmailVerify />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route
-          path="/resend-verification-link"
-          element={<ResendVerification />}
-        />
-        {/* Catch-all for unknown routes */}
-        <Route path="*" element={<ErrorPage />} />
       </Routes>
 
       <ToastContainer

@@ -1,7 +1,5 @@
-import DarkThemeToggler from "@/components/shared/DarkThemeToggler";
-import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const features = [
   {
@@ -42,31 +40,6 @@ const LandingPage = () => {
 
   return (
     <div>
-      <header>
-        <nav className="navbar">
-          <div className="flex items-center">
-            <Logo />
-            <h1 className="md:hidden text-lg font-bold ml-1">BlogSphere</h1>
-          </div>
-          <div className="flex items-center gap-1 md:gap-4 ml-auto">
-            <DarkThemeToggler />
-            <Button
-              onClick={() => navigate("/login")}
-              variant="outline"
-              className="max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
-            >
-              Log in
-            </Button>
-            <Button
-              onClick={() => navigate("/signup")}
-              className="max-sm:hidden rounded-full"
-            >
-              Sign up
-            </Button>
-          </div>
-        </nav>
-      </header>
-
       {/* Hero Section */}
       <section className="pt-20 pb-4 md:py-32 md:pb-20 flex gap-6 md:gap-1 flex-col md:flex-row">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 xl:px-14 text-center md:text-left flex flex-col gap-2 md:gap-4">
@@ -180,49 +153,6 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-6 md:py-8 px-14 text-sm bg-secondary text-secondary-foreground text-center flex items-center justify-center md:justify-around flex-col md:flex-row">
-        <div className="flex-center gap-1">
-          <Logo withText={false} className="w-10 h-10" />{" "}
-          <p className="text-muted-foreground flex max-sm:flex-col">
-            <span>
-              {" "}
-              Copyright &copy; {new Date().getFullYear()} BlogSphere.&nbsp;
-            </span>
-            <span>
-              All right reserved.{" "}
-              <Link
-                to="/privacy-policy"
-                className="hover:underline text-muted-foreground md:hidden"
-              >
-                {" "}
-                Privacy Policy{" "}
-              </Link>
-            </span>
-          </p>
-        </div>
-
-        <Link
-          to="/privacy-policy"
-          className="hover:underline text-muted-foreground max-sm:hidden"
-        >
-          {" "}
-          Privacy Policy{" "}
-        </Link>
-
-        <p className="mt-3 md:mt-0">
-          Built by{" "}
-          <a
-            href="https://github.com/keertyverma"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline text-primary"
-          >
-            Keerty 👩🏻‍💻
-          </a>
-        </p>
-      </footer>
     </div>
   );
 };

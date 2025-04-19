@@ -1,4 +1,3 @@
-import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -7,9 +6,6 @@ const ErrorPage = () => {
 
   return (
     <>
-      <nav className="navbar">
-        <Logo />
-      </nav>
       <section className="h-cover flex-center flex-col md:flex-row gap-10 text-center">
         <img
           src="/assets/images/page_not_found_error.jpeg"

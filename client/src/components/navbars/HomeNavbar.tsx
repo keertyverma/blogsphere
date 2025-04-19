@@ -4,12 +4,12 @@ import { useAuthStore } from "@/store";
 import { BsPencilSquare } from "react-icons/bs";
 import { IoSearch } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import DarkThemeToggler from "../shared/DarkThemeToggler";
+import LoginPromptModal from "../shared/LoginPromptModal";
+import Logo from "../shared/Logo";
 import UserNavigationPanel from "../user-menu/UserNavigationPanel";
-import DarkThemeToggler from "./DarkThemeToggler";
-import LoginPromptModal from "./LoginPromptModal";
-import Logo from "./Logo";
 
-const NavBar = () => {
+const HomeNavbar = () => {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const {
@@ -90,4 +90,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default HomeNavbar;

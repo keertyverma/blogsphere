@@ -1,4 +1,3 @@
-import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useVerifyEmail } from "@/lib/react-query/queries";
@@ -87,10 +86,6 @@ const EmailVerify = () => {
 
   return (
     <div className="w-full h-full">
-      <nav className="navbar">
-        <Logo />
-      </nav>
-
       <section className="h-cover flex-center py-[20vh]">
         {isVerified ? (
           <div className="flex-center flex-col gap-3 text-center">
