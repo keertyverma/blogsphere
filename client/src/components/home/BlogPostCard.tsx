@@ -96,39 +96,46 @@ const BlogPostCard = ({
           </div>
         </Link>
       </section>
-      <section className="flex justify-between p-0 max-lg:mb-6">
-        {/* Show blog stats - total likes and read count only for published blogs */}
-        <div className="flex items-center justify-center gap-3 text-muted-foreground">
-          {showLikeCount && (
-            <div className="flex-center gap-1">
-              <FaRegHeart />
-              {activity && activity?.totalLikes > 0 && (
-                <p className="text-sm">{formateNumber(activity.totalLikes)}</p>
-              )}
-            </div>
-          )}
+      <Link to={blogPageUrl}>
+        <section className="flex justify-between p-0 max-lg:mb-6">
+          {/* Show blog stats - total likes and read count only for published blogs */}
 
-          {showReadCount && (
-            <div className="flex-center gap-1">
-              <IoEyeOutline className="text-lg" />
-              {activity && activity?.totalReads > 0 && (
-                <p className="text-sm">{formateNumber(activity.totalReads)}</p>
-              )}
-            </div>
-          )}
-        </div>
+          <div className="flex items-center justify-center gap-3 text-muted-foreground">
+            {showLikeCount && (
+              <div className="flex-center gap-1">
+                <FaRegHeart />
+                {activity && activity?.totalLikes > 0 && (
+                  <p className="text-sm">
+                    {formateNumber(activity.totalLikes)}
+                  </p>
+                )}
+              </div>
+            )}
 
-        <div className="flex gap-2">
-          {tags?.slice(0, 2).map((tag, i) => (
-            <span
-              key={i}
-              className="text-xs lg:text-sm font-medium text-muted-foreground bg-secondary p-1 px-2 rounded-full truncate max-w-[120px] lg:max-w-[240px] capitalize"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      </section>
+            {showReadCount && (
+              <div className="flex-center gap-1">
+                <IoEyeOutline className="text-lg" />
+                {activity && activity?.totalReads > 0 && (
+                  <p className="text-sm">
+                    {formateNumber(activity.totalReads)}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            {tags?.slice(0, 2).map((tag, i) => (
+              <span
+                key={i}
+                className="text-xs lg:text-sm font-medium text-muted-foreground bg-secondary p-1 px-2 rounded-full truncate max-w-[120px] lg:max-w-[240px] capitalize"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </section>
+      </Link>
     </article>
   );
 };
