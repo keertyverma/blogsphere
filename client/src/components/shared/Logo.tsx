@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 interface LogoProps {
   withText?: boolean;
   className?: string;
+  isHome?: boolean;
 }
 
-const Logo = ({ className, withText = true }: LogoProps) => {
+const Logo = ({ className, withText = true, isHome = false }: LogoProps) => {
   return (
     <Link to="/" className="flex items-center">
       <img
@@ -17,7 +18,11 @@ const Logo = ({ className, withText = true }: LogoProps) => {
         loading="lazy"
       />
       {withText && (
-        <h1 className="max-sm:hidden text-lg md:text-xl font-bold ml-1">
+        <h1
+          className={`text-lg md:text-xl font-bold ml-1 ${
+            isHome ? "max-sm:hidden" : ""
+          }`}
+        >
           BlogSphere
         </h1>
       )}

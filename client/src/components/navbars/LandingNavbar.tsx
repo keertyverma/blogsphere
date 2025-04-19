@@ -10,7 +10,6 @@ const LandingNavbar = () => {
     <nav className="navbar">
       <div className="flex items-center">
         <Logo />
-        <h1 className="md:hidden text-lg font-bold ml-1">BlogSphere</h1>
       </div>
       <div className="flex items-center gap-1 md:gap-4 ml-auto">
         <DarkThemeToggler />

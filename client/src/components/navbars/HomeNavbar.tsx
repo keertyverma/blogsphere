@@ -30,7 +30,7 @@ const HomeNavbar = () => {
 
   return (
     <nav className="navbar">
-      <Logo />
+      <Logo isHome />
       <div className="flex items-center gap-1 md:gap-4 ml-auto">
         <Button
           variant="ghost"
