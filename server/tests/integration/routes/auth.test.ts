@@ -200,7 +200,7 @@ describe("/api/v1/auth", () => {
       expect(res.body.status).toBe("success");
 
       const responseData = res.body.result;
-      expect(responseData.fullname).toBe(fullname.toLowerCase());
+      expect(responseData.fullname).toBe(fullname);
       expect(responseData.email).toBe(email);
       expect(responseData.username).toBe(username);
       expect(responseData.profileImage).toBe(profileImage);

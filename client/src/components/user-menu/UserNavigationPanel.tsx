@@ -1,6 +1,7 @@
 import { useGetUser, useLogout } from "@/lib/react-query/queries";
 import {
   clearBlogReadTimestamps,
+  getUserDisplayName,
   handleProfileImgErr,
   showErrorToast,
 } from "@/lib/utils";
@@ -80,8 +81,8 @@ const UserNavigationPanel = () => {
                   />
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="font-bold capitalize max-w-[200px]">
-                    {user?.personalInfo.fullname}
+                  <h2 className="font-bold max-w-[200px]">
+                    {getUserDisplayName(user?.personalInfo.fullname)}
                   </h2>
                   <p className="font-medium text-muted-foreground">
                     @{authUser.username}

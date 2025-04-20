@@ -1,4 +1,8 @@
-import { handleProfileImgErr, getTimeAgo } from "@/lib/utils";
+import {
+  handleProfileImgErr,
+  getTimeAgo,
+  getUserDisplayName,
+} from "@/lib/utils";
 import { IBlog } from "@/types";
 import { Link } from "react-router-dom";
 
@@ -36,8 +40,8 @@ const TrendingBlogPost = ({ blog, index }: Props) => {
               onError={handleProfileImgErr}
             />
             <div className="flex-col text-sm ">
-              <p className="text-secondary-foreground font-medium capitalize">
-                {fullname}
+              <p className="text-secondary-foreground font-medium">
+                {getUserDisplayName(fullname)}
               </p>
               <p className="text-muted-foreground font-normal">
                 {publishedAt && getTimeAgo(publishedAt)}

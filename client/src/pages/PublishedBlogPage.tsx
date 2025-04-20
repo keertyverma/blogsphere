@@ -3,9 +3,9 @@ import BlogInteraction from "@/components/blog/BlogInteraction";
 import BlogPageSkeleton from "@/components/blog/BlogPageSkeleton";
 import { useGetPublishedBlog, useUpdateReads } from "@/lib/react-query/queries";
 import {
-  capitalize,
   formatDate,
   getLastReadTimestamp,
+  getUserDisplayName,
   handleProfileImgErr,
   setLastReadTimestamp,
   showErrorToast,
@@ -65,7 +65,9 @@ const PublishedBlogPage = () => {
       } = blog;
 
       // Set blog page title
-      document.title = `${title} | by ${capitalize(authorName)} | BlogSphere`;
+      document.title = `${title} | by ${getUserDisplayName(
+        authorName
+      )} | BlogSphere`;
       return () => {
         document.title = "BlogSphere"; // Reset title on unmount
       };
@@ -135,8 +137,8 @@ const PublishedBlogPage = () => {
               onError={handleProfileImgErr}
             />
             <div className="flex flex-col gap-1">
-              <p className="text-base text-secondary-foreground font-medium capitalize">
-                {fullname}
+              <p className="text-base text-secondary-foreground font-medium">
+                {getUserDisplayName(fullname)}
               </p>
               <p className="text-sm text-muted-foreground font-normal">
                 Published on {publishedAt && formatDate(publishedAt)}

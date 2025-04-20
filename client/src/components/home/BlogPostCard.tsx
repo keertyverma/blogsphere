@@ -2,6 +2,7 @@ import {
   formatDate,
   formateNumber,
   getTimeAgo,
+  getUserDisplayName,
   handleProfileImgErr,
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
@@ -58,8 +59,8 @@ const BlogPostCard = ({
                 onError={handleProfileImgErr}
               />
               <div className="flex-col text-sm ">
-                <p className="text-secondary-foreground font-semibold capitalize">
-                  {fullname}
+                <p className="text-secondary-foreground font-semibold">
+                  {getUserDisplayName(fullname)}
                 </p>
                 <p className="text-muted-foreground font-normal">
                   {publishedAt && showTimeAgo

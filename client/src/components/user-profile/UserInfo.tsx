@@ -1,4 +1,9 @@
-import { formatDate, formateNumber, handleProfileImgErr } from "@/lib/utils";
+import {
+  formatDate,
+  formateNumber,
+  getUserDisplayName,
+  handleProfileImgErr,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor } from "@/types";
 import { LuCalendarDays } from "react-icons/lu";
@@ -33,7 +38,9 @@ const UserInfo = ({ profileId, user }: Props) => {
         </div>
 
         <div className="flex flex-col gap-1 justify-center">
-          <h1 className="text-xl font-semibold capitalize">{fullname}</h1>
+          <h1 className="text-xl font-semibold">
+            {getUserDisplayName(fullname)}
+          </h1>
           <p className="text-muted-foreground leading-5">{bio}</p>
           {totalPosts > 0 && (
             <div className="text-sm text-secondary-foreground mt-1 flex gap-1">

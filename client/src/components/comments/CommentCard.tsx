@@ -1,4 +1,9 @@
-import { getTimeAgo, handleProfileImgErr, truncateText } from "@/lib/utils";
+import {
+  getTimeAgo,
+  getUserDisplayName,
+  handleProfileImgErr,
+  truncateText,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IComment } from "@/types";
 import { Fragment, useState } from "react";
@@ -79,8 +84,8 @@ const CommentCard = ({ comment, classname, onEdit }: Props) => {
             />
             <div className="flex-col text-sm ">
               <div className="flex gap-2">
-                <p className="text-secondary-foreground font-semibold capitalize">
-                  {fullname}
+                <p className="text-secondary-foreground font-semibold">
+                  {getUserDisplayName(fullname)}
                 </p>
                 {commentedByUserId === blogAuthor && (
                   <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full dark:bg-green-800 dark:text-green-50">

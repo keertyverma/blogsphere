@@ -4,7 +4,11 @@ import {
   useGetUser,
   useUpdateComment,
 } from "@/lib/react-query/queries";
-import { handleProfileImgErr, showErrorToast } from "@/lib/utils";
+import {
+  getUserDisplayName,
+  handleProfileImgErr,
+  showErrorToast,
+} from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import LoginPromptModal from "../shared/LoginPromptModal";
@@ -115,8 +119,8 @@ const CommentForm = ({ blogId, existingComment, closeEditForm }: Props) => {
             className="w-10 h-10 object-cover rounded-full border-[1px] border-border shadow-lg"
             onError={handleProfileImgErr}
           />
-          <p className="font-semibold capitalize">
-            {user?.personalInfo.fullname}
+          <p className="font-semibold">
+            {getUserDisplayName(user?.personalInfo.fullname)}
           </p>
         </div>
       )}

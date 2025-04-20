@@ -139,13 +139,6 @@ export const truncateText = (text: string, maxLength: number) => {
     : truncated;
 };
 
-export const capitalize = (text: string): string => {
-  return text
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-};
-
 /**
  * Validates the content of a block to ensure it is not empty or invalid.
  * This function checks the content of various block types (e.g., paragraph, header, list, image, quote, code)
@@ -256,4 +249,22 @@ export const sanitizeContent = (htmlContent: string): string => {
     .replace(/\n/g, "<br>");
 
   return DOMPurify.sanitize(withLineBreaks);
+};
+
+/**
+ * Returns a display-friendly version of the user's name.
+ * - If the name is all lowercase, it capitalizes each word (e.g., " john doe " → "John Doe").
+ * - Otherwise, returns the name as-is (to respect user input like "McDonald" or "LeBron").
+ */
+export const getUserDisplayName = (name?: string): string => {
+  if (!name?.trim()) return "";
+
+  const isAllLowerCase = name === name.toLowerCase();
+  return isAllLowerCase
+    ? name
+        .trim()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    : name;
 };

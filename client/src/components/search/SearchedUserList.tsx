@@ -2,7 +2,7 @@ import { useGetSearchedUsers } from "@/lib/react-query/queries";
 import { Link } from "react-router-dom";
 import AnimationWrapper from "../shared/AnimationWrapper";
 import UserListSkeleton from "./UserListSkeleton";
-import { handleProfileImgErr } from "@/lib/utils";
+import { getUserDisplayName, handleProfileImgErr } from "@/lib/utils";
 
 interface Props {
   searchTerm: string;
@@ -42,8 +42,8 @@ const SearchedUserList = ({ searchTerm }: Props) => {
         </div>
 
         <div className="flex-col tracking-tight">
-          <p className="text-base text-secondary-foreground font-semibold capitalize line-clamp-2">
-            {user.personalInfo.fullname}
+          <p className="text-base text-secondary-foreground font-semibold line-clamp-2">
+            {getUserDisplayName(user.personalInfo.fullname)}
           </p>
           <p className="text-sm text-muted-foreground font-normal">
             {`@${user.personalInfo.username}`}

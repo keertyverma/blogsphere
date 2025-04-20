@@ -155,7 +155,7 @@ describe("/api/v1/users", () => {
       const responseData = res.body.result;
       const { id, fullname, email, username, profileImage } = responseData;
       expect(id).toBeDefined();
-      expect(fullname).toBe(userData.fullname.toLowerCase());
+      expect(fullname).toBe(userData.fullname);
       expect(email).toBe(userData.email);
       expect(username).toBe(userData.email.split("@")[0]);
       expect(profileImage).toMatch(/api\.dicebear\.com/);
@@ -237,7 +237,7 @@ describe("/api/v1/users", () => {
         (user) => user.personalInfo.username === "mickey"
       );
       expect(user.personalInfo.fullname).toBe(
-        existingUser.personalInfo.fullname.toLowerCase()
+        existingUser.personalInfo.fullname
       );
       expect(user.personalInfo.username).toBe(
         existingUser.personalInfo.username

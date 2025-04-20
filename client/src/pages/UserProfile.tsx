@@ -7,7 +7,7 @@ import UserDraftBlogList from "@/components/user-profile/UserDraftBlogList";
 import UserInfo from "@/components/user-profile/UserInfo";
 import UserPublishedBlogList from "@/components/user-profile/UserPublishedBlogList";
 import { useGetUser } from "@/lib/react-query/queries";
-import { capitalize } from "@/lib/utils";
+import { getUserDisplayName } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -25,7 +25,9 @@ const UserProfile = () => {
 
   useEffect(() => {
     if (user && user?.personalInfo?.fullname) {
-      document.title = `${capitalize(user.personalInfo.fullname)} - BlogSphere`;
+      document.title = `${getUserDisplayName(
+        user.personalInfo.fullname
+      )} - BlogSphere`;
 
       return () => {
         document.title = "BlogSphere"; // Reset title on unmount
