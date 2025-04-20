@@ -147,11 +147,11 @@ const SignupForm = () => {
           }
         />
       )}
-      <section className="h-cover flex-center py-[20vh]">
+      <section className="h-cover flex-center pt-[18vh]">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignup)}
-            className="w-[90%] max-w-[400px] flex flex-col gap-2 md:gap-3"
+            className="w-[90%] max-w-[400px] md:max-w-[450px] flex flex-col gap-2 md:gap-3 md:auth-container"
           >
             <div className="text-center">
               <h2 className="h3-bold md:h2-bold capitalize">join us today</h2>
@@ -280,6 +280,16 @@ const SignupForm = () => {
               <FcGoogle size={20} />
               Continue with Google
             </Button>
+            <p className="mt-4 text-sm text-center text-muted-foreground">
+              By signing up, you agree to BlogSphere's
+              <a
+                href="/privacy-policy"
+                className="no-underline hover:underline ml-1"
+              >
+                Privacy Policy
+              </a>
+              .
+            </p>
           </form>
         </Form>
       </section>

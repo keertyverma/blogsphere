@@ -11,7 +11,7 @@ const LandingNavbar = () => {
       <div className="flex items-center">
         <Logo />
       </div>
-      <div className="flex items-center gap-1 md:gap-4 ml-auto">
+      <div className="flex items-center gap-2 md:gap-4 ml-auto">
         <DarkThemeToggler />
         <Button
           onClick={() => navigate("/login")}

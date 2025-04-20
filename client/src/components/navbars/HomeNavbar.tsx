@@ -31,7 +31,7 @@ const HomeNavbar = () => {
   return (
     <nav className="navbar">
       <Logo isHome />
-      <div className="flex items-center gap-1 md:gap-4 ml-auto">
+      <div className="flex items-center gap-2 md:gap-4 ml-auto">
         <Button
           variant="ghost"
           size="sm"
@@ -41,6 +41,7 @@ const HomeNavbar = () => {
           <IoSearch className="text-muted-foreground text-lg" />
         </Button>
         <DarkThemeToggler />
+
         <Button
           onClick={handleWriteAction}
           className="sm:flex-center max-sm:hidden rounded-full gap-2 ml-2"
@@ -48,13 +49,12 @@ const HomeNavbar = () => {
           <BsPencilSquare />
           Write
         </Button>
-
         {/* Mobile Screens */}
         <Button
           onClick={handleWriteAction}
           variant="link"
           size="sm"
-          className="max-sm:flex sm:hidden rounded-full gap-2"
+          className="sm:hidden"
         >
           <BsPencilSquare className="text-2xl" />
         </Button>

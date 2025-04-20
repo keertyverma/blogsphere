@@ -1,6 +1,6 @@
-const GooglePrivacyPolicy = () => {
+const PrivacyPolicy = () => {
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6 h-cover py-20">
+    <div className="max-w-3xl mx-auto p-6 space-y-6 h-cover pt-20 pb-10">
       <div>
         <h1 className="text-center text-3xl font-bold">Privacy Policy</h1>
         <p className="text-center">Last updated: April 3, 2025</p>
@@ -8,13 +8,25 @@ const GooglePrivacyPolicy = () => {
 
       <div>
         <h2 className="text-xl font-semibold">1. Information We Collect</h2>
-        <p className="ml-6">We collect personal information, including:</p>
+        <p className="ml-6">
+          We collect personal information based on how you choose to signup or
+          login:
+        </p>
         <ul className="list-disc pl-12">
-          <li>Email address (for authentication)</li>
-          <li>Display name and profile picture (for user account creation)</li>
           <li>
-            Any additional information you choose to provide in your user
-            profile
+            <span className="font-semibold">
+              If you use email and password:
+            </span>
+            <br />
+            We collect your email address and full name during registration. You
+            can optionally upload a profile picture later by editing your user
+            profile.
+          </li>
+          <li className="mt-1">
+            <span className="font-semibold">If you log in with Google:</span>
+            <br />
+            We collect your email address, fullname, and profile picture from
+            your Google account.
           </li>
         </ul>
       </div>
@@ -73,4 +85,4 @@ const GooglePrivacyPolicy = () => {
   );
 };
 
-export default GooglePrivacyPolicy;
+export default PrivacyPolicy;

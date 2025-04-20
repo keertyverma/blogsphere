@@ -124,15 +124,14 @@ const BlogInteraction = ({
         setIsBookmarked(true);
         await createBookmark(id as string);
         showSuccessToast(
-          <div className="flex-center space-x-2">
+          <div className="flex-center space-x-4">
             <span>Blog saved</span>
             <Button
               variant="outline"
-              size="sm"
-              className="bg-input text-popover-foreground rounded-md border-[1px] border-muted-foreground p-1 text-base capitalize hover:no-underline"
+              className="rounded-full hover:bg-input focus:bg-input active:bg-input"
               onClick={() => navigate("/bookmarks")}
             >
-              view
+              View
             </Button>
           </div>
         );
