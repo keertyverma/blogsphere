@@ -8,7 +8,7 @@ interface LogoProps {
 
 const Logo = ({ className, withText = true, isHome = false }: LogoProps) => {
   return (
-    <Link to="/" className="flex items-center">
+    <Link to={isHome ? "/feed" : "/"} className="flex items-center">
       <img
         src={"/assets/images/logo.svg"}
         alt="logo"
