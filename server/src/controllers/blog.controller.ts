@@ -206,6 +206,7 @@ const getAllPublishedBlogs = async (req: Request, res: Response) => {
         $or: [
           { title: regexQuery },
           { description: regexQuery },
+          { tags: regexQuery },
           // Include fullname match only when 'authorId' is not provided
           ...(!authorId
             ? [

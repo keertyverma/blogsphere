@@ -166,6 +166,20 @@ const PublishedBlogPage = () => {
             </div>
           ))}
         </div>
+
+        {/* Tags Section */}
+        <hr className="my-4" />
+        <div className="flex gap-2 items-center flex-wrap text-xs lg:text-sm text-muted-foreground">
+          <p>Tagged with:</p>
+          {tags?.map((tag, i) => (
+            <span
+              key={i}
+              className="font-medium bg-secondary p-1 px-2 rounded-full truncate max-w-[120px] lg:max-w-[240px] capitalize"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );
