@@ -100,3 +100,23 @@ export const validatePasswordUpdate = (data: {
     throw new BadRequestError(errorMessage);
   }
 };
+
+export const validateUsernameUpdate = (data: { newUsername: string }) => {
+  const schema = Joi.object({
+    newUsername: Joi.string()
+      .trim()
+      .min(1)
+      .max(30)
+      .pattern(/^[a-z0-9_-]+$/i) // Only allow letters, numbers, hyphens and underscores
+      .required(),
+  }).messages({
+    "string.base": "Username must be a string.",
+    "string.min": "Username must be at least 1 character long.",
+    "string.max": "Username must be at most 30 characters long.",
+    "string.pattern.base":
+      "Username can only contain letters, numbers, hyphens(-), and underscores(_).",
+    "any.required": "Username is required.",
+  });
+
+  return schema.validate(data);
+};

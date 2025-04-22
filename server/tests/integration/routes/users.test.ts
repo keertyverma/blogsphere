@@ -7,14 +7,14 @@ import bcrypt from "bcrypt";
 import { Application } from "express";
 
 import { startServer } from "../../../src/start";
-import { IUser, User } from "../../../src/models/user.model";
+import { IUser, IUserDocument, User } from "../../../src/models/user.model";
 
 let server: Server;
 let app: Application; // Express instance
 let endpoint: string = `/api/v1/users`;
 
-const createUser = async () => {
-  const user1 = {
+const createUsers = async () => {
+  const user1 = await User.create({
     personalInfo: {
       fullname: "Mickey Mouse",
       password: "Clubhouse12",
@@ -23,8 +23,10 @@ const createUser = async () => {
       profileImage: "http://example-img1.png",
     },
     isVerified: true,
-  };
-  const user2 = {
+    usernameChanged: false,
+  });
+
+  const user2 = await User.create({
     personalInfo: {
       fullname: "Donald Duck",
       password: "Letsgo1234",
@@ -33,9 +35,10 @@ const createUser = async () => {
       profileImage: "http://example-img2.png",
     },
     isVerified: true,
-  };
+    usernameChanged: true,
+  });
 
-  const user3 = {
+  const user3 = await User.create({
     personalInfo: {
       fullname: "Pete",
       password: "Villain1234",
@@ -44,11 +47,11 @@ const createUser = async () => {
       profileImage: "http://example-img-pete.png",
     },
     isVerified: false,
-  };
+    usernameChanged: false,
+  });
 
-  const users = [user1, user2, user3];
-  await User.create(users);
-  return users as IUser[];
+  const users: IUserDocument[] = [user1, user2, user3];
+  return users;
 };
 
 describe("/api/v1/users", () => {
@@ -195,11 +198,11 @@ describe("/api/v1/users", () => {
   });
 
   describe("GET /", () => {
-    let users: IUser[];
+    let users: IUserDocument[];
 
     beforeAll(async () => {
       if (!server) return;
-      users = await createUser();
+      users = await createUsers();
     });
 
     afterAll(async () => {
@@ -246,11 +249,11 @@ describe("/api/v1/users", () => {
   });
 
   describe("GET /:id", () => {
-    let users: IUser[];
+    let users: IUserDocument[];
 
     beforeAll(async () => {
       if (!server) return;
-      users = await createUser();
+      users = await createUsers();
     });
 
     afterAll(async () => {
@@ -559,6 +562,121 @@ describe("/api/v1/users", () => {
       expect(youtube).toBe(toUpdate.socialLinks.youtube);
       expect(facebook).toBe(toUpdate.socialLinks.facebook);
       expect(twitter).not.toBe(""); // previous social links are not reset
+    });
+  });
+
+  describe("PATCH /changeUsername", () => {
+    let users: IUserDocument[];
+
+    beforeAll(async () => {
+      if (!server) return;
+      await User.deleteMany({}); // clean first
+      users = await createUsers();
+    });
+
+    afterAll(async () => {
+      if (!server) return;
+      // db cleanup
+      await User.deleteMany({});
+    });
+
+    let token: string;
+    const exec = async (payload: any = {}) => {
+      return await request(app)
+        .patch(`${endpoint}/changeUsername`)
+        .set("Cookie", `authToken=${token}`)
+        .send(payload);
+    };
+
+    it("should return UnAuthorized-401 if user is not authorized", async () => {
+      // token cookie is not set
+      token = "";
+
+      const res = await exec();
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
+    });
+
+    it("should return Forbidden-403 if user has already changed username", async () => {
+      // Find a user who has already changed their username (username change allowed only once)
+      const [user, _] = users.filter((user) => user.usernameChanged === true);
+      token = user.generateAuthToken();
+
+      const res = await exec({ newUsername: "newname" });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details:
+          "You’ve already changed your username. This action is allowed only once.",
+      });
+    });
+
+    it("should return BadRequest-400 if username format is invalid", async () => {
+      // Find a user who have not changed their username (username change allowed only once)
+      const [user, _] = users.filter((user) => user.usernameChanged === false);
+      token = user.generateAuthToken();
+
+      // Username must be 1–30 characters long and can include letters, numbers, hyphens (-), and underscores (_); no spaces or special characters allowed
+      const res = await exec({ newUsername: "invalid;@,." });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details:
+          "Username can only contain letters, numbers, hyphens(-), and underscores(_).",
+      });
+    });
+
+    it("should return BadRequest-400 if username is already taken", async () => {
+      const [user1, user2] = users.filter(
+        (user) => user.usernameChanged === false
+      );
+      token = user1.generateAuthToken();
+
+      const res = await exec({ newUsername: user2.personalInfo.username });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "This username is already taken.",
+      });
+    });
+
+    it("should return BadRequest-400 if username is reserved", async () => {
+      // Find a user who have not changed their username (username change allowed only once)
+      const [user, _] = users.filter((user) => user.usernameChanged === false);
+      token = user.generateAuthToken();
+
+      const res = await exec({ newUsername: "admin" });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "This username is reserved and cannot be used.",
+      });
+    });
+
+    it("should update username successfully with valid data", async () => {
+      // Find a user who have not changed their username (username change allowed only once)
+      const [user, _] = users.filter((user) => user.usernameChanged === false);
+      token = user.generateAuthToken();
+      const newUsername = "Newusername-1";
+
+      const res = await exec({ newUsername });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.result.message).toBe("Username updated successfully.");
+      expect(res.body.result.username).toBe(newUsername.toLowerCase());
     });
   });
 });

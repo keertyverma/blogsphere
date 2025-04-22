@@ -36,6 +36,7 @@ interface IUser extends Document {
     token: string;
     expiresAt: Date;
   };
+  usernameChanged: boolean;
 }
 
 interface IUserDocument extends IUser, Document {
@@ -139,6 +140,10 @@ const userSchema = new Schema(
     resetPasswordToken: {
       token: String,
       expiresAt: Date,
+    },
+    usernameChanged: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

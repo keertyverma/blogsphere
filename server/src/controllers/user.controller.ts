@@ -14,8 +14,19 @@ import logger from "../utils/logger";
 import { sendVerificationEmail } from "../utils/mailer";
 import {
   validatePasswordUpdate,
+  validateUsernameUpdate,
   validateUserUpdate,
 } from "../utils/validations";
+
+// Reserved usernames that cannot be used to prevent impersonation or system conflicts
+const RESERVED_KEYWORDS = [
+  "admin",
+  "support",
+  "system",
+  "blogsphere",
+  "blogsphere-team",
+  "official",
+];
 
 export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);
@@ -244,5 +255,74 @@ export const updateUser = async (req: Request, res: Response) => {
     },
   };
 
+  return res.status(data.statusCode).json(data);
+};
+
+export const updateUsername = async (req: Request, res: Response) => {
+  logger.debug(`PATCH Request on Route -> ${req.baseUrl}/changeUsername`);
+
+  // Enforce one-time username change policy.
+  // - Users are allowed to change their username only once to maintain consistency and prevent abuse.
+  const userId = (req.user as JwtPayload).id;
+  const user = await User.findById(userId).select("usernameChanged").lean();
+  if (user?.usernameChanged) {
+    throw new CustomAPIError(
+      "You’ve already changed your username. This action is allowed only once.",
+      StatusCodes.FORBIDDEN
+    );
+  }
+
+  // Verify the username format
+  const { error, value: validatedData } = validateUsernameUpdate(req.body);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  const { newUsername } = validatedData;
+  const normalizedUsername = newUsername.toLowerCase();
+
+  // Check if the username has already been taken
+  const isUsernameExists = await User.exists({
+    "personalInfo.username": normalizedUsername,
+  });
+  if (isUsernameExists) {
+    throw new BadRequestError("This username is already taken.");
+  }
+
+  // Ensure the username is not a reserved keyword
+  // - Reserved usernames are restricted to prevent impersonation of official accounts,
+  // - misuse of system-related keywords, and potential conflicts with future platform features.
+  if (RESERVED_KEYWORDS.includes(normalizedUsername)) {
+    throw new BadRequestError("This username is reserved and cannot be used.");
+  }
+
+  // Set new username
+  const updateResult = await User.updateOne(
+    { _id: userId },
+    {
+      $set: {
+        "personalInfo.username": normalizedUsername,
+        usernameChanged: true,
+      },
+    }
+  );
+
+  if (!updateResult.modifiedCount) {
+    throw new CustomAPIError(
+      "Failed to update username.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  const data: APIResponse = {
+    status: APIStatus.SUCCESS,
+    statusCode: StatusCodes.OK,
+    result: {
+      message: "Username updated successfully.",
+      username: normalizedUsername,
+    },
+  };
   return res.status(data.statusCode).json(data);
 };
