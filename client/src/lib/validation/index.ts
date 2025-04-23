@@ -47,10 +47,12 @@ export const ChangePasswordValidation = z.object({
   currentPassword: z
     .string()
     .trim()
+    .min(1, { message: "Current Password is required." })
     .min(8, { message: "Password must be at least 8 characters." }),
   newPassword: z
     .string()
     .trim()
+    .min(1, { message: "New Password is required." })
     .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/, {
       message:
         "New Password should be 8 to 20 characters long with atleast 1 numeric, 1 lowercase and 1 uppercase letters.",

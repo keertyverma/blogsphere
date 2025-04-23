@@ -20,7 +20,7 @@ import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import TextWithLoader from "../ui/text-with-loader";
 
 const ChangePassword = () => {
   const [passwordVisible, setPasswordVisible] = useState(true);
@@ -35,7 +35,7 @@ const ChangePassword = () => {
       currentPassword: "",
       newPassword: "",
     },
-    mode: "onBlur", // Validate when the input field loses focus (i.e., when the user clicks away or tabs out of the field)
+    mode: "onChange", // Set validation mode to trigger on every input change
   });
 
   const handlePasswordChange = async (
@@ -48,7 +48,9 @@ const ChangePassword = () => {
         newPassword,
       });
 
-      showSuccessToast("Password updated successfully! Please login again.");
+      showSuccessToast(
+        "Password updated successfully! Please log in again to continue."
+      );
       form.reset();
       navigate("/login");
       clearUserAuth();
@@ -87,11 +89,11 @@ const ChangePassword = () => {
         <p className="mt-2 mb-5 text-left text-slate-500 dark:text-slate-400">
           Enhance your security by updating your password regularly.
         </p>
-        <Form {...form}>
-          <div className="flex-center">
+        <div className="flex-center mt-10 md:mt-16">
+          <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handlePasswordChange)}
-              className="w-[80%] max-w-[400px] flex flex-col gap-2 md:gap-3"
+              className="w-full max-w-[400px] flex flex-col gap-2 md:gap-3 md:form-container md:!py-12"
             >
               <FormField
                 control={form.control}
@@ -164,14 +166,15 @@ const ChangePassword = () => {
                 className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
                 disabled={isUpdatingPassword}
               >
-                {isUpdatingPassword ? "Updating..." : "Update"}
-                {isUpdatingPassword && (
-                  <LoadingSpinner className="h-6 md:w-6 text-white" />
-                )}
+                <TextWithLoader
+                  text="Update"
+                  isLoading={isUpdatingPassword}
+                  loaderClassName="text-white"
+                />
               </Button>
             </form>
-          </div>
-        </Form>
+          </Form>
+        </div>
       </section>
     </AnimationWrapper>
   );

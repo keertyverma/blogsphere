@@ -57,7 +57,7 @@ const SideNavbar = () => {
           <Button
             ref={pageStateRef}
             variant="secondary"
-            className="capitalize text-secondary-foreground bg-transparent hover:bg-transparent"
+            className="capitalize text-secondary-foreground bg-transparent hover:bg-transparent text-base"
             onClick={(e) => {
               changePageState(e.target as HTMLButtonElement);
             }}

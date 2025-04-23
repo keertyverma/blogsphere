@@ -135,15 +135,15 @@ const EditProfile = () => {
   return (
     <AnimationWrapper>
       <section className="h-cover p-0 pb-20">
-        <div className="text-center mb-5">
+        <div className="max-md:hidden text-center">
           <h3 className="h3-bold !font-semibold capitalize text-left">
             Profile
           </h3>
-          <p className="text-left text-slate-500 dark:text-slate-400">
-            Manage your BlogSphere profile
-          </p>
-          <hr className="mt-3 border-1 border-border" />
+          <hr className="mt-2 border-1 border-border" />
         </div>
+        <p className="mt-2 mb-5 text-left text-slate-500 dark:text-slate-400">
+          Manage your BlogSphere profile
+        </p>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleProfileUpdate)}>
             <div className="flex flex-col lg:flex-row gap-5 md:gap-10">
