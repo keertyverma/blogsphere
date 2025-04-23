@@ -2,6 +2,7 @@ import { useAuthStore } from "@/store";
 import { useEffect, useRef, useState } from "react";
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 import { FaRegUserCircle } from "react-icons/fa";
+import { IoIosAt } from "react-icons/io";
 import { MdOutlineLock } from "react-icons/md";
 import { NavLink, Outlet } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -99,6 +100,16 @@ const SideNavbar = () => {
               <MdOutlineLock className="text-xl" /> Change Password
             </NavLink>
           )}
+          <NavLink
+            to="/settings/change-username"
+            onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
+              setPageUrl((e.target as HTMLAnchorElement).innerText)
+            }
+            className="sidebar-link !gap-3"
+          >
+            <IoIosAt className="text-2xl" />
+            Change Username
+          </NavLink>
         </div>
       </div>
       <div className="max-md:-mt-7 mt-5 w-full">

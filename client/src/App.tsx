@@ -11,6 +11,7 @@ import AuthRedirect from "./components/auth/AuthRedirect";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LandingLayout from "./components/layout/LandingLayout";
 import ChangePassword from "./components/settings/ChangePassword";
+import ChangeUsername from "./components/settings/ChangeUsername";
 import EditProfile from "./components/settings/EditProfile";
 import SideNavbar from "./components/settings/SideNavbar";
 import ScrollToTopOnNavigate from "./components/shared/ScrollToTopOnNavigate";
@@ -24,8 +25,8 @@ import EditorGuide from "./pages/EditorGuide";
 import EmailVerify from "./pages/EmailVerify";
 import ErrorPage from "./pages/ErrorPage";
 import ForgotPassword from "./pages/ForgotPassword";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
 import HomePage from "./pages/HomePage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import PublishedBlogPage from "./pages/PublishedBlogPage";
 import ResendVerification from "./pages/ResendVerification";
 import ResetPassword from "./pages/ResetPassword";
@@ -76,6 +77,7 @@ const App = () => {
           >
             <Route path="edit-profile" element={<EditProfile />} />
             <Route path="change-password" element={<ChangePassword />} />
+            <Route path="change-username" element={<ChangeUsername />} />
           </Route>
           <Route
             path="bookmarks"

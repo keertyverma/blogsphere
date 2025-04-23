@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isValidSocialPlatformUrl } from "../utils";
+import { isReservedUsername, isValidSocialPlatformUrl } from "../utils";
 
 export const SignupValidation = z.object({
   fullname: z
@@ -126,4 +126,19 @@ export const ResetPasswordValidation = z.object({
       "Password should be 8 to 20 characters long with atleast 1 numeric, 1 lowercase and 1 uppercase letters.",
   }),
   confirmNewPassword: z.string(),
+});
+
+export const ChangeUsernameValidation = z.object({
+  newUsername: z
+    .string()
+    .trim()
+    .min(1, { message: "Username is required." })
+    .max(30, { message: "Username must be at most 30 characters long." })
+    .regex(/^[a-z0-9_-]+$/i, {
+      message:
+        "Username can include letters, numbers, hyphens (-), and underscores (_). It must be between 1 to 30 characters long.",
+    })
+    .refine((username) => !isReservedUsername(username), {
+      message: "This username is reserved. Please choose another one.",
+    }),
 });

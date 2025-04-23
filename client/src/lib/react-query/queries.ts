@@ -158,6 +158,27 @@ export const useUpdateUserProfile = () => {
   });
 };
 
+export const useUpdateUsername = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { username: string }) =>
+      apiClient
+        .patch("/users/changeUsername", {
+          newUsername: data.username,
+        })
+        .then((res) => res.data.result),
+    onSuccess: (updatedData) => {
+      const { username } = updatedData;
+      if (username) {
+        // Clear cached queries to reset session-related data.
+        // Re-login is triggered in the component after this step.
+        queryClient.clear();
+      }
+    },
+  });
+};
+
 // ----------------- Blog -------------------
 export const useCreateBlog = () => {
   const queryClient = useQueryClient();

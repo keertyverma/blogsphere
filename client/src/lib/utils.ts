@@ -268,3 +268,18 @@ export const getUserDisplayName = (name?: string): string => {
         .join(" ")
     : name;
 };
+
+export const isReservedUsername = (username: string): boolean => {
+  // Reserved usernames are restricted to prevent impersonation of official accounts,
+  // misuse of system-related keywords, and potential conflicts with future platform features.
+  const RESERVED_KEYWORDS = new Set([
+    "admin",
+    "support",
+    "system",
+    "blogsphere",
+    "blogsphere-team",
+    "official",
+  ]);
+
+  return RESERVED_KEYWORDS.has(username.toLowerCase());
+};

@@ -20,7 +20,7 @@ const UserInfo = ({ profileId, user }: Props) => {
   const authUser = useAuthStore((s) => s.user);
 
   const {
-    personalInfo: { fullname, profileImage, bio },
+    personalInfo: { fullname, username, profileImage, bio },
     accountInfo: { totalPosts },
     createdAt,
     socialLinks,
@@ -41,14 +41,13 @@ const UserInfo = ({ profileId, user }: Props) => {
           <h1 className="text-xl font-semibold">
             {getUserDisplayName(fullname)}
           </h1>
-          <p className="text-muted-foreground leading-5">{bio}</p>
+          <p className="text-muted-foreground font-medium">@{username}</p>
+          <p className="text-muted-foreground leading-5 mt-1">{bio}</p>
           {totalPosts > 0 && (
             <div className="text-sm text-secondary-foreground mt-1 flex gap-1">
               <p>
-                <span className="font-semibold mr-1">
-                  {formateNumber(totalPosts)}
-                </span>
-                Blogs
+                <span className="mr-1">{formateNumber(totalPosts)}</span>
+                {totalPosts === 1 ? "Blog" : "Blogs"}
               </p>
             </div>
           )}

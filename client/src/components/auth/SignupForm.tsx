@@ -151,7 +151,7 @@ const SignupForm = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignup)}
-            className="w-[90%] max-w-[400px] md:max-w-[450px] flex flex-col gap-2 md:gap-3 md:auth-container"
+            className="w-[90%] max-w-[400px] md:max-w-[450px] flex flex-col gap-2 md:gap-3 md:form-container"
           >
             <div className="text-center">
               <h2 className="h3-bold md:h2-bold capitalize">join us today</h2>
