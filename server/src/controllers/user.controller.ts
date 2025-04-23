@@ -6,7 +6,7 @@ import escapeStringRegexp from "escape-string-regexp";
 
 import { User, validateUser } from "../models/user.model";
 import { APIResponse, APIStatus } from "../types/api-response";
-import { generateUsername } from "../utils";
+import { generateUsername, isReservedUsername } from "../utils";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
@@ -17,16 +17,6 @@ import {
   validateUsernameUpdate,
   validateUserUpdate,
 } from "../utils/validations";
-
-// Reserved usernames that cannot be used to prevent impersonation or system conflicts
-const RESERVED_KEYWORDS = [
-  "admin",
-  "support",
-  "system",
-  "blogsphere",
-  "blogsphere-team",
-  "official",
-];
 
 export const createUser = async (req: Request, res: Response) => {
   logger.debug(`POST Request on Route -> ${req.baseUrl}`);
@@ -49,9 +39,10 @@ export const createUser = async (req: Request, res: Response) => {
   // secure password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // create user
-  const username = await generateUsername(email);
+  // generate a unique username for the user based on their email or fullname
+  const username = await generateUsername(email, fullname);
 
+  // create user
   const user = new User({
     personalInfo: {
       fullname,
@@ -292,9 +283,7 @@ export const updateUsername = async (req: Request, res: Response) => {
   }
 
   // Ensure the username is not a reserved keyword
-  // - Reserved usernames are restricted to prevent impersonation of official accounts,
-  // - misuse of system-related keywords, and potential conflicts with future platform features.
-  if (RESERVED_KEYWORDS.includes(normalizedUsername)) {
+  if (isReservedUsername(normalizedUsername)) {
     throw new BadRequestError("This username is reserved and cannot be used.");
   }
 

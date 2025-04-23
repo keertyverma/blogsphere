@@ -19,7 +19,7 @@ const createUsers = async () => {
       fullname: "Mickey Mouse",
       password: "Clubhouse12",
       email: "mickey@test.com",
-      username: "mickey",
+      username: "mickeymouse",
       profileImage: "http://example-img1.png",
     },
     isVerified: true,
@@ -31,7 +31,7 @@ const createUsers = async () => {
       fullname: "Donald Duck",
       password: "Letsgo1234",
       email: "donald@test.com",
-      username: "donald",
+      username: "donaldduck",
       profileImage: "http://example-img2.png",
     },
     isVerified: true,
@@ -43,7 +43,7 @@ const createUsers = async () => {
       fullname: "Pete",
       password: "Villain1234",
       email: "pete@test.com",
-      username: "pete_villain",
+      username: "pete",
       profileImage: "http://example-img-pete.png",
     },
     isVerified: false,
@@ -160,7 +160,7 @@ describe("/api/v1/users", () => {
       expect(id).toBeDefined();
       expect(fullname).toBe(userData.fullname);
       expect(email).toBe(userData.email);
-      expect(username).toBe(userData.email.split("@")[0]);
+      expect(username).toBe("mickeymouse");
       expect(profileImage).toMatch(/api\.dicebear\.com/);
       expect(responseData).not.toHaveProperty("password");
     });
@@ -172,11 +172,11 @@ describe("/api/v1/users", () => {
           fullname: "Mickey Mouse",
           password: "Clubhouse12",
           email: "test@test.com",
-          username: "test",
+          username: "mickeymouse",
         },
       });
       const userData = {
-        fullname: "Pluto",
+        fullname: "Mickey Mouse",
         password: "Pluto123",
         email: "test@test2.com",
       };
@@ -192,8 +192,7 @@ describe("/api/v1/users", () => {
       } = res.body;
 
       expect(id).toBeDefined();
-      expect(username).not.toBe(userData.email.split("@")[0]);
-      expect(username).toMatch(/test/);
+      expect(username).toMatch(/mickeymouse/);
     });
   });
 
@@ -229,7 +228,7 @@ describe("/api/v1/users", () => {
 
     it("should return searched users when search query parameter is set", async () => {
       // search blog
-      const searchTerm = "mickey";
+      const searchTerm = "mickeymouse";
 
       const res = await request(app).get(`${endpoint}?search=${searchTerm}`);
 
@@ -237,7 +236,7 @@ describe("/api/v1/users", () => {
       expect(res.body.results.length).toBe(1);
       const [user] = res.body.results;
       const [existingUser] = users.filter(
-        (user) => user.personalInfo.username === "mickey"
+        (user) => user.personalInfo.username === "mickeymouse"
       );
       expect(user.personalInfo.fullname).toBe(
         existingUser.personalInfo.fullname
@@ -288,7 +287,7 @@ describe("/api/v1/users", () => {
     });
 
     it("should return user with given username", async () => {
-      const username = "mickey";
+      const username = "mickeymouse";
       const res = await request(app).get(`${endpoint}/${username}`);
 
       expect(res.statusCode).toBe(200);
@@ -356,7 +355,7 @@ describe("/api/v1/users", () => {
           fullname: "Mickey Mouse",
           password: "Clubhouse12",
           email: "test@test.com",
-          username: "test",
+          username: "mickeymouse",
         },
       });
       token = user.generateAuthToken();
@@ -377,7 +376,7 @@ describe("/api/v1/users", () => {
         personalInfo: {
           fullname: "Donald Duck",
           email: "donald@gmail.com",
-          username: "donald",
+          username: "donaldduck",
         },
         googleAuth: true,
       });
@@ -502,7 +501,7 @@ describe("/api/v1/users", () => {
           fullname: "Mickey Mouse",
           password: "Clubhouse12",
           email: "test@test.com",
-          username: "test",
+          username: "mickeymouse",
         },
       });
       token = user.generateAuthToken();
@@ -527,7 +526,7 @@ describe("/api/v1/users", () => {
           fullname: "Mickey Mouse",
           password: "Clubhouse12",
           email: "test@test.com",
-          username: "test",
+          username: "mickeymouse",
         },
         socialLinks: {
           youtube: "",

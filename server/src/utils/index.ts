@@ -5,12 +5,88 @@ import ms from "ms";
 import { nanoid } from "nanoid";
 import { User } from "../models/user.model";
 
-export const generateUsername = async (email: string): Promise<string> => {
-  let username = email.split("@")[0];
+export const isReservedUsername = (username: string): boolean => {
+  // Reserved usernames are restricted to prevent impersonation of official accounts,
+  // misuse of system-related keywords, and potential conflicts with future platform features.
+  const RESERVED_KEYWORDS = new Set([
+    "admin",
+    "support",
+    "system",
+    "blogsphere",
+    "blogsphere-team",
+    "official",
+  ]);
 
-  let existingUser = await User.findOne({ "personalInfo.username": username });
-  if (existingUser) {
-    username = username + nanoid().toString().substring(0, 5);
+  return RESERVED_KEYWORDS.has(username.toLowerCase());
+};
+
+/**
+ * Validates if the provided username is valid.
+ * A valid username must:
+ * - Be between 1 and 30 characters long.
+ * - Contain only letters, numbers, hyphens (-), and underscores (_).
+ * - Not be a reserved username.
+ * @param username - The username to validate.
+ * @returns {boolean} `true` if the username is valid, otherwise `false`.
+ */
+export const isUsernameValid = (username: string): boolean => {
+  const USERNAME_REGEX = /^[a-zA-Z0-9_-]{1,30}$/;
+  return !isReservedUsername(username) && USERNAME_REGEX.test(username);
+};
+
+const formatUsername = (username: string): string => {
+  // Valid characters for the username: letters, numbers, hyphens (-), and underscores (_)
+  return username
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "") // remove disallowed characters (no spaces, no symbols)
+    .substring(0, 30); // trim to 30 chars
+};
+
+/**
+ * Generates a unique username based on the user's full name (if provided),
+ * or falls back to the email prefix if the fullname is invalid or missing.
+ * It sanitizes the input (removing disallowed characters), ensures the username is within the character limit,
+ * and checks for uniqueness in the database. If a conflict occurs, a random 4-character suffix is added,
+ * and the process retries up to 10 times to find a unique name.
+ *
+ * @param email - The user's email address (used for fallback).
+ * @param fullname - The user's full name (optional).
+ * @returns {Promise<string>} The generated unique username.
+ */
+export const generateUsername = async (
+  email: string,
+  fullname?: string
+): Promise<string> => {
+  let base = "";
+
+  // If fullname is provided, format it into a valid username
+  if (fullname) {
+    base = formatUsername(fullname);
+  }
+
+  // Fallback to email prefix if fullname is missing or invalid
+  if (!base) {
+    base = formatUsername(email.split("@")[0]);
+  }
+
+  let username = base;
+  let attempt = 0;
+  // Ensure uniqueness and that the username is valid
+  while (
+    !isUsernameValid(username) ||
+    (await User.exists({ "personalInfo.username": username }))
+  ) {
+    // Generate a unique suffix and append it to the base username
+    const suffix = nanoid(4);
+
+    // Format the username to ensure it matches the required pattern
+    username = formatUsername(`${base}-${suffix}`);
+    attempt++;
+
+    // Fail-safe after 10 attempts to prevent infinite loop in case of collisions
+    if (attempt > 10) {
+      throw new Error("Could not generate a unique username after 10 attempts");
+    }
   }
 
   return username;
