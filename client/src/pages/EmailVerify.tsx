@@ -3,6 +3,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useVerifyEmail } from "@/lib/react-query/queries";
 import { AxiosError } from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import { MdOutlineErrorOutline } from "react-icons/md";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -85,47 +86,57 @@ const EmailVerify = () => {
     );
 
   return (
-    <div className="w-full h-full">
-      <section className="h-cover flex-center py-[20vh]">
-        {isVerified ? (
-          <div className="flex-center flex-col gap-3 text-center">
-            <IoMdCheckmarkCircle className="text-green-600 text-4xl" />
-            <h2 className="text-xl md:text-2xl font-semibold capitalize">
-              email verified
-            </h2>
-            <p>{verificationMsg} Please log in.</p>
-            <Button
-              onClick={() => navigate("/login")}
-              className="mt-2 min-w-[320px] max-w-[320px] max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
-            >
-              Login
-            </Button>
-          </div>
-        ) : (
-          <div className="flex-center flex-col gap-3 text-center">
-            <MdOutlineErrorOutline className="text-red-700 text-4xl" />
-            <h2 className="text-xl md:text-2xl font-semibold capitalize">
-              {verificationMsg === "network issue"
-                ? "Oops!"
-                : "Email verification failed!"}
-            </h2>
-            <p className="max-w-xl text-muted-foreground">
-              {verificationMsg === "network issue"
-                ? "Something went wrong on our end. Please try again later."
-                : verificationMsg}
-            </p>
-            {showResendLink && (
-              <Link
-                to="/resend-verification-link"
-                className="mt-2 text-primary underline text-sm md:text-base"
+    <>
+      <Helmet>
+        <title>Email Verification | BlogSphere</title>
+        <meta
+          name="description"
+          content="Verify your email address to complete the registration process and unlock all features."
+        />
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="w-full h-full">
+        <section className="h-cover flex-center py-[20vh]">
+          {isVerified ? (
+            <div className="flex-center flex-col gap-3 text-center">
+              <IoMdCheckmarkCircle className="text-green-600 text-4xl" />
+              <h2 className="text-xl md:text-2xl font-semibold capitalize">
+                email verified
+              </h2>
+              <p>{verificationMsg} Please log in.</p>
+              <Button
+                onClick={() => navigate("/login")}
+                className="mt-2 min-w-[320px] max-w-[320px] max-sm:bg-primary max-sm:text-primary-foreground max-sm:hover:bg-primary/90 rounded-full"
               >
-                Resend verification link
-              </Link>
-            )}
-          </div>
-        )}
-      </section>
-    </div>
+                Login
+              </Button>
+            </div>
+          ) : (
+            <div className="flex-center flex-col gap-3 text-center">
+              <MdOutlineErrorOutline className="text-red-700 text-4xl" />
+              <h2 className="text-xl md:text-2xl font-semibold capitalize">
+                {verificationMsg === "network issue"
+                  ? "Oops!"
+                  : "Email verification failed!"}
+              </h2>
+              <p className="max-w-xl text-muted-foreground">
+                {verificationMsg === "network issue"
+                  ? "Something went wrong on our end. Please try again later."
+                  : verificationMsg}
+              </p>
+              {showResendLink && (
+                <Link
+                  to="/resend-verification-link"
+                  className="mt-2 text-primary underline text-sm md:text-base"
+                >
+                  Resend verification link
+                </Link>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
+    </>
   );
 };
 

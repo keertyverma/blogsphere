@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 
 const ErrorPage = () => {
@@ -6,6 +7,13 @@ const ErrorPage = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Page Not Found | BlogSphere</title>
+        <meta
+          name="description"
+          content="The page you're looking for doesn't exist or has been moved. Return to the homepage to discover more blogs on BlogSphere."
+        />
+      </Helmet>
       <section className="h-cover flex-center flex-col md:flex-row gap-10 text-center">
         <img
           src="/assets/images/page_not_found_error.jpeg"

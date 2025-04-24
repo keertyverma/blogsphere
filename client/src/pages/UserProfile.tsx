@@ -11,6 +11,7 @@ import { getUserDisplayName } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { BsSearch } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
 import { useParams } from "react-router-dom";
@@ -22,18 +23,6 @@ const UserProfile = () => {
   const authUser = useAuthStore((s) => s.user);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    if (user && user?.personalInfo?.fullname) {
-      document.title = `${getUserDisplayName(
-        user.personalInfo.fullname
-      )} - BlogSphere`;
-
-      return () => {
-        document.title = "BlogSphere"; // Reset title on unmount
-      };
-    }
-  }, [user]);
 
   useEffect(() => {
     // Clear search input and term when user changes to prevent using outdated queries.
@@ -84,53 +73,66 @@ const UserProfile = () => {
   };
 
   return (
-    <AnimationWrapper>
-      <div className="h-cover px-0 md:px-10">
-        <section className="px-6 mx-auto md:max-w-[728px] flex flex-col gap-5 py-24">
-          {/* user info */}
-          {profileId && <UserInfo profileId={profileId} user={user} />}
+    <>
+      <Helmet>
+        <title>
+          {getUserDisplayName(user.personalInfo.fullname)} | BlogSphere
+        </title>
+        <meta
+          name="description"
+          content={`Explore the profile of ${getUserDisplayName(
+            user.personalInfo.fullname
+          )} on BlogSphere. Discover their latest blogs.`}
+        />
+      </Helmet>
+      <AnimationWrapper>
+        <div className="h-cover px-0 md:px-10">
+          <section className="px-6 mx-auto md:max-w-[728px] flex flex-col gap-5 py-24">
+            {/* user info */}
+            {profileId && <UserInfo profileId={profileId} user={user} />}
 
-          {/* search input box */}
-          <div className="relative w-full mx-auto md:p-0">
-            <BsSearch className="absolute left-[5%] md:left-5 top-1/2 md:pointer-events-none -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="bg-secondary pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
-              placeholder="Search"
-              value={searchInput}
-              onChange={handleChange}
-              onKeyDown={handleSearch}
-            />
-            {searchInput && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-[5%] md:right-5 top-1/2 -translate-y-1/2 text-muted-foreground"
-                onClick={handleClear}
-              >
-                <IoClose />
-              </Button>
-            )}
-          </div>
-
-          {/* user published blogs */}
-          <div className="w-full">
-            <InPageNavigation routes={routes}>
-              <UserPublishedBlogList
-                authorId={user._id}
-                searchTerm={searchTerm}
+            {/* search input box */}
+            <div className="relative w-full mx-auto md:p-0">
+              <BsSearch className="absolute left-[5%] md:left-5 top-1/2 md:pointer-events-none -translate-y-1/2 text-muted-foreground" />
+              <Input
+                className="bg-secondary pl-12 placeholder:text-muted-foreground text-accent-foreground rounded-full focus-visible:ring-1"
+                placeholder="Search"
+                value={searchInput}
+                onChange={handleChange}
+                onKeyDown={handleSearch}
               />
+              {searchInput && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-[5%] md:right-5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  onClick={handleClear}
+                >
+                  <IoClose />
+                </Button>
+              )}
+            </div>
 
-              {authUser.username === user.personalInfo.username && (
-                <UserDraftBlogList
+            {/* user published blogs */}
+            <div className="w-full">
+              <InPageNavigation routes={routes}>
+                <UserPublishedBlogList
                   authorId={user._id}
                   searchTerm={searchTerm}
                 />
-              )}
-            </InPageNavigation>
-          </div>
-        </section>
-      </div>
-    </AnimationWrapper>
+
+                {authUser.username === user.personalInfo.username && (
+                  <UserDraftBlogList
+                    authorId={user._id}
+                    searchTerm={searchTerm}
+                  />
+                )}
+              </InPageNavigation>
+            </div>
+          </section>
+        </div>
+      </AnimationWrapper>
+    </>
   );
 };
 

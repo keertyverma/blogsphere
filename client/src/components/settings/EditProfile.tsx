@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store";
 import { IUpdateUserProfile, SocialLink } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { FaFacebook, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa";
 import { RiTwitterXFill } from "react-icons/ri";
@@ -133,237 +134,248 @@ const EditProfile = () => {
   };
 
   return (
-    <AnimationWrapper>
-      <section className="h-cover p-0 pb-20">
-        <div className="max-md:hidden text-center">
-          <h3 className="h3-bold !font-semibold capitalize text-left">
-            Profile
-          </h3>
-          <hr className="mt-2 border-1 border-border" />
-        </div>
-        <p className="mt-2 mb-5 text-left text-slate-500 dark:text-slate-400">
-          Manage your BlogSphere profile
-        </p>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleProfileUpdate)}>
-            <div className="flex flex-col lg:flex-row gap-5 md:gap-10">
-              <div className="flex-1 flex flex-col gap-5">
-                <h4 className="text-lg font-semibold">Basic Info</h4>
-                <FormField
-                  control={form.control}
-                  name="profileImageFile"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col justify-start">
-                      <FormLabel className="text-secondary-foreground font-semibold">
-                        Profile Image
-                      </FormLabel>
-                      <FormControl>
-                        <ProfileUploader
-                          fieldChange={field.onChange}
-                          mediaUrl={user.personalInfo.profileImage ?? ""}
-                          onUpload={(url) => setProfileImgUrl(url)}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="fullname"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-secondary-foreground font-semibold">
-                        Full name
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Enter your full name"
-                          className="shad-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
+    <>
+      <Helmet>
+        <title>Edit Profile | BlogSphere</title>
+        <meta
+          name="description"
+          content="Edit your profile on BlogSphere. Update your bio, social links, and profile image to reflect your personality."
+        />
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <AnimationWrapper>
+        <section className="h-cover p-0 pb-20">
+          <div className="max-md:hidden text-center">
+            <h3 className="h3-bold !font-semibold capitalize text-left">
+              Profile
+            </h3>
+            <hr className="mt-2 border-1 border-border" />
+          </div>
+          <p className="mt-2 mb-5 text-left text-slate-500 dark:text-slate-400">
+            Manage your BlogSphere profile
+          </p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleProfileUpdate)}>
+              <div className="flex flex-col lg:flex-row gap-5 md:gap-10">
+                <div className="flex-1 flex flex-col gap-5">
+                  <h4 className="text-lg font-semibold">Basic Info</h4>
+                  <FormField
+                    control={form.control}
+                    name="profileImageFile"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col justify-start">
+                        <FormLabel className="text-secondary-foreground font-semibold">
+                          Profile Image
+                        </FormLabel>
+                        <FormControl>
+                          <ProfileUploader
+                            fieldChange={field.onChange}
+                            mediaUrl={user.personalInfo.profileImage ?? ""}
+                            onUpload={(url) => setProfileImgUrl(url)}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="fullname"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-secondary-foreground font-semibold">
+                          Full name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter your full name"
+                            className="shad-input"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="bio"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-secondary-foreground font-semibold">
-                        Bio (About You)
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          className="shad-textarea max-sm:placeholder:text-sm"
-                          placeholder="Tell us your story"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            handleDescriptionChange(e);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                      {bioValue?.length < BIO_CHAR_LIMIT && (
-                        <FormDescription className="text-sm text-muted-foreground text-right">
-                          {BIO_CHAR_LIMIT - bioValue?.length} characters left
-                        </FormDescription>
-                      )}
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="flex-1 flex flex-col gap-5">
-                <hr className="md:hidden" />
-                <div>
-                  <h4 className="text-lg font-semibold">Social Profiles</h4>
-                  <p className="mt-2 text-left text-slate-500 dark:text-slate-400 text-sm md:text-base">
-                    The social links you add here will show up on your profile.
-                  </p>
+                  <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-secondary-foreground font-semibold">
+                          Bio (About You)
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="shad-textarea max-sm:placeholder:text-sm"
+                            placeholder="Tell us your story"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              handleDescriptionChange(e);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                        {bioValue?.length < BIO_CHAR_LIMIT && (
+                          <FormDescription className="text-sm text-muted-foreground text-right">
+                            {BIO_CHAR_LIMIT - bioValue?.length} characters left
+                          </FormDescription>
+                        )}
+                      </FormItem>
+                    )}
+                  />
                 </div>
+                <div className="flex-1 flex flex-col gap-5">
+                  <hr className="md:hidden" />
+                  <div>
+                    <h4 className="text-lg font-semibold">Social Profiles</h4>
+                    <p className="mt-2 text-left text-slate-500 dark:text-slate-400 text-sm md:text-base">
+                      The social links you add here will show up on your
+                      profile.
+                    </p>
+                  </div>
 
-                <FormField
-                  control={form.control}
-                  name="twitter"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <RiTwitterXFill />
-                        X/Twitter
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://x.com/username"
-                          className="shad-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="instagram"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaInstagram /> Instagram
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://instagram.com/username"
-                          className="shad-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="github"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaGithub /> Github
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://github.com/username"
-                          className="shad-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="facebook"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaFacebook /> Facebook
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://facebook.com/username"
-                          className="shad-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="youtube"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <FaYoutube /> YouTube
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://youtube.com/username"
-                          className="shad-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="website"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
-                        <SlGlobe /> Website
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://username.com"
-                          className="shad-input"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="shad-form_message" />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="twitter"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
+                          <RiTwitterXFill />
+                          X/Twitter
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://x.com/username"
+                            className="shad-input"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="instagram"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
+                          <FaInstagram /> Instagram
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://instagram.com/username"
+                            className="shad-input"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="github"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
+                          <FaGithub /> Github
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://github.com/username"
+                            className="shad-input"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="facebook"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
+                          <FaFacebook /> Facebook
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://facebook.com/username"
+                            className="shad-input"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="youtube"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
+                          <FaYoutube /> YouTube
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://youtube.com/username"
+                            className="shad-input"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="website"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex gap-2 text-secondary-foreground font-semibold">
+                          <SlGlobe /> Website
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://username.com"
+                            className="shad-input"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="shad-form_message" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-            </div>
-            {/* fixed update button located at the footer of the page */}
-            <div className="w-full md:w-[calc(100%-200px)] xl:w-[calc(100%-350px)] fixed bottom-0 left-0 md:left-[200px] xl:left-[350px] border-t-2 bg-header p-4 z-30">
-              <div className="flex justify-center">
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="rounded-full flex-center gap-1"
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? "Updating..." : "Update"}
-                  {isUpdating && (
-                    <LoadingSpinner className="h-6 md:w-6 text-white" />
-                  )}
-                </Button>
+              {/* fixed update button located at the footer of the page */}
+              <div className="w-full md:w-[calc(100%-200px)] xl:w-[calc(100%-350px)] fixed bottom-0 left-0 md:left-[200px] xl:left-[350px] border-t-2 bg-header p-4 z-30">
+                <div className="flex justify-center">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="rounded-full flex-center gap-1"
+                    disabled={isUpdating}
+                  >
+                    {isUpdating ? "Updating..." : "Update"}
+                    {isUpdating && (
+                      <LoadingSpinner className="h-6 md:w-6 text-white" />
+                    )}
+                  </Button>
+                </div>
               </div>
-            </div>
-          </form>
-        </Form>
-      </section>
-    </AnimationWrapper>
+            </form>
+          </Form>
+        </section>
+      </AnimationWrapper>
+    </>
   );
 };
 

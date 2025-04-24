@@ -17,6 +17,7 @@ import { showErrorToast } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { AxiosError } from "axios";
 import { FormEvent, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { FcGoogle } from "react-icons/fc";
 import { IoEye, IoEyeOff, IoKeyOutline, IoMailOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
@@ -152,144 +153,152 @@ const LoginForm = () => {
   };
 
   return (
-    <AnimationWrapper>
-      {(isLoginUser || isGoogleLoginUser) && (
-        <FullScreenLoader message="Logging you in..." />
-      )}
+    <>
+      <Helmet>
+        <title>Login | BlogSphere</title>
+        <meta
+          name="description"
+          content="Log in to your BlogSphere account to explore a world of blogs, engage with writers, and manage your content effortlessly."
+        />
+      </Helmet>
+      <AnimationWrapper>
+        {(isLoginUser || isGoogleLoginUser) && (
+          <FullScreenLoader message="Logging you in..." />
+        )}
 
-      <section className="h-cover flex-center pt-[18vh]">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleLogin)}
-            className="w-[90%] max-w-[400px] md:max-w-[450px] flex flex-col gap-2 md:gap-3 md:form-container"
-          >
-            <div className="text-center mb-4">
-              <h2 className="h3-bold md:h2-bold capitalize">welcome back</h2>
-              <p className="text-light-3 base-medium md:body-medium my-2 md:mb-4">
-                Login to your account
-              </p>
-            </div>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type="email"
-                        placeholder="Email"
-                        className="shad-input pl-11 max-sm:placeholder:text-sm"
-                        {...field}
-                      />
-                      <IoMailOutline className="input-icon left-4" />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={passwordVisible ? "text" : "password"}
-                        placeholder="Password"
-                        autoComplete="on"
-                        className="shad-input pl-11 max-sm:placeholder:text-sm"
-                        {...field}
-                      />
-                      <IoKeyOutline className="input-icon left-4" />
-                      {passwordVisible ? (
-                        <IoEye
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      ) : (
-                        <IoEyeOff
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex justify-end">
-              <Link
-                to="/forgot-password"
-                className="underline text-primary ml-1 text-sm md:text-base"
-              >
-                Forgot Password?
-              </Link>
-            </div>
-
-            <Button
-              type="submit"
-              className="h-12 rounded-full mt-2 text-sm md:text-base"
-              disabled={isLoginUser}
+        <section className="h-cover flex-center pt-[18vh]">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleLogin)}
+              className="w-[90%] max-w-[400px] md:max-w-[450px] flex flex-col gap-2 md:gap-3 md:form-container"
             >
-              Log in
-            </Button>
-
-            {verificationMsg && (
-              <div className="text-center mb-4 bg-red-100 border border-red-400 p-1 rounded-md">
-                <p className="max-sm:text-sm text-red-800  p-2 rounded-md">
-                  {verificationMsg}
+              <div className="text-center mb-4">
+                <h2 className="h3-bold md:h2-bold capitalize">welcome back</h2>
+                <p className="text-light-3 base-medium md:body-medium my-2 md:mb-4">
+                  Login to your account
                 </p>
+              </div>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type="email"
+                          placeholder="Email"
+                          className="shad-input pl-11 max-sm:placeholder:text-sm"
+                          {...field}
+                        />
+                        <IoMailOutline className="input-icon left-4" />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={passwordVisible ? "text" : "password"}
+                          placeholder="Password"
+                          autoComplete="on"
+                          className="shad-input pl-11 max-sm:placeholder:text-sm"
+                          {...field}
+                        />
+                        <IoKeyOutline className="input-icon left-4" />
+                        {passwordVisible ? (
+                          <IoEye
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        ) : (
+                          <IoEyeOff
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end">
                 <Link
-                  to="/resend-verification-link"
-                  className="text-primary underline text-sm md:text-base"
+                  to="/forgot-password"
+                  className="underline text-primary ml-1 text-sm md:text-base"
                 >
-                  Resend verification link
+                  Forgot Password?
                 </Link>
               </div>
-            )}
 
-            <p className="text-sm md:text-base text-center text-secondary-foreground">
-              Don't have an account?
-              <Link to="/signup" className="underline text-primary ml-1">
-                Join us today
-              </Link>
-            </p>
-
-            <div className="w-full flex-center gap-3 my-2 md:my-3 uppercase text-muted-foreground font-medium">
-              <hr className="w-1/2 border-b border-border " />
-              or
-              <hr className="w-1/2 border-b border-border" />
-            </div>
-
-            <Button
-              variant="secondary"
-              className="h-12 border border-muted-foreground/40 rounded-full flex-center gap-3 text-sm md:text-base"
-              onClick={handleGoogleAuth}
-              disabled={isGoogleLoginUser}
-            >
-              <FcGoogle size={20} />
-              Continue with Google
-            </Button>
-
-            <p className="mt-4 text-sm text-center text-muted-foreground">
-              By logging in, you agree to BlogSphere's
-              <a
-                href="/privacy-policy"
-                className="no-underline hover:underline ml-1"
+              <Button
+                type="submit"
+                className="h-12 rounded-full mt-2 text-sm md:text-base"
+                disabled={isLoginUser}
               >
-                Privacy Policy
-              </a>
-              .
-            </p>
-          </form>
-        </Form>
-      </section>
-    </AnimationWrapper>
+                Log in
+              </Button>
+
+              {verificationMsg && (
+                <div className="text-center mb-4 bg-red-100 border border-red-400 p-1 rounded-md">
+                  <p className="max-sm:text-sm text-red-800  p-2 rounded-md">
+                    {verificationMsg}
+                  </p>
+                  <Link
+                    to="/resend-verification-link"
+                    className="text-primary underline text-sm md:text-base"
+                  >
+                    Resend verification link
+                  </Link>
+                </div>
+              )}
+
+              <p className="text-sm md:text-base text-center text-secondary-foreground">
+                Don't have an account?
+                <Link to="/signup" className="underline text-primary ml-1">
+                  Join us today
+                </Link>
+              </p>
+
+              <div className="w-full flex-center gap-3 my-2 md:my-3 uppercase text-muted-foreground font-medium">
+                <hr className="w-1/2 border-b border-border " />
+                or
+                <hr className="w-1/2 border-b border-border" />
+              </div>
+
+              <Button
+                variant="secondary"
+                className="h-12 border border-muted-foreground/40 rounded-full flex-center gap-3 text-sm md:text-base"
+                onClick={handleGoogleAuth}
+                disabled={isGoogleLoginUser}
+              >
+                <FcGoogle size={20} />
+                Continue with Google
+              </Button>
+
+              <p className="mt-4 text-sm text-center text-muted-foreground">
+                By logging in, you agree to BlogSphere's
+                <Link
+                  to="/privacy-policy"
+                  className="no-underline hover:underline ml-1"
+                >
+                  Privacy Policy.
+                </Link>
+              </p>
+            </form>
+          </Form>
+        </section>
+      </AnimationWrapper>
+    </>
   );
 };
 

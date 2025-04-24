@@ -14,6 +14,7 @@ import { ResetPasswordValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { IoEye, IoEyeOff, IoKeyOutline } from "react-icons/io5";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -98,116 +99,126 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="w-full h-full">
-      <section className="h-cover flex-center py-[20vh]">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleResetPassword)}
-            className="w-[80%] max-w-[450px] flex flex-col gap-2 md:gap-3"
-          >
-            <div className="text-center">
-              <h2 className="text-xl md:text-2xl font-semibold capitalize text-center">
-                Reset your password
-              </h2>
-
-              <p className="text-muted-foreground my-2 md:mb-2 text-sm md:text-base">
-                Ready for a fresh start? Go ahead and set a new password.
-              </p>
-            </div>
-            {isPending && <LoadingSpinner className="flex-col m-auto" />}
-
-            <FormField
-              control={form.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={passwordVisible ? "text" : "password"}
-                        placeholder="New Password"
-                        autoComplete="on"
-                        className="shad-input pl-11"
-                        {...field}
-                      />
-                      <IoKeyOutline className="input-icon left-4" />
-                      {passwordVisible ? (
-                        <IoEye
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      ) : (
-                        <IoEyeOff
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmNewPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={passwordVisible ? "text" : "password"}
-                        placeholder="Confirm New Password"
-                        autoComplete="on"
-                        className="shad-input pl-11"
-                        {...field}
-                      />
-                      <IoKeyOutline className="input-icon left-4" />
-                      {passwordVisible ? (
-                        <IoEye
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      ) : (
-                        <IoEyeOff
-                          onClick={() => setPasswordVisible((prev) => !prev)}
-                          className="input-icon right-4 cursor-pointer"
-                        />
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              type="submit"
-              className="h-12 rounded-full mt-2 text-sm md:text-base"
-              disabled={isPending}
+    <>
+      <Helmet>
+        <title>Reset Password | BlogSphere</title>
+        <meta
+          name="description"
+          content="Reset your password to regain access to your account."
+        />
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="w-full h-full">
+        <section className="h-cover flex-center py-[20vh]">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleResetPassword)}
+              className="w-[80%] max-w-[450px] flex flex-col gap-2 md:gap-3"
             >
-              Save
-            </Button>
+              <div className="text-center">
+                <h2 className="text-xl md:text-2xl font-semibold capitalize text-center">
+                  Reset your password
+                </h2>
 
-            {errorMsg && (
-              <div className="max-sm:text-sm text-red-800 bg-red-100 border border-red-400 p-2 rounded-md mt-3">
-                <p>{errorMsg}</p>
-                {showResendLink && (
-                  <p className="text-center mt-2">
-                    <Link
-                      to="/forgot-password"
-                      className="text-primary underline text-sm md:text-base"
-                    >
-                      Resend reset password link
-                    </Link>
-                  </p>
-                )}
+                <p className="text-muted-foreground my-2 md:mb-2 text-sm md:text-base">
+                  Ready for a fresh start? Go ahead and set a new password.
+                </p>
               </div>
-            )}
-          </form>
-        </Form>
-      </section>
-    </div>
+              {isPending && <LoadingSpinner className="flex-col m-auto" />}
+
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={passwordVisible ? "text" : "password"}
+                          placeholder="New Password"
+                          autoComplete="on"
+                          className="shad-input pl-11"
+                          {...field}
+                        />
+                        <IoKeyOutline className="input-icon left-4" />
+                        {passwordVisible ? (
+                          <IoEye
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        ) : (
+                          <IoEyeOff
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmNewPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={passwordVisible ? "text" : "password"}
+                          placeholder="Confirm New Password"
+                          autoComplete="on"
+                          className="shad-input pl-11"
+                          {...field}
+                        />
+                        <IoKeyOutline className="input-icon left-4" />
+                        {passwordVisible ? (
+                          <IoEye
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        ) : (
+                          <IoEyeOff
+                            onClick={() => setPasswordVisible((prev) => !prev)}
+                            className="input-icon right-4 cursor-pointer"
+                          />
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                className="h-12 rounded-full mt-2 text-sm md:text-base"
+                disabled={isPending}
+              >
+                Save
+              </Button>
+
+              {errorMsg && (
+                <div className="max-sm:text-sm text-red-800 bg-red-100 border border-red-400 p-2 rounded-md mt-3">
+                  <p>{errorMsg}</p>
+                  {showResendLink && (
+                    <p className="text-center mt-2">
+                      <Link
+                        to="/forgot-password"
+                        className="text-primary underline text-sm md:text-base"
+                      >
+                        Resend reset password link
+                      </Link>
+                    </p>
+                  )}
+                </div>
+              )}
+            </form>
+          </Form>
+        </section>
+      </div>
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import { useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import * as z from "zod";
@@ -99,121 +100,131 @@ const ChangeUsername = () => {
   };
 
   return (
-    <AnimationWrapper>
-      <section className="h-cover p-0">
-        <div className="max-md:hidden text-center">
-          <h3 className="h3-bold !font-semibold capitalize text-left">
-            Change Username
-          </h3>
-          <hr className="mt-2 border-1 border-border" />
-        </div>
-        <div className="my-2 text-left text-slate-500 dark:text-slate-400 flex flex-col gap-1">
-          <p>
-            Your username is your unique identity on this platform. It appears
-            in your profile URL.
-          </p>
-          {/* <p>
+    <>
+      <Helmet>
+        <title>Change Username | BlogSphere</title>
+        <meta
+          name="description"
+          content="Change your username on BlogSphere. Your username is your unique identity on this platform."
+        />
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <AnimationWrapper>
+        <section className="h-cover p-0">
+          <div className="max-md:hidden text-center">
+            <h3 className="h3-bold !font-semibold capitalize text-left">
+              Change Username
+            </h3>
+            <hr className="mt-2 border-1 border-border" />
+          </div>
+          <div className="my-2 text-left text-slate-500 dark:text-slate-400 flex flex-col gap-1">
+            <p>
+              Your username is your unique identity on this platform. It appears
+              in your profile URL.
+            </p>
+            {/* <p>
             {" "}
             and to mention you in posts and comments using{" "}
             <code>@username</code>.
           </p> */}
-        </div>
-        <div className="flex-center mt-10 md:mt-16">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleFormSubmit)}
-              className="w-full max-w-[400px] flex flex-col gap-2 md:gap-3 md:form-container md:!py-12"
-            >
-              <p>
-                Current Username:{" "}
-                <strong className="font-semibold">{user.username}</strong>
-              </p>
-              <FormField
-                control={form.control}
-                name="newUsername"
-                render={({ field }) => (
-                  <FormItem>
-                    <p className="text-muted-foreground mt-1">
-                      You can only change your username once.
-                    </p>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="New Username"
-                        className="shad-input pl-4"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button
-                type="submit"
-                ref={submitButtonRef}
-                className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
-                disabled={
-                  !form.formState.isValid ||
-                  form.watch("newUsername").trim().toLowerCase() ===
-                    user.username.toLowerCase()
-                }
+          </div>
+          <div className="flex-center mt-10 md:mt-16">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleFormSubmit)}
+                className="w-full max-w-[400px] flex flex-col gap-2 md:gap-3 md:form-container md:!py-12"
               >
-                Update
-              </Button>
-              <div className="mt-2 flex flex-col gap-2 text-sm">
                 <p>
-                  <strong className="font-semibold">Note:</strong> After
-                  updating your username, some links using the old one might
-                  temporarily stop working until everything refreshes.
+                  Current Username:{" "}
+                  <strong className="font-semibold">{user.username}</strong>
                 </p>
-                <p className="text-muted-foreground">
-                  Additionally, you will need to log in again for security
-                  reasons and proper session management.
-                </p>
-              </div>
-            </form>
-          </Form>
-        </div>
-        {/* Update Confirmation Dialog */}
-        <AlertDialog
-          open={showConfirmDialog}
-          onOpenChange={setShowConfirmDialog}
-        >
-          <AlertDialogContent className="!rounded-2xl">
-            <AlertDialogHeader className="text-left">
-              <AlertDialogTitle className="text-base">
-                Confirm Username Change
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                Your username can only be changed once. This action is permanent
-                and can not be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex-row justify-end gap-3 md:gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setShowConfirmDialog(false)}
-                disabled={isUpdating}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleUsernameUpdate}
-                disabled={isUpdating}
-              >
-                <TextWithLoader
-                  text="Update"
-                  isLoading={isUpdating}
-                  loaderClassName="text-white"
+                <FormField
+                  control={form.control}
+                  name="newUsername"
+                  render={({ field }) => (
+                    <FormItem>
+                      <p className="text-muted-foreground mt-1">
+                        You can only change your username once.
+                      </p>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="New Username"
+                          className="shad-input pl-4"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </section>
-    </AnimationWrapper>
+
+                <Button
+                  type="submit"
+                  ref={submitButtonRef}
+                  className="h-12 rounded-full mt-2 text-sm md:text-base flex-center gap-1"
+                  disabled={
+                    !form.formState.isValid ||
+                    form.watch("newUsername").trim().toLowerCase() ===
+                      user.username.toLowerCase()
+                  }
+                >
+                  Update
+                </Button>
+                <div className="mt-2 flex flex-col gap-2 text-sm">
+                  <p>
+                    <strong className="font-semibold">Note:</strong> After
+                    updating your username, some links using the old one might
+                    temporarily stop working until everything refreshes.
+                  </p>
+                  <p className="text-muted-foreground">
+                    Additionally, you will need to log in again for security
+                    reasons and proper session management.
+                  </p>
+                </div>
+              </form>
+            </Form>
+          </div>
+          {/* Update Confirmation Dialog */}
+          <AlertDialog
+            open={showConfirmDialog}
+            onOpenChange={setShowConfirmDialog}
+          >
+            <AlertDialogContent className="!rounded-2xl">
+              <AlertDialogHeader className="text-left">
+                <AlertDialogTitle className="text-base">
+                  Confirm Username Change
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Your username can only be changed once. This action is
+                  permanent and can not be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-row justify-end gap-3 md:gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowConfirmDialog(false)}
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleUsernameUpdate}
+                  disabled={isUpdating}
+                >
+                  <TextWithLoader
+                    text="Update"
+                    isLoading={isUpdating}
+                    loaderClassName="text-white"
+                  />
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </section>
+      </AnimationWrapper>
+    </>
   );
 };
 

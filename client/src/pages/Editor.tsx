@@ -3,6 +3,7 @@ import PublishForm from "@/components/editor/PublishForm";
 import { useGetBlog } from "@/lib/react-query/queries";
 import { INITIAL_BLOG, useEditorStore } from "@/store";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams, useSearchParams } from "react-router-dom";
 
 const Editor = () => {
@@ -23,14 +24,10 @@ const Editor = () => {
       // Edit mode: Load existing blog data for editing
       setBlog(data);
       setLastSavedBlog(data);
-      document.title = data.title
-        ? `Editor "${data.title}" - BlogSphere`
-        : "Editor - BlogSphere";
     } else {
       // Create mode: Initialize the blog with default values
       setBlog(INITIAL_BLOG);
       setLastSavedBlog(INITIAL_BLOG);
-      document.title = "Editor - BlogSphere";
     }
 
     setIsPublish(false);
@@ -46,7 +43,23 @@ const Editor = () => {
     }
   }, [isPublish]);
 
-  return isPublish ? <PublishForm /> : <BlogEditor />;
+  return (
+    <>
+      <Helmet>
+        <title>
+          {blogId && data?.title
+            ? `Editing "${data.title}" | BlogSphere`
+            : "Editor | BlogSphere"}
+        </title>
+        <meta
+          name="description"
+          content="Create, edit, and publish your blog posts on BlogSphere — your space to share ideas and stories."
+        />
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      {isPublish ? <PublishForm /> : <BlogEditor />}
+    </>
+  );
 };
 
 export default Editor;
