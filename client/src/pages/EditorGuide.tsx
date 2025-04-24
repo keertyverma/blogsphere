@@ -207,7 +207,8 @@ const EditorJsUserGuide = () => {
               </ul>
             </li>
             <li>
-              Supports <strong>nested lists</strong> for better organization.
+              Supports <strong>nested lists</strong> for better organization (up
+              to 3 levels).
               <div className="my-2 flex flex-col md:flex-row gap-4 md:gap-10">
                 <img
                   src="/docs/nested-unordered-list.png"

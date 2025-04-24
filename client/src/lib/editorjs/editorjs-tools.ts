@@ -35,6 +35,7 @@ export const editorJSTools = {
     inlineToolbar: true,
     config: {
       counterTypes: ["numeric"],
+      maxLevel: 3,
     },
   },
   image: {

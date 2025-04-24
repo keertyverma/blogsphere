@@ -5,7 +5,7 @@ import { useEffect } from "react";
  *
  * This hook monitors DOM changes to detect when the EditorJS popover is opened.
  * If the popover contains an item titled "Ordered," it hides the menu items
- * labeled "Start with" and "Counter type."
+ * labeled "Start with" and "Convert to."
  */
 const useHidePopoverItems = () => {
   useEffect(() => {
@@ -30,7 +30,7 @@ const useHidePopoverItems = () => {
         if (
           !titleText ||
           titleText === "Start with" ||
-          titleText === "Counter type"
+          titleText === "Convert to"
         ) {
           (item as HTMLElement).style.display = "none";
         }

@@ -44,7 +44,7 @@ const BlockList = ({ style, items }: Props) => {
             <span dangerouslySetInnerHTML={{ __html: safeHTML }} />
           )}
           {style === "checklist" && (
-            <div className="flex gap-1 md:gap-2">
+            <div className="flex gap-1">
               <span className={`${isChecked ? "mx-0.5  md:mx-0.8" : ""}`}>
                 {isChecked ? (
                   "✅"
