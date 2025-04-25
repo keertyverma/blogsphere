@@ -7,7 +7,6 @@ import {
 } from "@/lib/utils";
 import { useAuthStore } from "@/store";
 import { IAuthor, IBlog } from "@/types";
-import { FaRegHeart } from "react-icons/fa";
 import { IoEyeOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import ManageBlog from "../blog/ManageBlog";
@@ -100,27 +99,17 @@ const BlogPostCard = ({
       <Link to={blogPageUrl}>
         <section className="flex justify-between p-0 max-lg:mb-6">
           {/* Show blog stats - total likes and read count only for published blogs */}
-
           <div className="flex items-center justify-center gap-3 text-muted-foreground">
-            {showLikeCount && (
-              <div className="flex-center gap-1">
-                <FaRegHeart />
-                {activity && activity?.totalLikes > 0 && (
-                  <p className="text-sm">
-                    {formateNumber(activity.totalLikes)}
-                  </p>
-                )}
+            {showLikeCount && activity && activity.totalLikes > 0 && (
+              <div className="flex-center gap-1 text-sm">
+                <p>{formateNumber(activity.totalLikes)}</p>
+                <span>{activity.totalLikes === 1 ? "like" : "likes"}</span>
               </div>
             )}
-
-            {showReadCount && (
+            {showReadCount && activity && activity.totalReads > 0 && (
               <div className="flex-center gap-1">
-                <IoEyeOutline className="text-lg" />
-                {activity && activity?.totalReads > 0 && (
-                  <p className="text-sm">
-                    {formateNumber(activity.totalReads)}
-                  </p>
-                )}
+                <IoEyeOutline className="text-base" />
+                <p className="text-sm">{formateNumber(activity.totalReads)}</p>
               </div>
             )}
           </div>
