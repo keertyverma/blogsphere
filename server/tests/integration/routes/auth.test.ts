@@ -1,16 +1,17 @@
 import bcrypt from "bcrypt";
 import cookie from "cookie";
 import "dotenv/config";
-import { Server } from "http";
 import { Application } from "express";
+import { Server } from "http";
 import { disconnect } from "mongoose";
 import ms from "ms";
 import request from "supertest";
 
 import { IUser, User } from "../../../src/models/user.model";
+import { startServer } from "../../../src/start";
+import { generateUsername } from "../../../src/utils";
 import FirebaseAuthError from "../../../src/utils/errors/firebase-error";
 import * as firebaseAuth from "../../../src/utils/firebase-auth";
-import { startServer } from "../../../src/start";
 
 let server: Server;
 let app: Application;
@@ -220,10 +221,16 @@ describe("/api/v1/auth", () => {
       });
     };
 
-    const mockUser = {
+    const mockUser1 = {
       email: "test@gmail.com",
       name: "User-1",
       picture: "http://example.com/dummy=s96-c",
+    } as DecodedIdToken;
+
+    const mockUser2 = {
+      email: "test2@gmail.com",
+      name: "",
+      picture: "",
     } as DecodedIdToken;
 
     it("should return BadRequest-400 if access token is not provided", async () => {
@@ -289,13 +296,13 @@ describe("/api/v1/auth", () => {
 
     it("should return Forbidden-403 if user is already registered with same email without google sign-in", async () => {
       // Mock verifyIdToken function to return a mock user object
-      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser);
+      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser1);
 
       // create user with same email
       await User.create({
         personalInfo: {
-          fullname: mockUser.name,
-          email: mockUser.email,
+          fullname: mockUser1.name,
+          email: mockUser1.email,
         },
       });
 
@@ -314,13 +321,13 @@ describe("/api/v1/auth", () => {
 
     it("should authenticate user if google auth is set for given user", async () => {
       // Mock verifyIdToken function to return a mock user object
-      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser);
+      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser1);
 
       // create user with same email and set googleAuth
       const user = await User.create({
         personalInfo: {
-          fullname: mockUser.name,
-          email: mockUser.email,
+          fullname: mockUser1.name,
+          email: mockUser1.email,
         },
         googleAuth: true,
       });
@@ -346,9 +353,13 @@ describe("/api/v1/auth", () => {
 
     it("should create user and authenticate if user does not exists", async () => {
       // Mock verifyIdToken function to return a mock user object
-      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser);
-
+      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser1);
       const accessToken = "valid token";
+      const expectedUsername = await generateUsername(
+        mockUser1.email,
+        mockUser1.name
+      );
+
       const res = await exec(accessToken);
       expect(res.statusCode).toBe(200);
 
@@ -356,7 +367,7 @@ describe("/api/v1/auth", () => {
 
       // check if user is created in DB and googleAuth is set
       const user = (await User.findOne({
-        "personalInfo.email": mockUser.email,
+        "personalInfo.email": mockUser1.email,
       })) as IUser;
       expect(user.googleAuth).toBeTruthy();
       expect(user.isVerified).toBeTruthy();
@@ -367,11 +378,47 @@ describe("/api/v1/auth", () => {
       const cookies = cookie.parse(res.headers["set-cookie"][0]);
       expect(cookies.authToken).toBeDefined();
 
-      // User data in response body
-      const { fullname, email, username } = res.body.result;
-      expect(fullname).toBe(user?.personalInfo.fullname);
-      expect(email).toBe(user?.personalInfo.email);
-      expect(username).toBe(user?.personalInfo.username);
+      // Validate user data in response
+      const { fullname, email, username, profileImage } = res.body.result;
+      expect(email).toBe(mockUser1.email);
+      expect(fullname).toBe(mockUser1.name);
+      expect(username).toBe(expectedUsername); // username must be created from name
+      expect(profileImage.split("=")[0]).toBe(mockUser1.picture.split("=")[0]);
+    });
+
+    it("should create a user with fullname and username derived from email when Google name is missing", async () => {
+      // When Google user has no name, fallback to using email to assign fullname and generate username
+      // Mock verifyIdToken function to return a mock user object
+      jest.spyOn(firebaseAuth, "verifyIdToken").mockResolvedValue(mockUser2);
+      const accessToken = "valid token";
+      const expectedUsername = await generateUsername(
+        mockUser2.email,
+        mockUser2.name
+      );
+
+      const res = await exec(accessToken);
+
+      expect(res.statusCode).toBe(200);
+      expect(firebaseAuth.verifyIdToken).toHaveBeenCalledWith(accessToken);
+      // check if user is created in DB and googleAuth is set
+      const user = (await User.findOne({
+        "personalInfo.email": mockUser2.email,
+      })) as IUser;
+      expect(user.googleAuth).toBeTruthy();
+      expect(user.isVerified).toBeTruthy();
+
+      // Ensure the 'authToken' is set in the cookie
+      expect(res.headers["set-cookie"]).toBeTruthy();
+      // Parse the set-cookie header to get authToken
+      const cookies = cookie.parse(res.headers["set-cookie"][0]);
+      expect(cookies.authToken).toBeTruthy();
+
+      // Validate user data in response
+      const { fullname, email, username, profileImage } = res.body.result;
+      expect(email).toBe(mockUser2.email);
+      expect(fullname).toBe(mockUser2.email?.split("@")[0]);
+      expect(username).toBe(expectedUsername);
+      expect(profileImage).toBeTruthy();
     });
   });
 

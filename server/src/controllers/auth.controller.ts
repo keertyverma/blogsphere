@@ -134,14 +134,20 @@ const authenticateWithGoogle = async (req: Request, res: Response) => {
         );
       }
     } else {
+      // generate a unique username for the user based on their name or email
+      const username = await generateUsername(email || "", name);
+      // fallback to email prefix as fullname if Google name is missing
+      const fullname = name || email?.split("@")[0];
+
       // create user
-      const username = await generateUsername(email || "");
       user = new User({
         personalInfo: {
-          fullname: name,
+          fullname,
           email,
           username,
-          profileImage: picture,
+          // if Google profile picture exists, use it; otherwise leave it empty,
+          // and make sure during user creation a random/default profile image is assigned
+          ...(picture ? { profileImage: picture } : {}),
         },
         googleAuth: true,
         isVerified: true,
