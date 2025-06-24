@@ -7,5 +7,6 @@
     "clientEmail": "FIREBASE_CLIENT_EMAIL",
     "clientId": "FIREBASE_CLIENT_ID",
     "clientX509CertUrl": "FIREBASE_CLIENT_X509_CERT_URL"
-  }
+  },
+  "geminiApiKey": "GEMINI_API_KEY"
 }

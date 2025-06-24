@@ -10,3 +10,15 @@ export interface MailOptions {
   text: string;
   html?: string;
 }
+
+export interface EditorJsBlock {
+  id: string;
+  type: string;
+  data: Record<string, any>;
+}
+
+export interface BlogMetadata {
+  title: string;
+  summary: string;
+  tags: string[];
+}
