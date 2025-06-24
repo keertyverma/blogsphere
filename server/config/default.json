@@ -13,5 +13,6 @@
     "authToken": "7d",
     "verificationToken": "1d",
     "resetPasswordToken": "1d"
-  }
+  },
+  "geminiApiKey": ""
 }
