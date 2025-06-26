@@ -1,13 +1,24 @@
+// Mock `getAIClient` to allow custom behavior in individual tests (e.g., simulating Gemini API responses)
+jest.mock("../../../src/utils/gemini-ai/aiClient", () => {
+  const actual = jest.requireActual("../../../src/utils/gemini-ai/aiClient");
+  return {
+    ...actual,
+    getAIClient: jest.fn(),
+  };
+});
+
 import "dotenv/config";
+import { Application } from "express";
 import { Server } from "http";
 import { disconnect } from "mongoose";
-import request from "supertest";
-import { Application } from "express";
 import ms from "ms";
+import request from "supertest";
 
-import { startServer } from "../../../src/start";
+import { ApiError } from "@google/genai";
 import { Blog, IBlog } from "../../../src/models/blog.model";
 import { IUserDocument, User } from "../../../src/models/user.model";
+import { startServer } from "../../../src/start";
+import { getAIClient } from "../../../src/utils/gemini-ai/aiClient";
 
 let server: Server;
 let app: Application; // Express instance
@@ -1256,6 +1267,199 @@ describe("/api/v1/blogs", () => {
       expect(title).toBe(draftBlog.title);
       expect(publishedAt).toBeDefined();
       expect(publishedAt).toBeNull();
+    });
+  });
+
+  describe("POST /:blogId/ai-metadata", () => {
+    let token: string;
+    let blogs: IBlog[];
+    let user1: IUserDocument;
+    let user2: IUserDocument;
+    const mockedGetAIClient = getAIClient as jest.Mock;
+
+    beforeAll(async () => {
+      if (!server) return;
+      [user1, user2] = await createUsers();
+      blogs = await createBlogs(user1.id);
+    });
+
+    afterAll(async () => {
+      if (!server) return;
+      // db cleanup
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+    });
+
+    const exec = async (blogId: string) => {
+      return await request(app)
+        .post(`${endpoint}/${blogId}/ai-metadata`)
+        .set("Cookie", `authToken=${token}`);
+    };
+
+    it("should return Unauthorized-401 if user is not authorized", async () => {
+      // token cookie is not set
+      token = "";
+
+      const res = await exec("invalid-blogId");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.error).toMatchObject({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized access.",
+        details: "Access Denied.Token is not provided.",
+      });
+    });
+
+    it("should return 404-NotFound if blog with given blogId is not found", async () => {
+      token = user1.generateAuthToken();
+      const blogId = "invalid-blogId";
+
+      const res = await exec(blogId);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.error).toMatchObject({
+        code: "RESOURCE_NOT_FOUND",
+        message: "The requested resource was not found.",
+        details: `No blog found with blogId = ${blogId}`,
+      });
+    });
+
+    it("should return 403-Forbidden if user is unauthorized to access the blog", async () => {
+      // user2 is not the author of the blog
+      token = user2.generateAuthToken();
+      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
+        ?.blogId;
+
+      const res = await exec(publishedBlogId);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.error).toMatchObject({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this resource.",
+        details: "You are not authorized to access this blog.",
+      });
+    });
+
+    it("should return 400-BadRequest if blog content is empty", async () => {
+      token = user1.generateAuthToken();
+      const draftBlogId = blogs.filter(
+        (blog) => blog.isDraft === true && !blog.content
+      )[0].blogId;
+
+      const res = await exec(draftBlogId);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "No meaningful text found in blog content.",
+      });
+    });
+
+    it("should return 502-BadGateway if gemini API key is invalid", async () => {
+      token = user1.generateAuthToken();
+      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
+        ?.blogId;
+      // Mock `generateContent()` to throw a Gemini ApiError (simulates upstream failure)
+      mockedGetAIClient.mockReturnValue({
+        models: {
+          generateContent: jest.fn(() => {
+            throw new ApiError({
+              message: "API key not valid. Please pass a valid API key.",
+              status: 400,
+            });
+          }),
+        },
+      });
+
+      const res = await exec(publishedBlogId);
+
+      expect(res.statusCode).toBe(502);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_GATEWAY",
+        message:
+          "The server encountered an error while communicating with the AI service.",
+        details:
+          "AI service failed to respond properly. Please try again later.",
+      });
+    });
+
+    it("should return 502-BadGateway if AI responds with an invalid JSON", async () => {
+      token = user1.generateAuthToken();
+      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
+        ?.blogId;
+      // Mock `generateContent()` to return invalid JSON (causes JSON.parse to fail)
+      mockedGetAIClient.mockReturnValue({
+        models: {
+          generateContent: jest.fn(() => ({ text: "invalid json string" })),
+        },
+      });
+
+      const res = await exec(publishedBlogId);
+
+      expect(res.statusCode).toBe(502);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_GATEWAY",
+        message:
+          "The server encountered an error while communicating with the AI service.",
+        details: "AI response was invalid or incomplete.",
+      });
+    });
+
+    it("should return 502-BadGateway when AI response is missing required metadata fields", async () => {
+      token = user1.generateAuthToken();
+      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
+        ?.blogId;
+      // Mock `generateContent()` to return valid JSON but missing the "tags" field
+      mockedGetAIClient.mockReturnValue({
+        models: {
+          generateContent: jest.fn(() => ({
+            text: JSON.stringify({
+              title: "AI-generated title",
+              summary: "A concise summary of the blog content.",
+            }),
+          })),
+        },
+      });
+
+      const res = await exec(publishedBlogId);
+
+      expect(res.statusCode).toBe(502);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_GATEWAY",
+        message:
+          "The server encountered an error while communicating with the AI service.",
+        details: "AI response was invalid or incomplete.",
+      });
+    });
+
+    it("should return 200-Success and generate metadata for a valid blog", async () => {
+      token = user1.generateAuthToken();
+      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
+        ?.blogId;
+      // Mock `generateContent()` to return a valid JSON response with all required fields
+      const mockMetadata = {
+        title: "AI-generated title",
+        summary: "A concise summary of the blog content.",
+        tags: ["ai", "blog", "metadata"],
+      };
+      mockedGetAIClient.mockReturnValue({
+        models: {
+          generateContent: jest.fn(() => ({
+            text: JSON.stringify(mockMetadata),
+          })),
+        },
+      });
+
+      const res = await exec(publishedBlogId);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.result).toMatchObject({
+        blogId: publishedBlogId,
+        title: mockMetadata.title,
+        description: mockMetadata.summary,
+        tags: mockMetadata.tags,
+      });
     });
   });
 });

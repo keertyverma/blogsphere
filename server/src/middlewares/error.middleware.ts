@@ -34,6 +34,11 @@ export const errorHandler = (
       message:
         "An unexpected error occurred on the server. Please try again later",
     },
+    502: {
+      code: "BAD_GATEWAY",
+      message:
+        "The server encountered an error while communicating with the AI service.",
+    },
   };
 
   const customError = {

@@ -51,7 +51,21 @@ export function buildGeminiConfig({
   };
 }
 
-// Gemini client instance for AI content generation
-export const ai = new GoogleGenAI({
-  apiKey: config.get("geminiApiKey"),
-});
+let ai: GoogleGenAI | null = null;
+
+/**
+ * Returns a singleton instance of the Gemini AI client (`GoogleGenAI`).
+ * Throws an error if the Gemini API key is missing.
+ */
+export const getAIClient = (): GoogleGenAI => {
+  if (!ai) {
+    const apiKey = config.get<string>("geminiApiKey");
+    if (!apiKey) {
+      throw new Error("GEMINI_API_ERROR: Gemini API key is missing.");
+    }
+
+    ai = new GoogleGenAI({ apiKey });
+  }
+
+  return ai;
+};
