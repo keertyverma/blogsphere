@@ -10,7 +10,7 @@ import { Blog } from "../models/blog.model";
 import { Bookmark } from "../models/bookmark.model";
 import { Comment } from "../models/comment.model";
 import { User } from "../models/user.model";
-import { SortQuery } from "../types";
+import { BlogMetadata, SortQuery } from "../types";
 import {
   APIResponse,
   APIStatus,
@@ -20,6 +20,7 @@ import { isValidCursor } from "../utils";
 import BadRequestError from "../utils/errors/bad-request";
 import CustomAPIError from "../utils/errors/custom-api";
 import NotFoundError from "../utils/errors/not-found";
+import { generateBlogMetadataWithAI } from "../utils/gemini-ai/generateBlogMetadata";
 import { mongoIdValidator } from "../utils/joi-custom-types";
 import logger from "../utils/logger";
 
@@ -660,9 +661,76 @@ const getDraftBlogById = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
+const generateBlogAIMetadata = async (req: Request, res: Response) => {
+  logger.debug(
+    `${req.method} Request on Route -> ${req.baseUrl}/:blogId/ai-metadata`
+  );
+
+  const { blogId } = req.params;
+  const { id: userId } = req.user as JwtPayload;
+
+  // Find existing blog
+  const blog = await Blog.findOne({ blogId })
+    .select("_id author content")
+    .lean();
+  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+
+  // Ensure authenticated user is the author of the blog
+  if (userId !== blog.author.toString()) {
+    throw new CustomAPIError(
+      "You are not authorized to access this blog.",
+      StatusCodes.FORBIDDEN
+    );
+  }
+
+  // Generate blog metadata (title, summary and tags) using AI
+  try {
+    const blogMetadata = await generateBlogMetadataWithAI(blog.content);
+
+    const data: APIResponse = {
+      status: APIStatus.SUCCESS,
+      statusCode: StatusCodes.OK,
+      result: {
+        _id: blog._id,
+        blogId,
+        title: blogMetadata.title,
+        description: blogMetadata.summary,
+        tags: blogMetadata.tags,
+      },
+    };
+    return res.status(data.statusCode).json(data);
+  } catch (error: any) {
+    const errorMessage = error?.message || "";
+
+    if (errorMessage.startsWith("NO_MEANINGFUL_TEXT")) {
+      throw new BadRequestError("No meaningful text found in blog content.");
+    }
+
+    if (errorMessage.startsWith("GEMINI_API_ERROR")) {
+      throw new CustomAPIError(
+        "AI service failed to respond properly. Please try again later.",
+        StatusCodes.BAD_GATEWAY
+      );
+    }
+
+    if (errorMessage.startsWith("INVALID_AI_RESPONSE")) {
+      throw new CustomAPIError(
+        "AI response was invalid or incomplete.",
+        StatusCodes.BAD_GATEWAY
+      );
+    }
+    // Fallback
+    throw new CustomAPIError(
+      "Unexpected error during blog metadata generation.",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
 export {
   createBlog,
   deleteBlogByBlogId,
+  generateBlogAIMetadata,
   getAllDraftBlogs,
   getAllPublishedBlogs,
   getDraftBlogById,

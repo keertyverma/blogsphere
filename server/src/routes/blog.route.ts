@@ -2,13 +2,14 @@ import { Router } from "express";
 import {
   createBlog,
   deleteBlogByBlogId,
-  getPublishedBlogById,
+  generateBlogAIMetadata,
+  getAllDraftBlogs,
   getAllPublishedBlogs,
+  getDraftBlogById,
+  getPublishedBlogById,
   updateBlogById,
   updateLike,
   updateReadCount,
-  getAllDraftBlogs,
-  getDraftBlogById,
 } from "../controllers/blog.controller";
 import { verifyToken } from "../middlewares";
 
@@ -29,6 +30,7 @@ blogRouter.patch("/:blogId", verifyToken, updateBlogById); // Update a blog by i
 blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount); // Increment read count for a blog
 blogRouter.patch("/:blogId/like", verifyToken, updateLike); // Like or unlike a blog
 blogRouter.delete("/:blogId", verifyToken, deleteBlogByBlogId); // Delete a blog by its ID
+blogRouter.post("/:blogId/ai-metadata", verifyToken, generateBlogAIMetadata); // Generate blog metadata using AI
 
 /**
  * Public Routes
