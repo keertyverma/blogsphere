@@ -1,16 +1,17 @@
-import { useEditorStore } from "@/store";
 import { IoClose } from "react-icons/io5";
 import { Button } from "../ui/button";
 
-const Tag = ({ name }: { name: string }) => {
-  const blog = useEditorStore((s) => s.blog);
-  const setBlog = useEditorStore((s) => s.setBlog);
+interface TagProps {
+  name: string;
+  onDelete: (tag: string) => void;
+}
 
+const Tag = ({ name, onDelete }: TagProps) => {
   const handleTagDelete = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setBlog({ ...blog, tags: blog.tags.filter((t) => t !== name) });
+    onDelete(name);
   };
 
   return (

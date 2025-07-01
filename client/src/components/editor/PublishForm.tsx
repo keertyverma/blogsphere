@@ -1,12 +1,17 @@
-import { useCreateBlog, useUpdateBlog } from "@/lib/react-query/queries";
+import {
+  useCreateBlog,
+  useUpdateBlog,
+  useGenerateBlogMetadata,
+} from "@/lib/react-query/queries";
 import { showConfetti, showErrorToast, showSuccessToast } from "@/lib/utils";
 import { BlogValidation } from "@/lib/validation";
 import { useAuthStore, useEditorStore } from "@/store";
 import { IBlog, ICreatePublishedBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoSparkles } from "react-icons/io5";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -30,7 +35,7 @@ const PublishForm = () => {
   const DESCRIPTION_CHAR_LIMIT = 200;
   const {
     blog,
-    blog: { title, coverImgURL, description = "", tags = [], content },
+    blog: { title, coverImgURL, description = "", content },
   } = useEditorStore((s) => ({ blog: s.blog }));
   const setBlog = useEditorStore((s) => s.setBlog);
   const setIsPublish = useEditorStore((s) => s.setIsPublish);
@@ -39,10 +44,13 @@ const PublishForm = () => {
   const isDraft = searchParams.get("isDraft") === "true";
 
   const [descriptionValue, setDescriptionValue] = useState(description);
+  const [tags, setTags] = useState<string[]>(blog?.tags || []);
 
   const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
   const { mutateAsync: updatePublishedBlog, isPending: isUpdating } =
     useUpdateBlog();
+  const { mutateAsync: generateMetadataWithAI, isPending: isGeneratingWithAI } =
+    useGenerateBlogMetadata();
 
   const { blogId } = useParams();
   const navigate = useNavigate();
@@ -60,7 +68,7 @@ const PublishForm = () => {
     const { title, description, tag } = value;
 
     // tags are required
-    if (blog.tags.length === 0 && !tag) {
+    if (tags.length === 0 && !tag) {
       showErrorToast("Please add at least one tag to publish.");
       return;
     }
@@ -69,14 +77,13 @@ const PublishForm = () => {
       title,
       description,
       content: { blocks: content.blocks },
-      tags: blog.tags.length === 0 ? [tag] : blog.tags,
+      tags,
     };
 
     if (coverImgURL) {
       updatedBlog.coverImgURL = coverImgURL;
     }
 
-    setBlog({ ...blog, ...updatedBlog });
     const publishedBlog = {
       ...updatedBlog,
       isDraft: false,
@@ -94,12 +101,14 @@ const PublishForm = () => {
           blog: publishedBlog,
           isPublishingDraft,
         });
+        setBlog({ ...blog, ...updatedBlog });
         message = isDraft ? "Blog Published 🥳" : "Blog Updated";
         blogUrl = `/blogs/${updatedBlog.blogId}`;
         isPublished = isPublishingDraft;
       } else {
         // create mode - publish new blog
         const newBlog: IBlog = await createBlog(publishedBlog);
+        setBlog({ ...blog, ...newBlog });
         message = "Blog Published 🥳";
         blogUrl = `/blogs/${newBlog.blogId}`;
         isPublished = true;
@@ -128,15 +137,16 @@ const PublishForm = () => {
       e.preventDefault();
     }
   };
-  const addTags = (tag: string) => {
-    if (tags.length < TAG_LIMIT) {
-      // add tag
-      if (tag.length && !tags.includes(tag))
-        setBlog({ ...blog, tags: [...tags, tag] });
-    } else {
-      showErrorToast(
+
+  const addTag = (tag: string) => {
+    if (tags.length >= TAG_LIMIT) {
+      return showErrorToast(
         `Maximum tag limit of ${TAG_LIMIT} reached. You can’t add any more tags.`
       );
+    }
+
+    if (tag.length && !tags.includes(tag)) {
+      setTags([...tags, tag]);
     }
   };
 
@@ -159,7 +169,7 @@ const PublishForm = () => {
 
       const inputElement = e.target as HTMLInputElement;
       const tag = inputElement.value.trim();
-      addTags(tag);
+      addTag(tag);
 
       // reset input value
       form.setValue("tag", "");
@@ -180,16 +190,65 @@ const PublishForm = () => {
 
     if (inputValue.endsWith(",")) {
       const tag = inputValue.slice(0, -1).trim();
-      addTags(tag);
+      addTag(tag);
 
       form.setValue("tag", "");
+    }
+  };
+
+  /**
+   * Handles the process of generating blog metadata (title, summary, tags) using AI.
+   * Updates form fields and perform form validation after setting values.
+   */
+  const handleGenerateMetadataWithAI = async () => {
+    try {
+      if (blogId) {
+        // edit mode
+        const metadata = await generateMetadataWithAI(blogId);
+        if (!metadata) return;
+
+        // set AI-generated values into form
+        form.setValue("title", metadata.title);
+        form.setValue("description", metadata.description);
+        setDescriptionValue(metadata.description); // update character counter UI
+        setTags([...metadata.tags.slice(0, TAG_LIMIT)]); // cap the number of tags to the maximum allowed
+
+        // Trigger form-level validation
+        const isValid = await form.trigger(["title", "description"]);
+        if (isValid) {
+          showSuccessToast(
+            "AI-generated title, summary, and tags have been added to the form.",
+            { autoClose: 6000 }
+          );
+        }
+      } else {
+        // create mode
+        // TODO: create draft and then generate metadata
+        console.log("Pending...");
+      }
+    } catch (error) {
+      if (useAuthStore.getState().isTokenExpired) return;
+
+      let errorMessage = "An error occurred. Please try again later.";
+      if (error instanceof AxiosError && error.response) {
+        const { status } = error.response;
+        if (status === 400) {
+          errorMessage =
+            "To generate metadata, add more meaningful text (like paragraphs or headings) to your blog.";
+        } else if (status === 502) {
+          errorMessage =
+            "The AI service is currently unavailable. Please try again in a few moments.";
+        }
+      }
+
+      showErrorToast(errorMessage);
     }
   };
 
   return (
     <AnimationWrapper>
       <section className="px-6 mx-auto md:max-w-[728px] flex flex-col gap-2 py-12">
-        <div className="mb-5">
+        <div className="mb-1">
           <h3 className="h3-bold !font-semibold capitalize text-left">
             Publish your blog
           </h3>
@@ -209,6 +268,25 @@ const PublishForm = () => {
         >
           <IoClose className="text-xl" />
         </Button>
+        <div className="mb-1 flex flex-col-reverse sm:flex-row sm:justify-end sm:items-center gap-1 sm:gap-2">
+          <p className="text-xs sm:text-sm text-muted-foreground text-right">
+            💡 Let AI generate a title, summary, and tags.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border border-primary text-primary hover:text-primary rounded-lg self-end flex items-center gap-1"
+            onClick={handleGenerateMetadataWithAI}
+            disabled={isGeneratingWithAI}
+          >
+            {isGeneratingWithAI ? (
+              <LoadingSpinner className="h-4 w-4 md:w-4 dark:text-white" />
+            ) : (
+              <IoSparkles className="text-yellow-500 w-4 h-4" />
+            )}
+            Generate With AI
+          </Button>
+        </div>
         <Form {...form}>
           <form
             className="w-full flex flex-col gap-4 md:border-[1px] border-border md:shadow-md rounded-lg p-0 md:p-6"
@@ -304,15 +382,21 @@ const PublishForm = () => {
                         onKeyDown={handleTagKeyDown}
                       />
                       {tags.map((tag, index) => (
-                        <Tag key={index} name={tag} />
+                        <Tag
+                          key={index}
+                          name={tag}
+                          onDelete={(tagToDelete: string) => {
+                            setTags(tags.filter((tag) => tag !== tagToDelete));
+                          }}
+                        />
                       ))}
+                      {tags.length > 0 && tags.length < TAG_LIMIT && (
+                        <FormDescription className="text-sm text-muted-foreground text-right mt-1">
+                          {TAG_LIMIT - tags.length} tags left
+                        </FormDescription>
+                      )}
                     </div>
                   </FormControl>
-                  {tags.length > 0 && tags.length < TAG_LIMIT && (
-                    <FormDescription className="text-sm text-muted-foreground text-right">
-                      {TAG_LIMIT - tags.length} tags left
-                    </FormDescription>
-                  )}
                   <FormMessage className="shad-form_message" />
                 </FormItem>
               )}

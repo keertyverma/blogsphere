@@ -583,6 +583,15 @@ export const useDeleteBlog = () => {
   });
 };
 
+export const useGenerateBlogMetadata = () => {
+  return useMutation({
+    mutationFn: (blogId: string) =>
+      apiClient
+        .post(`/blogs/${blogId}/ai-metadata`)
+        .then((res) => res.data.result),
+  });
+};
+
 // ----------------- Comment -------------------
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
