@@ -1,7 +1,7 @@
 import { ApiError, Type } from "@google/genai";
 import Joi from "joi";
-import { BlogMetadata, EditorJsBlock } from "../../types";
-import { getAIClient, buildGeminiConfig } from "./aiClient";
+import { BlogMetadata } from "../../types";
+import { buildGeminiConfig, getAIClient } from "./aiClient";
 
 /**
  * Generates SEO-friendly blog metadata (title, summary, tags) using Gemini 2.0 Flash Lite.
@@ -93,64 +93,6 @@ export const generateBlogMetadataWithAI = async (
       "UNHANDLED_AI_ERROR: An unexpected error occurred during AI metadata generation."
     );
   }
-};
-
-/**
- * Converts an array of Editor.js blocks to plain, structured text.
- * Used for generating blog metadata (title, summary, tags) with AI.
- *
- * Only includes semantic content types: header, paragraph, quote, and list.
- * Ignores visual or non-informative blocks like code, image, divider, etc.
- *
- * @param blocks - Array of Editor.js content blocks
- * @returns Plain text string for AI consumption
- */
-export const convertEditorJsToText = (blocks: EditorJsBlock[]): string => {
-  return blocks
-    .map((block) => {
-      const { type, data } = block;
-      switch (type) {
-        case "header":
-          // Include heading level (e.g., #, ##) to preserve content structure and hierarchy,
-          // which helps the AI better understand the importance of each section.
-          if (!data.text?.trim()) return "";
-          return `${"#".repeat(data.level)} ${data.text}`;
-        case "paragraph":
-          return data.text?.trim() || "";
-        case "quote":
-          return data.text?.trim() || "";
-        case "list":
-          return renderNestedList(data.items || []);
-        default:
-          return ""; // Ignore all other block types (e.g., code, image, divider)
-      }
-    })
-    .filter(Boolean) // Remove empty or invalid blocks
-    .join("\n")
-    .trim();
-};
-
-/**
- * Recursively renders nested list items from Editor.js-style blocks into plain text.
- * Skips empty items and formats with indentation for nesting.
- *
- * @param items - The list items array from Editor.js block
- * @param level - The current nesting level (used for indentation)
- * @returns A formatted plain-text string representing the list
- */
-const renderNestedList = (items: any[], level = 0): string => {
-  const indent = " ".repeat(level * 2);
-
-  return items
-    .filter((item) => item.content?.trim()) // Skip empty list items
-    .map((item) => {
-      const line = `${indent}- ${item.content.trim()}`;
-      const nested = item.items?.length
-        ? `\n${renderNestedList(item.items, level + 1)}`
-        : "";
-      return `${line}${nested}`;
-    })
-    .join("\n");
 };
 
 const validateBlogMetadata = (metadata: any) => {
