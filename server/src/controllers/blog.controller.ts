@@ -661,50 +661,66 @@ const getDraftBlogById = async (req: Request, res: Response) => {
   return res.status(data.statusCode).json(data);
 };
 
+const validateGenerateBlogAIMetadata = (data: {
+  blogId?: string;
+  blogText: string;
+}) => {
+  const schema = Joi.object({
+    blogId: mongoIdValidator.objectId().trim(),
+    blogText: Joi.string().trim().required().messages({
+      "string.empty": "'blogText' is required.",
+      "any.required": "'blogText' is required.",
+    }),
+  });
+
+  const { error, value } = schema.validate(data);
+  if (error) {
+    let errorMessage = error.details[0].message;
+    logger.error(`Input Validation Error! \n ${errorMessage}`);
+    throw new BadRequestError(errorMessage);
+  }
+
+  return value;
+};
+
 const generateBlogAIMetadata = async (req: Request, res: Response) => {
-  logger.debug(
-    `${req.method} Request on Route -> ${req.baseUrl}/:blogId/ai-metadata`
-  );
+  logger.debug(`${req.method} Request on Route -> ${req.baseUrl}/ai-metadata`);
 
-  const { blogId } = req.params;
-  const { id: userId } = req.user as JwtPayload;
+  // validate request body
+  const { blogId, blogText } = validateGenerateBlogAIMetadata(req.body);
 
-  // Find existing blog
-  const blog = await Blog.findOne({ blogId })
-    .select("_id author content")
-    .lean();
-  if (!blog) throw new NotFoundError(`No blog found with blogId = ${blogId}`);
+  if (blogId) {
+    // Find existing blog
+    const blog = await Blog.findById(blogId).select("author").lean();
+    if (!blog) throw new NotFoundError(`No blog found with ID = ${blogId}`);
 
-  // Ensure authenticated user is the author of the blog
-  if (userId !== blog.author.toString()) {
-    throw new CustomAPIError(
-      "You are not authorized to access this blog.",
-      StatusCodes.FORBIDDEN
-    );
+    // Ensure authenticated user is the author of the blog
+    const userId = (req.user as JwtPayload).id;
+    if (userId !== blog.author.toString()) {
+      throw new CustomAPIError(
+        "You are not authorized to access this blog.",
+        StatusCodes.FORBIDDEN
+      );
+    }
   }
 
   // Generate blog metadata (title, summary and tags) using AI
   try {
-    const blogMetadata = await generateBlogMetadataWithAI(blog.content);
+    const { title, summary, tags } = await generateBlogMetadataWithAI(blogText);
 
     const data: APIResponse = {
       status: APIStatus.SUCCESS,
       statusCode: StatusCodes.OK,
       result: {
-        _id: blog._id,
-        blogId,
-        title: blogMetadata.title,
-        description: blogMetadata.summary,
-        tags: blogMetadata.tags,
+        ...(blogId ? { _id: blogId } : {}),
+        title,
+        description: summary,
+        tags: tags,
       },
     };
     return res.status(data.statusCode).json(data);
   } catch (error: any) {
     const errorMessage = error?.message || "";
-
-    if (errorMessage.startsWith("NO_MEANINGFUL_TEXT")) {
-      throw new BadRequestError("No meaningful text found in blog content.");
-    }
 
     if (errorMessage.startsWith("GEMINI_API_ERROR")) {
       throw new CustomAPIError(

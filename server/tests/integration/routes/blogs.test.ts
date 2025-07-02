@@ -10,7 +10,7 @@ jest.mock("../../../src/utils/gemini-ai/aiClient", () => {
 import "dotenv/config";
 import { Application } from "express";
 import { Server } from "http";
-import { disconnect } from "mongoose";
+import mongoose, { disconnect } from "mongoose";
 import ms from "ms";
 import request from "supertest";
 
@@ -1270,7 +1270,7 @@ describe("/api/v1/blogs", () => {
     });
   });
 
-  describe("POST /:blogId/ai-metadata", () => {
+  describe("POST /ai-metadata", () => {
     let token: string;
     let blogs: IBlog[];
     let user1: IUserDocument;
@@ -1290,17 +1290,18 @@ describe("/api/v1/blogs", () => {
       await Blog.deleteMany({});
     });
 
-    const exec = async (blogId: string) => {
+    const exec = async (payload: { blogText: string; blogId?: string }) => {
       return await request(app)
-        .post(`${endpoint}/${blogId}/ai-metadata`)
-        .set("Cookie", `authToken=${token}`);
+        .post(`${endpoint}/ai-metadata`)
+        .set("Cookie", `authToken=${token}`)
+        .send(payload);
     };
 
     it("should return Unauthorized-401 if user is not authorized", async () => {
       // token cookie is not set
       token = "";
 
-      const res = await exec("invalid-blogId");
+      const res = await exec({ blogText: "dummy data" });
 
       expect(res.statusCode).toBe(401);
       expect(res.body.error).toMatchObject({
@@ -1310,27 +1311,61 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return 404-NotFound if blog with given blogId is not found", async () => {
+    it("should return 400-BadRequest if blog content is empty", async () => {
       token = user1.generateAuthToken();
-      const blogId = "invalid-blogId";
 
-      const res = await exec(blogId);
+      const res = await exec({ blogText: "" });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: "'blogText' is required.",
+      });
+    });
+
+    it("should return 400-BadRequest if blogId is invalid", async () => {
+      token = user1.generateAuthToken();
+      // 'blogId' must be a valid mongodb Object id
+      const blogId = "invalid-blogid";
+
+      const res = await exec({ blogId, blogText: "some meaningful text data" });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Invalid input data",
+        details: '"blogId" must be a valid ID',
+      });
+    });
+
+    it("should return 404-NotFound if blog does not exists", async () => {
+      token = user1.generateAuthToken();
+      // blog with this id does not exists
+      const blogId = new mongoose.Types.ObjectId().toString();
+
+      const res = await exec({ blogId, blogText: "some meaningful text data" });
 
       expect(res.statusCode).toBe(404);
       expect(res.body.error).toMatchObject({
         code: "RESOURCE_NOT_FOUND",
         message: "The requested resource was not found.",
-        details: `No blog found with blogId = ${blogId}`,
+        details: `No blog found with ID = ${blogId}`,
       });
     });
 
     it("should return 403-Forbidden if user is unauthorized to access the blog", async () => {
       // user2 is not the author of the blog
       token = user2.generateAuthToken();
-      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
-        ?.blogId;
+      const publishedBlogId = blogs.filter((blog) => !blog.isDraft)[0]?.blogId;
+      const publishedBlog = await Blog.findOne({ blogId: publishedBlogId })
+        .select("_id")
+        .lean();
 
-      const res = await exec(publishedBlogId);
+      const res = await exec({
+        blogId: publishedBlog?._id.toString(),
+        blogText: "some meaningful text data",
+      });
 
       expect(res.statusCode).toBe(403);
       expect(res.body.error).toMatchObject({
@@ -1340,26 +1375,8 @@ describe("/api/v1/blogs", () => {
       });
     });
 
-    it("should return 400-BadRequest if blog content is empty", async () => {
-      token = user1.generateAuthToken();
-      const draftBlogId = blogs.filter(
-        (blog) => blog.isDraft === true && !blog.content
-      )[0].blogId;
-
-      const res = await exec(draftBlogId);
-
-      expect(res.statusCode).toBe(400);
-      expect(res.body.error).toMatchObject({
-        code: "BAD_REQUEST",
-        message: "Invalid input data",
-        details: "No meaningful text found in blog content.",
-      });
-    });
-
     it("should return 502-BadGateway if gemini API key is invalid", async () => {
       token = user1.generateAuthToken();
-      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
-        ?.blogId;
       // Mock `generateContent()` to throw a Gemini ApiError (simulates upstream failure)
       mockedGetAIClient.mockReturnValue({
         models: {
@@ -1372,7 +1389,9 @@ describe("/api/v1/blogs", () => {
         },
       });
 
-      const res = await exec(publishedBlogId);
+      const res = await exec({
+        blogText: "some meaningful text data",
+      });
 
       expect(res.statusCode).toBe(502);
       expect(res.body.error).toMatchObject({
@@ -1386,8 +1405,6 @@ describe("/api/v1/blogs", () => {
 
     it("should return 502-BadGateway if AI responds with an invalid JSON", async () => {
       token = user1.generateAuthToken();
-      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
-        ?.blogId;
       // Mock `generateContent()` to return invalid JSON (causes JSON.parse to fail)
       mockedGetAIClient.mockReturnValue({
         models: {
@@ -1395,7 +1412,9 @@ describe("/api/v1/blogs", () => {
         },
       });
 
-      const res = await exec(publishedBlogId);
+      const res = await exec({
+        blogText: "some meaningful text data",
+      });
 
       expect(res.statusCode).toBe(502);
       expect(res.body.error).toMatchObject({
@@ -1408,8 +1427,6 @@ describe("/api/v1/blogs", () => {
 
     it("should return 502-BadGateway when AI response is missing required metadata fields", async () => {
       token = user1.generateAuthToken();
-      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
-        ?.blogId;
       // Mock `generateContent()` to return valid JSON but missing the "tags" field
       mockedGetAIClient.mockReturnValue({
         models: {
@@ -1422,7 +1439,9 @@ describe("/api/v1/blogs", () => {
         },
       });
 
-      const res = await exec(publishedBlogId);
+      const res = await exec({
+        blogText: "some meaningful text data",
+      });
 
       expect(res.statusCode).toBe(502);
       expect(res.body.error).toMatchObject({
@@ -1435,8 +1454,10 @@ describe("/api/v1/blogs", () => {
 
     it("should return 200-Success and generate metadata for a valid blog", async () => {
       token = user1.generateAuthToken();
-      const publishedBlogId = blogs.filter((blog) => blog.isDraft === false)[0]
-        ?.blogId;
+      const publishedBlogId = blogs.filter((blog) => !blog.isDraft)[0]?.blogId;
+      const publishedBlog = await Blog.findOne({ blogId: publishedBlogId })
+        .select("_id")
+        .lean();
       // Mock `generateContent()` to return a valid JSON response with all required fields
       const mockMetadata = {
         title: "AI-generated title",
@@ -1450,12 +1471,46 @@ describe("/api/v1/blogs", () => {
           })),
         },
       });
+      const payload = {
+        blogId: publishedBlog?._id.toString(),
+        blogText: "some meaningful text data",
+      };
 
-      const res = await exec(publishedBlogId);
+      const res = await exec(payload);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.result).toMatchObject({
-        blogId: publishedBlogId,
+        _id: payload.blogId,
+        title: mockMetadata.title,
+        description: mockMetadata.summary,
+        tags: mockMetadata.tags,
+      });
+    });
+
+    it("should return 200-Success and generate metadata even when blogId is not passed", async () => {
+      token = user1.generateAuthToken();
+      // Mock `generateContent()` to return a valid JSON response with all required fields
+      const mockMetadata = {
+        title: "AI-generated title",
+        summary: "A concise summary of the blog content.",
+        tags: ["ai", "blog", "metadata"],
+      };
+      mockedGetAIClient.mockReturnValue({
+        models: {
+          generateContent: jest.fn(() => ({
+            text: JSON.stringify(mockMetadata),
+          })),
+        },
+      });
+      const payload = {
+        blogText: "some meaningful text data",
+      };
+
+      const res = await exec(payload);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.result._id).not.toBeDefined();
+      expect(res.body.result).toMatchObject({
         title: mockMetadata.title,
         description: mockMetadata.summary,
         tags: mockMetadata.tags,

@@ -5,13 +5,19 @@ import { getAIClient, buildGeminiConfig } from "./aiClient";
 
 /**
  * Generates SEO-friendly blog metadata (title, summary, tags) using Gemini 2.0 Flash Lite.
- * @param blogContent Editor.js block data from the blog
+ * @param blogText - Clean, meaningful text extracted from blog content blocks — excluding code, images, and other non-textual elements.
  * @returns Parsed AI-generated metadata as { title, summary, tags }
  * @throws If AI response cannot be parsed into valid JSON
  */
-export const generateBlogMetadataWithAI = async (blogContent: {
-  blocks: EditorJsBlock[];
-}): Promise<BlogMetadata> => {
+export const generateBlogMetadataWithAI = async (
+  blogText: string
+): Promise<BlogMetadata> => {
+  if (!blogText) {
+    throw new Error(
+      "NO_BLOG_TEXT: blogText is required but was empty or not provided."
+    );
+  }
+
   const model = "gemini-2.0-flash-lite";
 
   // Define structured schema for AI output
@@ -35,14 +41,6 @@ export const generateBlogMetadataWithAI = async (blogContent: {
     },
   };
   const config = buildGeminiConfig({ schema });
-
-  // Convert structured Editor.js blocks to plain text
-  const blogText = convertEditorJsToText(blogContent.blocks);
-  if (!blogText) {
-    throw new Error(
-      "NO_MEANINGFUL_TEXT: No meaningful text found in blog content."
-    );
-  }
 
   // Build prompt in Gemini's chat format: an array of messages with `role` and `parts`.
   // Here, we send a single user message with plain text.
