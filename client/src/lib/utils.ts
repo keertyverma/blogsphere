@@ -283,3 +283,62 @@ export const isReservedUsername = (username: string): boolean => {
 
   return RESERVED_KEYWORDS.has(username.toLowerCase());
 };
+
+/**
+ * Recursively renders nested list items from Editor.js-style blocks into plain text.
+ * Skips empty items and formats with indentation for nesting.
+ *
+ * @param items - The list items array from Editor.js block
+ * @param level - The current nesting level (used for indentation)
+ * @returns A formatted plain-text string representing the list
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const renderNestedList = (items: any[], level = 0): string => {
+  const indent = " ".repeat(level * 2);
+
+  return items
+    .filter((item) => item.content?.trim()) // Skip empty list items
+    .map((item) => {
+      const line = `${indent}- ${item.content.trim()}`;
+      const nested = item.items?.length
+        ? `\n${renderNestedList(item.items, level + 1)}`
+        : "";
+      return `${line}${nested}`;
+    })
+    .join("\n");
+};
+
+/**
+ * Extracts meaningful plain text from Editor.js blocks for AI-based metadata generation.
+ *
+ * Includes only semantic content types: header, paragraph, quote, and list.
+ * Excludes non-textual or decorative blocks like code, image, and divider.
+ *
+ * @param blocks - The Editor.js content blocks
+ * @returns A structured plain text string for AI processing
+ */
+export const extractMeaningfulTextFromBlogContent = (
+  blocks: OutputBlockData[]
+): string => {
+  return blocks
+    .map((block) => {
+      const { type, data } = block;
+      switch (type) {
+        case "header":
+          // Include heading level (e.g., #, ##) to preserve content structure and hierarchy,
+          // which helps the AI better understand the importance of each section.
+          if (!data.text?.trim()) return "";
+          return `${"#".repeat(data.level)} ${data.text.trim()}`;
+        case "paragraph":
+        case "quote":
+          return data.text?.trim() || "";
+        case "list":
+          return renderNestedList(data.items || []);
+        default:
+          return ""; // Ignore all other block types (e.g., code, image, divider)
+      }
+    })
+    .filter(Boolean) // Remove empty or invalid blocks
+    .join("\n")
+    .trim();
+};

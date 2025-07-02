@@ -585,9 +585,12 @@ export const useDeleteBlog = () => {
 
 export const useGenerateBlogMetadata = () => {
   return useMutation({
-    mutationFn: (blogId: string) =>
+    mutationFn: ({ blogText, blogId }: { blogText: string; blogId?: string }) =>
       apiClient
-        .post(`/blogs/${blogId}/ai-metadata`)
+        .post(`/blogs/ai-metadata`, {
+          blogText,
+          ...(blogId && { blogId }),
+        })
         .then((res) => res.data.result),
   });
 };

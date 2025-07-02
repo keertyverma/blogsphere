@@ -1,9 +1,14 @@
 import {
   useCreateBlog,
-  useUpdateBlog,
   useGenerateBlogMetadata,
+  useUpdateBlog,
 } from "@/lib/react-query/queries";
-import { showConfetti, showErrorToast, showSuccessToast } from "@/lib/utils";
+import {
+  extractMeaningfulTextFromBlogContent,
+  showConfetti,
+  showErrorToast,
+  showSuccessToast,
+} from "@/lib/utils";
 import { BlogValidation } from "@/lib/validation";
 import { useAuthStore, useEditorStore } from "@/store";
 import { IBlog, ICreatePublishedBlog } from "@/types";
@@ -202,29 +207,34 @@ const PublishForm = () => {
    */
   const handleGenerateMetadataWithAI = async () => {
     try {
-      if (blogId) {
-        // edit mode
-        const metadata = await generateMetadataWithAI(blogId);
-        if (!metadata) return;
+      // Extract meaningful text from the latest blog content
+      const blogText = extractMeaningfulTextFromBlogContent(content.blocks);
+      if (!blogText) {
+        return showErrorToast(
+          "To generate metadata, add more meaningful text (like paragraphs or headings) to your blog."
+        );
+      }
 
-        // set AI-generated values into form
-        form.setValue("title", metadata.title);
-        form.setValue("description", metadata.description);
-        setDescriptionValue(metadata.description); // update character counter UI
-        setTags([...metadata.tags.slice(0, TAG_LIMIT)]); // cap the number of tags to the maximum allowed
+      // Request AI-generated metadata
+      const metadata = await generateMetadataWithAI({
+        blogText,
+        ...(blog._id && { blogId: blog._id }),
+      });
+      if (!metadata) return;
 
-        // Trigger form-level validation
-        const isValid = await form.trigger(["title", "description"]);
-        if (isValid) {
-          showSuccessToast(
-            "AI-generated title, summary, and tags have been added to the form.",
-            { autoClose: 6000 }
-          );
-        }
-      } else {
-        // create mode
-        // TODO: create draft and then generate metadata
-        console.log("Pending...");
+      // Update form fields with AI-generated values
+      form.setValue("title", metadata.title);
+      form.setValue("description", metadata.description);
+      setDescriptionValue(metadata.description); // for character count UI
+      setTags([...metadata.tags.slice(0, TAG_LIMIT)]); // cap the number of tags to the maximum allowed
+
+      // Trigger form validation for updated fields
+      const isValid = await form.trigger(["title", "description"]);
+      if (isValid) {
+        showSuccessToast(
+          "AI-generated title, summary, and tags have been added to the form.",
+          { autoClose: 6000 }
+        );
       }
     } catch (error) {
       if (useAuthStore.getState().isTokenExpired) return;
@@ -232,10 +242,7 @@ const PublishForm = () => {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.response) {
         const { status } = error.response;
-        if (status === 400) {
-          errorMessage =
-            "To generate metadata, add more meaningful text (like paragraphs or headings) to your blog.";
-        } else if (status === 502) {
+        if (status === 502) {
           errorMessage =
             "The AI service is currently unavailable. Please try again in a few moments.";
         }
