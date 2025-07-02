@@ -35,7 +35,7 @@ export const generateBlogMetadataWithAI = async (
       },
       tags: {
         type: Type.ARRAY,
-        description: "Relevant tags (3-5 keywords)",
+        description: "Relevant tags (keywords)",
         items: { type: Type.STRING },
       },
     },
@@ -97,8 +97,8 @@ export const generateBlogMetadataWithAI = async (
 
 const validateBlogMetadata = (metadata: any) => {
   const schema = Joi.object({
-    title: Joi.string().trim().min(1).required(),
-    summary: Joi.string().trim().min(1).max(200).required(),
+    title: Joi.string().trim().min(10).required(),
+    summary: Joi.string().trim().min(20).max(200).required(),
     tags: Joi.array()
       .items(Joi.string().trim().min(1))
       .min(1)
@@ -110,10 +110,15 @@ const validateBlogMetadata = (metadata: any) => {
 };
 
 const buildPrompt = (text: string) => `
-Generate a short summary (max 200 characters), a title, and 3 to 5 lowercase, SEO-friendly tags based on the blog content.
-Do not include emojis. Return a valid JSON.
+  You are an expert content analyzer tasked with extracting key metadata from blog posts.
+  Generate a concise summary, a compelling title, and relevant SEO-friendly tags for the provided blog content.
 
-Blog post: "${text}"
+  Instructions:
+  1. **Title:** Must be at least 10 characters long.  
+  2. **Summary:** Must be between 20 and 200 characters long.
+  3. **Tags:** Generate 3 to 5 tags. Each tag must be lowercase, hyphen-separated (kebab-case if multi-word), and highly relevant to the content. Exclude emojis.
+ 
+  Blog post: "${text}"
 `;
 
 const parseAIResponseJSON = (responseText: string | undefined): any => {

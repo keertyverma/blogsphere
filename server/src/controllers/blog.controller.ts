@@ -10,7 +10,7 @@ import { Blog } from "../models/blog.model";
 import { Bookmark } from "../models/bookmark.model";
 import { Comment } from "../models/comment.model";
 import { User } from "../models/user.model";
-import { BlogMetadata, SortQuery } from "../types";
+import { SortQuery } from "../types";
 import {
   APIResponse,
   APIStatus,
