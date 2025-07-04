@@ -98,7 +98,7 @@ export const generateBlogMetadataWithAI = async (
 const validateBlogMetadata = (metadata: any) => {
   const schema = Joi.object({
     title: Joi.string().trim().min(10).required(),
-    summary: Joi.string().trim().min(20).max(200).required(),
+    summary: Joi.string().trim().min(20).required(),
     tags: Joi.array()
       .items(Joi.string().trim().min(1))
       .min(1)
@@ -114,10 +114,9 @@ const buildPrompt = (text: string) => `
   Generate a concise summary, a compelling title, and relevant SEO-friendly tags for the provided blog content.
 
   Instructions:
-  1. **Title:** Must be at least 10 characters long.  
-  2. **Summary:** Must be between 20 and 200 characters long.
-  3. **Tags:** Generate 3 to 5 tags. Each tag must be lowercase, hyphen-separated (kebab-case if multi-word), and highly relevant to the content. Exclude emojis.
- 
+  1. Title: Must be at least 10 characters long.
+  2. Summary: Must be a single sentence between 20 and 200 characters. This is a hard limit — do not exceed 200 characters under any circumstance.
+  3. Tags: Generate 3 to 5 tags. Each tag must be lowercase, hyphen-separated (kebab-case if multi-word), and highly relevant to the content. Exclude emojis.
   Blog post: "${text}"
 `;
 
