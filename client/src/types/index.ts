@@ -162,3 +162,9 @@ export interface IBookmarkGetQuery {
   pageSize?: number;
   page?: number;
 }
+
+export type FormSnapshot = {
+  title: string;
+  description: string;
+  tags: string[];
+};

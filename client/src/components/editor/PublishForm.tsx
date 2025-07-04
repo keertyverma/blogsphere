@@ -11,12 +11,12 @@ import {
 } from "@/lib/utils";
 import { BlogValidation } from "@/lib/validation";
 import { useAuthStore, useEditorStore } from "@/store";
-import { IBlog, ICreatePublishedBlog } from "@/types";
+import { FormSnapshot, IBlog, ICreatePublishedBlog } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
-import { ChangeEvent, KeyboardEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IoClose, IoSparkles } from "react-icons/io5";
+import { IoArrowUndoSharp, IoClose, IoSparkles } from "react-icons/io5";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import * as z from "zod";
 import AnimationWrapper from "../shared/AnimationWrapper";
@@ -50,6 +50,8 @@ const PublishForm = () => {
 
   const [descriptionValue, setDescriptionValue] = useState(description);
   const [tags, setTags] = useState<string[]>(blog?.tags || []);
+  const [showUndo, setShowUndo] = useState<boolean>(false);
+  const prevFormSnapshot = useRef<FormSnapshot | null>(null);
 
   const { mutateAsync: createBlog, isPending: isPublishing } = useCreateBlog();
   const { mutateAsync: updatePublishedBlog, isPending: isUpdating } =
@@ -202,8 +204,13 @@ const PublishForm = () => {
   };
 
   /**
-   * Handles the process of generating blog metadata (title, summary, tags) using AI.
-   * Updates form fields and perform form validation after setting values.
+   * Handles the end-to-end process of generating blog metadata using AI.
+   * - Validates blog content
+   * - Calls the backend API to generate metadata (title, summary, tags)
+   * - Captures a form snapshot before override
+   * - Updates form fields with AI-generated values
+   * - Triggers validation for updated fields
+   * - Shows Undo if snapshot is captured
    */
   const handleGenerateMetadataWithAI = async () => {
     try {
@@ -222,18 +229,24 @@ const PublishForm = () => {
       });
       if (!metadata) return;
 
+      captureFormSnapshot(); // Capture the current form data before override
+
       // Update form fields with AI-generated values
       form.setValue("title", metadata.title);
       form.setValue("description", metadata.description);
       setDescriptionValue(metadata.description); // for character count UI
       setTags([...metadata.tags.slice(0, TAG_LIMIT)]); // cap the number of tags to the maximum allowed
 
+      // Show Undo (only if snapshot was created)
+      if (prevFormSnapshot.current) {
+        setShowUndo(true);
+      }
+
       // Trigger form validation for updated fields
       const isValid = await form.trigger(["title", "description"]);
       if (isValid) {
         showSuccessToast(
-          "AI-generated title, summary, and tags have been added to the form.",
-          { autoClose: 6000 }
+          "AI-generated title, summary, and tags have been added to the form."
         );
       }
     } catch (error) {
@@ -250,6 +263,42 @@ const PublishForm = () => {
 
       showErrorToast(errorMessage);
     }
+  };
+
+  /**
+   * Captures a snapshot of the current form state (title, description, tags)
+   * to support undoing AI-generated metadata changes.
+   */
+  const captureFormSnapshot = () => {
+    const { title, description } = form.getValues();
+
+    prevFormSnapshot.current = {
+      title,
+      description,
+      tags, // local state
+    };
+  };
+
+  /**
+   * Reverts the form fields and tag list to the previously captured snapshot.
+   * Hides the undo button
+   */
+  const handleUndoAIMetadata = async () => {
+    setShowUndo(false);
+
+    const snapshot = prevFormSnapshot.current;
+    if (!snapshot) return;
+
+    // Restore previous form values and tags
+    const { title, description, tags: previousTags } = snapshot;
+    form.setValue("title", title);
+    form.setValue("description", description);
+    setDescriptionValue(description); // for character count UI
+    setTags([...previousTags.slice(0, TAG_LIMIT)]); // cap the number of tags to the maximum allowed
+
+    prevFormSnapshot.current = null;
+
+    await form.trigger(["title", "description"]); // Trigger form validation for restored fields
   };
 
   return (
@@ -275,9 +324,29 @@ const PublishForm = () => {
         >
           <IoClose className="text-xl" />
         </Button>
-        <div className="mb-1 flex flex-col-reverse sm:flex-row sm:justify-end sm:items-center gap-1 sm:gap-2">
+        <div className="mb-1 flex flex-col-reverse sm:flex-row sm:justify-end sm:items-center gap-2">
           <p className="text-xs sm:text-sm text-muted-foreground text-right">
-            💡 Let AI generate a title, summary, and tags.
+            {showUndo && !isGeneratingWithAI ? (
+              <>
+                ✅ AI-generated blog metadata applied.{" "}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg py-1 px-2"
+                  onClick={handleUndoAIMetadata}
+                  aria-label="Undo AI-generated metadata"
+                >
+                  <div className="flex items-center gap-1">
+                    <IoArrowUndoSharp />
+                    <span className="text-secondary-foreground text-xs sm:text-sm">
+                      Undo
+                    </span>
+                  </div>
+                </Button>
+              </>
+            ) : (
+              <> 💡 Let AI generate a title, summary, and tags.</>
+            )}
           </p>
           <Button
             variant="outline"
@@ -285,6 +354,7 @@ const PublishForm = () => {
             className="border border-primary text-primary hover:text-primary rounded-lg self-end flex items-center gap-1"
             onClick={handleGenerateMetadataWithAI}
             disabled={isGeneratingWithAI}
+            aria-label="Generate blog metadata using AI"
           >
             {isGeneratingWithAI ? (
               <LoadingSpinner className="h-4 w-4 md:w-4 dark:text-white" />
