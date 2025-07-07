@@ -255,9 +255,13 @@ const PublishForm = () => {
       let errorMessage = "An error occurred. Please try again later.";
       if (error instanceof AxiosError && error.response) {
         const { status } = error.response;
+        if (status === 429) return; // Interceptor handles AI rate limit toasts
         if (status === 502) {
           errorMessage =
             "The AI service is currently unavailable. Please try again in a few moments.";
+        } else if (status === 503) {
+          errorMessage =
+            "The AI service is temporarily unavailable due to high load. Please try again shortly.";
         }
       }
 

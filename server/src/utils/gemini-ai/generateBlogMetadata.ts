@@ -75,7 +75,11 @@ export const generateBlogMetadataWithAI = async (
 
     if (error instanceof ApiError) {
       const { status, message } = error;
-      throw new Error(`GEMINI_API_ERROR: ${status} - ${message}.`);
+      const baseMessage = `${status} - ${message}.`;
+      if (status === 429) {
+        throw new Error(`GEMINI_RATE_LIMIT_EXCEEDED: ${baseMessage}`);
+      }
+      throw new Error(`GEMINI_API_ERROR: ${baseMessage}`);
     }
 
     if (message.startsWith("INVALID_AI_RESPONSE")) {
