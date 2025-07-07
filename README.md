@@ -8,9 +8,9 @@
 
 👋 Welcome to Blogsphere, <strong>a modern blogging platform built to empower creators and engage curious readers.</strong>
 
-Whether you're a writer looking to share your voice or a reader eager to explore new ideas, BlogSphere makes it easy to <strong>create, discover, and engage</strong> with meaningful content.
-<br>Powered by an ✨ <strong>AI Blog Metadata Generator</strong>, it helps you craft compelling titles, concise summaries, and relevant tags from your content — streamlining your publishing workflow.
-<br>And with a responsive, modern design, your content always looks great—on any device.
+- 🌐 **Create, Discover, and Engage** — with seamless social and engagement features.
+- ✨ **AI-powered publishing workflow** — instantly generate titles, summaries, and tags.
+- 📱 **Responsive, accessible design** — sleek on mobile, tablet, and desktop.
 
 ### 📽️ App Demo
 
