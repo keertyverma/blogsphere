@@ -36,9 +36,21 @@ const useAxiosInterceptors = () => {
 
           if (status === 429) {
             // Api rate limit exceeds
-            showErrorToast(
-              "You have exceeded the request limit. Please try again later in 1 hour."
-            );
+            const serverMessage = error.response?.data || "";
+            let errorMessage =
+              "You have exceeded the request limit. Please try again later.";
+            if (serverMessage.includes("resending emails")) {
+              errorMessage =
+                "You've made too many requests to resend the email. Please wait before trying again.";
+            } else if (serverMessage.includes("AI")) {
+              errorMessage =
+                "The AI service is currently experiencing high demand. Please try again shortly.";
+            } else if (serverMessage.includes("requests per hour")) {
+              errorMessage =
+                "You have exceeded your request limit. Please try again in an hour.";
+            }
+
+            showErrorToast(errorMessage);
           }
         }
         return Promise.reject(error);

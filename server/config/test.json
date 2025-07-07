@@ -8,6 +8,8 @@
   },
   "rateLimiter": {
     "globalMaxRequestsPerHour": 5000,
-    "resendEmailMaxRequestsPerHour": 50
+    "resendEmailMaxRequestsPerHour": 50,
+    "aiMetadataGlobalMaxRequestsPerMinute": 1000,
+    "aiMetadataPerUserMaxRequestsPerMinute": 100
   }
 }

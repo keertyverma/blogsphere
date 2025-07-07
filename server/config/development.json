@@ -2,6 +2,8 @@
   "appName": "blogsphere-dev",
   "rateLimiter": {
     "globalMaxRequestsPerHour": 10000,
-    "resendEmailMaxRequestsPerHour": 100
+    "resendEmailMaxRequestsPerHour": 100,
+    "aiMetadataGlobalMaxRequestsPerMinute": 10,
+    "aiMetadataPerUserMaxRequestsPerMinute": 5
   }
 }

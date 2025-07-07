@@ -1452,6 +1452,35 @@ describe("/api/v1/blogs", () => {
       });
     });
 
+    it("should return 503-Service Unavailable if gemini rate limit exceeds", async () => {
+      token = user1.generateAuthToken();
+      // Mock `generateContent()` to throw a Gemini Rate Limit Error
+      mockedGetAIClient.mockReturnValue({
+        models: {
+          generateContent: jest.fn(() => {
+            throw new ApiError({
+              message:
+                "Quota exceeded for quota metric 'Requests' and limit 'Requests per minute' of service generativelanguage.googleapis.com",
+              status: 429,
+            });
+          }),
+        },
+      });
+
+      const res = await exec({
+        blogText: "some meaningful text data",
+      });
+
+      expect(res.statusCode).toBe(503);
+      expect(res.body.error).toMatchObject({
+        code: "SERVICE_UNAVAILABLE",
+        message:
+          "The service is temporarily unavailable. Please try again later",
+        details:
+          "AI service is temporarily unavailable due to rate limits. Please try again soon.",
+      });
+    });
+
     it("should return 200-Success and generate metadata for a valid blog", async () => {
       token = user1.generateAuthToken();
       const publishedBlogId = blogs.filter((blog) => !blog.isDraft)[0]?.blogId;

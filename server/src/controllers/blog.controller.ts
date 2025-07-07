@@ -721,25 +721,23 @@ const generateBlogAIMetadata = async (req: Request, res: Response) => {
     return res.status(data.statusCode).json(data);
   } catch (error: any) {
     const errorMessage = error?.message || "";
+    let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+    let userMessage = "Unexpected error during blog metadata generation.";
 
-    if (errorMessage.startsWith("GEMINI_API_ERROR")) {
-      throw new CustomAPIError(
-        "AI service failed to respond properly. Please try again later.",
-        StatusCodes.BAD_GATEWAY
-      );
+    if (errorMessage.startsWith("GEMINI_RATE_LIMIT_EXCEEDED")) {
+      statusCode = StatusCodes.SERVICE_UNAVAILABLE;
+      userMessage =
+        "AI service is temporarily unavailable due to rate limits. Please try again soon.";
+    } else if (errorMessage.startsWith("GEMINI_API_ERROR")) {
+      statusCode = StatusCodes.BAD_GATEWAY;
+      userMessage =
+        "AI service failed to respond properly. Please try again later.";
+    } else if (errorMessage.startsWith("INVALID_AI_RESPONSE")) {
+      statusCode = StatusCodes.BAD_GATEWAY;
+      userMessage = "AI response was invalid or incomplete.";
     }
 
-    if (errorMessage.startsWith("INVALID_AI_RESPONSE")) {
-      throw new CustomAPIError(
-        "AI response was invalid or incomplete.",
-        StatusCodes.BAD_GATEWAY
-      );
-    }
-    // Fallback
-    throw new CustomAPIError(
-      "Unexpected error during blog metadata generation.",
-      StatusCodes.INTERNAL_SERVER_ERROR
-    );
+    throw new CustomAPIError(userMessage, statusCode);
   }
 };
 

@@ -39,6 +39,10 @@ export const errorHandler = (
       message:
         "The server encountered an error while communicating with the AI service.",
     },
+    503: {
+      code: "SERVICE_UNAVAILABLE",
+      message: "The service is temporarily unavailable. Please try again later",
+    },
   };
 
   const customError = {

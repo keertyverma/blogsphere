@@ -12,6 +12,10 @@ import {
   updateReadCount,
 } from "../controllers/blog.controller";
 import { verifyToken } from "../middlewares";
+import {
+  aiMetadataGlobalRateLimiter,
+  aiMetadataPerUserRateLimiter,
+} from "../middlewares/rate-limit-middleware";
 
 export const blogRouter = Router();
 
@@ -30,7 +34,13 @@ blogRouter.patch("/:blogId", verifyToken, updateBlogById); // Update a blog by i
 blogRouter.patch("/:blogId/readCount", verifyToken, updateReadCount); // Increment read count for a blog
 blogRouter.patch("/:blogId/like", verifyToken, updateLike); // Like or unlike a blog
 blogRouter.delete("/:blogId", verifyToken, deleteBlogByBlogId); // Delete a blog by its ID
-blogRouter.post("/ai-metadata", verifyToken, generateBlogAIMetadata); // Generate blog metadata using AI
+blogRouter.post(
+  "/ai-metadata",
+  verifyToken,
+  aiMetadataGlobalRateLimiter,
+  aiMetadataPerUserRateLimiter,
+  generateBlogAIMetadata
+); // Generate blog metadata using AI
 
 /**
  * Public Routes
