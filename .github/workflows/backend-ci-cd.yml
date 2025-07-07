@@ -6,6 +6,10 @@ name: Google App Engine CI/CD
 on:
   push:
     branches: ["main"]
+    paths:
+      - "server/**" # Only run when changes are made in the server folder
+    paths-ignore:
+      - "client/**"
   workflow_dispatch: # Allows manual trigger
 
 jobs:

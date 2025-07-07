@@ -9,6 +9,7 @@
 👋 Welcome to Blogsphere, <strong>a modern blogging platform built to empower creators and engage curious readers.</strong>
 
 Whether you're a writer looking to share your voice or a reader eager to explore new ideas, BlogSphere makes it easy to <strong>create, discover, and engage</strong> with meaningful content.
+<br>Powered by an ✨ <strong>AI Blog Metadata Generator</strong>, it helps you craft compelling titles, concise summaries, and relevant tags from your content — streamlining your publishing workflow.
 <br>And with a responsive, modern design, your content always looks great—on any device.
 
 ### 📽️ App Demo
@@ -53,6 +54,7 @@ Whether you're a writer looking to share your voice or a reader eager to explore
 
 - **Full Blog Control**: Effortlessly create, edit, and delete both draft and published blogs through a clean, user-friendly dashboard.
 - **Rich Text Editor**: Create beautifully structured blogs using a block-style editor powered by [Editor.js](https://editorjs.io/).<br>Add headings, paragraphs, lists, images, quotes, code blocks, and more with ease. Need help? Access the dedicated [Editor Guide](https://blogsphere.360verse.co/editor-guide) to assist content creation.
+- **✨ AI Blog Metadata Generator**: Speed up your publishing workflow with **one-click AI-generated metadata** - including a compelling title, concise summary, and relevant tags, based on your blog content. Easily review, refine, or undo AI suggestions to stay in control.
 - **Draft & Publish Modes**:
   - Save blogs as drafts and continue editing anytime.
   - Preview your draft to see exactly how the blog page will look before publishing.
@@ -87,7 +89,8 @@ Whether you're a writer looking to share your voice or a reader eager to explore
 
 - [Node.js](https://nodejs.org/) - JavaScript runtime environment
 - [Express](https://expressjs.com/) — API framework.
-- [MongoDB](https://www.mongodb.com/) — Document-based NoSQL database to store users, blogs, and comments.<br> Fully managed via [MongoDB Atlas](https://www.mongodb.com/atlas) for data storage and scalability
+- [MongoDB](https://www.mongodb.com/) — Document-based NoSQL database to store users, blogs, and comments.<br> Fully managed via [MongoDB Atlas](https://www.mongodb.com/atlas) for data storage and scalability.
+- [Google Gemini AI](<(https://gemini.google/about/?hl=en-IN)>) (GenAI) — Powers the AI Blog Metadata Generator by generating titles, summaries, and tags based on blog content.
 - [Cloudinary](https://cloudinary.com/) — Manage and deliver blog images and user profile pictures with fast, cloud-based storage and CDN delivery.
 - [Firebase](https://firebase.google.com/) — Used for Google authentication integration.
 - [Mailgun](https://www.mailgun.com/) — Transactional email service used for account verification and password recovery emails.
