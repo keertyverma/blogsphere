@@ -301,8 +301,6 @@ const PublishForm = () => {
     setTags([...previousTags.slice(0, TAG_LIMIT)]); // cap the number of tags to the maximum allowed
 
     prevFormSnapshot.current = null;
-
-    await form.trigger(["title", "description"]); // Trigger form validation for restored fields
   };
 
   return (

@@ -299,7 +299,8 @@ const renderNestedList = (items: any[], level = 0): string => {
   return items
     .filter((item) => item.content?.trim()) // Skip empty list items
     .map((item) => {
-      const line = `${indent}- ${item.content.trim()}`;
+      const cleanedText = cleanBlockText(item.content || "");
+      const line = `${indent}- ${cleanedText}`;
       const nested = item.items?.length
         ? `\n${renderNestedList(item.items, level + 1)}`
         : "";
@@ -311,8 +312,9 @@ const renderNestedList = (items: any[], level = 0): string => {
 /**
  * Extracts meaningful plain text from Editor.js blocks for AI-based metadata generation.
  *
- * Includes only semantic content types: header, paragraph, quote, and list.
- * Excludes non-textual or decorative blocks like code, image, and divider.
+ * Includes only semantic content (header, paragraph, quote, list).
+ * Excludes non-textual or decorative blocks (code, image, divider).
+ * Preserves content hierarchy (e.g., headers) and structure.
  *
  * @param blocks - The Editor.js content blocks
  * @returns A structured plain text string for AI processing
@@ -324,14 +326,15 @@ export const extractMeaningfulTextFromBlogContent = (
     .map((block) => {
       const { type, data } = block;
       switch (type) {
-        case "header":
+        case "header": {
           // Include heading level (e.g., #, ##) to preserve content structure and hierarchy,
           // which helps the AI better understand the importance of each section.
-          if (!data.text?.trim()) return "";
-          return `${"#".repeat(data.level)} ${data.text.trim()}`;
+          const cleanHeader = cleanBlockText(data.text || "");
+          return cleanHeader ? `${"#".repeat(data.level)} ${cleanHeader}` : "";
+        }
         case "paragraph":
         case "quote":
-          return data.text?.trim() || "";
+          return cleanBlockText(data.text || "");
         case "list":
           return renderNestedList(data.items || []);
         default:
@@ -341,4 +344,44 @@ export const extractMeaningfulTextFromBlogContent = (
     .filter(Boolean) // Remove empty or invalid blocks
     .join("\n")
     .trim();
+};
+
+/**
+ * Cleans a block of text by:
+ * - Decoding HTML entities
+ * - Removing HTML tags to extract only meaningful user-visible content
+ *   (Tags like <b>, <i>, <code>, <mark>, etc. are for visual formatting and don't carry semantic meaning for AI)
+ * - Removing <br> and &nbsp;
+ * - Normalizing whitespace to ensure consistent and clean AI input
+ *
+ * This helps prevent noisy, confusing, or non-semantic data from affecting AI-based metadata generation.
+ * The final result is a clean, readable, plain-text version of user content suitable for NLP tasks.
+ *
+ * @param raw - The raw string from Editor.js block
+ * @returns Cleaned, AI-friendly plain text
+ */
+const cleanBlockText = (raw: string): string => {
+  if (!raw?.trim()) return "";
+
+  const decoded = decodeEntities(raw); // Decode html text
+  const cleaned = decoded
+    .replace(/<br\s*\/?>/gi, "") // Remove <br> and <br/>
+    .replace(/&nbsp;/gi, " ") // Replace non-breaking spaces
+    .replace(/<[^>]*>/g, "") // Remove all remaining HTML tags
+    .replace(/\s+/g, " ") // Normalize multiple spaces
+    .trim();
+
+  return cleaned;
+};
+
+/**
+ * Decodes HTML entities like &lt;, &nbsp;, etc. to their corresponding characters.
+ *
+ * @param str - The raw HTML-escaped string
+ * @returns Decoded plain string
+ */
+const decodeEntities = (str: string): string => {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  return txt.value;
 };
