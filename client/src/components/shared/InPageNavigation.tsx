@@ -21,6 +21,8 @@ const InPageNavigation = ({
 
   const changePageState = (btn: HTMLButtonElement, index: number) => {
     setActiveNavIndex(index);
+    // Scroll to top of window
+    window.scrollTo({ top: 0, behavior: "auto" });
 
     if (activeTabLineRef && activeTabLineRef.current) {
       const { offsetWidth, offsetLeft } = btn;
