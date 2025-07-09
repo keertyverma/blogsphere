@@ -16,8 +16,8 @@ const features = [
     icon: "/assets/images/feature-blog-manage.svg",
     title: "Smarter Blog Management",
     points: [
-      "Create, edit and manage blogs with ease.",
-      "Rich block-style blog editor for seamless creation.",
+      "Create, edit and manage blogs with a rich block-style editor.",
+      "Publish faster with smart, AI-powered metadata suggestions.",
       "Filter blogs by tags and search across users and content.",
       "Manage drafts and published blogs in one place.",
     ],
@@ -131,15 +131,15 @@ const LandingPage = () => {
       </section>
 
       {/* Call to Action Section  */}
-      <section className="bg-primary/90 text-primary-foreground px-5 md:px-10 py-10 md:py-16">
+      <section className="bg-primary/90 text-primary-foreground px-5 md:px-10 py-10 md:py-24">
         <div className="flex flex-col md:flex-row gap-2 justify-center items-center">
           <div className="max-sm:text-center">
             <h3 className="text-[1.75rem] md:text-[2.5rem] font-semibold">
               Ready to Get Started?
             </h3>
-            <p className="max-w-3xl text-base md:text-lg mt-1">
+            <p className="max-w-4xl text-base md:text-lg mt-1">
               Join a growing community of creators. Write, share, and connect
-              with the world—one blog at a time.
+              with the world - one blog at a time.
             </p>
           </div>
           <div>

@@ -16,7 +16,9 @@ import ChangeUsername from "./components/settings/ChangeUsername";
 import EditProfile from "./components/settings/EditProfile";
 import SideNavbar from "./components/settings/SideNavbar";
 import ScrollToTopOnNavigate from "./components/shared/ScrollToTopOnNavigate";
+import ThemeFadeOverlay from "./components/shared/ThemeFadeOverlay";
 import CustomCloseButton from "./components/ui/custom-toastify-close-button";
+import { useTheme } from "./contexts/themeContext";
 import { useAxiosInterceptors } from "./lib/api-client";
 import { getToastOptions } from "./lib/utils";
 import Bookmarks from "./pages/Bookmarks";
@@ -37,6 +39,7 @@ const App = () => {
   // to intercept response and handle token expiration
   useAxiosInterceptors();
   const isMobile = useMediaQuery("(max-width:640px)");
+  const { isTransitioning } = useTheme();
 
   return (
     <>
@@ -47,6 +50,7 @@ const App = () => {
           content="BlogSphere - A blogging platform to share your thoughts, explore blogs, and connect with a community of writers and readers."
         />
       </Helmet>
+      <ThemeFadeOverlay isVisible={isTransitioning} />
       <main className="w-full h-screen">
         <ScrollToTopOnNavigate />
         <Routes>
