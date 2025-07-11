@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /login
+Disallow: /signup
+Disallow: /verify-email
+Disallow: /reset-password
+Disallow: /forgot-password
+Disallow: /resend-verification-link
+Disallow: /settings/
+Disallow: /editor
+Disallow: /editor/
+Disallow: /bookmarks
+Disallow: /blogs/drafts/
+Disallow: /blogs/drafts
+
+Sitemap: https://blogsphere.360verse.co/sitemap.xml
