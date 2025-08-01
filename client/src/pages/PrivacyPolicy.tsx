@@ -84,7 +84,7 @@ const PrivacyPolicy = () => {
           <h2 className="text-xl font-semibold ">6. Contact Us</h2>
           <p className="ml-6">
             If you have any questions about this Privacy Policy, please contact
-            us at:
+            us at following email: <br />
             <a
               href="mailto:blogsphere-support@sooprr.com"
               className="text-blue-600"
