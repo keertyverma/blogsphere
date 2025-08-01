@@ -12,4 +12,4 @@ Disallow: /bookmarks
 Disallow: /blogs/drafts/
 Disallow: /blogs/drafts
 
-Sitemap: https://blogsphere.sooprr.com/sitemap-v2.xml
+Sitemap: https://blogsphere.sooprr.com/sitemap.xml

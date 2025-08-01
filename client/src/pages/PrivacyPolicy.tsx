@@ -85,9 +85,12 @@ const PrivacyPolicy = () => {
           <p className="ml-6">
             If you have any questions about this Privacy Policy, please contact
             us at:
-            <a href="mailto:blogpshere@sooprr.com" className="text-blue-600">
+            <a
+              href="mailto:blogsphere-support@sooprr.com"
+              className="text-blue-600"
+            >
               {" "}
-              blogpshere@sooprr.com
+              blogsphere-support@sooprr.com
             </a>
           </p>
         </div>
