@@ -139,7 +139,7 @@ export const getCookieOptions = (): CookieOptions => {
     httpOnly: true, // Prevents JavaScript from accessing the cookie. Helps mitigate XSS attacks
     sameSite: "strict", // Mitigate Cross-Site Request Forgery (CSRF) attack
     secure: isProduction, // Ensures cookie is sent only over HTTPS in production
-    domain: isProduction ? ".360verse.co" : "localhost",
+    domain: isProduction ? ".sooprr.com" : "localhost",
     path: "/api/v1/", // Ensures cookie is accessible only within a specific subset of URLs within the domain that begin with /api/v1/
     maxAge, // Cookie's lifetime in milliseconds. After this time, the cookie will expire and be removed from the client’s browser.
   };

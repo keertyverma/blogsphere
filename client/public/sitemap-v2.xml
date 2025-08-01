@@ -3,56 +3,56 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://blogsphere.360verse.co/</loc>
+    <loc>https://blogsphere.sooprr.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Feed Page -->
   <url>
-    <loc>https://blogsphere.360verse.co/feed</loc>
+    <loc>https://blogsphere.sooprr.com/feed</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Static Informational Pages -->
   <url>
-    <loc>https://blogsphere.360verse.co/editor-guide</loc>
+    <loc>https://blogsphere.sooprr.com/editor-guide</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://blogsphere.360verse.co/privacy-policy</loc>
+    <loc>https://blogsphere.sooprr.com/privacy-policy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <!-- Sample Blog Pages (replace with actual blogId slugs) -->
   <url>
-    <loc>https://blogsphere.360verse.co/blogs/The-benefits-of-reading-everydayga3fTLMqumVU3G9XJ1Koh</loc>
+    <loc>https://blogsphere.sooprr.com/blogs/The-benefits-of-reading-everydayga3fTLMqumVU3G9XJ1Koh</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://blogsphere.360verse.co/blogs/My-Personal-Blog-editor-guidexXlikbdppFKAz8YSh8xvD</loc>
+    <loc>https://blogsphere.sooprr.com/blogs/My-Personal-Blog-editor-guidexXlikbdppFKAz8YSh8xvD</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Sample User Profiles (replace with actual usernames) -->
   <url>
-    <loc>https://blogsphere.360verse.co/user/keertyverma</loc>
+    <loc>https://blogsphere.sooprr.com/user/keertyverma</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://blogsphere.360verse.co/user/sumitkumar</loc>
+    <loc>https://blogsphere.sooprr.com/user/sumitkumar</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://blogsphere.360verse.co/user/snehaverma</loc>
+    <loc>https://blogsphere.sooprr.com/user/snehaverma</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url> 

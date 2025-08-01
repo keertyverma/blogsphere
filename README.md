@@ -2,7 +2,7 @@
 
 [![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/keertyverma/blogsphere/backend-ci-cd.yml?label=Backend%20CI/CD%20Pipeline)](https://github.com/keertyverma/blogsphere/actions/workflows/backend-ci-cd.yml)
 
-🔗 **Live App**: [https://blogsphere.360verse.co](https://blogsphere.360verse.co)
+🔗 **Live App**: [https://blogsphere.sooprr.com](https://blogsphere.sooprr.com)
 
 <hr />
 
@@ -53,7 +53,7 @@
 ### ✍️ Blog Management
 
 - **Full Blog Control**: Effortlessly create, edit, and delete both draft and published blogs through a clean, user-friendly dashboard.
-- **Rich Text Editor**: Create beautifully structured blogs using a block-style editor powered by [Editor.js](https://editorjs.io/).<br>Add headings, paragraphs, lists, images, quotes, code blocks, and more with ease. Need help? Access the dedicated [Editor Guide](https://blogsphere.360verse.co/editor-guide) to assist content creation.
+- **Rich Text Editor**: Create beautifully structured blogs using a block-style editor powered by [Editor.js](https://editorjs.io/).<br>Add headings, paragraphs, lists, images, quotes, code blocks, and more with ease. Need help? Access the dedicated [Editor Guide](https://blogsphere.sooprr.com/editor-guide) to assist content creation.
 - **✨ AI Blog Metadata Generator**: Speed up your publishing workflow with **one-click AI-generated metadata** - including a compelling title, concise summary, and relevant tags, based on your blog content. Easily review, refine, or undo AI suggestions to stay in control.
 - **Draft & Publish Modes**:
   - Save blogs as drafts and continue editing anytime.
